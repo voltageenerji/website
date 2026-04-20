@@ -1,0 +1,8 @@
+# Cloudflare Pages — yönlendirme kuralları
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+
+# www -> root
+https://www.voltage.com.tr/* https://voltage.com.tr/:splat 301
+
+# .html uzantısını kaldır (temiz URL)
+/index.html / 301
