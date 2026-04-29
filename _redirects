@@ -4,5 +4,12 @@
 # www -> root
 https://www.voltage.com.tr/* https://voltage.com.tr/:splat 301
 
+# voltan domainlerini canonical voltage.com.tr'ye yönlendir
+# (CORS sorununu çözer + SEO duplicate content engellenir)
+https://voltan.com.tr/* https://voltage.com.tr/:splat 301
+https://www.voltan.com.tr/* https://voltage.com.tr/:splat 301
+https://voltan.com/* https://voltage.com.tr/:splat 301
+https://www.voltan.com/* https://voltage.com.tr/:splat 301
+
 # .html uzantısını kaldır (temiz URL)
 /index.html / 301
