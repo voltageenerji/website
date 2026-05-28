@@ -37,12 +37,17 @@ Kimlik sorulursa GitHub kullanıcı adın + Personal Access Token (password kabu
 
 1. https://dash.cloudflare.com → **Workers & Pages** → **Create application** → **Pages** sekmesi → **Connect to Git**
 2. **GitHub** seç → yetki ver → `voltage-site` repo'sunu seç → **Begin setup**
-3. Ayarlar:
+3. Ayarlar (⚠️ ARTIK NEXT.JS — build adımı gerekli):
    - **Project name:** `voltage-site`
    - **Production branch:** `main`
-   - **Build command:** boş bırak
-   - **Build output directory:** `/` (yani kök)
-4. **Save and Deploy** → ~30 saniye sonra siten `https://voltage-site.pages.dev`'de yayında.
+   - **Framework preset:** `Next.js (Static HTML Export)` (veya None)
+   - **Build command:** `npm run build`
+   - **Build output directory:** `out`
+   - **Environment variable:** `NODE_VERSION = 20` (veya üzeri)
+4. **Save and Deploy** → build (~1-2 dk) sonra siten `https://voltage-site.pages.dev`'de yayında.
+
+> Not: `_headers`, `_redirects`, `robots.txt`, `sitemap.xml` artık `public/`
+> klasöründe; build sırasında otomatik olarak `out/` içine kopyalanır.
 
 ---
 

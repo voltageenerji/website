@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+/* ============================================================
+   VOLTAGE — cinematic energy-intelligence design system
+   Palette: deep graphite · midnight blue · dark emerald
+            · electric cyan · muted gold
+   ============================================================ */
+@theme {
+  /* Graphite / void — base canvas */
+  --color-void: #05070b;
+  --color-graphite: #0a0e16;
+  --color-graphite-2: #0e141f;
+  --color-graphite-3: #141c2a;
+
+  /* Midnight blue */
+  --color-midnight: #0a1830;
+  --color-midnight-2: #0e2747;
+  --color-midnight-3: #14365f;
+
+  /* Dark emerald */
+  --color-emerald-deep: #06231d;
+  --color-emerald: #0f3a30;
+  --color-emerald-bright: #2fae7e;
+
+  /* Electric cyan — primary accent */
+  --color-cyan: #2fe6ff;
+  --color-cyan-soft: #5ff0ff;
+  --color-cyan-deep: #0bb9d6;
+
+  /* Muted gold — secondary highlight */
+  --color-gold: #c9a961;
+  --color-gold-bright: #e4c77e;
+
+  /* Ink / neutrals on dark */
+  --color-mist: #e7eef7;
+  --color-mist-2: #aab6c6;
+  --color-mist-3: #6b7888;
+  --color-hair: rgba(231, 238, 247, 0.1);
+  --color-hair-2: rgba(231, 238, 247, 0.06);
+
+  /* Status */
+  --color-up: #34d99a;
+  --color-down: #ff6b6b;
+
+  --font-sans: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* Lenis controls scroll; native smooth must stay off */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+body {
+  margin: 0;
+  background: var(--color-void);
+  color: var(--color-mist);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-cyan) 35%, transparent);
+  color: #fff;
+}
+
+/* Tabular numerics everywhere data appears */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Thin premium scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-cyan) 25%, var(--color-graphite-3));
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cyan-deep);
+}
+
+/* Utility: hairline grid backdrop for control-room panels */
+.grid-lines {
+  background-image: linear-gradient(var(--color-hair-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-hair-2) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Eyebrow label */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-mist-3);
+}
+
+/* Glow text accent */
+.text-glow-cyan {
+  color: var(--color-cyan);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--color-cyan) 45%, transparent);
+}
+
+/* Live pulse dot */
+.pulse-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--color-emerald-bright);
+  box-shadow: 0 0 10px var(--color-emerald-bright);
+}
+.pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 99px;
+  border: 1px solid var(--color-emerald-bright);
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Panel surface */
+.panel {
+  background: linear-gradient(
+    180deg,
+    rgba(231, 238, 247, 0.035),
+    rgba(231, 238, 247, 0.012)
+  );
+  border: 1px solid var(--color-hair);
+  border-radius: 18px;
+  backdrop-filter: blur(14px);
+}
+
+/* Shimmer for skeleton/loading numbers */
+.shimmer {
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(47, 230, 255, 0.18) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

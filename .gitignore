@@ -20,11 +20,18 @@ npm-debug.log*
 *.pem
 *.key
 
-# Build / deps (şu an gerekmiyor ama ilerisi için)
+# Build / deps
 node_modules/
 dist/
 .cache/
 .wrangler/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+.turbo/
+*.tsbuildinfo
 
 # Yedekler
 *.bak
