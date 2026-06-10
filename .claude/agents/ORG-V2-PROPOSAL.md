@@ -1,8 +1,14 @@
 # Voltan AI Organization — Version 2.0 Proposal
 
-Status: **PROPOSED — awaiting Orchestrator/owner approval.** Nothing in this
-document is active until the agents are created under the agent-creation
-protocol and registered in `ORG-CHART.md`.
+Status: **APPROVED WITH MODIFICATIONS — 2026-06-10. Implemented.**
+Modifications ordered at approval: (1) the proposed Finance Ops Agent is
+replaced by the **Treasury & Capital Agent** (`treasury-capital`); (2) an
+**Investor Relations Agent** (`investor-relations`) is added as a direct
+staff function; (3) all organization design is bound to Voltan's identity as
+an electricity supplier, aggregator and energy trading company — codified as
+the identity principle in `CLAUDE.md`. The live hierarchy is maintained in
+`ORG-CHART.md`; this document is retained as the audit record of the
+decision.
 
 Prepared: 2026-06-10 · Author: Orchestrator Agent
 
