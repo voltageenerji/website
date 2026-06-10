@@ -91,14 +91,85 @@ Cloudflare Pages otomatik yeni build'i deploy eder, ~30sn içinde site güncelle
 
 ---
 
+## 5.5) Pages Functions — lead formu + olay ölçümü backend'i
+
+Repo'daki `functions/` klasörü Cloudflare Pages tarafından otomatik deploy edilir
+(ekstra build ayarı gerekmez):
+
+- `functions/api/lead.js` → `POST /api/lead` — teklif formu kayıtları
+- `functions/api/event.js` → `POST /api/event` — çerezsiz funnel olayları
+
+### KV namespace'leri oluştur ve bağla
+
+1. Dashboard → **Workers & Pages → KV** → **Create namespace**:
+   - `voltage-leads`
+   - `voltage-events`
+   (veya CLI: `wrangler kv namespace create voltage-leads` vb.)
+2. Pages projesi → **Settings → Functions → KV namespace bindings** → **Add binding**:
+   - Variable name: `LEADS` → namespace: `voltage-leads`
+   - Variable name: `EVENTS` → namespace: `voltage-events`
+3. Production **ve** Preview ortamları için ayrı ayrı bağla, sonra **yeniden deploy et**
+   (binding değişiklikleri yeni deploy ile etkinleşir).
+
+### Opsiyonel: lead webhook (e-posta / Slack / CRM köprüsü)
+
+Pages projesi → **Settings → Environment variables** → `LEAD_WEBHOOK_URL` ekle
+(ör. bir Zapier/Make webhook'u veya kendi Worker'ın). Her lead, JSON olarak bu
+URL'ye de POST edilir.
+
+### Bağlı değilse davranış (bilinçli tasarım)
+
+- `LEADS` KV **ve** `LEAD_WEBHOOK_URL` ikisi de yoksa `/api/lead` **503** döner;
+  form ziyaretçiye dürüst bir hata + telefon/e-posta alternatifi gösterir.
+  **Veri çöpe giderken asla "talebiniz alındı" denmez.**
+- `EVENTS` KV yoksa `/api/event` sessizce 204 döner — analitik durur, site durmaz.
+
+### Lead'leri okuma
+
+Dashboard → KV → `voltage-leads` → anahtarlar `lead:<timestamp>:<random>`
+biçimindedir; değer JSON'dur. (CLI: `wrangler kv key list --namespace-id=...`)
+
+---
+
+## 5.6) Cloudflare Web Analytics (çerezsiz, opsiyonel)
+
+1. Dashboard → **Analytics & Logs → Web Analytics** → site ekle → token'ı kopyala.
+2. `index.html` `<head>` içindeki yorumlu beacon bloğunu bul
+   (`CF_WEB_ANALYTICS_TOKEN_BURAYA`), token'ı yapıştır, yorumdan çıkar.
+3. `_headers` CSP'sine `https://static.cloudflareinsights.com` ekle:
+   `script-src`'e ve `connect-src`'e. Eklenmezse beacon CSP tarafından bloklanır.
+4. Çerezsiz çalıştığı için Çerez Politikası metniyle uyumludur; çerezli bir
+   araca geçilirse `cerez-politikasi.html` önce güncellenmelidir.
+
+---
+
+## YAYIN ÖNCESİ DOLDURULMASI ZORUNLU (must-fill) kontrol listesi
+
+Sahibinden alınacak resmî veriler — **uydurma/placeholder değerle yayına çıkılmaz**:
+
+- [ ] **EPDK Tedarik Lisansı No** → `index.html` footer'ında `MUST-FILL` işaretli
+      yorum bloğu (arama: `EPDK-LISANS-NO`). Değeri yaz, satırı yorumdan çıkar.
+- [ ] **MERSİS No** → aynı yorum bloğu (arama: `MERSIS-NO`).
+- [ ] **Ticaret Sicil No** → aynı yorum bloğu (arama: `TICARET-SICIL-NO`).
+- [ ] **Hukuk incelemesi**: `kvkk.html`, `cerez-politikasi.html`,
+      `kullanim-kosullari.html` dosyaları TASLAK'tır (her birinin başında HTML
+      yorumu olarak işaretli) — yayın onayı legal-compliance'tan alınmalı.
+- [ ] **KV binding'leri** (`LEADS`, `EVENTS`) bağlandı ve test lead'i KV'de görüldü.
+- [ ] Simülatör çarpanları Pricing Agent tarafından doğrulanana kadar
+      "örnek senaryo" ibaresi kaldırılamaz (`index.html` içinde `TODO(pricing)`).
+
+---
+
 ## Kontrol listesi (deploy sonrası)
 
 - [ ] https://voltage.com.tr açılıyor, HTTPS yeşil
 - [ ] TR/EN switcher çalışıyor
 - [ ] Hero'daki PTF rakamı gerçek değer gösteriyor (simüle değil; EPİAŞ'ın o saatki değeri)
 - [ ] Üst kayan şeritte 24 saatin gerçek fiyatları var
-- [ ] Teklif formu gönderildiğinde nereye düşsün? (form şu an sadece frontend — backend bağlanacaksa ayrıca konuşalım)
-- [ ] Mobil'de sorunsuz
+- [ ] Teklif formu gönderimi `/api/lead`'e düşüyor (KV `voltage-leads` içinde yeni kayıt görünüyor; bkz. §5.5)
+- [ ] Form KV bağlanmadan denenirse dürüst hata + telefon/e-posta alternatifi gösteriyor (başarı mesajı GÖSTERMİYOR)
+- [ ] Mobil'de sorunsuz (hamburger menü açılıyor/kapanıyor, Teklif Al CTA çalışıyor)
+- [ ] /kvkk, /cerez-politikasi, /kullanim-kosullari açılıyor
 
 ---
 
@@ -110,4 +181,4 @@ Cloudflare Pages otomatik yeni build'i deploy eder, ~30sn içinde site güncelle
 
 **PTF hala simüle gözüküyor** → Tarayıcı console'unu aç (F12 → Console). `PTF proxy unavailable` hatası varsa Worker'a ulaşamıyor demektir. `curl -H "Origin: https://voltage.com.tr" https://epias-proxy.emirhantan-ku.workers.dev/ptf/today` ile test et.
 
-**Form gönderilemiyor** → form action'ı şu an yok; gerçek e-postaya düşmesi için ayrı bir servis gerekir (Formspree, Web3Forms vb.) — söylersen bağlarım.
+**Form gönderilemiyor / hata mesajı görünüyor** → `/api/lead` 503 dönüyorsa `LEADS` KV binding'i veya `LEAD_WEBHOOK_URL` tanımlı değildir (bkz. §5.5). Binding ekledikten sonra projeyi yeniden deploy et. Tarayıcı console'unda `Lead submit failed: ...` satırı hatanın nedenini gösterir.

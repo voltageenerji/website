@@ -131,6 +131,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<!-- Cloudflare Web Analytics (çerezsiz) — etkinleştirmek için token'ı doldurup
+     yorumu kaldırın; kurulum: DEPLOY.md "Cloudflare Web Analytics" bölümü.
+     NOT: Etkinleştirirken _headers CSP'sine https://static.cloudflareinsights.com
+     adresini script-src ve connect-src'e eklemeyi unutmayın.
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "CF_WEB_ANALYTICS_TOKEN_BURAYA"}'></script>
+-->
+
+
 <style>
 /* ============ LANGUAGE TOGGLE ============ */
 html[lang="tr"] .en-only { display: none !important; }
@@ -156,9 +164,12 @@ html { scroll-behavior: smooth; }
   --accent: #C9A961;
   --accent-dark: #A68A44;
   --red: #B8332A;
-  
+  --line-strong: #D6D2C4;
+
   --serif: 'Fraunces', Georgia, serif;
   --sans: 'Inter Tight', -apple-system, sans-serif;
+  /* "IBM Plex Mono" is referenced but never loaded — use a system mono stack */
+  --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
   
   --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -1890,6 +1901,95 @@ section {
 .certs-strip { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; padding: 60px 48px; background: var(--paper); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .cert-pill { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); padding: 12px 22px; border: 1px solid var(--line-strong); border-radius: 100px; }
 .cert-pill b { color: var(--accent-dark); font-weight: 600; margin-right: 8px; }
+a.cert-pill { transition: border-color 0.3s var(--ease); }
+a.cert-pill:hover { border-color: var(--accent-dark); }
+
+/* ============ PTF DATA-STATUS (canlı / temsili) ============ */
+.hud-ptf-status { font-size: 9px; letter-spacing: 0.08em; color: var(--ink-muted); text-transform: none; }
+.lm-chart-meta.fallback { color: rgba(245,243,236,0.55); }
+.lm-chart-meta.fallback::before { background: var(--ink-muted); box-shadow: none; animation: none; }
+
+/* ============ MOBILE MENU ============ */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 99;
+  padding: 92px 28px 32px;
+  background: rgba(245,243,236,0.97);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+  flex-direction: column;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  padding: 15px 2px;
+  font-size: 16px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line-soft);
+}
+.mobile-menu a.mobile-menu-cta {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 100px;
+  border-bottom: none;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+@media (min-width: 641px) { .mobile-menu { display: none !important; } }
+.mobile-menu-btn[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.mobile-menu-btn[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.mobile-menu-btn[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+.mobile-menu-btn span { transition: all 0.25s var(--ease); }
+
+/* ============ CALC CTA + DISCLAIMER ============ */
+.calc-cta {
+  margin-top: 32px;
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px 24px;
+  background: var(--accent);
+  color: var(--ink);
+  border-radius: 100px;
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;
+  transition: background 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.calc-cta:hover { background: #D9BC78; transform: translateY(-1px); }
+.calc-disclaimer { margin-top: 16px; font-size: 11px; line-height: 1.55; color: rgba(245,243,236,0.45); }
+
+/* ============ FORM: consent, honeypot, durum panelleri ============ */
+.form-consent {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-top: 4px;
+  font-size: 12.5px; line-height: 1.55; color: var(--ink-soft);
+}
+.form-consent input[type=checkbox] { margin-top: 3px; accent-color: var(--ink); flex-shrink: 0; width: 15px; height: 15px; }
+.form-consent a { text-decoration: underline; text-underline-offset: 2px; }
+.form-consent a:hover { color: var(--accent-dark); }
+.hp-field { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.form-error {
+  display: none;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--red);
+  background: rgba(184,51,42,0.06);
+  color: var(--red);
+  font-size: 13px; line-height: 1.55;
+}
+.form-error a { text-decoration: underline; font-weight: 500; }
+.form-submit:disabled { opacity: 0.55; cursor: wait; }
+.form-success { display: none; }
+.form-success-title { font-family: var(--serif); font-weight: 400; font-size: 26px; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 10px; }
+.form-success-sub { font-size: 14px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 28px; }
+.form-success-steps { list-style: none; display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+.form-success-steps li { display: grid; grid-template-columns: 40px 1fr; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.form-success-steps .n { font-family: var(--serif); font-size: 15px; color: var(--accent-dark); }
+.form-success-steps .t { display: block; font-weight: 500; color: var(--ink); font-size: 14px; margin-bottom: 4px; }
+.form-success-steps .d { display: block; font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
 
 </style>
 </head>
@@ -1925,10 +2025,19 @@ section {
     </div>
     <a href="#iletisim" class="nav-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
   </div>
-  <button class="mobile-menu-btn" aria-label="Menu">
+  <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menü" aria-controls="mobileMenu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
 </nav>
+
+<!-- MOBILE MENU PANEL -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hakkimizda" data-tr="Hakkımızda" data-en="About">Hakkımızda</a>
+  <a href="#hizmetler" data-tr="Hizmetler" data-en="Services">Hizmetler</a>
+  <a href="#yaklasim" data-tr="Yaklaşım" data-en="Approach">Yaklaşım</a>
+  <a href="#iletisim" data-tr="İletişim" data-en="Contact">İletişim</a>
+  <a href="#iletisim" class="mobile-menu-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -1973,8 +2082,8 @@ section {
   <!-- Floating HUD chips -->
   <div class="hero-hud">
     <div class="hud-chip ul">
-      <span data-tr="EPİAŞ · Gün Öncesi PTF · Canlı" data-en="EPIAS · Day-Ahead MCP · Live">EPİAŞ · Gün Öncesi PTF · Canlı</span>
-      <span class="big"><span id="hudPtf">2,148.40</span> <em>₺/MWh</em></span>
+      <span data-tr="EPİAŞ · Gün Öncesi PTF · Saatlik" data-en="EPIAS · Day-Ahead MCP · Hourly">EPİAŞ · Gün Öncesi PTF · Saatlik</span>
+      <span class="big"><span id="hudPtf">—</span> <em>₺/MWh</em></span>
       <svg class="spark" viewBox="0 0 120 30" preserveAspectRatio="none">
         <defs>
           <linearGradient id="sparkFill" x1="0" x2="0" y1="0" y2="1">
@@ -1986,11 +2095,12 @@ section {
         <polyline id="sparkLine" points="" stroke="#C9A961" stroke-width="1.4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
         <circle id="sparkDot" cx="118" cy="15" r="2.2" fill="#C9A961"/>
       </svg>
+      <span class="hud-ptf-status" id="hudPtfStatus"></span>
     </div>
     <div class="hud-chip br">
-      <span data-tr="Anlık Dengelenen Portföy" data-en="Live Balanced Portfolio">Anlık Dengelenen Portföy</span>
-      <span class="big"><span id="hudMwh">162</span> <em>üye tesis</em></span>
-      <span style="font-size:10px;color:var(--ink-muted)" data-tr="Kurumsal + endüstriyel" data-en="Corporate + industrial">Kurumsal + endüstriyel</span>
+      <span data-tr="Piyasa Operasyonu" data-en="Market Operations">Piyasa Operasyonu</span>
+      <span class="big">7/24 <em data-tr="GÖP · GİP" data-en="DAM · IDM">GÖP · GİP</em></span>
+      <span style="font-size:10px;color:var(--ink-muted)" data-tr="İkili anlaşmalar · EPİAŞ üyesi" data-en="Bilateral agreements · EPIAS member">İkili anlaşmalar · EPİAŞ üyesi</span>
     </div>
   </div>
 
@@ -2004,18 +2114,18 @@ section {
     <div class="hero-eyebrow" data-tr="Kurumsal Enerji Tedariki" data-en="Corporate Energy Supply">Kurumsal Enerji Tedariki</div>
     
     <h1 class="hero-title" data-tr-mode="tr">
-      <!-- TR title -->
-      <div class="tr-only">
-        <div class="line"><span>Türkiye'nin</span></div>
-        <div class="line"><span>endüstriyel enerji</span></div>
-        <div class="line"><span>ortağı, <em>Voltage.</em></span></div>
-      </div>
+      <!-- TR title (span'lar: h1 içinde div geçersiz HTML — display:block span kullanılıyor) -->
+      <span class="tr-only" style="display:block">
+        <span class="line"><span>Türkiye'nin</span></span>
+        <span class="line"><span>endüstriyel enerji</span></span>
+        <span class="line"><span>ortağı, <em>Voltage.</em></span></span>
+      </span>
       <!-- EN title -->
-      <div class="en-only">
-        <div class="line"><span>Türkiye's</span></div>
-        <div class="line"><span>industrial energy</span></div>
-        <div class="line"><span>partner, <em>Voltage.</em></span></div>
-      </div>
+      <span class="en-only" style="display:block">
+        <span class="line"><span>Türkiye's</span></span>
+        <span class="line"><span>industrial energy</span></span>
+        <span class="line"><span>partner, <em>Voltage.</em></span></span>
+      </span>
     </h1>
     
     <div class="hero-sub">
@@ -2105,12 +2215,12 @@ section {
         <div class="lm-chart-head">
           <div>
             <div class="lm-chart-title" data-tr="Gün Öncesi PTF · 24s" data-en="Day-Ahead MCP · 24h">Gün Öncesi PTF · 24s</div>
-            <div class="lm-chart-meta">LIVE · EPİAŞ</div>
+            <div class="lm-chart-meta" id="lmChartMeta">EPİAŞ · GÜN ÖNCESİ PTF</div>
           </div>
           <div class="lm-chart-now">
-            <span class="k" data-tr="Şu an" data-en="Now">Şu an</span>
-            <span class="v"><span id="lmNow">2,148.40</span><span class="cur">₺</span></span>
-            <span class="delta" data-tr-suffix="gün ort." data-en-suffix="day avg">▲ 3.8% · 24h</span>
+            <span class="k" data-tr="Bu saat" data-en="This hour">Bu saat</span>
+            <span class="v"><span id="lmNow">—</span><span class="cur">₺</span></span>
+            <span class="delta" data-tr-suffix="gün ort." data-en-suffix="day avg">—</span>
           </div>
         </div>
         <svg class="lm-chart-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
@@ -2147,13 +2257,15 @@ section {
           </div>
         </div>
         <div class="lm-card">
-          <h5><span data-tr="Portföy Karması" data-en="Portfolio Mix">Portföy Karması</span></h5>
+          <h5><span data-tr="Portföy Karması · Temsili" data-en="Portfolio Mix · Illustrative">Portföy Karması · Temsili</span></h5>
           <div class="lm-bar"><span data-tr="GÖP / Gün Öncesi" data-en="DAM">GÖP / Gün Öncesi</span><span>62%</span></div>
           <div class="lm-bar-wrap"><span style="width:62%"></span></div>
           <div class="lm-bar"><span data-tr="İkili Anlaşma" data-en="Bilateral">İkili Anlaşma</span><span>31%</span></div>
           <div class="lm-bar-wrap"><span style="width:31%"></span></div>
           <div class="lm-bar"><span data-tr="GİP / Gün İçi" data-en="IDM">GİP / Gün İçi</span><span>7%</span></div>
           <div class="lm-bar-wrap"><span style="width:7%"></span></div>
+          <!-- TODO(pricing): 62/31/7 temsili değerlerdir; doğrulanmış portföy karması yayınlanana dek "Temsili" etiketi kaldırılamaz. -->
+          <div style="margin-top:10px;font-size:10px;letter-spacing:.04em;color:var(--ink-muted);" data-tr="Temsili dağılım — güncel portföy verisi doğrulama sürecindedir." data-en="Illustrative breakdown — current portfolio data pending validation.">Temsili dağılım — güncel portföy verisi doğrulama sürecindedir.</div>
         </div>
       </div>
     </div>
@@ -2222,12 +2334,19 @@ section {
       </div>
       <div class="calc-result">
         <div class="calc-result-k" data-tr="Tahmini Aylık Fatura · Voltage" data-en="Est. Monthly Invoice · Voltage">Tahmini Aylık Fatura · Voltage</div>
-        <div class="calc-result-v"><span id="calcTotal">2.580.000</span><span class="cur">₺</span></div>
+        <div class="calc-result-v"><span id="calcTotal">2.469.060</span><span class="cur">₺</span></div>
         <div class="calc-result-sub" data-tr="Dengeleme, sapma, fatura hizmeti ve vergi hariç net tedarik bedeli." data-en="Net supply only — excl. balancing, deviation, billing service and taxes.">Dengeleme, sapma, fatura hizmeti ve vergi hariç net tedarik bedeli.</div>
         <div class="calc-savings">
           <div><div class="k" data-tr="Yıllık Hacim" data-en="Annual Volume">Yıllık Hacim</div><div class="v"><span id="calcAnnual">14.400</span> MWh</div></div>
-          <div><div class="k" data-tr="Öngörülen Tasarruf" data-en="Est. Savings">Öngörülen Tasarruf</div><div class="v">~<span id="calcSavings">9,4</span>%</div></div>
+          <div><div class="k" data-tr="Senaryo Tasarrufu" data-en="Scenario Savings">Senaryo Tasarrufu</div><div class="v">~<span id="calcSavings">4,3</span>%</div></div>
         </div>
+        <button type="button" class="calc-cta" id="calcCta">
+          <span data-tr="Bu hesabı teklife dönüştürün" data-en="Turn this estimate into a quote">Bu hesabı teklife dönüştürün</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <p class="calc-disclaimer" data-tr="Bu rakamlar örnek senaryo değerleridir; dengeleme, sapma, vergi ve fatura hizmet bedellerini içermez ve bağlayıcı teklif niteliği taşımaz. Nihai fiyatlandırma fatura analizi sonrasında belirlenir." data-en="These figures are illustrative scenario values; they exclude balancing, deviation, taxes and billing service fees and do not constitute a binding offer. Final pricing is determined after a bill analysis.">Bu rakamlar örnek senaryo değerleridir; dengeleme, sapma, vergi ve fatura hizmet bedellerini içermez ve bağlayıcı teklif niteliği taşımaz. Nihai fiyatlandırma fatura analizi sonrasında belirlenir.</p>
       </div>
     </div>
   </div>
@@ -2235,11 +2354,11 @@ section {
 
 <!-- CERTS -->
 <section class="certs-strip">
-  <div class="cert-pill"><b>EPDK</b> LİSANSLI TEDARİKÇİ</div>
-  <div class="cert-pill"><b>EPDK</b> TEDARİK LİSANSI</div>
-  <div class="cert-pill"><b>YEK-G</b> SERTİFİKALI SATICI</div>
-  <div class="cert-pill"><b>İTO</b> ÜYESİ</div>
-  <div class="cert-pill"><b>KVKK</b> UYUMLU</div>
+  <div class="cert-pill"><b>EPDK</b> <span data-tr="LİSANSLI TEDARİKÇİ" data-en="LICENSED SUPPLIER">LİSANSLI TEDARİKÇİ</span></div>
+  <div class="cert-pill"><b>YEK-G</b> <span data-tr="SERTİFİKALI SATICI" data-en="CERTIFIED SELLER">SERTİFİKALI SATICI</span></div>
+  <div class="cert-pill"><b>İTO</b> <span data-tr="ÜYESİ" data-en="MEMBER">ÜYESİ</span></div>
+  <!-- KVKK pili tutuldu: aydınlatma metni artık yayında (/kvkk) ve form açık rıza alıyor -->
+  <a class="cert-pill" href="/kvkk"><b>KVKK</b> <span data-tr="AYDINLATMA METNİ" data-en="PRIVACY NOTICE">AYDINLATMA METNİ</span></a>
 </section>
 
 <!-- ABOUT -->
@@ -2283,8 +2402,10 @@ section {
           <div class="about-stat-value">2011</div>
         </div>
         <div class="about-stat">
-          <div class="about-stat-label" data-tr="Aktif Tedarik Hacmi" data-en="Active Supply Volume">Aktif Tedarik Hacmi</div>
-          <div class="about-stat-value">M+<span class="unit" data-tr="kWh/ay" data-en="kWh/mo">kWh/ay</span></div>
+          <!-- Doğrulanmış portföy istatistiği yayınlanana kadar nicel iddia yok
+               (analytics/IR sistemleri kurulunca gerçek MWh hacmi buraya gelebilir) -->
+          <div class="about-stat-label" data-tr="Piyasa Operasyonu" data-en="Market Operations">Piyasa Operasyonu</div>
+          <div class="about-stat-value">7/24<span class="unit" data-tr="GÖP · GİP" data-en="DAM · IDM">GÖP · GİP</span></div>
         </div>
         <div class="about-stat">
           <div class="about-stat-label" data-tr="Sözleşme Türleri" data-en="Contract Types">Sözleşme Türleri</div>
@@ -2468,72 +2589,97 @@ section {
             </div>
           </div>
           <div class="contact-detail">
-            <div class="contact-detail-label" data-tr="Ticaret Sicil" data-en="Legal Entity">Ticaret Sicil</div>
+            <div class="contact-detail-label" data-tr="Tüzel Kişilik" data-en="Legal Entity">Tüzel Kişilik</div>
             <div class="contact-detail-value" style="font-family: var(--sans); font-size: 14px; color: var(--ink-muted);">Voltan Elektrik Toptan Satış<br>İthalat ve İhracat A.Ş.</div>
           </div>
         </div>
       </div>
       
-      <form class="form reveal" onsubmit="event.preventDefault(); const msg = document.documentElement.lang === 'en' ? 'Your request has been received. We will get back to you within 1 business day.' : 'Talebiniz alındı. 1 iş günü içinde size dönüş yapacağız.'; alert(msg);">
+      <div class="reveal">
+      <form class="form" id="leadForm">
         <h3 class="form-title" data-tr="Teklif Talebi" data-en="Request a Proposal">Teklif Talebi</h3>
         <p class="form-subtitle" data-tr="Tüm alanları doldurarak hızlı dönüş alın." data-en="Fill out all fields for a prompt response.">Tüm alanları doldurarak hızlı dönüş alın.</p>
-        
+
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" data-tr="Ad" data-en="First Name">Ad</label>
-            <input type="text" class="form-input" required>
+            <label class="form-label" for="f-ad" data-tr="Ad" data-en="First Name">Ad</label>
+            <input type="text" class="form-input" id="f-ad" name="ad" autocomplete="given-name" required>
           </div>
           <div class="form-group">
-            <label class="form-label" data-tr="Soyad" data-en="Last Name">Soyad</label>
-            <input type="text" class="form-input" required>
+            <label class="form-label" for="f-soyad" data-tr="Soyad" data-en="Last Name">Soyad</label>
+            <input type="text" class="form-input" id="f-soyad" name="soyad" autocomplete="family-name" required>
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label class="form-label" data-tr="Şirket Adı" data-en="Company">Şirket Adı</label>
-          <input type="text" class="form-input" required>
+          <label class="form-label" for="f-sirket" data-tr="Şirket Adı" data-en="Company">Şirket Adı</label>
+          <input type="text" class="form-input" id="f-sirket" name="sirket" autocomplete="organization" required>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" data-tr="Telefon" data-en="Phone">Telefon</label>
-            <input type="tel" class="form-input" required>
+            <label class="form-label" for="f-telefon" data-tr="Telefon" data-en="Phone">Telefon</label>
+            <input type="tel" class="form-input" id="f-telefon" name="telefon" inputmode="tel" autocomplete="tel" required>
           </div>
           <div class="form-group">
-            <label class="form-label" data-tr="E-posta" data-en="Email">E-posta</label>
-            <input type="email" class="form-input" required>
+            <label class="form-label" for="f-eposta" data-tr="E-posta" data-en="Email">E-posta</label>
+            <input type="email" class="form-input" id="f-eposta" name="eposta" inputmode="email" autocomplete="email" required>
           </div>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" data-tr="Aylık Tüketim" data-en="Monthly Consumption">Aylık Tüketim</label>
-            <select class="form-select" required>
+            <label class="form-label" for="f-tuketim" data-tr="Aylık Tüketim" data-en="Monthly Consumption">Aylık Tüketim</label>
+            <select class="form-select" id="f-tuketim" name="tuketim" required>
               <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
-              <option data-tr="100.000 kWh altı" data-en="Under 100,000 kWh">100.000 kWh altı</option>
-              <option data-tr="100.000 – 500.000 kWh" data-en="100,000 – 500,000 kWh">100.000 – 500.000 kWh</option>
-              <option data-tr="500.000 – 1.000.000 kWh" data-en="500,000 – 1,000,000 kWh">500.000 – 1.000.000 kWh</option>
-              <option data-tr="1.000.000 kWh üstü" data-en="Over 1,000,000 kWh">1.000.000 kWh üstü</option>
+              <option value="0-100" data-tr="100.000 kWh altı" data-en="Under 100,000 kWh">100.000 kWh altı</option>
+              <option value="100-500" data-tr="100.000 – 500.000 kWh" data-en="100,000 – 500,000 kWh">100.000 – 500.000 kWh</option>
+              <option value="500-1000" data-tr="500.000 – 1.000.000 kWh" data-en="500,000 – 1,000,000 kWh">500.000 – 1.000.000 kWh</option>
+              <option value="1000+" data-tr="1.000.000 kWh üstü" data-en="Over 1,000,000 kWh">1.000.000 kWh üstü</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" data-tr="Sektör" data-en="Industry">Sektör</label>
-            <select class="form-select" required>
+            <label class="form-label" for="f-sektor" data-tr="Sektör" data-en="Industry">Sektör</label>
+            <select class="form-select" id="f-sektor" name="sektor" required>
               <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
-              <option data-tr="Üretim / Sanayi" data-en="Manufacturing / Industry">Üretim / Sanayi</option>
-              <option data-tr="OSB" data-en="Organized Industrial Zone">OSB</option>
-              <option data-tr="Hizmet / Ticaret" data-en="Services / Commerce">Hizmet / Ticaret</option>
-              <option data-tr="Veri Merkezi" data-en="Data Center">Veri Merkezi</option>
-              <option data-tr="Diğer" data-en="Other">Diğer</option>
+              <option value="uretim-sanayi" data-tr="Üretim / Sanayi" data-en="Manufacturing / Industry">Üretim / Sanayi</option>
+              <option value="osb" data-tr="OSB" data-en="Organized Industrial Zone">OSB</option>
+              <option value="hizmet-ticaret" data-tr="Hizmet / Ticaret" data-en="Services / Commerce">Hizmet / Ticaret</option>
+              <option value="veri-merkezi" data-tr="Veri Merkezi" data-en="Data Center">Veri Merkezi</option>
+              <option value="diger" data-tr="Diğer" data-en="Other">Diğer</option>
             </select>
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label class="form-label" data-tr="Notunuz (opsiyonel)" data-en="Your Note (optional)">Notunuz (opsiyonel)</label>
-          <textarea class="form-textarea" data-tr-placeholder="Mevcut sözleşme detayları, ihtiyaçlar..." data-en-placeholder="Current contract details, requirements..." placeholder="Mevcut sözleşme detayları, ihtiyaçlar..."></textarea>
+          <label class="form-label" for="f-mesaj" data-tr="Notunuz (opsiyonel)" data-en="Your Note (optional)">Notunuz (opsiyonel)</label>
+          <textarea class="form-textarea" id="f-mesaj" name="mesaj" data-tr-placeholder="Mevcut sözleşme detayları, ihtiyaçlar..." data-en-placeholder="Current contract details, requirements..." placeholder="Mevcut sözleşme detayları, ihtiyaçlar..."></textarea>
         </div>
-        
+
+        <!-- Simülatör aktarımı (CTA ile doldurulur) -->
+        <input type="hidden" name="sim_mwh" id="simMwh">
+        <input type="hidden" name="sim_price" id="simPrice">
+        <input type="hidden" name="sim_model" id="simModel">
+
+        <!-- Honeypot — insan kullanıcılar görmez, doldurulursa istek sessizce atılır -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="f-website">Website</label>
+          <input type="text" id="f-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <label class="form-consent">
+          <input type="checkbox" name="kvkk" id="f-kvkk" required>
+          <span>
+            <span class="tr-only">Kişisel verilerimin teklif hazırlama ve iletişim amacıyla işlenmesine ilişkin <a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni okudum, kabul ediyorum.</span>
+            <span class="en-only">I have read and accept the <a href="/kvkk" target="_blank" rel="noopener">Privacy Notice (KVKK)</a> regarding the processing of my personal data for proposal preparation and contact purposes.</span>
+          </span>
+        </label>
+
+        <div class="form-error" id="leadError" role="alert">
+          <span class="tr-only">Gönderim başarısız oldu. Lütfen tekrar deneyin ya da bize doğrudan ulaşın: <a href="tel:+902164790510">0216 479 0510</a> · <a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a></span>
+          <span class="en-only">Submission failed. Please try again or reach us directly: <a href="tel:+902164790510">+90 216 479 0510</a> · <a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a></span>
+        </div>
+
         <button type="submit" class="form-submit">
           <span data-tr="Teklif Talep Et" data-en="Request Proposal">Teklif Talep Et</span>
           <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
@@ -2541,6 +2687,27 @@ section {
           </svg>
         </button>
       </form>
+
+      <!-- Başarı paneli — form başarıyla gönderilince formun yerini alır -->
+      <div class="form form-success" id="leadSuccess" role="status" aria-live="polite">
+        <h3 class="form-success-title" data-tr="Talebiniz alındı" data-en="Your request has been received">Talebiniz alındı</h3>
+        <p class="form-success-sub" data-tr="1 iş günü içinde dönüş yapacağız. Süreç şöyle ilerleyecek:" data-en="We will get back to you within 1 business day. Here is what happens next:">1 iş günü içinde dönüş yapacağız. Süreç şöyle ilerleyecek:</p>
+        <ol class="form-success-steps">
+          <li>
+            <span class="n">01</span>
+            <span><span class="t" data-tr="Keşif" data-en="Discovery">Keşif</span><span class="d" data-tr="Tesisinizin yük profili, OG/AG kullanımı ve gün-saat dağılımı incelenir." data-en="Your facility's load profile, MV/LV usage and hourly distribution are analyzed.">Tesisinizin yük profili, OG/AG kullanımı ve gün-saat dağılımı incelenir.</span></span>
+          </li>
+          <li>
+            <span class="n">02</span>
+            <span><span class="t" data-tr="Modelleme" data-en="Modeling">Modelleme</span><span class="d" data-tr="GÖP + ikili karışım modeli, risk dağılımı ve referans dönem PTF analizi hazırlanır." data-en="A DAM + bilateral blend model, risk allocation and reference-period MCP analysis are prepared.">GÖP + ikili karışım modeli, risk dağılımı ve referans dönem PTF analizi hazırlanır.</span></span>
+          </li>
+          <li>
+            <span class="n">03</span>
+            <span><span class="t" data-tr="Teklif" data-en="Proposal">Teklif</span><span class="d" data-tr="Sabit, endeksli veya hibrit fiyatlama seçenekleriyle teklifiniz sunulur. Tüm formüller sözleşmede." data-en="Your proposal is presented with fixed, indexed or hybrid pricing options. Every formula in the contract.">Sabit, endeksli veya hibrit fiyatlama seçenekleriyle teklifiniz sunulur. Tüm formüller sözleşmede.</span></span>
+          </li>
+        </ol>
+      </div>
+      </div>
     </div>
   </div>
 </section>
@@ -2570,8 +2737,9 @@ section {
         <ul>
           <li><a href="#hakkimizda" data-tr="Hakkımızda" data-en="About">Hakkımızda</a></li>
           <li><a href="#yaklasim" data-tr="Yaklaşımımız" data-en="Our Approach">Yaklaşımımız</a></li>
-          <li><a href="#" data-tr="Basın" data-en="Press">Basın</a></li>
-          <li><a href="#" data-tr="Kariyer" data-en="Careers">Kariyer</a></li>
+          <!-- "Basın" ve "Kariyer" kaldırıldı: hedef sayfaları yok (ölü link bırakmıyoruz).
+               İçerik hazır olduğunda gerçek sayfalarla geri eklenebilir. -->
+          <li><a href="/kvkk" data-tr="KVKK Aydınlatma" data-en="Privacy Notice">KVKK Aydınlatma</a></li>
         </ul>
       </div>
       
@@ -2597,10 +2765,18 @@ section {
     
     <div class="footer-bottom">
       <div data-tr="© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş." data-en="© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. All rights reserved.">© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.</div>
+      <!-- MUST-FILL (sahibinden alınacak resmi veriler — DEPLOY.md kontrol listesine bakın).
+           Değerler gelene kadar ziyaretçiye HİÇBİR placeholder gösterilmez.
+           Doldurulunca aşağıdaki satırı yorumdan çıkarın:
+      <div data-tr="EPDK Tedarik Lisansı No: [EPDK-LISANS-NO] · MERSİS: [MERSIS-NO] · Ticaret Sicil No: [TICARET-SICIL-NO] (İstanbul)"
+           data-en="EPDK Supply License No: [EPDK-LISANS-NO] · MERSİS: [MERSIS-NO] · Trade Registry No: [TICARET-SICIL-NO] (Istanbul)">
+        EPDK Tedarik Lisansı No: [EPDK-LISANS-NO] · MERSİS: [MERSIS-NO] · Ticaret Sicil No: [TICARET-SICIL-NO] (İstanbul)
+      </div>
+      -->
       <div class="footer-legal">
-        <a href="#" data-tr="KVKK" data-en="Privacy">KVKK</a>
-        <a href="#" data-tr="Çerez Politikası" data-en="Cookie Policy">Çerez Politikası</a>
-        <a href="#" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a>
+        <a href="/kvkk" data-tr="KVKK" data-en="Privacy">KVKK</a>
+        <a href="/cerez-politikasi" data-tr="Çerez Politikası" data-en="Cookie Policy">Çerez Politikası</a>
+        <a href="/kullanim-kosullari" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a>
       </div>
     </div>
   </div>
@@ -2715,74 +2891,102 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
 
 // ====== CINEMATIC INTERACTIONS ======
 // PTF proxy (EPIAS Şeffaflık via Cloudflare Worker)
+// Tek paylaşılan fetch promise'i: rail + HUD + grafik aynı isteği kullanır
+// (eskiden 3 paralel özdeş istek atılıyordu).
 const PTF_PROXY = 'https://epias-proxy.emirhantan-ku.workers.dev';
+// Temsili (fallback) eğri — canlı akış yoksa kullanılır ve arayüzde
+// "Temsili veri / Indicative data" olarak etiketlenir, asla CANLI denmez.
+const PTF_FALLBACK = [2010,1890,1820,1780,1790,1850,1980,2180,2340,2420,2380,2290,2250,2190,2160,2120,2180,2350,2620,2780,2680,2490,2280,2120];
+let ptfPromise = null;
 let ptfLiveData = null; // { items:[{hour,price}], stats:{current,...}, date }
-async function fetchPtfLive(){
-  try{
-    const r = await fetch(PTF_PROXY + '/ptf/today', { cache: 'no-store' });
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    if(!j.items || !j.items.length) throw new Error('empty');
-    ptfLiveData = j;
-    return j;
-  }catch(e){ console.warn('PTF proxy unavailable, using fallback:', e.message); return null; }
+function fetchPtfLive(force){
+  if(force || !ptfPromise){
+    ptfPromise = (async()=>{
+      try{
+        const r = await fetch(PTF_PROXY + '/ptf/today', { cache: 'no-store' });
+        if(!r.ok) throw new Error('HTTP ' + r.status);
+        const j = await r.json();
+        if(!j.items || !j.items.length) throw new Error('empty');
+        ptfLiveData = j;
+        return j;
+      }catch(e){ console.warn('PTF proxy unavailable, using fallback:', e.message); return null; }
+    })();
+  }
+  return ptfPromise;
 }
+// 15 dakikada bir tek noktadan yeniden senkron; tüm tüketiciler 'ptfupdate'
+// olayını dinler. (Eski koddaki donmuş `const anchor` re-sync hatası giderildi.)
+setInterval(async ()=>{
+  const fresh = await fetchPtfLive(true);
+  window.dispatchEvent(new CustomEvent('ptfupdate', { detail: { data: fresh } }));
+}, 15*60*1000);
 
 // 1) MCP rail ticker
 (async function(){
   const rail = document.getElementById('mcpTrack');
   if(!rail) return;
   const hours = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
-  const fallback = [2010,1890,1820,1780,1790,1850,1980,2180,2340,2420,2380,2290,2250,2190,2160,2120,2180,2350,2620,2780,2680,2490,2280,2120];
-  const data = await fetchPtfLive();
-  const prices = [];
-  for(let h=0;h<24;h++){
-    const it = data && data.items ? data.items.find(x=>x.hour===h) : null;
-    prices.push(it ? Math.round(it.price) : fallback[h]);
-  }
-  let html = '';
-  for(let rep=0;rep<2;rep++){
-    for(let i=0;i<24;i++){
-      const prev = i===0?prices[23]:prices[i-1];
-      const diff = prices[i]-prev;
-      const cls = diff>=0?'up':'dn';
-      const arr = diff>=0?'▲':'▼';
-      html += `<span class="cell">${hours[i]}:00 <b>${prices[i].toLocaleString('tr-TR')}</b> ₺/MWh <span class="${cls}">${arr} ${Math.abs(diff)}</span></span>`;
+  function build(data){
+    const prices = [];
+    for(let h=0;h<24;h++){
+      const it = data && data.items ? data.items.find(x=>x.hour===h) : null;
+      prices.push(it ? Math.round(it.price) : PTF_FALLBACK[h]);
     }
+    let html = '';
+    for(let rep=0;rep<2;rep++){
+      for(let i=0;i<24;i++){
+        const prev = i===0?prices[23]:prices[i-1];
+        const diff = prices[i]-prev;
+        const cls = diff>=0?'up':'dn';
+        const arr = diff>=0?'▲':'▼';
+        html += `<span class="cell">${hours[i]}:00 <b>${prices[i].toLocaleString('tr-TR')}</b> ₺/MWh <span class="${cls}">${arr} ${Math.abs(diff)}</span></span>`;
+      }
+    }
+    rail.innerHTML = html;
   }
-  rail.innerHTML = html;
+  build(await fetchPtfLive());
+  window.addEventListener('ptfupdate', e => build(e.detail.data));
 })();
 
-// 2) Hero HUD live tick
+// 2) Hero HUD — saatlik gün öncesi PTF.
+// Dürüstlük paketi (Faz 1): yapay ±%0.8 "canlılık" jitter'ı KALDIRILDI; değer
+// yalnızca gerçek saatlik PTF'tir ve 15 dk'lık re-sync ile güncellenir.
+// Canlı akış yoksa temsili eğri gösterilir ve açıkça etiketlenir.
 (async function(){
   const ptfEl = document.getElementById('hudPtf');
   const lmEl = document.getElementById('lmNow');
+  const statusEl = document.getElementById('hudPtfStatus');
+  const metaEl = document.getElementById('lmChartMeta');
   const sparkLine = document.getElementById('sparkLine');
   const sparkArea = document.getElementById('sparkArea');
   const sparkDot = document.getElementById('sparkDot');
   if(!ptfEl && !lmEl) return;
-  // Wait up to ~1.5s for first fetch (rail may have already triggered it)
-  let data = ptfLiveData || await fetchPtfLive();
-  let buf = [];
-  if(data && data.items && data.items.length){
-    // Seed buffer from today's real PTF hours (last N up to current hour)
-    const now = new Date();
-    const cur = now.getHours();
-    for(let h = Math.max(0, cur-11); h <= cur && h < 24; h++){
-      const it = data.items.find(x=>x.hour===h);
-      if(it) buf.push(it.price);
-    }
-    // If still short, pad left with earlier hours
-    let idx = 0;
-    while(buf.length < 12 && data.items[idx]){ buf.unshift(data.items[idx].price); idx++; }
-  }
-  if(buf.length < 6){
-    // Fallback: synthetic curve
-    for(let i=0;i<24;i++){ buf.push(2000 + Math.sin(i*0.4)*180 + (Math.random()-0.5)*80); }
-  }
-  let ptf = buf[buf.length-1];
+  const fmt = v => v.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const W = 120, H = 30;
-  function render(){
+  let isLive = false;
+  let lastSync = null;
+
+  function seriesFrom(data){
+    // Gün başından içinde bulunulan saate kadarki saatlik fiyatlar (min 6 nokta)
+    const cur = new Date().getHours();
+    const upTo = Math.max(5, Math.min(23, cur));
+    const arr = [];
+    for(let h=0; h<=upTo; h++){
+      const it = data && data.items ? data.items.find(x=>x.hour===h) : null;
+      arr.push(it ? it.price : PTF_FALLBACK[h]);
+    }
+    return arr;
+  }
+  function currentFrom(data){
+    if(data && data.stats && Number.isFinite(data.stats.current)) return data.stats.current;
+    const h = Math.min(23, new Date().getHours());
+    if(data && data.items){
+      const it = data.items.find(x=>x.hour===h);
+      if(it) return it.price;
+    }
+    return PTF_FALLBACK[h];
+  }
+  function renderSpark(buf){
     const min = Math.min(...buf), max = Math.max(...buf);
     const range = Math.max(1, max-min);
     const pts = buf.map((v,i)=>{
@@ -2800,28 +3004,33 @@ async function fetchPtfLive(){
       sparkDot.setAttribute('cy', pts[pts.length-1][1]);
     }
   }
-  const fmt = v => v.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  render();
-  if(ptfEl) ptfEl.textContent = fmt(ptf);
-  if(lmEl) lmEl.textContent = fmt(ptf);
-  // Micro-tick within ±1% around real last price for live feel
-  const anchor = ptf;
-  setInterval(()=>{
-    const jitter = (Math.random()-0.5) * anchor * 0.008;
-    ptf = anchor + jitter;
-    buf.shift(); buf.push(ptf);
-    render();
+  function renderStatus(){
+    const lang = document.documentElement.lang === 'en' ? 'en' : 'tr';
+    const time = lastSync ? lastSync.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) : '—';
+    if(statusEl){
+      statusEl.textContent = isLive
+        ? (lang === 'en' ? 'Hourly day-ahead price · updated ' + time : 'Saatlik gün öncesi fiyat · son güncelleme ' + time)
+        : (lang === 'en' ? 'Indicative data — live feed unavailable' : 'Temsili veri — canlı akış kullanılamıyor');
+    }
+    if(metaEl){
+      metaEl.textContent = isLive
+        ? (lang === 'en' ? 'EPIAS · HOURLY DAY-AHEAD MCP · ' + time : 'EPİAŞ · SAATLİK GÜN ÖNCESİ PTF · ' + time)
+        : (lang === 'en' ? 'INDICATIVE DATA' : 'TEMSİLİ VERİ');
+      metaEl.classList.toggle('fallback', !isLive);
+    }
+  }
+  function apply(data){
+    isLive = !!(data && data.items && data.items.length);
+    lastSync = new Date();
+    const ptf = currentFrom(data);
     if(ptfEl) ptfEl.textContent = fmt(ptf);
     if(lmEl) lmEl.textContent = fmt(ptf);
-  },1400);
-  // Re-sync with EPIAS every 15 min
-  setInterval(async ()=>{
-    const fresh = await fetchPtfLive();
-    if(fresh && fresh.stats && Number.isFinite(fresh.stats.current)){
-      ptf = fresh.stats.current;
-      buf.push(ptf); buf.shift();
-    }
-  }, 15*60*1000);
+    renderSpark(seriesFrom(data));
+    renderStatus();
+  }
+  apply(await fetchPtfLive());
+  window.addEventListener('ptfupdate', e => apply(e.detail.data));
+  window.addEventListener('languagechange', renderStatus);
 })();
 
 // 2.5) Live market chart — drive lmArea / lmLine / lmDot / delta from real PTF
@@ -2831,9 +3040,6 @@ async function fetchPtfLive(){
   const lmDot   = document.getElementById('lmDot');
   const lmDelta = document.querySelector('.live-market .delta');
   if(!lmArea || !lmLine) return;
-
-  // Use the same fallback as MCP rail so the chart never looks broken
-  const fallback = [2010,1890,1820,1780,1790,1850,1980,2180,2340,2420,2380,2290,2250,2190,2160,2120,2180,2350,2620,2780,2680,2490,2280,2120];
 
   // SVG geometry — viewBox is "0 0 800 280"
   const W = 800, H = 280;
@@ -2885,28 +3091,22 @@ async function fetchPtfLive(){
     const arr = [];
     for(let h = 0; h < 24; h++){
       const it = data && data.items ? data.items.find(x => x.hour === h) : null;
-      arr.push(it ? it.price : fallback[h]);
+      arr.push(it ? it.price : PTF_FALLBACK[h]);
     }
     return arr;
   }
 
-  // First render — wait briefly for the rail's fetch if it's already in flight
-  let data = ptfLiveData || await fetchPtfLive();
-  buildAndDraw(pricesFrom(data));
+  // First render — shares the single in-flight fetch with rail + HUD
+  buildAndDraw(pricesFrom(await fetchPtfLive()));
 
   // Re-render delta label on language toggle
   window.addEventListener('languagechange', renderDeltaLabel);
 
-  // Re-sync with EPIAŞ every 15 min
-  setInterval(async () => {
-    const fresh = await fetchPtfLive();
-    if(fresh && fresh.items && fresh.items.length){
-      buildAndDraw(pricesFrom(fresh));
-    }
-  }, 15 * 60 * 1000);
+  // 15 dk'lık paylaşılan re-sync (tek interval, 'ptfupdate' yayını)
+  window.addEventListener('ptfupdate', e => buildAndDraw(pricesFrom(e.detail.data)));
 })();
 
-// 3) Calculator
+// 3) Calculator (Tasarruf Simülatörü)
 (function(){
   const mwhIn = document.getElementById('calcRangeMwh');
   const pIn = document.getElementById('calcRangePrice');
@@ -2917,13 +3117,20 @@ async function fetchPtfLive(){
   const annLbl = document.getElementById('calcAnnual');
   const savLbl = document.getElementById('calcSavings');
   let model = 'blend';
+  // TODO(pricing): Bu çarpanlar örnek senaryo değerleridir ve Pricing Agent
+  // doğrulaması beklemektedir (Faz 1, madde 1.6). Doğrulanana kadar arayüzde
+  // "örnek senaryo / bağlayıcı teklif değildir" ibaresi görünür durumda kalmalı.
   const multipliers = { blend: 0.957, fixed: 0.978, index: 0.941 };
-  const savings = { blend: 9.4, fixed: 6.8, index: 12.3 };
+  // Gösterilen tasarruf, modellenen tasarrufa EŞİTTİR: (1 - çarpan) × 100.
+  // (Eski koddaki bağımsız {9.4, 6.8, 12.3} sabitleri kendi matematiğiyle
+  // çelişiyordu; kaldırıldı.)
+  const savingsPct = m => (1 - multipliers[m]) * 100;
   document.querySelectorAll('.calc-toggle button').forEach(b=>{
     b.addEventListener('click',()=>{
       document.querySelectorAll('.calc-toggle button').forEach(x=>x.classList.remove('active'));
       b.classList.add('active');
       model = b.dataset.model;
+      markSimUsed();
       recalc();
     });
   });
@@ -2934,11 +3141,177 @@ async function fetchPtfLive(){
     const total = mwh*p*multipliers[model];
     totLbl.textContent = Math.round(total).toLocaleString('tr-TR');
     annLbl.textContent = (mwh*12).toLocaleString('tr-TR');
-    savLbl.textContent = savings[model].toString().replace('.',',');
+    savLbl.textContent = savingsPct(model).toFixed(1).replace('.',',');
   }
-  mwhIn.addEventListener('input',recalc);
-  pIn.addEventListener('input',recalc);
+  // Simülatör state'i — form payload'ı ve CTA aktarımı için
+  function markSimUsed(){
+    if(!window.__simState) track('sim_input'); // yalnızca ilk etkileşimde
+    window.__simState = { mwh: +mwhIn.value, price: +pIn.value, model };
+  }
+  mwhIn.addEventListener('input',()=>{ markSimUsed(); recalc(); });
+  pIn.addEventListener('input',()=>{ markSimUsed(); recalc(); });
   recalc();
+
+  // Simülatör → teklif formu aktarımı
+  const cta = document.getElementById('calcCta');
+  if(cta){
+    cta.addEventListener('click', ()=>{
+      const mwh = +mwhIn.value, p = +pIn.value;
+      window.__simState = { mwh, price: p, model };
+      const simMwh = document.getElementById('simMwh');
+      const simPrice = document.getElementById('simPrice');
+      const simModel = document.getElementById('simModel');
+      if(simMwh) simMwh.value = String(mwh);
+      if(simPrice) simPrice.value = String(p);
+      if(simModel) simModel.value = model;
+      // Uygun tüketim bandını seç (form bantları kWh, simülatör MWh: ×1000)
+      const tuketim = document.getElementById('f-tuketim');
+      if(tuketim){
+        tuketim.value = mwh < 100 ? '0-100' : mwh < 500 ? '100-500' : mwh <= 1000 ? '500-1000' : '1000+';
+      }
+      track('sim_result_cta', { model });
+      const target = document.getElementById('leadForm') || document.getElementById('iletisim');
+      if(target){
+        window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+        const first = document.getElementById('f-ad');
+        if(first) setTimeout(()=>{ first.focus({ preventScroll: true }); }, 700);
+      }
+    });
+  }
+})();
+
+// ============ FIRST-PARTY FUNNEL EVENTS ============
+// KVKK-minimal: çerez yok, fingerprint yok, PII yok — yalnız olay adı + dil + UTM.
+// Backend bağlı değilse istekler sessizce düşer; UX asla etkilenmez.
+const UTM = (function(){
+  const out = {};
+  try{
+    const q = new URLSearchParams(location.search);
+    ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(k=>{
+      const v = q.get(k);
+      if(v) out[k] = v.slice(0,100);
+    });
+  }catch(e){}
+  return out;
+})();
+function track(name, props){
+  try{
+    const body = JSON.stringify({
+      event: name,
+      props: Object.assign({ lang: document.documentElement.lang || 'tr' }, props || {}),
+      ts: Date.now()
+    });
+    if(navigator.sendBeacon){
+      navigator.sendBeacon('/api/event', new Blob([body], { type: 'application/json' }));
+    } else {
+      fetch('/api/event', { method:'POST', headers:{'Content-Type':'application/json'}, body, keepalive:true }).catch(()=>{});
+    }
+  }catch(e){}
+}
+track('page_view', Object.keys(UTM).length ? { utm: UTM } : {});
+document.querySelectorAll('a[href^="tel:"]').forEach(a=> a.addEventListener('click', ()=> track('tel_click')));
+document.querySelectorAll('a[href^="mailto:"]').forEach(a=> a.addEventListener('click', ()=> track('mail_click')));
+
+// ============ MOBILE MENU ============
+(function(){
+  const btn = document.getElementById('mobileMenuBtn');
+  const menu = document.getElementById('mobileMenu');
+  if(!btn || !menu) return;
+  let open = false;
+  function setOpen(v){
+    open = v;
+    menu.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    if(open){
+      const first = menu.querySelector('a');
+      if(first) first.focus();
+      track('mobile_menu_open');
+    }
+  }
+  btn.addEventListener('click', ()=> setOpen(!open));
+  menu.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> setOpen(false)));
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && open){ setOpen(false); btn.focus(); }
+  });
+})();
+
+// ============ LEAD FORM → /api/lead ============
+(function(){
+  const form = document.getElementById('leadForm');
+  if(!form) return;
+  const successPanel = document.getElementById('leadSuccess');
+  const errorBox = document.getElementById('leadError');
+  const submitBtn = form.querySelector('.form-submit');
+  const submitLbl = submitBtn ? submitBtn.querySelector('span') : null;
+
+  let started = false;
+  form.addEventListener('focusin', ()=>{
+    if(!started){ started = true; track('form_start'); }
+  });
+
+  function setBusy(busy){
+    if(!submitBtn) return;
+    submitBtn.disabled = busy;
+    if(submitLbl){
+      const lang = document.documentElement.lang === 'en' ? 'en' : 'tr';
+      submitLbl.textContent = busy
+        ? (lang === 'en' ? 'Sending…' : 'Gönderiliyor…')
+        : (submitLbl.getAttribute('data-' + lang) || submitLbl.textContent);
+    }
+  }
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if(errorBox) errorBox.style.display = 'none';
+    const fd = new FormData(form);
+    const payload = {
+      ad: (fd.get('ad') || '').trim(),
+      soyad: (fd.get('soyad') || '').trim(),
+      sirket: (fd.get('sirket') || '').trim(),
+      telefon: (fd.get('telefon') || '').trim(),
+      eposta: (fd.get('eposta') || '').trim(),
+      tuketim: fd.get('tuketim') || '',
+      sektor: fd.get('sektor') || '',
+      mesaj: (fd.get('mesaj') || '').trim(),
+      kvkk: fd.get('kvkk') === 'on',
+      website: fd.get('website') || '', // honeypot
+      sim_mwh: fd.get('sim_mwh') || '',
+      sim_price: fd.get('sim_price') || '',
+      sim_model: fd.get('sim_model') || '',
+      lang: document.documentElement.lang || 'tr',
+      utm: UTM
+    };
+    // Simülatör kullanıldı ama CTA'ya basılmadıysa da state'i ekle
+    if(!payload.sim_mwh && window.__simState){
+      payload.sim_mwh = String(window.__simState.mwh);
+      payload.sim_price = String(window.__simState.price);
+      payload.sim_model = window.__simState.model;
+    }
+    setBusy(true);
+    try{
+      const r = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json().catch(()=>({ ok:false }));
+      if(!r.ok || !j.ok) throw new Error(j.error || ('HTTP ' + r.status));
+      track('form_submit_ok');
+      form.style.display = 'none';
+      if(successPanel){
+        successPanel.style.display = 'block';
+        successPanel.scrollIntoView({ behavior:'smooth', block:'center' });
+      }
+    }catch(err){
+      track('form_submit_err');
+      console.warn('Lead submit failed:', err.message);
+      if(errorBox){
+        errorBox.style.display = 'block';
+        errorBox.scrollIntoView({ behavior:'smooth', block:'center' });
+      }
+      setBusy(false);
+    }
+  });
 })();
 
 // Initialize from URL param, stored preference, or browser language
