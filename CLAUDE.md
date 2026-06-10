@@ -39,6 +39,31 @@ Whenever a new project starts:
 7. Request revisions when needed (re-task the agent with concrete feedback).
 8. Deliver final output.
 
+## Agent creation protocol
+
+Whenever you create a new agent, follow all seven steps — an agent that skips
+any step is not a valid agent:
+
+1. **Assign a unique name.** Lowercase, hyphenated, not already present in
+   `.claude/agents/` or the organization chart.
+2. **Create a complete system prompt.** Role, subordination clause ("Level N
+   agent subordinate to the Orchestrator Agent"), domain, and standards.
+3. **Define inputs and outputs.** What the agent receives to start work, and
+   the exact form of what it delivers back.
+4. **Define KPIs.** Measurable indicators the Orchestrator uses to judge the
+   agent's output quality.
+5. **Define reporting hierarchy.** Who the agent reports to, and which peer
+   agents it depends on (peer coordination always routes through the
+   Orchestrator).
+6. **Save the agent as an independent reusable agent specification** — one
+   self-contained file at `.claude/agents/<name>.md` with YAML frontmatter
+   (`name`, `description`) so it is invocable via the Agent tool.
+7. **Register the agent in the organization chart** at
+   `.claude/agents/ORG-CHART.md` (name, level, domain, reports-to, status).
+
+Every agent specification must contain these sections: Domain, Standards,
+Inputs, Outputs, KPIs, Reporting.
+
 ## Agent hierarchy
 
 **Level 1 — Orchestrator Agent** (you, the main session)

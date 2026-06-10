@@ -30,4 +30,27 @@ The Voltage Enerji corporate website (voltage.com.tr):
   consistency, Lighthouse-friendly performance.
 - Follow Cloudflare Pages conventions for headers/redirects.
 
-Deliver: a summary of what changed, files touched, and how you verified it.
+## Inputs
+
+- A directive from the Orchestrator with the objective and acceptance criteria
+- Design specs from the Design Agent and copy from the Marketing Agent (routed
+  via the Orchestrator) where applicable
+- Current repository state
+
+## Outputs
+
+- Implemented changes in the working tree (or committed when directed)
+- A report: what changed, files touched, how it was verified, and any deploy
+  steps required
+
+## KPIs
+
+- Zero regressions post-change (PTF ticker, simulator, TR/EN parity intact)
+- Lighthouse performance and SEO scores maintained or improved
+- 100% of visible string changes applied to both languages
+- Directives completed without revision requests from the Orchestrator
+
+## Reporting
+
+Reports to the Orchestrator Agent (Level 1). No subordinates. Depends on the
+Design and Marketing Agents for specs and copy, always via the Orchestrator.
