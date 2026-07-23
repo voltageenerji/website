@@ -4,7 +4,7 @@ Voltan Elektrik Toptan Satış A.Ş. kurumsal web sitesi.
 
 ## Yapı
 
-- `index.html` — tek dosyalık statik site (TR/EN, canlı PTF, tasarruf simülatörü)
+- `index.html` — tek dosyalık statik site (TR/EN, canlı EPİAŞ PTF verisi, sözleşme modelleri tablosu)
 - `_headers` — Cloudflare Pages için güvenlik ve cache başlıkları
 - `_redirects` — Cloudflare Pages yönlendirme kuralları
 - `robots.txt` — arama motorları için
