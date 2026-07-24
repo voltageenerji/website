@@ -79,7 +79,6 @@
       },
       "contactPoint": [{
         "@type": "ContactPoint",
-        "telephone": "+90-216-479-0510",
         "contactType": "sales",
         "email": "info@voltage.com.tr",
         "areaServed": "TR",
@@ -945,6 +944,34 @@ section {
   .reveal { opacity: 1 !important; transform: none !important; }
 }
 
+
+/* Mobil menü paneli */
+.mobile-menu { display: none; }
+body.menu-open { overflow: hidden; }
+@media (max-width: 640px) {
+  .mobile-menu {
+    position: fixed; inset: 0; z-index: 90;
+    background: var(--paper);
+    padding: 108px 28px 40px;
+    display: flex; flex-direction: column;
+  }
+  .mobile-menu[hidden] { display: none; }
+  .mobile-menu > a {
+    font-family: var(--mono,'IBM Plex Mono',monospace);
+    font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink); padding: 18px 2px;
+    border-bottom: 1px solid var(--line);
+  }
+  .mobile-menu > a.mobile-menu-cta {
+    margin-top: 28px; border: none;
+    background: var(--ink); color: var(--paper);
+    text-align: center; padding: 15px;
+  }
+  .mobile-menu-btn span { transition: transform 0.25s var(--ease), opacity 0.2s; }
+  .mobile-menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .mobile-menu-btn.open span:nth-child(2) { opacity: 0; }
+  .mobile-menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+}
 </style>
 </head>
 <body>
@@ -980,10 +1007,18 @@ section {
     </div>
     <a href="#iletisim" class="nav-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
   </div>
-  <button class="mobile-menu-btn" aria-label="Menu">
+  <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
     <span></span><span></span><span></span>
   </button>
 </nav>
+
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <a href="#hakkimizda" data-tr="Hakkımızda" data-en="About">Hakkımızda</a>
+  <a href="#hizmetler" data-tr="Hizmetler" data-en="Services">Hizmetler</a>
+  <a href="#yaklasim" data-tr="Yaklaşım" data-en="Approach">Yaklaşım</a>
+  <a href="#iletisim" data-tr="İletişim" data-en="Contact">İletişim</a>
+  <a href="#iletisim" class="mobile-menu-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
+</div>
 
 <!-- HERO -->
 <section class="hero grain-sec" id="kapak" data-folio="01" data-folio-tr="KAPAK" data-folio-en="COVER" data-screen-label="01 Kapak">
@@ -1425,10 +1460,6 @@ section {
         
         <div class="contact-details">
           <div class="contact-detail">
-            <div class="contact-detail-label" data-tr="Telefon" data-en="Phone">Telefon</div>
-            <div class="contact-detail-value"><a href="tel:+902164790510">0216 479 0510</a></div>
-          </div>
-          <div class="contact-detail">
             <div class="contact-detail-label" data-tr="E-posta" data-en="Email">E-posta</div>
             <div class="contact-detail-value"><a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a></div>
           </div>
@@ -1557,7 +1588,7 @@ section {
       </div>
       <div>
         <div class="cl-k" data-tr="İletişim" data-en="Contact">İletişim</div>
-        <div class="cl-v"><a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a> · <a href="tel:+902164790510">0216 479 0510</a><br><span class="mono">voltage.com.tr</span></div>
+        <div class="cl-v"><a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a><br><span class="mono">voltage.com.tr</span></div>
       </div>
       <div>
         <div class="cl-k" data-tr="Kayıt" data-en="Registry">Kayıt</div>
@@ -1928,5 +1959,21 @@ async function fetchPtfLive(){
 })();
 </script>
 
+<script>
+(function(){
+  var btn = document.getElementById('mobileMenuBtn');
+  var menu = document.getElementById('mobileMenu');
+  if (!btn || !menu) return;
+  function setOpen(open){
+    menu.hidden = !open;
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(){ setOpen(menu.hidden); });
+  menu.addEventListener('click', function(e){ if (e.target.closest('a')) setOpen(false); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !menu.hidden) setOpen(false); });
+})();
+</script>
 </body>
 </html>
