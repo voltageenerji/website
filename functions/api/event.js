@@ -19,6 +19,7 @@ const ALLOWED_EVENTS = [
   'tel_click',
   'mail_click',
   'mobile_menu_open',
+  'ptf_tab',
 ];
 
 const MAX_PROPS_BYTES = 1024;

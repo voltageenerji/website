@@ -131,6 +131,25 @@ biçimindedir; değer JSON'dur. (CLI: `wrangler kv key list --namespace-id=...`)
 
 ---
 
+## 5.5.1) epias-proxy ek uçları — `/ptf/tomorrow` ve `/yekdem` (yeni özellik ön koşulu)
+
+Sitedeki iki yeni özellik, `epias-proxy` Worker'ında **henüz deploy edilmemiş** iki uca
+bağlıdır:
+
+- **"Yarın" PTF sekmesi** (Canlı Piyasa bandı) → `GET /ptf/tomorrow`
+- **YEKDEM Birim Maliyeti kartı** → `GET /yekdem`
+
+Yapıştırmaya hazır Worker kodu, JSON sözleşmeleri, cache ve CORS notları:
+**`docs/epias-proxy-EK-UCLAR.md`** (auth bloğu ve EPİAŞ endpoint yolları için
+`ADAPT-HERE` işaretlerine ve resmî doküman teyidi uyarısına dikkat).
+
+Uçlar deploy edilene kadar site zarifçe düşer: "Yarın" sekmesi dürüst bir
+"henüz alınamadı / 14:00'te yayınlanır" notu gösterir, YEKDEM kartı hiç görünmez.
+**Hiçbir durumda sentetik veri gösterilmez** — yani bu uçlar olmadan yayına çıkmak
+güvenlidir, ancak özelliklerin aktifleşmesi için Worker deploy'u ön koşuldur.
+
+---
+
 ## 5.6) Cloudflare Web Analytics (çerezsiz, opsiyonel)
 
 1. Dashboard → **Analytics & Logs → Web Analytics** → site ekle → token'ı kopyala.
