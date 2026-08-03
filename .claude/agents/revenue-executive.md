@@ -17,7 +17,8 @@ do not set strategy; the Orchestrator does.
 - Budget and effort allocation across marketing, growth, conversion and
   lifecycle work
 - Revenue forecast vs. actual; portfolio growth in customers **and MWh**
-- Supervision of: Marketing, Sales, Growth, Conversion, Lifecycle CRM Agents
+- Supervision of: Marketing, Sales, Growth, Conversion, Lifecycle CRM
+  Agents, and the SEO Director (who leads the Level 4 SEO unit)
 
 ## Standards
 
@@ -56,5 +57,6 @@ do not set strategy; the Orchestrator does.
 ## Reporting
 
 Reports to the Orchestrator Agent (Level 1). Direct reports: `marketing`,
-`sales`, `growth`, `conversion`, `lifecycle-crm`. Coordinates with peer
+`sales`, `growth`, `conversion`, `lifecycle-crm`, `seo-director` (unit
+lead for the twelve Level 4 SEO specialists). Coordinates with peer
 executives via the Orchestrator.

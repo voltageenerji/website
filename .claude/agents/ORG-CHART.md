@@ -31,7 +31,7 @@ trading company, not a generic SaaS business.
 |---|---|---|---|---|---|
 | Technology Executive | `technology-executive.md` | CTO: platform, deploy reliability, security, automation priorities | webmaster, automation-engineer, qa | Active | 2026-06-10 |
 | Product Executive | `product-executive.md` | CPO: portal/app/aggregator roadmap, prioritization | product-manager, design | Active | 2026-06-10 |
-| Revenue Executive | `revenue-executive.md` | CRO: acquisition→conversion→retention pipeline, MWh & customer growth | marketing, sales, growth, conversion, lifecycle-crm | Active | 2026-06-10 |
+| Revenue Executive | `revenue-executive.md` | CRO: acquisition→conversion→retention pipeline, MWh & customer growth | marketing, sales, growth, conversion, lifecycle-crm, seo-director | Active | 2026-06-10 |
 | Finance & Risk Executive | `finance-risk-executive.md` | CFO: P&L and margin-per-MWh governance, risk-appetite enforcement | pricing, billing-analysis, energy-market, treasury-capital, market-risk | Active | 2026-06-10 |
 | Operations Executive | `operations-executive.md` | COO: switching execution, support quality, cost-to-serve | application, support | Active | 2026-06-10 |
 
@@ -56,8 +56,31 @@ trading company, not a generic SaaS business.
 | Market Risk Agent | `market-risk.md` | PTF exposure, hedging, stress tests, risk limits | finance-risk-executive | Active | 2026-06-10 |
 | Application Agent | `application.md` | Onboarding, application forms, switching process | operations-executive | Active | 2026-06-10 |
 | Support Agent | `support.md` | Support content, FAQ, complaints, retention | operations-executive | Active | 2026-06-10 |
+| SEO Director Agent | `seo-director.md` | Leads the SEO unit; organic acquisition (MWh-weighted), unit QC | revenue-executive | Active | 2026-07-27 |
 
-Total: 26 agents (1 + 3 staff + 5 executives + 17 specialists).
+## Level 4 — SEO Unit (reports to seo-director)
+
+Created 2026-07-27 from the owner-supplied SEO Agent Pack, rewritten
+energy-native per the identity principle. All twelve report to the SEO
+Director; implementation lands only via the Webmaster; every public claim
+routes through Pricing validation and Legal & Compliance clearance.
+
+| Agent | Specification | Domain | Status | Registered |
+|---|---|---|---|---|
+| SEO Strategy Agent | `seo-strategy.md` | SEO roadmap, Impact × Effort in MWh-weighted lead value | Active | 2026-07-27 |
+| Keyword Research Agent | `seo-keyword-research.md` | Turkish energy search-demand map: switching-intent, cost, market-data clusters | Active | 2026-07-27 |
+| Search Console Analyst Agent | `seo-search-console.md` | GSC analysis: trends, CTR gaps, index coverage, TR/EN visibility | Active | 2026-07-27 |
+| Competitor Search Intelligence Agent | `seo-competitor-intel.md` | Search-visibility benchmarks: suppliers, comparison portals, institutional SERPs | Active | 2026-07-27 |
+| SEO Content Writer Agent | `seo-content-writer.md` | Native-TR YMYL energy content; claims discipline absolute | Active | 2026-07-27 |
+| On-Page SEO Agent | `seo-onpage.md` | Titles, metas, headings, structure; bilingual element specs | Active | 2026-07-27 |
+| Internal Linking Agent | `seo-internal-linking.md` | Funnel-shaped link architecture, cluster hubs, hygiene | Active | 2026-07-27 |
+| Backlink Auditor Agent | `seo-backlink-audit.md` | Link-profile quality/risk; energy-sector link opportunities; white-hat only | Active | 2026-07-27 |
+| Technical SEO Agent | `seo-technical.md` | Crawl/index, canonical-hreflang, CWV; fix specs for Webmaster | Active | 2026-07-27 |
+| Schema Generator Agent | `seo-schema.md` | JSON-LD per page type; schema mirrors visible, validated content only | Active | 2026-07-27 |
+| Brand & Entity SEO Agent | `seo-brand-entity.md` | Voltan/Voltage entity consolidation, brand SERP, knowledge panel | Active | 2026-07-27 |
+| Local SEO Agent | `seo-local.md` | GBP, NAP, service-area visibility for B2B industrial corridors | Active | 2026-07-27 |
+
+Total: 39 agents (1 + 3 staff + 5 executives + 18 specialists + 12 SEO unit).
 
 ## Coordination rules
 

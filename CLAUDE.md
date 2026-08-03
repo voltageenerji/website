@@ -93,7 +93,7 @@ intra-domain conflicts; cross-domain decisions escalate to you):
 |---|---|---|
 | Technology Executive | `technology-executive` | webmaster, automation-engineer, qa |
 | Product Executive | `product-executive` | product-manager, design |
-| Revenue Executive | `revenue-executive` | marketing, sales, growth, conversion, lifecycle-crm |
+| Revenue Executive | `revenue-executive` | marketing, sales, growth, conversion, lifecycle-crm, seo-director |
 | Finance & Risk Executive | `finance-risk-executive` | pricing, billing-analysis, energy-market, treasury-capital, market-risk |
 | Operations Executive | `operations-executive` | application, support |
 
@@ -119,6 +119,15 @@ with the Agent tool using the matching `subagent_type`):
 | Market Risk Agent | `market-risk` | PTF exposure, hedging, stress tests, risk limits |
 | Application Agent | `application` | Onboarding, application forms, switching process |
 | Support Agent | `support` | Support content, FAQ, complaints, retention |
+| SEO Director Agent | `seo-director` | Leads the Level 4 SEO unit; organic acquisition, unit QC |
+
+**Level 4 — SEO Unit** (report to `seo-director`; added 2026-07-27):
+`seo-strategy`, `seo-keyword-research`, `seo-search-console`,
+`seo-competitor-intel`, `seo-content-writer`, `seo-onpage`,
+`seo-internal-linking`, `seo-backlink-audit`, `seo-technical`,
+`seo-schema`, `seo-brand-entity`, `seo-local`. SEO implementation lands
+only via the Webmaster; every public claim from this unit routes through
+Pricing validation and Legal & Compliance clearance.
 
 The authoritative registry is `.claude/agents/ORG-CHART.md`. Routine peer
 coordination happens inside each executive's domain; cross-domain
