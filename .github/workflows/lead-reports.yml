@@ -1,0 +1,60 @@
+# Lead raporu zamanlayıcısı — voltage.com.tr/api/report tetikleyicisi.
+#
+# İki cron:
+#   - '30 5 * * 1' → her Pazartesi 05:30 UTC = 08:30 İstanbul → HAFTALIK rapor
+#   - '45 5 1 * *' → her ayın 1'i 05:45 UTC = 08:45 İstanbul → AYLIK rapor
+# Dönem seçimi: hangi cron ifadesinin tetiklediği github.event.schedule ile
+# ayırt edilir (aşağıdaki "Determine period" adımı). Ayın 1'i Pazartesi'ye
+# denk gelirse iki rapor da gönderilir — bu bilinçli (dönemler farklı).
+#
+# Manuel test: Actions → "Lead Reports" → Run workflow → period seç.
+#
+# Gerekli repo secret: REPORT_TOKEN (Cloudflare Pages'teki REPORT_TOKEN ile
+# birebir aynı değer). Bkz. DEPLOY.md "Lead bildirimleri ve raporlar".
+#
+# curl -fsS: 2xx dışı yanıtta adım (ve job) FAIL olur — kırık pipeline
+# Actions'ta kırmızı görünür, asla sessiz kalmaz.
+
+name: Lead Reports
+
+on:
+  schedule:
+    - cron: '30 5 * * 1'   # haftalık — Pazartesi 08:30 İstanbul
+    - cron: '45 5 1 * *'   # aylık — ayın 1'i 08:45 İstanbul
+  workflow_dispatch:
+    inputs:
+      period:
+        description: 'Rapor dönemi'
+        required: true
+        default: 'weekly'
+        type: choice
+        options:
+          - weekly
+          - monthly
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine period
+        id: period
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "period=${{ inputs.period }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "45 5 1 * *" ]; then
+            echo "period=monthly" >> "$GITHUB_OUTPUT"
+          else
+            echo "period=weekly" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Call report endpoint
+        env:
+          REPORT_TOKEN: ${{ secrets.REPORT_TOKEN }}
+        run: |
+          if [ -z "$REPORT_TOKEN" ]; then
+            echo "::error::REPORT_TOKEN secret tanımlı değil"
+            exit 1
+          fi
+          curl -fsS \
+            -H "Authorization: Bearer $REPORT_TOKEN" \
+            "https://voltage.com.tr/api/report?period=${{ steps.period.outputs.period }}"

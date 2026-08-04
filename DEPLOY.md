@@ -133,6 +133,71 @@ biçimindedir; değer JSON'dur. (CLI: `wrangler kv key list --namespace-id=...`)
 
 ---
 
+## 5.5.1) Lead bildirimleri ve raporlar
+
+Her başarılı lead kaydından sonra anlık e-posta bildirimi (`functions/api/lead.js`)
+ve zamanlanmış haftalık/aylık özet raporu (`functions/api/report.js` +
+`.github/workflows/lead-reports.yml`) gönderilir. E-posta altyapısı: Resend.
+
+**Önemli tasarım kuralı:** e-posta hatası lead'i asla düşürmez — KV doğruluk
+kaynağıdır. Rapor endpoint'i ise tam tersi: e-posta gönderilemezse 502 döner
+(rapor e-postayla var olur, sessiz başarı yok). Sıfır lead de rapordur
+("Bu dönemde talep gelmedi" e-postası yine gider).
+
+### Gerekli environment variable'lar (Pages → Settings → Environment variables)
+
+| Değişken | Tür | Açıklama |
+|---|---|---|
+| `RESEND_API_KEY` | **Secret** | Resend API anahtarı (`re_...`). Dashboard → API Keys |
+| `LEAD_NOTIFY_TO` | Plaintext | Bildirim alıcı(ları); virgülle çoklu: `satis@voltage.com.tr,emirhantan.ku@gmail.com` |
+| `MAIL_FROM` | Plaintext | Gönderen adres — **Resend'de doğrulanmış domain'de olmalı**, ör. `bildirim@voltage.com.tr` |
+| `REPORT_TOKEN` | **Secret** | `/api/report` erişim token'ı (uzun rastgele değer, ör. `openssl rand -hex 32`). **Aynı değer** GitHub repo'sunda Actions secret'ı `REPORT_TOKEN` olarak da tanımlanmalı |
+
+Üç Resend değişkeninden biri eksikse lead bildirimi sessizce atlanır (lead yine
+kaydedilir); `/api/report` ise 503 döner. Production **ve** Preview için ayrı
+ayrı tanımla, sonra yeniden deploy et.
+
+### Resend domain doğrulama (bir kere)
+
+1. https://resend.com → kayıt ol → **Domains → Add Domain** → `voltage.com.tr`
+2. Resend'in verdiği DNS kayıtlarını (SPF için TXT, DKIM için TXT/CNAME, MX
+   `send.` alt alanı) Cloudflare → DNS → Records'a birebir ekle
+   (proxy KAPALI / "DNS only" olmalı).
+3. Resend'de **Verify** → yeşile dönünce `bildirim@voltage.com.tr` gibi
+   adreslerden gönderim yapılabilir.
+4. **API Keys** → yeni key oluştur → `RESEND_API_KEY` olarak Pages'e ekle.
+
+### GitHub Actions zamanlayıcısı
+
+`.github/workflows/lead-reports.yml`:
+
+- Pazartesi 05:30 UTC (08:30 İstanbul) → haftalık rapor (son 7 tam gün)
+- Ayın 1'i 05:45 UTC (08:45 İstanbul) → aylık rapor (önceki takvim ayı)
+- `curl -fsS` kullanır: endpoint 2xx dışı dönerse job **fail** olur — kırık
+  pipeline Actions sekmesinde kırmızı görünür, sessiz kalmaz.
+
+Kurulum: GitHub repo → **Settings → Secrets and variables → Actions →
+New repository secret** → Name: `REPORT_TOKEN`, Value: Pages'teki değerin aynısı.
+
+### Test
+
+Manuel workflow: GitHub → **Actions → Lead Reports → Run workflow** →
+period seç (`weekly`/`monthly`) → çalıştır → job yeşilse e-posta gelmiş olmalı.
+
+Doğrudan curl (token'ı kendi değerinle değiştir):
+
+```bash
+curl -fsS -H "Authorization: Bearer $REPORT_TOKEN" \
+  "https://voltage.com.tr/api/report?period=weekly"
+```
+
+Dönen JSON PII içermez (sayımlar + şirket adları) — loglanabilir. Lead
+bildirimi testi: siteden bir test teklif formu gönder; `LEAD_NOTIFY_TO`
+adresine "Yeni Teklif Talebi — {şirket}" konulu e-posta düşmeli ve KV'de
+kayıt görünmeli (e-posta gelmese bile kayıt esastır).
+
+---
+
 ## 5.6) Cloudflare Web Analytics (çerezsiz, opsiyonel)
 
 1. Dashboard → **Analytics & Logs → Web Analytics** → site ekle → token'ı kopyala.
