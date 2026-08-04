@@ -98,6 +98,8 @@ Repo'daki `functions/` klasörü Cloudflare Pages tarafından otomatik deploy ed
 
 - `functions/api/lead.js` → `POST /api/lead` — teklif formu kayıtları
 - `functions/api/event.js` → `POST /api/event` — çerezsiz funnel olayları
+  (mevcut sayfa olay göndermiyor; analitik ihtiyacını Cloudflare Web Analytics
+  karşılıyor — endpoint ileride kullanım için hazır bekliyor)
 
 ### KV namespace'leri oluştur ve bağla
 
@@ -120,7 +122,7 @@ URL'ye de POST edilir.
 ### Bağlı değilse davranış (bilinçli tasarım)
 
 - `LEADS` KV **ve** `LEAD_WEBHOOK_URL` ikisi de yoksa `/api/lead` **503** döner;
-  form ziyaretçiye dürüst bir hata + telefon/e-posta alternatifi gösterir.
+  form ziyaretçiye dürüst bir hata + e-posta (mailto) alternatifi gösterir.
   **Veri çöpe giderken asla "talebiniz alındı" denmez.**
 - `EVENTS` KV yoksa `/api/event` sessizce 204 döner — analitik durur, site durmaz.
 
@@ -134,29 +136,28 @@ biçimindedir; değer JSON'dur. (CLI: `wrangler kv key list --namespace-id=...`)
 ## 5.6) Cloudflare Web Analytics (çerezsiz, opsiyonel)
 
 1. Dashboard → **Analytics & Logs → Web Analytics** → site ekle → token'ı kopyala.
-2. `index.html` `<head>` içindeki yorumlu beacon bloğunu bul
+2. `index.html` içinde `</body>` hemen öncesindeki yorumlu beacon bloğunu bul
    (`CF_WEB_ANALYTICS_TOKEN_BURAYA`), token'ı yapıştır, yorumdan çıkar.
-3. `_headers` CSP'sine `https://static.cloudflareinsights.com` ekle:
-   `script-src`'e ve `connect-src`'e. Eklenmezse beacon CSP tarafından bloklanır.
+3. `_headers` CSP'si `https://static.cloudflareinsights.com`'u `script-src` ve
+   `connect-src`'te zaten içeriyor — ekstra CSP değişikliği gerekmez.
 4. Çerezsiz çalıştığı için Çerez Politikası metniyle uyumludur; çerezli bir
    araca geçilirse `cerez-politikasi.html` önce güncellenmelidir.
 
 ---
 
-## YAYIN ÖNCESİ DOLDURULMASI ZORUNLU (must-fill) kontrol listesi
+## YAYIN ÖNCESİ kontrol listesi (must-do)
 
-Sahibinden alınacak resmî veriler — **uydurma/placeholder değerle yayına çıkılmaz**:
+Resmî veriler sitede yayında: EPDK lisansı `ETS/3424-8/2074` ve Ticaret Sicil
+`786882-0 · İstanbul` (Exhibit A, İletişim ve footer'da). Kalanlar:
 
-- [ ] **EPDK Tedarik Lisansı No** → `index.html` footer'ında `MUST-FILL` işaretli
-      yorum bloğu (arama: `EPDK-LISANS-NO`). Değeri yaz, satırı yorumdan çıkar.
-- [ ] **MERSİS No** → aynı yorum bloğu (arama: `MERSIS-NO`).
-- [ ] **Ticaret Sicil No** → aynı yorum bloğu (arama: `TICARET-SICIL-NO`).
 - [ ] **Hukuk incelemesi**: `kvkk.html`, `cerez-politikasi.html`,
       `kullanim-kosullari.html` dosyaları TASLAK'tır (her birinin başında HTML
       yorumu olarak işaretli) — yayın onayı legal-compliance'tan alınmalı.
-- [ ] **KV binding'leri** (`LEADS`, `EVENTS`) bağlandı ve test lead'i KV'de görüldü.
-- [ ] Simülatör çarpanları Pricing Agent tarafından doğrulanana kadar
-      "örnek senaryo" ibaresi kaldırılamaz (`index.html` içinde `TODO(pricing)`).
+      Not: KVKK metni ve Kullanım Koşulları'ndaki "tasarruf simülatörü"
+      ibareleri güncel sitede karşılıksız — incelemede çıkarılmalı.
+- [ ] **KV binding'i** `LEADS` bağlandı ve test lead'i KV'de görüldü
+      (`EVENTS` opsiyonel; sayfa şu an olay göndermiyor). Binding yoksa
+      `/api/lead` 503 döner, form dürüst hata + e-posta alternatifi gösterir.
 
 ---
 
@@ -167,7 +168,7 @@ Sahibinden alınacak resmî veriler — **uydurma/placeholder değerle yayına �
 - [ ] Hero'daki PTF rakamı gerçek değer gösteriyor (simüle değil; EPİAŞ'ın o saatki değeri)
 - [ ] Üst kayan şeritte 24 saatin gerçek fiyatları var
 - [ ] Teklif formu gönderimi `/api/lead`'e düşüyor (KV `voltage-leads` içinde yeni kayıt görünüyor; bkz. §5.5)
-- [ ] Form KV bağlanmadan denenirse dürüst hata + telefon/e-posta alternatifi gösteriyor (başarı mesajı GÖSTERMİYOR)
+- [ ] Form KV bağlanmadan denenirse dürüst hata + e-posta (mailto) alternatifi gösteriyor (başarı mesajı GÖSTERMİYOR)
 - [ ] Mobil'de sorunsuz (hamburger menü açılıyor/kapanıyor, Teklif Al CTA çalışıyor)
 - [ ] /kvkk, /cerez-politikasi, /kullanim-kosullari açılıyor
 

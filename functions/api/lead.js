@@ -85,10 +85,6 @@ export async function onRequestPost(context) {
     kvkk: true,
     lang: body.lang === 'en' ? 'en' : 'tr',
     utm,
-    // Simülatör state'i (CTA ile geldiyse) — fiyat/teklif ön bağlamı
-    sim_mwh: clean(body.sim_mwh, 20),
-    sim_price: clean(body.sim_price, 20),
-    sim_model: clean(body.sim_model, 20),
     receivedAt: new Date().toISOString(),
     source: 'voltage.com.tr/teklif-formu',
   };

@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <!-- TASLAK — yayın öncesi hukuk incelemesi gerekli (legal-compliance).
      Gözden geçirilecek noktalar: saklama süreleri, yurt dışı aktarım (Cloudflare
-     barındırma altyapısı), veri işleyen listesi, VERBİS yükümlülüğü. -->
+     barındırma altyapısı), veri işleyen listesi, VERBİS yükümlülüğü.
+     NOT (2026-08-04, webmaster): §2'deki "tasarruf simülatöründe girdiğiniz
+     tüketim/fiyat değerleri" ibaresi güncel sitede karşılıksızdır (simülatör
+     kaldırıldı) — hukuk incelemesinde metinden çıkarılması önerilir. -->
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -12,21 +15,24 @@
 <link rel="canonical" href="https://voltage.com.tr/kvkk">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" sizes="48x48 32x32 16x16" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root { --ink:#11141F; --ink-soft:#2B3142; --ink-muted:#555D6E; --line:#E2DDCF; --line-strong:#CFC8B4; --paper:#F7F5EF; --paper-warm:#EFEBE0; --accent:#C9A961; --accent-dark:#A68A44; --accent-ink:#7E632B; }
+:root { --ink:#0A0E1A; --ink-soft:#1A2032; --ink-muted:#4A5264; --line:#E4E2DC; --line-strong:#D6D2C6; --paper:#F5F3EC; --paper-warm:#EDEAE0; --accent:#C9A961; --accent-dark:#A68A44; --accent-ink:#826829; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Inter Tight', -apple-system, sans-serif; background: var(--paper); color: var(--ink); font-size: 15.5px; line-height: 1.7; }
+body { font-family: 'Archivo', -apple-system, sans-serif; background: var(--paper); color: var(--ink); font-size: 15.5px; line-height: 1.7; }
 .page { max-width: 800px; margin: 0 auto; padding: 64px 24px 96px; }
 a { color: var(--accent-ink); text-underline-offset: 2px; }
 .back { display: inline-block; font-size: 13px; letter-spacing: 0.04em; color: var(--ink-muted); text-decoration: none; margin-bottom: 40px; }
 .back:hover { color: var(--ink); }
-h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 8px; }
-.updated { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
-h2 { font-family: Georgia, serif; font-weight: 400; font-size: 21px; letter-spacing: -0.01em; margin: 36px 0 12px; }
+h1 { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 8px; }
+.updated { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+h2 { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 21px; letter-spacing: -0.01em; margin: 36px 0 12px; }
 p, li { color: var(--ink-soft); margin-bottom: 12px; }
 ul, ol { padding-left: 22px; margin-bottom: 16px; }
 li { margin-bottom: 6px; }
-.note { margin-top: 48px; padding: 16px 18px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--paper-warm); font-size: 13px; color: var(--ink-muted); }
+.note { margin-top: 48px; padding: 16px 18px; border: 1px solid var(--line-strong); border-radius: 0; background: var(--paper-warm); font-size: 13px; color: var(--ink-muted); }
 footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-muted); }
 </style>
 </head>

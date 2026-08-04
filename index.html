@@ -4,21 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Primary Meta Tags -->
+<!-- Primary Meta Tags — statik head Türkçe-first; EN takası JS META_CONTENT ile yapılır -->
 <title>Voltage Enerji — Kurumsal ve Endüstriyel Elektrik Tedarikçisi | Voltan Elektrik A.Ş.</title>
-<meta name="title" content="Voltage Enerji — Kurumsal ve Endüstriyel Elektrik Tedarikçisi">
 <meta name="description" content="Voltage Enerji, 2011'den bu yana Türkiye serbest elektrik piyasasının ilk oyuncularından biri olarak GÖP, GİP ve ikili anlaşmalar üzerinden kurumsal ve endüstriyel müşterilere güvenilir elektrik tedariki sağlamaktadır.">
-<meta name="keywords" content="elektrik tedarikçisi, endüstriyel elektrik, kurumsal elektrik, GÖP, GİP, EPİAŞ, ikili anlaşma, portföy yönetimi, serbest elektrik piyasası, OSB elektrik tedariki, Voltan Elektrik, yenilenebilir enerji, YEK-G">
 <meta name="author" content="Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
-<meta name="language" content="Turkish">
-<meta name="revisit-after" content="7 days">
 
-<!-- Canonical & Language Alternates -->
+<!-- Canonical — tek URL; dil alternatifi link'leri prerendered /en/ yayınlanana kadar eklenmez (TECHNICAL-AUDIT Y1) -->
 <link rel="canonical" href="https://voltage.com.tr/">
-<link rel="alternate" hreflang="tr" href="https://voltage.com.tr/">
-<link rel="alternate" hreflang="en" href="https://voltage.com.tr/?lang=en">
-<link rel="alternate" hreflang="x-default" href="https://voltage.com.tr/">
 
 <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
 <meta property="og:type" content="website">
@@ -40,9 +33,10 @@
 <meta name="twitter:description" content="2011'den bu yana kurumsal ve endüstriyel elektrik tedariki. Serbest piyasanın ilk oyuncularından.">
 <meta name="twitter:image" content="https://voltage.com.tr/og-image.jpg">
 
-<!-- Favicon (SVG inline for maximum compatibility) -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%230A0E1A'/%3E%3Ccircle cx='18' cy='18' r='15' stroke='%23C9A961' stroke-width='1' fill='none' opacity='0.4'/%3E%3Cpath d='M11 10 L18 26 L25 10' stroke='%23F5F3EC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='18' cy='18' r='1.5' fill='%23C9A961'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%230A0E1A'/%3E%3Cpath d='M11 10 L18 26 L25 10' stroke='%23F5F3EC' stroke-width='2' fill='none'/%3E%3C/svg%3E">
+<!-- Favicon — gerçek dosyalar (data-URI yerine): SVG + ICO (48/32/16) + PNG touch icon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" sizes="48x48 32x32 16x16" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
 <!-- Theme color for mobile browsers -->
 <meta name="theme-color" content="#0A0E1A">
@@ -647,6 +641,38 @@ section {
   gap: 12px;
 }
 .form-submit:hover { background: var(--accent-dark); }
+.form-submit[disabled] { opacity: 0.55; cursor: wait; }
+
+/* Form altyapısı — KVKK onayı, honeypot, gönderim durumları */
+.form-consent {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-top: 6px;
+  font-size: 12.5px; line-height: 1.55; color: var(--ink-soft);
+  cursor: pointer;
+}
+.form-consent input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 15px; height: 15px; flex: none; margin-top: 2px;
+  border: 1px solid var(--ink-muted); border-radius: 0;
+  background: transparent; cursor: pointer;
+  display: inline-grid; place-content: center;
+}
+.form-consent input[type="checkbox"]:checked { border-color: var(--ink); background: var(--ink); }
+.form-consent input[type="checkbox"]:checked::before {
+  content: ''; width: 8px; height: 4.5px;
+  border-left: 1.5px solid var(--paper); border-bottom: 1.5px solid var(--paper);
+  transform: rotate(-45deg) translateY(-1px);
+}
+.form-consent a { color: var(--accent-text); border-bottom: 1px solid var(--accent-text); transition: color 0.3s var(--ease); }
+.form-consent a:hover { color: var(--accent-dark); border-bottom-color: var(--accent-dark); }
+.hp-field { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+.form-status { display: none; margin-top: 18px; font-size: 13.5px; line-height: 1.6; }
+.form-status.error { display: block; color: var(--red); border-top: 1px solid var(--line); padding-top: 14px; }
+.form-status.error a { border-bottom: 1px solid currentColor; }
+.form-success { padding: 8px 0 4px; }
+.form-success-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--green); margin-bottom: 16px; }
+.form-success-title { font-family: var(--serif); font-weight: 400; font-size: 26px; line-height: 1.2; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 12px; }
+.form-success-text { font-size: 14px; line-height: 1.65; color: var(--ink-soft); max-width: 400px; }
 
 /* ============ ANIMATIONS ============ */
 @keyframes fadeUp {
@@ -1306,7 +1332,7 @@ body.menu-open { overflow: hidden; }
       </div>
     </div>
   </div>
-</section></section>
+</section>
 
 <!-- SERVICES -->
 <section class="services grain-sec" id="hizmetler" data-folio="07" data-folio-tr="HİZMETLER" data-folio-en="SERVICES" data-screen-label="07 Hizmetler">
@@ -1485,72 +1511,87 @@ body.menu-open { overflow: hidden; }
         </div>
       </div>
       
-      <form class="form reveal" onsubmit="event.preventDefault(); const msg = document.documentElement.lang === 'en' ? 'Your request has been received. We will get back to you within 1 business day.' : 'Talebiniz alındı. 1 iş günü içinde size dönüş yapacağız.'; alert(msg);">
+      <form class="form reveal" id="leadForm" action="/api/lead" method="post">
         <h3 class="form-title" data-tr="Teklif Talebi" data-en="Request a Proposal">Teklif Talebi</h3>
         <p class="form-subtitle" data-tr="Tüm alanları doldurarak hızlı dönüş alın." data-en="Fill out all fields for a prompt response.">Tüm alanları doldurarak hızlı dönüş alın.</p>
-        
+
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" data-tr="Ad" data-en="First Name">Ad</label>
-            <input type="text" class="form-input" required>
+            <label class="form-label" for="lead-ad" data-tr="Ad" data-en="First Name">Ad</label>
+            <input type="text" class="form-input" id="lead-ad" name="ad" autocomplete="given-name" required>
           </div>
           <div class="form-group">
-            <label class="form-label" data-tr="Soyad" data-en="Last Name">Soyad</label>
-            <input type="text" class="form-input" required>
+            <label class="form-label" for="lead-soyad" data-tr="Soyad" data-en="Last Name">Soyad</label>
+            <input type="text" class="form-input" id="lead-soyad" name="soyad" autocomplete="family-name" required>
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label class="form-label" data-tr="Şirket Adı" data-en="Company">Şirket Adı</label>
-          <input type="text" class="form-input" required>
+          <label class="form-label" for="lead-sirket" data-tr="Şirket Adı" data-en="Company">Şirket Adı</label>
+          <input type="text" class="form-input" id="lead-sirket" name="sirket" autocomplete="organization" required>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" data-tr="Telefon" data-en="Phone">Telefon</label>
-            <input type="tel" class="form-input" required>
+            <label class="form-label" for="lead-telefon" data-tr="Telefon" data-en="Phone">Telefon</label>
+            <input type="tel" class="form-input" id="lead-telefon" name="telefon" autocomplete="tel" inputmode="tel" required>
           </div>
           <div class="form-group">
-            <label class="form-label" data-tr="E-posta" data-en="Email">E-posta</label>
-            <input type="email" class="form-input" required>
+            <label class="form-label" for="lead-eposta" data-tr="E-posta" data-en="Email">E-posta</label>
+            <input type="email" class="form-input" id="lead-eposta" name="eposta" autocomplete="email" inputmode="email" required>
           </div>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" data-tr="Aylık Tüketim" data-en="Monthly Consumption">Aylık Tüketim</label>
-            <select class="form-select" required>
+            <label class="form-label" for="lead-tuketim" data-tr="Aylık Tüketim" data-en="Monthly Consumption">Aylık Tüketim</label>
+            <select class="form-select" id="lead-tuketim" name="tuketim" required>
               <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
-              <option data-tr="100.000 kWh altı" data-en="Under 100,000 kWh">100.000 kWh altı</option>
-              <option data-tr="100.000 – 500.000 kWh" data-en="100,000 – 500,000 kWh">100.000 – 500.000 kWh</option>
-              <option data-tr="500.000 – 1.000.000 kWh" data-en="500,000 – 1,000,000 kWh">500.000 – 1.000.000 kWh</option>
-              <option data-tr="1.000.000 kWh üstü" data-en="Over 1,000,000 kWh">1.000.000 kWh üstü</option>
+              <option value="0-100000" data-tr="100.000 kWh altı" data-en="Under 100,000 kWh">100.000 kWh altı</option>
+              <option value="100000-500000" data-tr="100.000 – 500.000 kWh" data-en="100,000 – 500,000 kWh">100.000 – 500.000 kWh</option>
+              <option value="500000-1000000" data-tr="500.000 – 1.000.000 kWh" data-en="500,000 – 1,000,000 kWh">500.000 – 1.000.000 kWh</option>
+              <option value="1000000+" data-tr="1.000.000 kWh üstü" data-en="Over 1,000,000 kWh">1.000.000 kWh üstü</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" data-tr="Sektör" data-en="Industry">Sektör</label>
-            <select class="form-select" required>
+            <label class="form-label" for="lead-sektor" data-tr="Sektör" data-en="Industry">Sektör</label>
+            <select class="form-select" id="lead-sektor" name="sektor" required>
               <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
-              <option data-tr="Üretim / Sanayi" data-en="Manufacturing / Industry">Üretim / Sanayi</option>
-              <option data-tr="OSB" data-en="Organized Industrial Zone">OSB</option>
-              <option data-tr="Hizmet / Ticaret" data-en="Services / Commerce">Hizmet / Ticaret</option>
-              <option data-tr="Veri Merkezi" data-en="Data Center">Veri Merkezi</option>
-              <option data-tr="Diğer" data-en="Other">Diğer</option>
+              <option value="uretim-sanayi" data-tr="Üretim / Sanayi" data-en="Manufacturing / Industry">Üretim / Sanayi</option>
+              <option value="osb" data-tr="OSB" data-en="Organized Industrial Zone">OSB</option>
+              <option value="hizmet-ticaret" data-tr="Hizmet / Ticaret" data-en="Services / Commerce">Hizmet / Ticaret</option>
+              <option value="veri-merkezi" data-tr="Veri Merkezi" data-en="Data Center">Veri Merkezi</option>
+              <option value="diger" data-tr="Diğer" data-en="Other">Diğer</option>
             </select>
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label class="form-label" data-tr="Notunuz (opsiyonel)" data-en="Your Note (optional)">Notunuz (opsiyonel)</label>
-          <textarea class="form-textarea" data-tr-placeholder="Mevcut sözleşme detayları, ihtiyaçlar..." data-en-placeholder="Current contract details, requirements..." placeholder="Mevcut sözleşme detayları, ihtiyaçlar..."></textarea>
+          <label class="form-label" for="lead-mesaj" data-tr="Notunuz (opsiyonel)" data-en="Your Note (optional)">Notunuz (opsiyonel)</label>
+          <textarea class="form-textarea" id="lead-mesaj" name="mesaj" data-tr-placeholder="Mevcut sözleşme detayları, ihtiyaçlar..." data-en-placeholder="Current contract details, requirements..." placeholder="Mevcut sözleşme detayları, ihtiyaçlar..."></textarea>
         </div>
-        
-        <button type="submit" class="form-submit">
+
+        <!-- Honeypot — insan kullanıcılar görmez; doluysa backend sessizce eler -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="lead-website">Website</label>
+          <input type="text" id="lead-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <label class="form-consent" for="lead-kvkk">
+          <input type="checkbox" id="lead-kvkk" name="kvkk" required>
+          <span>
+            <span class="tr-only"><a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni okudum; kişisel verilerimin teklif hazırlanması amacıyla işlenmesine onay veriyorum.</span>
+            <span class="en-only">I have read the <a href="/kvkk" target="_blank" rel="noopener">KVKK Privacy Notice</a> and consent to the processing of my personal data for the preparation of a proposal.</span>
+          </span>
+        </label>
+
+        <button type="submit" class="form-submit" id="leadSubmit">
           <span data-tr="Teklif Talep Et" data-en="Request Proposal">Teklif Talep Et</span>
           <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
             <path d="M1 5h12M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
+        <div class="form-status" id="leadStatus" role="alert"></div>
       </form>
     </div>
   </div>
@@ -1598,14 +1639,14 @@ body.menu-open { overflow: hidden; }
     <div class="cl-bottom">
       <span class="cl-copy" data-tr="© 2026 VOLTAN ELEKTRİK TOPTAN SATIŞ İTHALAT VE İHRACAT A.Ş." data-en="© 2026 VOLTAN ELEKTRİK TOPTAN SATIŞ İTHALAT VE İHRACAT A.Ş. ALL RIGHTS RESERVED.">© 2026 VOLTAN ELEKTRİK TOPTAN SATIŞ İTHALAT VE İHRACAT A.Ş.</span>
       <div class="cl-legal">
-        <a href="#" data-tr="KVKK" data-en="Privacy">KVKK</a>
-        <a href="#" data-tr="Çerez Politikası" data-en="Cookie Policy">Çerez Politikası</a>
-        <a href="#" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a>
+        <a href="/kvkk" data-tr="KVKK" data-en="Privacy">KVKK</a>
+        <a href="/cerez-politikasi" data-tr="Çerez Politikası" data-en="Cookie Policy">Çerez Politikası</a>
+        <a href="/kullanim-kosullari" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a>
       </div>
       <span class="cl-markline">VOLTAGE ENERJİ</span>
     </div>
   </div>
-</footer></footer>
+</footer>
 
 <script>
 // Reduced motion: strip SMIL animations (CSS can't reach them)
@@ -1939,7 +1980,93 @@ async function fetchPtfLive(){
   tio.observe(t);
 })();
 
-// Initialize from URL param, stored preference, or browser language
+// 6) Teklif formu — /api/lead backend (Pages Function). Tarayıcı uyarı
+// kutusu kullanılmaz: başarı formun yerine geçer, hata dürüst mesaj +
+// mailto alternatifi gösterir.
+(function(){
+  const form = document.getElementById('leadForm');
+  if(!form) return;
+  const btn = document.getElementById('leadSubmit');
+  const btnLabel = btn ? btn.querySelector('span') : null;
+  const status = document.getElementById('leadStatus');
+  const L = function(){ return document.documentElement.lang === 'en' ? 'en' : 'tr'; };
+  const TXT = {
+    busy: { tr: 'Gönderiliyor…', en: 'Sending…' },
+    btn: { tr: 'Teklif Talep Et', en: 'Request Proposal' },
+    okTag: { tr: 'KAYIT ALINDI', en: 'REQUEST RECEIVED' },
+    okTitle: { tr: 'Talebiniz alındı.', en: 'Your request has been received.' },
+    okText: { tr: '1 iş günü içinde dönüş yapacağız.', en: 'We will get back to you within 1 business day.' },
+    errPre: { tr: 'Talebiniz gönderilemedi. Lütfen tekrar deneyin veya ', en: 'Your request could not be sent. Please try again or email ' },
+    errPost: { tr: ' adresine yazın.', en: '.' }
+  };
+  function esc(s){ return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  function utmParams(){
+    const utm = {};
+    try {
+      const q = new URLSearchParams(location.search);
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(function(k){
+        const v = q.get(k);
+        if(v) utm[k] = v;
+      });
+    } catch(e) {}
+    return utm;
+  }
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(btn) btn.disabled = true;
+    if(btnLabel) btnLabel.textContent = TXT.busy[L()];
+    if(status){ status.className = 'form-status'; status.textContent = ''; }
+    const fd = new FormData(form);
+    const payload = {
+      ad: fd.get('ad') || '',
+      soyad: fd.get('soyad') || '',
+      sirket: fd.get('sirket') || '',
+      telefon: fd.get('telefon') || '',
+      eposta: fd.get('eposta') || '',
+      tuketim: fd.get('tuketim') || '',
+      sektor: fd.get('sektor') || '',
+      mesaj: fd.get('mesaj') || '',
+      kvkk: fd.get('kvkk') === 'on',
+      website: fd.get('website') || '',
+      lang: L(),
+      utm: utmParams()
+    };
+    try {
+      const r = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json().catch(function(){ return null; });
+      if(!r.ok || !j || j.ok !== true) throw new Error('HTTP ' + r.status);
+      const t = L();
+      form.innerHTML = '<div class="form-success">' +
+        '<div class="form-success-tag" data-tr="' + esc(TXT.okTag.tr) + '" data-en="' + esc(TXT.okTag.en) + '">' + TXT.okTag[t] + '</div>' +
+        '<div class="form-success-title" data-tr="' + esc(TXT.okTitle.tr) + '" data-en="' + esc(TXT.okTitle.en) + '">' + TXT.okTitle[t] + '</div>' +
+        '<p class="form-success-text" data-tr="' + esc(TXT.okText.tr) + '" data-en="' + esc(TXT.okText.en) + '">' + TXT.okText[t] + '</p>' +
+        '</div>';
+    } catch(err) {
+      console.warn('Lead submit failed:', err.message);
+      if(status){
+        status.className = 'form-status error';
+        status.textContent = '';
+        const t = L();
+        status.append(TXT.errPre[t]);
+        const a = document.createElement('a');
+        a.href = 'mailto:info@voltage.com.tr';
+        a.textContent = 'info@voltage.com.tr';
+        status.append(a);
+        status.append(TXT.errPost[t]);
+      }
+      if(btn) btn.disabled = false;
+      if(btnLabel) btnLabel.textContent = TXT.btn[L()];
+    }
+  });
+})();
+
+// Initialize from URL param or stored preference. TR is the default:
+// tarayıcı diline göre otomatik EN açılışı YOK (K1 — Googlebot ABD'den
+// tarar, otomatik EN açılış TR indekslenmesini bozar).
 (function initLanguage() {
   let lang = 'tr';
   try {
@@ -1950,8 +2077,6 @@ async function fetchPtfLive(){
       const stored = localStorage.getItem('voltage-lang');
       if (stored === 'en' || stored === 'tr') {
         lang = stored;
-      } else if (navigator.language && !navigator.language.toLowerCase().startsWith('tr')) {
-        lang = 'en';
       }
     }
   } catch(e) {}
@@ -1975,5 +2100,10 @@ async function fetchPtfLive(){
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !menu.hidden) setOpen(false); });
 })();
 </script>
+
+<!-- Cloudflare Web Analytics (çerezsiz beacon) — etkinleştirme: DEPLOY.md §5.6.
+     Token'ı yapıştır, bloğu yorumdan çıkar. CSP izinleri _headers'ta hazırdır.
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "CF_WEB_ANALYTICS_TOKEN_BURAYA"}'></script>
+-->
 </body>
 </html>
