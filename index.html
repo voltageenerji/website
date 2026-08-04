@@ -8,17 +8,12 @@
 <title>Voltage Enerji — Kurumsal ve Endüstriyel Elektrik Tedarikçisi | Voltan Elektrik A.Ş.</title>
 <meta name="title" content="Voltage Enerji — Kurumsal ve Endüstriyel Elektrik Tedarikçisi">
 <meta name="description" content="Voltage Enerji, 2011'den bu yana Türkiye serbest elektrik piyasasının ilk oyuncularından biri olarak GÖP, GİP ve ikili anlaşmalar üzerinden kurumsal ve endüstriyel müşterilere güvenilir elektrik tedariki sağlamaktadır.">
-<meta name="keywords" content="elektrik tedarikçisi, endüstriyel elektrik, kurumsal elektrik, GÖP, GİP, EPİAŞ, ikili anlaşma, portföy yönetimi, serbest elektrik piyasası, OSB elektrik tedariki, Voltan Elektrik, yenilenebilir enerji, YEK-G">
 <meta name="author" content="Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
-<meta name="language" content="Turkish">
-<meta name="revisit-after" content="7 days">
 
-<!-- Canonical & Language Alternates -->
+<!-- Canonical (hreflang intentionally absent until a prerendered /en/ exists —
+     see docs/seo/TECHNICAL-AUDIT.md Y1 / §6.6) -->
 <link rel="canonical" href="https://voltage.com.tr/">
-<link rel="alternate" hreflang="tr" href="https://voltage.com.tr/">
-<link rel="alternate" hreflang="en" href="https://voltage.com.tr/?lang=en">
-<link rel="alternate" hreflang="x-default" href="https://voltage.com.tr/">
 
 <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
 <meta property="og:type" content="website">
@@ -40,15 +35,16 @@
 <meta name="twitter:description" content="2011'den bu yana kurumsal ve endüstriyel elektrik tedariki. Serbest piyasanın ilk oyuncularından.">
 <meta name="twitter:image" content="https://voltage.com.tr/og-image.jpg">
 
-<!-- Favicon (SVG inline for maximum compatibility) -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%23F7F5EF'/%3E%3Ccircle cx='18' cy='18' r='15' stroke='%23C9A961' stroke-width='1' fill='none' opacity='0.4'/%3E%3Cpath d='M11 10 L18 26 L25 10' stroke='%2311141F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='18' cy='18' r='1.5' fill='%23C9A961'/%3E%3C/svg%3E">
+<!-- Favicon (real files — Google SERP favicon'u fetch edilebilir URL ister; TECHNICAL-AUDIT.md O4) -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" sizes="48x48 32x32 16x16" href="/favicon.ico">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%23F7F5EF'/%3E%3Cpath d='M11 10 L18 26 L25 10' stroke='%2311141F' stroke-width='2' fill='none'/%3E%3C/svg%3E">
 
 <!-- Theme color for mobile browsers -->
 <meta name="theme-color" content="#F7F5EF">
 <meta name="msapplication-TileColor" content="#F7F5EF">
 
-<!-- Schema.org Structured Data: Organization + Website + LocalBusiness -->
+<!-- Schema.org Structured Data: Organization + WebSite + Service -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -127,9 +123,7 @@
 }
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Fonts self-host edildi (TECHNICAL-AUDIT.md O3) — /assets/fonts/, @font-face style bloğunda -->
 
 <!-- Cloudflare Web Analytics (çerezsiz) — etkinleştirmek için token'ı doldurup
      yorumu kaldırın; kurulum: DEPLOY.md "Cloudflare Web Analytics" bölümü.
@@ -146,6 +140,14 @@ html[lang="tr"] .en-only { display: none !important; }
 html[lang="en"] .tr-only { display: none !important; }
 html[lang="tr"] .marquee-track.en-only,
 html[lang="en"] .marquee-track.tr-only { display: none !important; }
+/* Self-hosted fonts (TECHNICAL-AUDIT.md O3) — Google Fonts v38/v9 variable woff2 slices,
+   latin + latin-ext (latin-ext ZORUNLU: ğĞşŞİ; latin: üÜıöÖçÇ dahil U+0131 ı) */
+@font-face{font-family:'Fraunces';font-style:normal;font-weight:300 400;font-display:swap;src:url('/assets/fonts/fraunces-v38-roman-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'Fraunces';font-style:normal;font-weight:300 400;font-display:swap;src:url('/assets/fonts/fraunces-v38-roman-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'Fraunces';font-style:italic;font-weight:400;font-display:swap;src:url('/assets/fonts/fraunces-v38-italic-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'Fraunces';font-style:italic;font-weight:400;font-display:swap;src:url('/assets/fonts/fraunces-v38-italic-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'Inter Tight';font-style:normal;font-weight:400 600;font-display:swap;src:url('/assets/fonts/inter-tight-v9-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'Inter Tight';font-style:normal;font-weight:400 600;font-display:swap;src:url('/assets/fonts/inter-tight-v9-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
 /* Tokens (spec §1.1, verbatim) */
 :root{/* Surfaces (light, warm) */
 --paper:#F7F5EF;--paper-warm:#EFEBE0;--paper-raise:#FFFFFF;--cream-deep:#E7E2D3;/* Ink (text) */
@@ -1832,7 +1834,8 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(a=> a.addEventListener('
   }
 })();
 
-// Initialize from URL param, stored preference, or browser language
+// Initialize from URL param or stored preference (default: TR — no browser-language
+// auto-detection; Googlebot renders en-US and would otherwise index the EN variant)
 (function initLanguage() {
   let lang = 'tr';
   try {
@@ -1843,8 +1846,6 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(a=> a.addEventListener('
       const stored = localStorage.getItem('voltage-lang');
       if (stored === 'en' || stored === 'tr') {
         lang = stored;
-      } else if (navigator.language && !navigator.language.toLowerCase().startsWith('tr')) {
-        lang = 'en';
       }
     }
   } catch(e) {}
