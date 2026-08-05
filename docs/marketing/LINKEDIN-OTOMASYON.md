@@ -85,3 +85,9 @@ itibarıyla yayına açılmıştır ve akışta görünür. Kurulum sırasında:
    test ile yayınlamazsanız tanıtım postu hiçbir zaman otomatik atılmaz.
 3. Test sonrası Zap'i On yapın — sıradaki gönderiler (26.08, 09.09, 23.09,
    07.10) tarihlerinde otomatik yayınlanır.
+
+**Operasyon kaydı (05.08.2026):** Kurulumda aksiyon testi atlandığı için
+tanıtım öğesi Zap baseline'ına takıldı; guid `li-2026-08-05-tanitim-v2`
+olarak yenilenip yeniden tetiklendi. Kural notu: "id değiştirilmez" kuralı
+yayın SONRASI öğeler içindir — baseline'a takılan yayınlanmamış bir öğeyi
+yeniden tetiklemenin yolu tam olarak guid yenilemektir (dedupe=Different Guid).
