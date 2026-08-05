@@ -72,3 +72,16 @@ Zapier tercih edilir.
 - **Feed URL testi:** `curl -s https://voltage.com.tr/feed/linkedin | head`
   geçerli `<?xml ... <rss version="2.0">` çıktısı vermelidir; POST isteği
   405 döner (tasarım gereği).
+
+
+## Kurulum testi hakkında önemli not (2026-08-05)
+
+Akış zaman kilitlidir; kurulum yapılabilsin diye tanıtım gönderisi 05.08.2026
+itibarıyla yayına açılmıştır ve akışta görünür. Kurulum sırasında:
+1. "Test trigger" örnek olarak tanıtım gönderisini çekecektir.
+2. "Test step" (LinkedIn aksiyonu) çalıştırıldığında tanıtım gönderisi
+   GERÇEKTEN yayınlanır — bu istenen davranıştır (lansman gönderisidir).
+   Testi ATLAMAYIN: Zap açılırken akışta mevcut öğeler "görülmüş" sayılır;
+   test ile yayınlamazsanız tanıtım postu hiçbir zaman otomatik atılmaz.
+3. Test sonrası Zap'i On yapın — sıradaki gönderiler (26.08, 09.09, 23.09,
+   07.10) tarihlerinde otomatik yayınlanır.
