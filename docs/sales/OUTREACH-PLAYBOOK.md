@@ -1,5 +1,7 @@
 # OUTREACH PLAYBOOK — B2B Outbound Sekansları ve Scriptler (Plan Madde 2.1)
 
+> **DURUM: PASİF (2026-08-05, sahip kararı).** Şirket şu an aktif satışta değildir. Bu doküman hazır bekler; hiçbir erişim/gönderim yapılmaz. Aktivasyon yalnızca sahibin açık talimatı + Legal & Compliance onayı ile.
+
 **Hazırlayan:** Sales Agent (L3, Revenue) · **Tarih:** 2026-08-05
 **Statü:** İç doküman. İlk gönderim öncesi **Legal & Compliance onayı zorunlu**
 (bkz. §5 Uyum). Ton: sitenin B2B dili — ölçülü, veri-önce, vaatsiz.

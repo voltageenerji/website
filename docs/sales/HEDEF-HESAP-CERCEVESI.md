@@ -1,5 +1,7 @@
 # HEDEF HESAP ÇERÇEVESİ — B2B Outbound Motoru (Plan Madde 2.1)
 
+> **DURUM: PASİF (2026-08-05, sahip kararı).** Şirket şu an aktif satışta değildir. Bu doküman hazır bekler; hiçbir erişim/gönderim yapılmaz. Aktivasyon yalnızca sahibin açık talimatı + Legal & Compliance onayı ile.
+
 **Hazırlayan:** Sales Agent (L3, Revenue) · **Tarih:** 2026-08-05
 **Statü:** İç doküman — siteye yansımaz. Revenue Executive onayına sunulur.
 **Bağlı kurallar:** Hiçbir sayısal fiyat/tasarruf iddiası kullanılamaz (Pricing

@@ -1,5 +1,7 @@
 # PIPELINE TAKİP — B2B Outbound Hunisi ve Haftalık Rapor Seti (Plan Madde 2.1)
 
+> **DURUM: PASİF (2026-08-05, sahip kararı).** Şirket şu an aktif satışta değildir. Bu doküman hazır bekler; hiçbir erişim/gönderim yapılmaz. Aktivasyon yalnızca sahibin açık talimatı + Legal & Compliance onayı ile.
+
 **Hazırlayan:** Sales Agent (L3, Revenue) · **Tarih:** 2026-08-05
 **Statü:** İç doküman. Ölçüm tanımları Analytics ile, risk kapıları Market
 Risk ile paylaşılır. MWh-ağırlıklı düşünce esastır (marj/MWh > adet).
