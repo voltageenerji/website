@@ -91,3 +91,8 @@ tanıtım öğesi Zap baseline'ına takıldı; guid `li-2026-08-05-tanitim-v2`
 olarak yenilenip yeniden tetiklendi. Kural notu: "id değiştirilmez" kuralı
 yayın SONRASI öğeler içindir — baseline'a takılan yayınlanmamış bir öğeyi
 yeniden tetiklemenin yolu tam olarak guid yenilemektir (dedupe=Different Guid).
+
+**DURUM: DEVREDE (05.08.2026).** İlk gönderi (tanıtım) otomasyon üzerinden
+LinkedIn sayfasında yayınlandı — sahip ekran görüntüsüyle teyit etti.
+Sıradaki otomatik gönderiler: 26.08 (canlı PTF), 09.09 (rehber lansmanı),
+23.09 (serbest tüketici 2026), 07.10 (ilke postu).
