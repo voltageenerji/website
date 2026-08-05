@@ -6,6 +6,7 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /docs/
 
 # --- AI arama / cevap motoru tarayıcıları (açıkça izinli) ---
 

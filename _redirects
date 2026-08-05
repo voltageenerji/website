@@ -13,3 +13,9 @@ https://www.voltan.com/* https://voltage.com.tr/:splat 301
 
 # .html uzantısını kaldır (temiz URL)
 /index.html / 301
+
+# İç dokümanlar herkese açık servis edilmez (repo = Pages çıktı dizini)
+/docs/* / 302
+/CLAUDE.md / 302
+/DEPLOY.md / 302
+/CHANGELOG.md / 302
