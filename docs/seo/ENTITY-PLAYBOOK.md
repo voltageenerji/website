@@ -298,3 +298,7 @@ adlandırma kurallarının **sahipli yüzeylerde** (site metni) uygulanmasıdır
 *Dağıtım: SEO Direktörü (onay), seo-schema (Bölüm 4), seo-local (Bölüm 1.4,*
 *2, 5/8–9), marketing (sosyal), investor-relations (Crunchbase, data-room),*
 *legal-compliance (sicil/lisans teyitleri), Support (itibar bulgu rotası).*
+
+
+---
+**Güncelleme (2026-08-05, Orchestrator):** LinkedIn sayfası sahiplikçe teyit edildi: https://www.linkedin.com/company/voltage-enerji/ — JSON-LD `sameAs` ve llms.txt'ye işlendi. Sıradaki adım: profil bilgilerinin isim kural setiyle hizalanması (marketing görevi).
