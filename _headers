@@ -26,6 +26,13 @@
 /kullanim-kosullari
   Cache-Control: public, max-age=300, must-revalidate
 
+# Rehber bölümü (hub + makaleler, uzantısız temiz URL'ler)
+/rehber
+  Cache-Control: public, max-age=300, must-revalidate
+
+/rehber/*
+  Cache-Control: public, max-age=300, must-revalidate
+
 # API (Pages Functions) — asla cache'leme, asla indeksleme (O1)
 /api/*
   Cache-Control: no-store
