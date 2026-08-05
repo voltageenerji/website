@@ -14,6 +14,9 @@ https://www.voltan.com/* https://voltage.com.tr/:splat 301
 # .html uzantısını kaldır (temiz URL)
 /index.html / 301
 
+# LinkedIn RSS beslemesi — .xml uzantılı istekler fonksiyon yoluna gider
+/feed/linkedin.xml /feed/linkedin 301
+
 # İç dokümanlar herkese açık servis edilmez (repo = Pages çıktı dizini)
 /docs/* / 302
 /CLAUDE.md / 302

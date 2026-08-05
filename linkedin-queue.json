@@ -1,0 +1,37 @@
+[
+  {
+    "id": "li-2026-08-12-tanitim",
+    "publishAt": "2026-08-12T10:00:00+03:00",
+    "title": "Tanıtım / Yeniden Merhaba",
+    "text": "LinkedIn'de yeniden merhaba.\n\nVoltage Enerji, Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. çatısı altında, 2011'den bu yana Türkiye serbest elektrik piyasasında faaliyet gösteriyor — piyasanın ilk oyuncularından biri olarak. ETS/3424-8/2074 numaralı EPDK tedarik lisansıyla EPİAŞ'ta Gün Öncesi, Gün İçi ve ikili anlaşma piyasalarının aktif katılımcısıyız.\n\nBu sayfada satış dili görmeyeceksiniz. Görecekleriniz: piyasa mekanizmasına dair açıklayıcı içerik, mevzuat değişikliklerinin tarihli ve kaynaklı özetleri ve tedarik sözleşmelerine dair kurumsal bakışımız.\n\nKim olduğumuz, hangi tesis sınıflarıyla çalıştığımız ve nasıl çalıştığımız: https://voltage.com.tr\n\n#enerji #elektrikpiyasası #EPİAŞ #enerjitedariki",
+    "link": "https://voltage.com.tr"
+  },
+  {
+    "id": "li-2026-08-26-canli-ptf",
+    "publishAt": "2026-08-26T10:00:00+03:00",
+    "title": "Canlı PTF Bandı (dürüst veri ilkesi)",
+    "text": "Elektriğin fiyatı tek bir sayı değildir; her gün yeniden oluşan 24 saatlik bir seridir.\n\nAna sayfamızda, EPİAŞ Şeffaflık Platformu kaynaklı Gün Öncesi PTF verisini saatlik seri hâlinde canlı yayınlıyoruz: günün cetveli, en düşük ve en yüksek saatler, gün ortalaması — kaynağı ve zaman damgasıyla.\n\nNeden? Çünkü üzerine sözleşme kurulan bir referans, herkesin doğrulayabildiği bir referans olmalıdır. PTF verisi zaten kamuya açıktır; biz onu okunur hâle getiriyoruz. Yorum katmadan, tahmin taahhüdüne çevirmeden.\n\nCanlı bandı görmek için: https://voltage.com.tr\n\n#PTF #EPİAŞ #elektrikpiyasası #şeffaflık",
+    "link": "https://voltage.com.tr"
+  },
+  {
+    "id": "li-2026-09-09-rehber-lansmani",
+    "publishAt": "2026-09-09T10:00:00+03:00",
+    "title": "/rehber Lansmanı (10 rehber)",
+    "text": "Elektrik tedariki, düzenlemesi her yıl değişen, fiyatı her saat yeniden oluşan bir piyasada yürür. Bu piyasada karar veren işletmeler için 10 rehberlik bir set yayınladık.\n\nKapsam: serbest tüketici mevzuatı, tedarikçi değiştirme süreci, PTF'nin oluşumu, OSB'de tedarik — ve sektörel yük profilleri: demir-çelik, kimya, tekstil, cam-seramik, soğuk zincir, veri merkezleri.\n\nYazım ilkesi baştan net: her düzenleyici bilgi tarihli ve kaynaklıdır (EPDK, EPİAŞ, Resmî Gazete); hiçbir sayfada tasarruf yüzdesi veya tutar taahhüdü yoktur. Pazarlama diliyle değil, sözleşme ve mevzuat diliyle.\n\nRehber dizini: https://voltage.com.tr/rehber\n\n#enerjirehberi #serbesttüketici #elektriktedariki #EPDK #PTF",
+    "link": "https://voltage.com.tr/rehber"
+  },
+  {
+    "id": "li-2026-09-23-serbest-tuketici-2026",
+    "publishAt": "2026-09-23T10:00:00+03:00",
+    "title": "\"Serbest Tüketici 2026\" Rehberi",
+    "text": "2026'da serbest tüketici limiti yıllık 500 kWh.\n\nEPDK'nın 14039 sayılı Kurul Kararı (Resmî Gazete 23.12.2025, sayı 33116) ile limit 750 kWh'ten 500 kWh'e indi. Pratikte anlamı: Türkiye'de elektrik kullanan hemen her işletme artık tedarikçisini seçme hakkına sahip.\n\nRehberde tarihli kaynaklarıyla anlattık: serbest tüketici kimdir, hak nasıl kullanılır, ikili anlaşma imzalamayan yüksek tüketimli abonelere uygulanan Son Kaynak Tedarik Tarifesi (SKTT) nedir, sayaç ve bağlantı değişir mi (değişmez).\n\nDürüst not rehberde de yazıyor: bu hakkı kullanmanın mantıklı olup olmadığı tüketim profiline bağlıdır; her profil için tek doğru cevap yoktur.\n\nRehberin tamamı: https://voltage.com.tr/rehber/serbest-tuketici\n\n#serbesttüketici #EPDK #elektrikpiyasası #mevzuat",
+    "link": "https://voltage.com.tr/rehber/serbest-tuketici"
+  },
+  {
+    "id": "li-2026-10-07-sozlesme-neyse-o",
+    "publishAt": "2026-10-07T10:00:00+03:00",
+    "title": "\"Sözleşme Neyse O\" İlke Postu",
+    "text": "İş modelimizin merkezinde tek bir prensip var: sözleşme ne diyorsa, o olur.\n\nBu ilkenin bizim için üç somut karşılığı:\n\n1) Her fiyat formülü sözleşme metninde yazılıdır — sabit, endeksli veya hibrit; hangisiyse, nasıl hesaplandığı açıkça görünür.\n2) Riskin kimde olduğu belirsiz bırakılmaz. Piyasa riski sözleşmede kime yazılmışsa ondadır; sabit modelde bizde, paylaşımlı modellerde formülüyle birlikte.\n3) Tasarruf yüzdesi ve tutar taahhüdü vermeyiz. PTF beklentisi taahhüt değil, senaryodur; karşılaştırma verilerle yapılır.\n\nEnerji tedariki, fiyat kadar güvenilirliğin de satın alındığı bir ilişkidir. 2011'den beri bu disiplinle çalışıyoruz.\n\nYaklaşımımız: https://voltage.com.tr\n\n#enerjitedariki #sözleşme #şeffaflık #kurumsalenerji",
+    "link": "https://voltage.com.tr"
+  }
+]

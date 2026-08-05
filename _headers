@@ -33,6 +33,12 @@
 /rehber/*
   Cache-Control: public, max-age=300, must-revalidate
 
+# Feed (Pages Functions) — köprüler (Zapier/Buffer) okur; kısa cache.
+# noindex yalnızca arama sonuçlarını temiz tutar, fetch tabanlı köprüleri ETKİLEMEZ.
+/feed/*
+  Cache-Control: public, max-age=300
+  X-Robots-Tag: noindex
+
 # API (Pages Functions) — asla cache'leme, asla indeksleme (O1)
 /api/*
   Cache-Control: no-store
