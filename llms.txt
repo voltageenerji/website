@@ -23,6 +23,7 @@
 - [Veri Merkezi Elektrik Tedariki](https://voltage.com.tr/rehber/veri-merkezi-elektrik): 7/24 düz yük çeken veri merkezlerinde elektrik tedariki: PTF endeksli ve sabit modeller, PUE bilinci ve YEK-G belgeli yeşil enerji tedariki.
 - [Soğuk Zincir ve Depolarda Elektrik Maliyeti](https://voltage.com.tr/rehber/soguk-zincir-elektrik): Kompresör yükleri, gece öne-soğutma ve saat planlaması: soğuk zincir depoları ve lojistik tesisleri için elektrik tedarik modelleri ve süreç.
 - [Cam ve Seramik Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/cam-seramik-elektrik): Fırın sürekliliği ve kesinti toleransı olmayan yükler: cam ve seramik tesislerinde elektrik maliyeti, ısıl-elektrik ayrımı ve tedarik modelleri.
+- [Yenilenebilir Üreticiler için Portföy Hizmetleri](https://voltage.com.tr/rehber/yenilenebilir-ureticiler): GES-RES üreticileri için üretim portföy hizmetleri: tahmin ve dengesizlik yönetimi, YEK-G belgelendirme desteği, dengeden sorumlu taraf ilişkisi.
 
 ## Canlı Veri
 
