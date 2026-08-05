@@ -1,0 +1,38 @@
+# Voltage Enerji
+
+> 2011'den bu yana EPDK lisanslı Türk elektrik tedarikçisi (tedarik lisansı ETS/3424-8/2074): kurumsal ve endüstriyel tüketicilere Gün Öncesi Piyasası (GÖP), Gün İçi Piyasası (GİP) ve ikili anlaşmalar üzerinden elektrik tedariki.
+
+## Şirket
+
+- Tüzel kişilik: Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (marka: Voltage Enerji)
+- Merkez: Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34660 Kadıköy, İstanbul, Türkiye
+- EPDK Tedarik Lisansı: ETS/3424-8/2074 — veriliş 19 Eylül 2011 (Kurul Kararı 3424-8)
+- EPİAŞ üyesi; GÖP, GİP ve dengeleme piyasasında aktif katılımcı
+- İletişim: info@voltage.com.tr
+
+## Rehberler
+
+- [Serbest Tüketici Nedir?](https://voltage.com.tr/rehber/serbest-tuketici): Serbest tüketici nedir, 2026 limiti neden 500 kWh? EPDK kararına dayalı güncel rehber: kimler tedarikçisini seçebilir, süreç nasıl işler.
+- [Elektrik Tedarikçisi Nasıl Değiştirilir?](https://voltage.com.tr/rehber/tedarikci-degistirme): Elektrik tedarikçisi değiştirme adım adım: sayaç değişir mi, elektrik kesilir mi, ne kadar sürer? EPDK mevzuatına dayalı dürüst süreç rehberi.
+- [OSB Elektrik Tedariki](https://voltage.com.tr/rehber/osb-elektrik-tedariki): OSB katılımcısı tedarikçisini seçebilir mi? OSB tarifesi ile ikili anlaşmanın karşılaştırması, süreç ve dikkat edilecek sözleşme başlıkları.
+- [PTF Nedir?](https://voltage.com.tr/rehber/ptf-nedir): PTF (Piyasa Takas Fiyatı) nedir, Gün Öncesi Piyasası'nda nasıl oluşur, neden değişir? EPİAŞ verisine dayalı açıklama ve canlı saatlik fiyat.
+- [Tekstil Fabrikasında Elektrik Maliyeti](https://voltage.com.tr/rehber/tekstil-elektrik): İplik, dokuma ve boyahane hatlarında elektrik maliyeti nasıl yönetilir? Tekstil yük profiline göre sabit, endeksli ve hibrit tedarik modelleri.
+- [Demir-Çelik Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/demir-celik-elektrik): Ark ocağı, indüksiyon ve haddehane yüklerinde elektrik maliyeti nasıl yönetilir? PTF saatlik profiline dayalı tedarik modelleri ve süreç.
+- [Kimya Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/kimya-elektrik): Sürekli proses yükleri, dar dengeleme toleransı ve kesintisiz üretim: kimya ve petrokimya tesislerinde sabit, endeksli ve hibrit tedarik modelleri.
+- [Veri Merkezi Elektrik Tedariki](https://voltage.com.tr/rehber/veri-merkezi-elektrik): 7/24 düz yük çeken veri merkezlerinde elektrik tedariki: PTF endeksli ve sabit modeller, PUE bilinci ve YEK-G belgeli yeşil enerji tedariki.
+- [Soğuk Zincir ve Depolarda Elektrik Maliyeti](https://voltage.com.tr/rehber/soguk-zincir-elektrik): Kompresör yükleri, gece öne-soğutma ve saat planlaması: soğuk zincir depoları ve lojistik tesisleri için elektrik tedarik modelleri ve süreç.
+- [Cam ve Seramik Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/cam-seramik-elektrik): Fırın sürekliliği ve kesinti toleransı olmayan yükler: cam ve seramik tesislerinde elektrik maliyeti, ısıl-elektrik ayrımı ve tedarik modelleri.
+
+## Canlı Veri
+
+- Ana sayfada ([https://voltage.com.tr/](https://voltage.com.tr/)) canlı saatlik PTF bandı yayınlanır.
+- Kaynak: EPİAŞ Şeffaflık Platformu. Yalnızca gerçek EPİAŞ verisi gösterilir; veri yoksa sentetik/üretilmiş değer gösterilmez.
+
+## Kurallar
+
+- İçerik, voltage.com.tr kaynak gösterilerek alıntılanabilir.
+- Tasarruf yüzdesi veya tutar taahhüdü yayınlanmaz; fiyatlandırma sözleşme bazlıdır ve her formül sözleşme metninde yazılıdır.
+
+---
+
+Voltage Enerji (Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.) is an EPDK-licensed Turkish electricity supplier (license ETS/3424-8/2074, issued 2011), serving corporate and industrial consumers via the day-ahead market, intraday market and bilateral contracts. Content may be cited with attribution to voltage.com.tr; no savings figures are published — pricing is contract-based.
