@@ -1797,10 +1797,17 @@ async function fetchPtfLive(){
   if(!rail || !track) return;
   const data = await fetchPtfLive();
   if(!data || !data.items || !data.items.length) return;
+  /* Fiyat kapısı: yalnızca sayı veya boş olmayan sayısal metin — null/'' ASLA 0 olmaz (QA DEF-D6) */
+  const railPrice = function(v){
+    if(typeof v === 'number') return Number.isFinite(v) ? v : null;
+    if(typeof v === 'string' && v.trim() !== ''){ const n = Number(v); return Number.isFinite(n) ? n : null; }
+    return null;
+  };
   const items = [];
   for(let h = 0; h < 24; h++){
     const it = data.items.find(x => x.hour === h);
-    if(it) items.push({ h: h, p: Math.round(it.price) });
+    const pv = it ? railPrice(it.price) : null;
+    if(pv !== null) items.push({ h: h, p: Math.round(pv) });   /* geçersiz saat rayda hiç görünmez */
   }
   if(items.length < 6) return;
   let html = '';
@@ -1864,39 +1871,68 @@ async function fetchPtfLive(){
   function drawChart(prices){
     if(!lmLine || !lmArea) return;
     const W = 800, H = 260, padTop = 24, padBottom = 24;
-    const min = Math.min.apply(null, prices), max = Math.max.apply(null, prices);
+    const fin = prices.filter(function(v){ return Number.isFinite(v); });
+    if(fin.length < 2){ if(lmLine) lmLine.setAttribute('d',''); if(lmArea) lmArea.setAttribute('d',''); if(lmDot) lmDot.style.display='none'; return; }
+    const min = Math.min.apply(null, fin), max = Math.max.apply(null, fin);
     const range = Math.max(1, max - min);
     const usable = H - padTop - padBottom;
-    const pts = prices.map(function(p, i){
-      return [+((i / 23) * W).toFixed(1), +(padTop + (1 - (p - min) / range) * usable).toFixed(1)];
-    });
-    const line = 'M' + pts.map(function(p){ return p.join(','); }).join(' L');
-    lmLine.setAttribute('d', line);
-    lmArea.setAttribute('d', line + ' L' + W + ',' + H + ' L0,' + H + ' Z');
-    if(lmDot){
-      const nowH = Math.min(23, new Date().getHours());
-      lmDot.setAttribute('cx', pts[nowH][0]);
-      lmDot.setAttribute('cy', pts[nowH][1]);
-      lmDot.style.display = state.mode === 'live' ? '' : 'none';
+    /* Eksik saatler çizilmez — grafik yalnızca gerçek noktaları birleştirir */
+    const pts = [];
+    for(let i = 0; i < 24; i++){
+      if(!Number.isFinite(prices[i])) continue;
+      pts.push([+((i / 23) * W).toFixed(1), +(padTop + (1 - (prices[i] - min) / range) * usable).toFixed(1), i]);
     }
+    /* Bitişik olmayan saatler birleştirilmez — boşlukta çizgi kopar (D3) */
+    let line = '', prevIdx = null;
+    for(let i = 0; i < pts.length; i++){
+      const cmd = (prevIdx === null || pts[i][2] - prevIdx > 1) ? 'M' : 'L';
+      line += (line ? ' ' : '') + cmd + pts[i][0] + ',' + pts[i][1];
+      prevIdx = pts[i][2];
+    }
+    lmLine.setAttribute('d', line);
+    lmArea.setAttribute('d', line + ' L' + pts[pts.length - 1][0] + ',' + H + ' L' + pts[0][0] + ',' + H + ' Z');
+    if(lmDot){
+      const nowH = Math.min(23, istanbulHourHome());
+      let hit = null;
+      for(let i = 0; i < pts.length; i++){ if(pts[i][2] === nowH) hit = pts[i]; }
+      if(hit && state.mode === 'live'){ lmDot.setAttribute('cx', hit[0]); lmDot.setAttribute('cy', hit[1]); lmDot.style.display = ''; }
+      else lmDot.style.display = 'none';
+    }
+  }
+  /* Saat İstanbul'a sabit — ziyaretçi cihaz saati kullanılmaz */
+  function istanbulHourHome(){
+    try{ return +new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Istanbul',hour:'2-digit',hourCycle:'h23'}).format(new Date()); }
+    catch(e){ return (new Date().getUTCHours() + 3) % 24; }
   }
   function render(){
     const cls = state.mode === 'live' ? '' : (state.mode === 'stale' ? ' stale' : ' waiting');
     if(kfStamp){ kfStamp.textContent = stampText(); kfStamp.className = 'kf-stamp' + cls; }
     if(kpiStamp){ kpiStamp.textContent = stampText(); kpiStamp.className = 'kpi-stamp' + cls; }
     if(lmMode){ lmMode.textContent = modeText(); lmMode.className = 'lm-mode' + cls; }
-    if(state.price != null && kfPtf) kfPtf.textContent = fmt(state.price);
+    const DASH = '\u2014';
+    if(kfPtf) kfPtf.textContent = Number.isFinite(state.price) ? fmt(state.price) : DASH;
     if(state.prices){
       const ps = state.prices;
-      const min = Math.min.apply(null, ps), max = Math.max.apply(null, ps);
-      const avg = ps.reduce(function(a, b){ return a + b; }, 0) / ps.length;
-      const nowH = Math.min(23, new Date().getHours());
-      if(kpiNow) kpiNow.textContent = fmt(ps[nowH]);
-      if(kpiMin) kpiMin.textContent = fmt(min);
-      if(kpiMax) kpiMax.textContent = fmt(max);
-      if(lgAvg) lgAvg.textContent = fmt(avg) + ' \u20BA/MWh';
-      if(lgMinH) lgMinH.textContent = hh(ps.indexOf(min)) + ':00 \u00B7 ' + fmt(min) + ' \u20BA';
-      if(lgMaxH) lgMaxH.textContent = hh(ps.indexOf(max)) + ':00 \u00B7 ' + fmt(max) + ' \u20BA';
+      const vals = [], idx = [];
+      for(let i = 0; i < 24; i++){ if(Number.isFinite(ps[i])){ vals.push(ps[i]); idx.push(i); } }
+      const nowH = Math.min(23, istanbulHourHome());
+      if(vals.length){
+        const min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+        const avg = vals.reduce(function(a, b){ return a + b; }, 0) / vals.length;
+        if(kpiNow) kpiNow.textContent = Number.isFinite(ps[nowH]) ? fmt(ps[nowH]) : DASH;
+        if(kpiMin) kpiMin.textContent = fmt(min);
+        if(kpiMax) kpiMax.textContent = fmt(max);
+        if(lgAvg) lgAvg.textContent = fmt(avg) + ' \u20BA/MWh';
+        if(lgMinH) lgMinH.textContent = hh(idx[vals.indexOf(min)]) + ':00 \u00B7 ' + fmt(min) + ' \u20BA';
+        if(lgMaxH) lgMaxH.textContent = hh(idx[vals.indexOf(max)]) + ':00 \u00B7 ' + fmt(max) + ' \u20BA';
+      } else {
+        if(kpiNow) kpiNow.textContent = DASH;
+        if(kpiMin) kpiMin.textContent = DASH;
+        if(kpiMax) kpiMax.textContent = DASH;
+        if(lgAvg) lgAvg.textContent = DASH;
+        if(lgMinH) lgMinH.textContent = DASH;
+        if(lgMaxH) lgMaxH.textContent = DASH;
+      }
       if(lgUpd) lgUpd.textContent = stampText();
       drawChart(ps);
     } else if(lgUpd){ lgUpd.textContent = stampText(); }
@@ -1911,17 +1947,22 @@ async function fetchPtfLive(){
       }
     }
   }
+  /* Fiyat dönüştürücü: yalnızca sayı veya boş olmayan sayısal metin kabul edilir.
+     null / '' / '   ' / [] gibi değerler ASLA 0'a çevrilmez (uydurma fiyat riski). */
+  function toPrice(v){
+    if(typeof v === 'number') return Number.isFinite(v) ? v : null;
+    if(typeof v === 'string' && v.trim() !== ''){ const n = Number(v); return Number.isFinite(n) ? n : null; }
+    return null;
+  }
   function applyData(data){
-    const nowH = Math.min(23, new Date().getHours());
+    const nowH = Math.min(23, istanbulHourHome());
     const ps = [];
     for(let h = 0; h < 24; h++){
       const it = data.items.find(function(x){ return x.hour === h; });
-      ps.push(it ? it.price : null);
+      ps.push(it ? toPrice(it.price) : null);
     }
-    for(let h = 0; h < 24; h++){
-      if(ps[h] == null) ps[h] = (h > 0 && ps[h - 1] != null) ? ps[h - 1] : (ps.find(function(v){ return v != null; }) || 0);
-    }
-    state = { mode: 'live', hour: nowH, syncTs: Date.now(), prices: ps, price: ps[nowH], month: state.month };
+    /* Eksik saatler null kalır — taşıma/0 tabanı yok: uydurma değer gösterilmez */
+    state = { mode: 'live', hour: nowH, syncTs: Date.now(), prices: ps, price: Number.isFinite(ps[nowH]) ? ps[nowH] : null, month: state.month };
     try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), hour: nowH, price: ps[nowH], prices: ps, date: new Date().toDateString(), month: state.month })); }catch(e){}
     render();
   }
@@ -1948,7 +1989,11 @@ async function fetchPtfLive(){
   async function sync(){
     const data = ptfLiveData || await fetchPtfLive();
     if(data && data.items && data.items.length) applyData(data);
-    else if(!applyCache()) render();
+    else if(!applyCache()){
+      /* Canlı veri yok: taze olduğunu iddia etme — mevcut görüntü varsa SON SENKRON'a düşür */
+      if(state.mode === 'live') state = { mode: 'stale', hour: state.hour, syncTs: state.syncTs || Date.now(), prices: state.prices, price: state.price, month: state.month };
+      render();
+    }
     const stats = await fetchStats();
     if(stats){
       state.month = { avg: stats.monthAvg, range: stats.monthRange || '', ts: Date.now() };

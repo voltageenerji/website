@@ -259,7 +259,12 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
       if(!Number.isFinite(ps[i])) continue;
       pts.push([+((i / 23) * W).toFixed(1), +(padTop + (1 - (ps[i] - min) / range) * usable).toFixed(1), i]);
     }
-    var line = 'M' + pts.map(function(p){ return p[0] + ',' + p[1]; }).join(' L');
+    var line = '', prevIdx = null;
+    for(i = 0; i < pts.length; i++){
+      var cmd = (prevIdx === null || pts[i][2] - prevIdx > 1) ? 'M' : 'L';
+      line += (line ? ' ' : '') + cmd + pts[i][0] + ',' + pts[i][1];
+      prevIdx = pts[i][2];
+    }
     elLine.setAttribute('d', line);
     elArea.setAttribute('d', line + ' L' + pts[pts.length - 1][0] + ',' + H + ' L' + pts[0][0] + ',' + H + ' Z');
     if(elDot){
@@ -273,7 +278,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 
   /* Saat İstanbul'a sabittir — ziyaretçinin cihaz saat dilimi kullanılmaz (QA DEF-2) */
   function istanbulHour(){
-    try{ return +new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Istanbul',hour:'2-digit',hour12:false}).format(new Date()); }
+    try{ return +new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Istanbul',hour:'2-digit',hourCycle:'h23'}).format(new Date()); }
     catch(e){ return (new Date().getUTCHours() + 3) % 24; }
   }
 
@@ -317,12 +322,18 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     }
   }
 
+  /* Fiyat dönüştürücü: yalnızca sayı veya boş olmayan sayısal metin; null/'' asla 0 olmaz */
+  function toPrice(v){
+    if(typeof v === 'number') return Number.isFinite(v) ? v : null;
+    if(typeof v === 'string' && v.trim() !== ''){ var n = Number(v); return Number.isFinite(n) ? n : null; }
+    return null;
+  }
   function applyData(data){
     var nowH = Math.min(23, istanbulHour()), ps = [], h;
     for(h = 0; h < 24; h++){
       var it = data.items.find(function(x){ return x.hour === h; });
       /* eksik saat null kalır — taşıma/doldurma YOK */
-      ps.push(it && Number.isFinite(it.price) ? it.price : null);
+      ps.push(it ? toPrice(it.price) : null);
     }
     state = { mode: 'live', hour: nowH, syncTs: Date.now(), prices: ps, price: Number.isFinite(ps[nowH]) ? ps[nowH] : null, month: state.month };
     try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: state.syncTs, hour: nowH, price: state.price, prices: ps, date: new Date().toDateString(), month: state.month })); }catch(e){}
@@ -369,7 +380,11 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   async function sync(){
     var data = await fetchToday();
     if(data) applyData(data);            /* 1) canlı gerçek veri */
-    else if(!applyCache()) render();     /* 2) önbellekteki gerçek veri  3) dürüst bekleme */
+    else if(!applyCache()){              /* 2) önbellekteki gerçek veri  3) dürüst bekleme */
+      /* Tazelik iddiası düşer: canlı senkron başarısızsa CANLI denmez */
+      if(state.mode === 'live') state = { mode: 'stale', hour: state.hour, syncTs: state.syncTs || Date.now(), prices: state.prices, price: state.price, month: state.month };
+      render();
+    }
     var stats = await fetchStats();
     if(stats){
       state.month = { avg: stats.monthAvg, range: stats.monthRange || '' };
