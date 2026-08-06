@@ -752,7 +752,13 @@ section {
   overflow: hidden;
   z-index: 1;
   display: flex; align-items: center;
+  /* ray artık <a> — bağlantı varsayılanlarını nötrle: görünüm birebir korunur */
+  color: inherit; text-decoration: none; cursor: pointer;
+  transition: background 0.3s var(--ease);
 }
+/* hover/odak yalnızca boyama değiştirir — yerleşim kaymaz */
+.mcp-rail:hover { background: rgba(201,169,97,0.10); }
+.mcp-rail:focus-visible { outline: 1px solid var(--accent); outline-offset: -1px; }
 .mcp-rail[hidden] { display: none; }
 .mcp-rail-track {
   display: inline-flex;
@@ -1085,8 +1091,12 @@ body.menu-open { overflow: hidden; }
     </svg>
   </div>
 
-  <!-- Live MCP (PTF) price rail -->
-  <div class="mcp-rail" id="mcpRail" hidden><div class="mcp-rail-track" id="mcpTrack"></div></div>
+  <!-- Live MCP (PTF) price rail — rayın KENDİSİ bağlantıdır (/canli-ptf).
+       Neden dış kapsayıcı: JS yalnızca #mcpTrack.innerHTML yazar ve #mcpRail.hidden ayarlar;
+       bağlantı dıştaki elemanda durduğu için innerHTML yazımı bağlantıyı asla yok edemez,
+       marquee elemanı ve animasyonu hiç dokunulmadan kalır, yeni kutu eklenmediği için
+       yerleşim birebir aynıdır. -->
+  <a class="mcp-rail" id="mcpRail" href="/canli-ptf" aria-label="Canlı PTF sayfasını aç" hidden><div class="mcp-rail-track" id="mcpTrack"></div></a>
 
   <div class="hero-content">
     <div class="kicker" data-tr="Kurumsal Enerji Tedariki" data-en="Corporate Energy Supply">Kurumsal Enerji Tedariki</div>

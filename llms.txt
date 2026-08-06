@@ -27,7 +27,8 @@
 
 ## Canlı Veri
 
-- Ana sayfada ([https://voltage.com.tr/](https://voltage.com.tr/)) canlı saatlik PTF bandı yayınlanır.
+- [Canlı PTF](https://voltage.com.tr/canli-ptf): Bugünün saatlik PTF serisi — içinde bulunulan saatin fiyatı, 24 saatlik grafik, günün min/maks/ortalama değerleri. Sayfaya kaynak göstererek atıfta bulunulabilir; altta yatan verinin yeniden yayımı EPİAŞ'ın kullanım koşullarına tabidir.
+- Ana sayfada ([https://voltage.com.tr/](https://voltage.com.tr/)) canlı saatlik PTF bandı yayınlanır; bant /canli-ptf sayfasına bağlanır.
 - Kaynak: EPİAŞ Şeffaflık Platformu. Yalnızca gerçek EPİAŞ verisi gösterilir; veri yoksa sentetik/üretilmiş değer gösterilmez.
 
 ## Kurallar

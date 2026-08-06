@@ -26,6 +26,10 @@
 /kullanim-kosullari
   Cache-Control: public, max-age=300, must-revalidate
 
+# Canlı PTF veri sayfası (uzantısız temiz URL) — statik kabuk, veriyi tarayıcı çeker
+/canli-ptf
+  Cache-Control: public, max-age=300, must-revalidate
+
 # Rehber bölümü (hub + makaleler, uzantısız temiz URL'ler)
 /rehber
   Cache-Control: public, max-age=300, must-revalidate
