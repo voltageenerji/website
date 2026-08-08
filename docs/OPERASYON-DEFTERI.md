@@ -43,6 +43,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-05**.
 
 | Konu | Tür | Durum |
 |---|---|---|
+| Müşteri portalı → mobil uygulama | Kapılı plan (sahip kararı 2026-08-08) | Sıra: (1) veri altyapısı [tetik: aktif satış] → (2) web portalı [tetik: ~10 sözleşmeli müşteri] → (3) mobil uygulama [tetik: portal talebi VEYA agregatör DR bildirimleri]. Öncesinde uygulama yapılmaz. |
 | ChatGPT Ads Türkiye lansmanı | Dış gelişme (izleme) | Pasif — TRde aktif değil (canlı: US/CA/AU/NZ/UK/JP/KR, 2026-08). Şartlar: TR lansmanı + aktif satış kararı + ölçüm temeli. Organik katman (llms.txt/FAQ şema/Bing) zaten kurulu. |
 
 ## 4. Karar kayıtları (aktif kısıtlar)
