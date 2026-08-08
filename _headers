@@ -37,6 +37,15 @@
 /rehber/*
   Cache-Control: public, max-age=300, must-revalidate
 
+# Sayfa başına paylaşım kartları (og:image / twitter:image)
+# Dosya adları sayfa slug'ından türer, içerik hash'i TAŞIMAZ: bir sayfanın başlığı
+# değişip kart yeniden üretildiğinde aynı ad yeni içerikle döner. Bu yüzden "immutable"
+# GÜVENLİ DEĞİLDİR (revalidate edilmeyen eski kart 1 yıl boyunca servis edilirdi).
+# 1 gün + revalidate: kartlar sayfa tarafından yüklenmez, yalnız paylaşım robotları
+# çeker; performans etkisi yoktur, tazelik kazanılır.
+/og/*
+  Cache-Control: public, max-age=86400, must-revalidate
+
 # Feed (Pages Functions) — köprüler (Zapier/Buffer) okur; kısa cache.
 # noindex yalnızca arama sonuçlarını temiz tutar, fetch tabanlı köprüleri ETKİLEMEZ.
 /feed/*
