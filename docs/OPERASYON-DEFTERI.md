@@ -39,6 +39,12 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-05**.
 | Resend API anahtarının domain kısıtı | Sahip (Resend paneli) | Hijyen (düşük öncelik) |
 | Kullanılmayan Zapier LinkedIn bağlantısının silinmesi | Sahip | Hijyen (düşük öncelik) |
 
+### İzleme listesi (dış gelişmeler)
+
+| Konu | Tür | Durum |
+|---|---|---|
+| ChatGPT Ads Türkiye lansmanı | Dış gelişme (izleme) | Pasif — TRde aktif değil (canlı: US/CA/AU/NZ/UK/JP/KR, 2026-08). Şartlar: TR lansmanı + aktif satış kararı + ölçüm temeli. Organik katman (llms.txt/FAQ şema/Bing) zaten kurulu. |
+
 ## 4. Karar kayıtları (aktif kısıtlar)
 
 | Karar | Tarih | Kapsam |
