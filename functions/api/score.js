@@ -87,6 +87,44 @@ function cleanName(v) {
     .slice(0, NAME_MAX);
 }
 
+// ---------------------------------------------------------------------------
+// İsim sansürü — küfür/hakaret içeren adlar tabloya giremez.
+// İki katman (yanlış pozitifleri sınırlamak için):
+//  - SUB: boşluk/noktalama atılmış metinde ALT DİZGİ olarak aranan net kökler
+//  - TOKEN: yalnız TAM KELİME olarak aranan kısa/riskli kelimeler
+//    ("sik" alt dizgi olsaydı "Klasik" de yanardı)
+// Leetspeak ve Türkçe karakterler önce katlanır (0→o, 1→i, ş→s ...).
+// Liste mükemmel olamaz — kaçanı DELETE (reset) temizler.
+// ---------------------------------------------------------------------------
+
+const BANNED_SUB = [
+  'orospu', 'oruspu', 'amcik', 'amcuk', 'yarrak', 'yarak', 'siktir', 'sikerim',
+  'sikeyim', 'sikis', 'sikik', 'sikim', 'pezeven', 'kahpe', 'kaltak', 'ibne',
+  'ipne', 'yavsak', 'pust', 'gotveren', 'serefsiz', 'gerizekal', 'ananisik',
+  'fuck', 'fck', 'bitch', 'cunt', 'nigg', 'whore', 'slut', 'asshole', 'porno',
+  'wanker', 'shit', 'penis',
+];
+const BANNED_TOKEN = [
+  'sik', 'am', 'amk', 'amq', 'aq', 'mk', 'oc', 'pic', 'got', 'salak', 'aptal',
+  'mal', 'gerizekali', 'dick', 'cock', 'piss', 'anal', 'gay', 'hoe',
+];
+
+const FOLD = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '$': 's', '@': 'a', 'ç': 'c', 'ş': 's', 'ğ': 'g', 'ü': 'u', 'ö': 'o', 'ı': 'i', 'â': 'a', 'î': 'i', 'û': 'u' };
+
+function foldName(s) {
+  return s.toLocaleLowerCase('tr').replace(/[013457$@çşğüöıâîû]/g, (c) => FOLD[c] ?? c);
+}
+
+function isBannedName(name) {
+  const folded = foldName(name);
+  const tokens = folded.split(/[^a-z]+/).filter(Boolean);
+  const compact = folded.replace(/[^a-z]/g, '');
+  const collapsed = compact.replace(/(.)\1+/g, '$1'); // "orrrospu" → "orospu"
+  if (BANNED_SUB.some((r) => compact.includes(r) || collapsed.includes(r))) return true;
+  if (tokens.some((tok) => BANNED_TOKEN.includes(tok))) return true;
+  return false;
+}
+
 export async function onRequestGet(context) {
   const kv = kvOf(context.env);
   if (!kv) return json({ ok: false, error: 'no_persistence' }, 503);
@@ -111,6 +149,7 @@ export async function onRequestPost(context) {
 
   const name = cleanName(body.name);
   if (name.length < NAME_MIN) return json({ ok: false, error: 'invalid_name' }, 400);
+  if (isBannedName(name)) return json({ ok: false, error: 'blocked_name' }, 400);
 
   const mwh = Number(body.mwh);
   const dist = Number(body.dist);

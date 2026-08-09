@@ -400,11 +400,13 @@ export class Game {
         body: JSON.stringify({ name, mwh: this.lastRun.mwh, dist: this.lastRun.dist }),
         signal: this.lbSignal(),
       });
-      const data = (await r.json()) as { ok: boolean; board?: { n: string; m: number; d: number }[]; you?: number };
+      const data = (await r.json()) as { ok: boolean; board?: { n: string; m: number; d: number }[]; you?: number; error?: string };
       if (data.ok && data.board) {
         try { localStorage.setItem(NAME_KEY, name); } catch { /* private mode */ }
         this.hud.lbRender(data.board, data.you ?? -1);
         this.hud.lbFormShow(false);
+      } else if (data.error === 'blocked_name') {
+        this.hud.lbError(t('lbBlocked')); // sansür: form açık kalır, yeni ad denenir
       } else {
         this.hud.lbError();
       }

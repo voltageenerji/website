@@ -85,5 +85,34 @@ for (let i = 0; i < 30; i++) await post({ name: `Dolgu ${i}`, mwh: 400 + i * 4, 
 fr = await (await post({ name: 'Sondaki', mwh: 12, dist: 50 })).json();
 eq('you-out-of-slice', [fr.ok, fr.you, fr.board.length], [true, -1, 20]);
 
+// 11. İsim sansürü — küfür/hakaret engellenir, masum adlar geçer
+const blockedNames = [
+  'Orospu Çocuğu',      // düz küfür
+  '0r0spu',             // leetspeak
+  'S1ktir Git',         // leetspeak + birleşim
+  'yarrrak',            // harf tekrarı
+  'Amk Reis',           // kısaltma (token)
+  'Şerefsiz61',         // hakaret + sayı
+  'fuck99',             // İngilizce
+  'B1tch',              // İngilizce leetspeak
+  'Ali mal',            // hakaret token'ı
+  'a m c ı k',          // boşlukla kaçış
+];
+for (const n of blockedNames) {
+  const res = await (await post({ name: n, mwh: 240, dist: 100 })).json();
+  eq(`censor-block: ${n}`, res.error, 'blocked_name');
+}
+const allowedNames = [
+  'Klasik',             // "sik" alt dizgi DEĞİL, token — geçmeli
+  'Gotik Metal',        // "got" yalnız token — geçmeli
+  'Malik',              // "mal" token bütünlüğü — geçmeli
+  'Fiziksel Güç',       // içinde s-i-k geçse de token değil
+  'Deniz Yılmaz 34',
+];
+for (const n of allowedNames) {
+  const res = await (await post({ name: n, mwh: 240, dist: 100 })).json();
+  eq(`censor-allow: ${n}`, res.ok, true);
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

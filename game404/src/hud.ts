@@ -109,9 +109,9 @@ export class Hud {
     if (on) el('gLbMsg').hidden = true;
   }
 
-  lbError(): void {
+  lbError(text?: string): void {
     const m = el('gLbMsg');
-    m.textContent = t('lbErr');
+    m.textContent = text ?? t('lbErr');
     m.hidden = false;
   }
 
