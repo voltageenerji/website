@@ -17,7 +17,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-09**.
 | Canlı PTF bandı | ✅ Canlı | epias-proxy Worker (`/ptf/today`, `/ptf/stats`). Dürüst durum merdiveni: CANLI / SON SENKRON / VERİ BEKLENİYOR. |
 | GSC + Bing | ✅ Doğrulandı (3 mülk) | Veri birikiyor; ilk anlamlı okuma ~2 hafta. |
 | 404 deneyimi "Transmission Dash" | ✅ Canlı | İnteraktif 3B mini oyun (Three.js, `/g404/game.js`, 150 KB gz). JS/WebGL yoksa veya hareket azaltma açıksa statik yedek linkler görünür; her koşulda gerçek HTTP 404 döner, noindex. Kaynak: `game404/` (build: `npm run build` + `dist/game.js → g404/`). |
-| 404 oyunu lider tablosu | ✅ Canlı | `/api/score` (GET/POST/DELETE). Hesap yok — yalnız takma ad; `voltage-leads` KV'de tek anahtar `lb:board` (en iyi 50, ilk 20 gösterilir; aynı isimde yalnız en iyi skor). KVKK notu: kişisel veri toplanmaz (isim serbest takma ad, IP/UA kaydedilmez). **SIFIRLAMA:** GitHub → Actions → `leaderboard-reset` → Run workflow (REPORT_TOKEN ile korunan DELETE atar); Orchestrator da tetikleyebilir. Kalıcı QA testleri: `docs/qa/`. |
+| 404 oyunu lider tablosu | ✅ Canlı | `/api/score` (GET/POST/DELETE). Hesap yok — yalnız takma ad; `voltage-leads` KV'de tek anahtar `lb:board` (en iyi 50, ilk 20 gösterilir; aynı isimde yalnız en iyi skor). KVKK notu: kişisel veri toplanmaz (isim serbest takma ad, IP/UA kaydedilmez). İsim sansürü sunucu tarafında (TR+EN küfür/hakaret, leetspeak katlamalı; sahip kararı 2026-08-09: "bu kadarı yeterli" — bilinen kaçaklar dokümante, güvence sıfırlamadır). **SIFIRLAMA:** GitHub → Actions → `leaderboard-reset` → Run workflow (REPORT_TOKEN ile korunan DELETE atar); Orchestrator da tetikleyebilir. Kalıcı QA testleri: `docs/qa/`. |
 
 ## 2. Zamanlanmış olaylar
 
