@@ -34,6 +34,7 @@ Sonuçları Orchestrator'a bildirin (geçti/kaldı + ekran görüntüsü).
 - [ ] /docs/OPERASYON-DEFTERI.md → ana sayfaya YÖNLENİYOR (içerik GÖRÜNMEMELİ)
 - [ ] /sitemap.xml → 16 URL listeleniyor
 - [ ] voltan.com.tr → voltage.com.tr'ye yönleniyor (diğer alan adları da)
+- [ ] voltage.com.tr/olmayan-sayfa → tasarımlı 404 sayfası çıkıyor (boş Cloudflare sayfası DEĞİL)
 
 ## F. Cloudflare paneli (2 dakika)
 - [ ] Workers & Pages → site projesi → Metrics/Web Analytics: **etkin mi?**
