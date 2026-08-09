@@ -163,6 +163,28 @@ body.g-on { overflow: hidden; height: 100vh; }
 .g-cta.ghost:hover { color: var(--ink); border-color: rgba(126, 203, 255, 0.5); background: transparent; }
 #gPausedLabel { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 14px; letter-spacing: 0.34em; text-transform: uppercase; color: var(--ink); padding-left: 0.34em; }
 
+/* ---- Lider tablosu ---- */
+#gOver .g-card { max-height: 88vh; overflow-y: auto; }
+#gLb { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(126, 203, 255, 0.1); text-align: left; }
+.lb-title { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); text-align: center; padding-left: 0.3em; margin-bottom: 12px; }
+#gLbList { list-style: none; max-height: 218px; overflow-y: auto; }
+#gLbList li { display: flex; align-items: baseline; gap: 12px; padding: 6px 2px; font-size: 13px; border-bottom: 1px solid rgba(126, 203, 255, 0.06); }
+#gLbList li .r { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 11px; color: var(--dim); width: 22px; text-align: right; flex: none; }
+#gLbList li .n { flex: 1; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#gLbList li .s { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 12.5px; color: var(--cyan); flex: none; }
+#gLbList li.me .n, #gLbList li.me .r { color: var(--amber); }
+#gLbList li.me .s { color: var(--amber); }
+.lb-empty { font-size: 12.5px; color: var(--dim); text-align: center; padding: 8px 0; }
+#gLbForm { display: flex; gap: 10px; margin-top: 14px; }
+#gLbName {
+  flex: 1; min-width: 0; padding: 12px 14px; font-size: 14px; font-family: 'Archivo', sans-serif;
+  background: rgba(126, 203, 255, 0.05); border: 1px solid var(--line); border-radius: 2px;
+  color: var(--ink); outline: none; transition: border-color 0.25s;
+}
+#gLbName:focus { border-color: rgba(126, 203, 255, 0.55); }
+#gLbForm .g-cta { padding: 12px 18px; white-space: nowrap; }
+.lb-msg { margin-top: 10px; font-size: 12.5px; color: var(--amber); text-align: center; }
+
 /* ---- Toast + yumurta ---- */
 #gToast {
   position: fixed; bottom: 68px; right: 22px; z-index: 7; padding: 12px 18px;
@@ -277,6 +299,16 @@ body.g-on #gFallback { display: none; }
         <div class="g-row"><span class="k" id="gStatRankLabel"></span><span class="v rank" id="gRank"></span></div>
       </div>
       <div id="gAchList"></div>
+      <div id="gLb" hidden>
+        <div id="gLbTitle" class="lb-title"></div>
+        <ol id="gLbList"></ol>
+        <div id="gLbEmpty" class="lb-empty" hidden></div>
+        <form id="gLbForm" hidden>
+          <input id="gLbName" type="text" maxlength="24" minlength="2" autocomplete="nickname" spellcheck="false" required>
+          <button class="g-cta" id="gLbSubmit" type="submit"></button>
+        </form>
+        <div id="gLbMsg" class="lb-msg" role="alert" hidden></div>
+      </div>
       <div class="g-actions">
         <button class="g-cta" id="gAgain" type="button"></button>
         <a class="g-cta ghost" id="gHome" href="/"></a>

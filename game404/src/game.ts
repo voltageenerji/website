@@ -18,8 +18,10 @@ import { range } from './rng';
 type State = 'attract' | 'powerup' | 'run' | 'egg' | 'dying' | 'over';
 
 const PROGRESS_KEY = 'voltage-404-progress';
+const NAME_KEY = 'voltage-404-name';
 const ACH_MWH = [100, 500, 1000, 5000, 10000];
 const RANK_MWH = [60, 150, 300, 600, 1200];
+const LB_TIMEOUT_MS = 6000;
 
 interface Progress { mwh: number; ach: number[]; bestD: number; bestM: number }
 
@@ -63,6 +65,9 @@ export class Game {
   private progress = loadProgress();
   private camPos = new THREE.Vector3(0, CFG.cableY + 7, 20);
   private camLook = new THREE.Vector3(0, CFG.cableY, -40);
+  /** Skor gönderimi için biten koşunun donmuş istatistikleri */
+  private lastRun = { mwh: 0, dist: 0 };
+  private lbSubmitting = false;
 
   constructor(canvas: HTMLCanvasElement) {
     const isTouch = window.matchMedia('(pointer: coarse)').matches;
@@ -81,7 +86,9 @@ export class Game {
       onResume: () => this.togglePause(),
       onSound: (on) => { this.audio.setEnabled(on); return on; },
       onAgain: () => this.restart(),
+      onLbSubmit: (name) => { void this.submitScore(name); },
     });
+    try { this.hud.lbPrefill(localStorage.getItem(NAME_KEY) || ''); } catch { /* private mode */ }
     this.hud.setSoundState(this.audio.enabled);
     this.hud.setGridPct(0.18);
 
@@ -352,6 +359,7 @@ export class Game {
       if (this.progress.ach.includes(i) && !before.has(i)) newAch.push(t('achievements')[i]);
     }
     this.saveProgress(true);
+    this.lastRun = { mwh: Math.round(this.mwh), dist: Math.round(this.distance) };
     this.hud.showOver({
       distanceM: this.distance,
       mwh: Math.round(this.mwh),
@@ -359,6 +367,53 @@ export class Game {
       rank: this.rank(),
       newAchievements: newAch,
     });
+    // Lider tablosu: skoru olan forma davet edilir; tablo her koşulda çekilir.
+    this.hud.lbFormShow(this.lastRun.mwh >= 12);
+    void this.refreshBoard();
+  }
+
+  // ---- Lider tablosu (backend: /api/score) ----
+
+  private lbSignal(): AbortSignal | undefined {
+    return typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(LB_TIMEOUT_MS) : undefined;
+  }
+
+  private async refreshBoard(): Promise<void> {
+    try {
+      const r = await fetch('/api/score', { signal: this.lbSignal() });
+      const data = (await r.json()) as { ok: boolean; board?: { n: string; m: number; d: number }[] };
+      if (data.ok && data.board) this.hud.lbRender(data.board, -1);
+      else this.hud.lbHide(); // backend yoksa sahte tablo gösterilmez
+    } catch {
+      this.hud.lbHide();
+    }
+  }
+
+  private async submitScore(name: string): Promise<void> {
+    if (this.lbSubmitting || this.lastRun.mwh < 12) return;
+    this.lbSubmitting = true;
+    this.hud.lbBusy(true);
+    try {
+      const r = await fetch('/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, mwh: this.lastRun.mwh, dist: this.lastRun.dist }),
+        signal: this.lbSignal(),
+      });
+      const data = (await r.json()) as { ok: boolean; board?: { n: string; m: number; d: number }[]; you?: number };
+      if (data.ok && data.board) {
+        try { localStorage.setItem(NAME_KEY, name); } catch { /* private mode */ }
+        this.hud.lbRender(data.board, data.you ?? -1);
+        this.hud.lbFormShow(false);
+      } else {
+        this.hud.lbError();
+      }
+    } catch {
+      this.hud.lbError();
+    } finally {
+      this.lbSubmitting = false;
+      this.hud.lbBusy(false);
+    }
   }
 
   private saveProgress(full: boolean): void {
@@ -379,6 +434,8 @@ export class Game {
     this.obstacles.reset();
     this.collectibles.reset();
     this.hud.hideOver();
+    this.hud.lbHide();
+    this.lastRun = { mwh: 0, dist: 0 };
     this.hud.setStats(0, 0, 100);
     this.hud.setEnergy(0, false);
     this.state = 'run';

@@ -19,6 +19,12 @@ export interface OverStats {
   newAchievements: string[];
 }
 
+export interface LbEntry {
+  n: string;
+  m: number;
+  d: number;
+}
+
 export class Hud {
   private dist = el('gDist');
   private mwh = el('gMwh');
@@ -38,7 +44,7 @@ export class Hud {
 
   constructor(
     isTouch: boolean,
-    handlers: { onPause: () => void; onResume: () => void; onSound: (on: boolean) => boolean; onAgain: () => void },
+    handlers: { onPause: () => void; onResume: () => void; onSound: (on: boolean) => boolean; onAgain: () => void; onLbSubmit: (name: string) => void },
   ) {
     // Metinleri dile göre doldur
     el('gLost').textContent = t('lost');
@@ -73,6 +79,66 @@ export class Hud {
       const on = handlers.onSound(soundBtn.getAttribute('data-on') !== 'true');
       soundBtn.setAttribute('data-on', String(on));
     });
+
+    // Lider tablosu
+    el('gLbTitle').textContent = t('lbTitle');
+    const nameInput = el<HTMLInputElement>('gLbName');
+    nameInput.placeholder = t('lbName');
+    el('gLbSubmit').textContent = t('lbSubmit');
+    el<HTMLFormElement>('gLbForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = nameInput.value.replace(/\s+/g, ' ').trim();
+      if (name.length >= 2) handlers.onLbSubmit(name);
+    });
+  }
+
+  // ---- Lider tablosu ----
+
+  lbPrefill(name: string): void {
+    el<HTMLInputElement>('gLbName').value = name;
+  }
+
+  lbFormShow(show: boolean): void {
+    el('gLbForm').hidden = !show;
+  }
+
+  lbBusy(on: boolean): void {
+    el<HTMLButtonElement>('gLbSubmit').disabled = on;
+    if (on) el('gLbMsg').hidden = true;
+  }
+
+  lbError(): void {
+    const m = el('gLbMsg');
+    m.textContent = t('lbErr');
+    m.hidden = false;
+  }
+
+  /** Sunucudan gelen tabloyu çizer. youIdx: oyuncunun satırı (yoksa -1). */
+  lbRender(entries: LbEntry[], youIdx: number): void {
+    el('gLb').hidden = false;
+    const list = el('gLbList');
+    list.innerHTML = '';
+    el('gLbEmpty').hidden = entries.length > 0;
+    if (entries.length === 0) el('gLbEmpty').textContent = t('lbEmpty');
+    entries.forEach((entry, i) => {
+      const li = document.createElement('li');
+      li.className = i === youIdx ? 'me' : '';
+      const rank = document.createElement('span');
+      rank.className = 'r';
+      rank.textContent = String(i + 1);
+      const name = document.createElement('span');
+      name.className = 'n';
+      name.textContent = entry.n; // textContent → injection imkânsız
+      const score = document.createElement('span');
+      score.className = 's';
+      score.textContent = `${nfInt.format(entry.m)} MWh`;
+      li.append(rank, name, score);
+      list.appendChild(li);
+    });
+  }
+
+  lbHide(): void {
+    el('gLb').hidden = true;
   }
 
   setSoundState(on: boolean): void {

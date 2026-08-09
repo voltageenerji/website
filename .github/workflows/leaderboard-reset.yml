@@ -1,0 +1,17 @@
+# 404 oyunu lider tablosunu sıfırlar. YALNIZ elle tetiklenir
+# (Actions → leaderboard-reset → Run workflow). Orchestrator da GitHub
+# API üzerinden tetikleyebilir — "buradan resetleme" yolu budur.
+name: leaderboard-reset
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reset leaderboard
+        run: |
+          curl --fail -sS -X DELETE \
+            -H "Authorization: Bearer ${{ secrets.REPORT_TOKEN }}" \
+            https://voltage.com.tr/api/score

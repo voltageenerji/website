@@ -30,9 +30,10 @@ export class Input {
 
     window.addEventListener('keydown', (e) => {
       if (e.repeat) return;
-      // Odak bir buton/bağlantıdaysa (skor paneli, pause) tarayıcı davranışı
-      // bozulmasın: SPACE/Enter butonu tetiklesin, oyun girişi karışmasın.
-      if ((e.target as HTMLElement).closest?.('button, a')) return;
+      // Odak bir buton/bağlantı/metin alanındaysa (skor paneli, lider tablosu
+      // isim girişi) tarayıcı davranışı bozulmasın: SPACE isimde boşluk yazsın,
+      // Enter formu göndersin — oyun girişi karışmasın.
+      if ((e.target as HTMLElement).closest?.('button, a, input')) return;
       this.h.onAnyGesture();
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); this.h.onJump(); }
       else if (e.code === 'ArrowLeft' || e.code === 'KeyA') this.h.onLane(-1);
@@ -52,7 +53,7 @@ export class Input {
     // Dokunmatik: UI butonlarına gelen dokunuşlara karışma (closest ile ayıklanır).
     window.addEventListener('touchstart', (e) => {
       const target = e.target as HTMLElement;
-      if (target.closest('button, a')) return;
+      if (target.closest('button, a, input, .g-card')) return;
       this.h.onAnyGesture();
       if (this.touchId !== null) return;
       const tch = e.changedTouches[0];
@@ -99,7 +100,7 @@ export class Input {
     // Masaüstünde tıkla-zıpla (canvas üstünde)
     window.addEventListener('mousedown', (e) => {
       const target = e.target as HTMLElement;
-      if (target.closest('button, a, .panel')) return;
+      if (target.closest('button, a, input, .g-card')) return;
       this.h.onAnyGesture();
       if (!this.isTouch) this.h.onJump();
     });
