@@ -56,17 +56,27 @@ function timingSafeEqual(a, b) {
   return diff === 0;
 }
 
+/**
+ * Tabloyu okur. DÖNÜŞ SÖZLEŞMESİ (QA D1): null = okuma/parse HATASI —
+ * çağıran 503 dönmeli ve ASLA üzerine yazmamalı (yoksa geçici bir KV
+ * hatası 49 kaydı tek kayıtla ezerdi). [] yalnız "anahtar hiç yok" durumudur.
+ */
 async function readBoard(kv) {
+  let raw;
   try {
-    const raw = await kv.get(KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data && Array.isArray(data.entries)) return data.entries;
-    }
+    raw = await kv.get(KEY);
   } catch (e) {
     console.error('lb read failed:', e.message);
+    return null;
   }
-  return [];
+  if (raw === null || raw === undefined) return [];
+  try {
+    const data = JSON.parse(raw);
+    if (data && Array.isArray(data.entries)) return data.entries;
+  } catch (e) {
+    console.error('lb parse failed:', e.message);
+  }
+  return null; // bozuk kayıt — onarım yolu DELETE (reset), sessiz silme değil
 }
 
 function cleanName(v) {
@@ -81,6 +91,7 @@ export async function onRequestGet(context) {
   const kv = kvOf(context.env);
   if (!kv) return json({ ok: false, error: 'no_persistence' }, 503);
   const entries = await readBoard(kv);
+  if (entries === null) return json({ ok: false, error: 'no_persistence' }, 503);
   return json({ ok: true, board: entries.slice(0, MAX_RETURNED) });
 }
 
@@ -113,13 +124,15 @@ export async function onRequestPost(context) {
   }
 
   let entries = await readBoard(kv);
+  if (entries === null) return json({ ok: false, error: 'no_persistence' }, 503);
 
   // Aynı isim: yalnız en iyi skor tutulur
   const lower = name.toLocaleLowerCase('tr');
   const existing = entries.findIndex((e) => String(e.n).toLocaleLowerCase('tr') === lower);
   if (existing >= 0) {
     if (entries[existing].m >= mwh) {
-      return json({ ok: true, board: entries.slice(0, MAX_RETURNED), you: existing, kept: true });
+      const youKept = existing < MAX_RETURNED ? existing : -1;
+      return json({ ok: true, board: entries.slice(0, MAX_RETURNED), you: youKept, kept: true });
     }
     entries.splice(existing, 1);
   }
@@ -135,8 +148,9 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'no_persistence' }, 503);
   }
 
-  const you = entries.findIndex((e) => String(e.n).toLocaleLowerCase('tr') === lower);
-  return json({ ok: true, board: entries.slice(0, MAX_RETURNED), you });
+  // you: dönen 20'lik dilimdeki satır; oyuncu 21-50 bandındaysa -1 (QA N1)
+  const idx = entries.findIndex((e) => String(e.n).toLocaleLowerCase('tr') === lower);
+  return json({ ok: true, board: entries.slice(0, MAX_RETURNED), you: idx < MAX_RETURNED ? idx : -1 });
 }
 
 export async function onRequestDelete(context) {

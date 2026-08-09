@@ -87,7 +87,9 @@ export class Hud {
     el('gLbSubmit').textContent = t('lbSubmit');
     el<HTMLFormElement>('gLbForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = nameInput.value.replace(/\s+/g, ' ').trim();
+      // Sunucunun sildiği karakterler burada da elenir — "kaydettim ama
+      // sunucu reddetti" sürprizi yaşanmaz (QA N4)
+      const name = nameInput.value.replace(/[<>&"'`]/g, '').replace(/\s+/g, ' ').trim();
       if (name.length >= 2) handlers.onLbSubmit(name);
     });
   }
