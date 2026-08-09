@@ -30,6 +30,9 @@ export class Input {
 
     window.addEventListener('keydown', (e) => {
       if (e.repeat) return;
+      // Odak bir buton/bağlantıdaysa (skor paneli, pause) tarayıcı davranışı
+      // bozulmasın: SPACE/Enter butonu tetiklesin, oyun girişi karışmasın.
+      if ((e.target as HTMLElement).closest?.('button, a')) return;
       this.h.onAnyGesture();
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); this.h.onJump(); }
       else if (e.code === 'ArrowLeft' || e.code === 'KeyA') this.h.onLane(-1);

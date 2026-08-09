@@ -28,6 +28,8 @@ interface Obstacle {
 
 const JUMP_CLEAR = 1.7; // kablo + bu değerin altındaki gövde zıplayarak aşılır
 const FLOCK_LOW = 1.9; // sürü bu yüksekliğin ÜSTÜNÜ kapatır
+const STRIKE_ARM_Z = -9; // yıldırım bu z'den itibaren düşer (uyarı biter)
+const STRIKE_END_Z = 6; // bu z'den sonra söner
 
 export interface CollisionResult {
   kind: 'hit' | 'destroyed';
@@ -172,13 +174,14 @@ export class Obstacles {
         }
       } else if (o.type === 'strike') {
         o.root.position.set(CFG.laneX[o.lane], cable, o.z);
-        // Faz: 0-1.4 sn uyarı, 1.4-1.85 sn aktif yıldırım, sonra söner
+        // Fazlar KONUMA bağlıdır (QA-1): uyarı yaklaşırken yanıp söner,
+        // yıldırım oyuncu penceresinden geçerken aktiftir — hız ne olursa olsun.
         const warn = o.warn!.material as THREE.SpriteMaterial;
         const bolt = o.bolt!.material as THREE.LineBasicMaterial;
-        if (o.timer < 1.4) {
+        if (o.z < STRIKE_ARM_Z) {
           warn.opacity = 0.45 + 0.4 * Math.sin(o.timer * 14);
           bolt.opacity = 0;
-        } else if (o.timer < 1.85) {
+        } else if (o.z <= STRIKE_END_Z) {
           warn.opacity = 0;
           bolt.opacity = range(0.6, 1);
         } else {
@@ -203,7 +206,9 @@ export class Obstacles {
     const l = (): LaneIndex => pick(lanes);
     const pattern = rng();
     if (stormy && pattern < 0.18) {
-      this.spawn('strike', l(), spawnZ * 0.35); // yıldırım daha yakında doğar (uyarı süresi yeter)
+      // Yıldırım yakında doğar: nominal hızda ~2 sn uyarı süresi kalacak mesafede.
+      const nomSpeed = Math.min(CFG.baseSpeed + (distance / 100) * CFG.speedRampPer100m, CFG.maxSpeed);
+      this.spawn('strike', l(), STRIKE_ARM_Z - nomSpeed * 2.0);
     } else if (pattern < 0.3) {
       this.spawn('flock', 1, spawnZ);
     } else if (pattern < 0.5) {
@@ -234,7 +239,7 @@ export class Obstacles {
       let blocked = false;
       if (o.type === 'flock') blocked = relY > FLOCK_LOW; // alçakta kal
       else if (o.type === 'crane') blocked = o.lane === lane; // her yükseklik
-      else if (o.type === 'strike') blocked = o.lane === lane && o.timer >= 1.4 && o.timer < 1.85;
+      else if (o.type === 'strike') blocked = o.lane === lane && o.z >= STRIKE_ARM_Z; // aktif yıldırım her yüksekliği kapatır
       else blocked = o.lane === lane && relY < JUMP_CLEAR; // zıplayarak aşılır
       if (!blocked) continue;
       if (player.overcharge > 0 && o.type !== 'strike') {

@@ -83,9 +83,12 @@ export class World {
   private pulseLane: number[] = [];
   private turbines: { root: THREE.Group; rotor: THREE.Group; speed: number }[] = [];
   private cityMat: THREE.PointsMaterial;
-  private substations: THREE.Group[] = [];
+  private substations: { root: THREE.Group; lamp: THREE.Sprite }[] = [];
   private scroll = 0;
   private towerMatrix = new THREE.Matrix4();
+  // Kare başı ayırma yapmamak için önceden oluşturulan renkler (QA notu 3)
+  private cableBase = new THREE.Color(0x39435a);
+  private cableHot = new THREE.Color(0x4a7a9a);
 
   constructor(scene: THREE.Scene) {
     // Zemin
@@ -215,11 +218,10 @@ export class World {
     const lamp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture('rgba(255,190,90,0.95)', 'rgba(200,120,40,0.2)', 64), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.0 }));
     lamp.position.set(0, 6.5, 0);
     lamp.scale.setScalar(2.2);
-    lamp.name = 'lamp';
     root.add(lamp);
     const side = rng() > 0.5 ? 1 : -1;
     root.position.set(side * range(28, 46), 0, z);
-    this.substations.push(root);
+    this.substations.push({ root, lamp });
     this.group.add(root);
   }
 
@@ -243,12 +245,11 @@ export class World {
     // Güç seviyesi görselleri
     const powered = this.power;
     this.cityMat.opacity = powered * 0.9;
-    this.cableMat.color.setHex(0x39435a).lerp(new THREE.Color(0x4a7a9a), powered * 0.6);
+    this.cableMat.color.copy(this.cableBase).lerp(this.cableHot, powered * 0.6);
     for (const s of this.substations) {
-      const lamp = s.getObjectByName('lamp') as THREE.Sprite;
-      (lamp.material as THREE.SpriteMaterial).opacity = powered * (0.55 + 0.45 * Math.sin(elapsed * 2.2 + s.position.z));
-      s.position.z += dz;
-      if (s.position.z > 60) { s.position.z -= CORRIDOR_LEN; s.position.x = (rng() > 0.5 ? 1 : -1) * range(28, 46); }
+      (s.lamp.material as THREE.SpriteMaterial).opacity = powered * (0.55 + 0.45 * Math.sin(elapsed * 2.2 + s.root.position.z));
+      s.root.position.z += dz;
+      if (s.root.position.z > 60) { s.root.position.z -= CORRIDOR_LEN; s.root.position.x = (rng() > 0.5 ? 1 : -1) * range(28, 46); }
     }
     for (const t of this.turbines) {
       t.rotor.rotation.z += t.speed * dt * (0.4 + powered);

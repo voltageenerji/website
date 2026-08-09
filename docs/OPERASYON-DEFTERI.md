@@ -16,6 +16,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-09**.
 | LinkedIn otomasyonu | ✅ DEVREDE | Kuyruk (`linkedin-queue.json`) → `/feed/linkedin` → Zapier "Voltage Enerji - RSS to LinkedIn" → sayfa (ID 10004014). İlk gönderi 05.08 yayınlandı, sahip teyitli. |
 | Canlı PTF bandı | ✅ Canlı | epias-proxy Worker (`/ptf/today`, `/ptf/stats`). Dürüst durum merdiveni: CANLI / SON SENKRON / VERİ BEKLENİYOR. |
 | GSC + Bing | ✅ Doğrulandı (3 mülk) | Veri birikiyor; ilk anlamlı okuma ~2 hafta. |
+| 404 deneyimi "Transmission Dash" | ✅ Canlı | İnteraktif 3B mini oyun (Three.js, `/g404/game.js`, 149 KB gz). JS/WebGL yoksa veya hareket azaltma açıksa statik yedek linkler görünür; her koşulda gerçek HTTP 404 döner, noindex. Kaynak: `game404/` (build: `npm run build` + `dist/game.js → g404/`). |
 
 ## 2. Zamanlanmış olaylar
 

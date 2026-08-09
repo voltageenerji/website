@@ -260,7 +260,10 @@ export class Game {
   }
 
   private efficiency(): number {
-    return this.collectibles.spawnedTotal > 0 ? Math.round((this.collected / this.collectibles.spawnedTotal) * 100) : 100;
+    // Payda: oyuncunun gerçekten karşılaştığı paketler (toplanan + kaçırılan).
+    // İleride hâlâ yolda olanlar sayılmaz — verim haksız yere düşük görünmez.
+    const seen = this.collected + this.collectibles.missedTotal;
+    return seen > 0 ? Math.round((this.collected / seen) * 100) : 100;
   }
 
   private updateCamera(dt: number, elapsed: number): void {

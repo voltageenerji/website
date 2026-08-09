@@ -25,6 +25,8 @@ export class Collectibles {
   private glowTex = glowTexture('rgba(140,220,255,0.8)', 'rgba(50,140,240,0.15)', 64);
   private nextIn = 18;
   spawnedTotal = 0;
+  /** Oyuncuyu toplanmadan geçip giden paketler — verim paydası (QA notu 1) */
+  missedTotal = 0;
 
   constructor(private scene: THREE.Scene) {
     for (let i = 0; i < 48; i++) {
@@ -56,7 +58,7 @@ export class Collectibles {
       p.mesh.position.set(CFG.laneX[p.lane], cable + p.yOff + Math.sin(elapsed * 2.4 + p.phase) * 0.12, p.z);
       p.mesh.rotation.y += dt * 2.2;
       p.mesh.rotation.x += dt * 0.8;
-      if (p.z > 12) this.release(p);
+      if (p.z > 12) { this.missedTotal++; this.release(p); }
     }
   }
 
@@ -104,5 +106,6 @@ export class Collectibles {
     for (const p of this.pool) this.release(p);
     this.nextIn = 18;
     this.spawnedTotal = 0;
+    this.missedTotal = 0;
   }
 }
