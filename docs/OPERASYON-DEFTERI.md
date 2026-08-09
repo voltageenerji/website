@@ -1,7 +1,7 @@
 # VOLTAN — OPERASYON DEFTERİ
 
 Tek kaynak: neyin canlı olduğu, neyin zamanlanmış olduğu, neyin kimde
-beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-05**.
+beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-09**.
 
 ## 1. Canlı sistemler
 
@@ -38,6 +38,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-05**.
 | GSC sitemap yeniden gönderimi (16 URL) | Sahip/eklenti | Yeni sayfaların hızlı taranması |
 | Resend API anahtarının domain kısıtı | Sahip (Resend paneli) | Hijyen (düşük öncelik) |
 | Kullanılmayan Zapier LinkedIn bağlantısının silinmesi | Sahip | Hijyen (düşük öncelik) |
+| voltan.com.tr → voltage.com.tr sunucu tarafı 301 (Cloudflare zone Redirect Rule) | Sahip/eklenti | GSC "Alternate page with proper canonical" bulgusunun kapanması. Repo `_redirects` kuralları mevcut ama alan adı Pages projesine bağlı olmadığı için çalışmıyor; zone seviyesinde kural gerekli. Sonrasında GSC'de "Validate fix". SEO değeri kaybı YOK (canonical konsolidasyonu çalışıyor) — hijyen işi. |
 
 ### İzleme listesi (dış gelişmeler)
 
@@ -55,6 +56,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-05**.
 | Sıfır tasarruf vaadi | Yayın ilkesi | Tüm kanallar (site, rehber, LinkedIn, mail) |
 | İç dokümanlar servis dışı | 2026-08-05 | `/docs/*`, CLAUDE.md, DEPLOY.md, CHANGELOG.md → 302 |
 | Prop trading yasağı / fiyat sabitleme kapısı | 180g planı | Sabit fiyat taahhüdü öncesi pozisyon kontrolü (şirket pasif satışta — uyuyan kural) |
+| voltan.com.tr AYRI SİTE DEĞİL, takma ad (alias) | 2026-08-09 | Tek kanonik alan: voltage.com.tr. voltan.* türevleri yalnızca 301 ile yönlenir; ayrı içerik/canonical/sitemap asla kurulmaz. |
 
 ## 5. Erişim haritası (kimlik bilgisi İÇERMEZ)
 
