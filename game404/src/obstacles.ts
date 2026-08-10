@@ -24,6 +24,10 @@ interface Obstacle {
   birds?: THREE.Mesh[];
   bolt?: THREE.Line;
   warn?: THREE.Sprite;
+  /** Görünürlük ışıkları: amber ikaz lambaları / ark parıltısı (nabız atar) */
+  lamps?: THREE.Sprite[];
+  /** true → düzenli nabız yerine elektrik arkı gibi titrer (kırık izolatör) */
+  flicker?: boolean;
 }
 
 const JUMP_CLEAR = 1.7; // kablo + bu değerin altındaki gövde zıplayarak aşılır
@@ -39,11 +43,23 @@ export interface CollisionResult {
 export class Obstacles {
   private pool: Obstacle[] = [];
   private nextIn = 40; // ilk engel için mesafe tamponu
-  private steel = new THREE.MeshLambertMaterial({ color: 0x39404e });
-  private dark = new THREE.MeshLambertMaterial({ color: 0x1c212c });
-  private amber = new THREE.MeshBasicMaterial({ color: 0xd99a4e });
+  // Görünürlük (sahip geri bildirimi 2026-08-09): karanlık presetlerde engeller
+  // kayboluyordu → malzemeler aydınlatıldı + hafif emissive; her engel tipine
+  // gerçekçi ikaz ışığı eklendi. Yıldırım (strike) görselleri DEĞİŞMEDİ.
+  private steel = new THREE.MeshLambertMaterial({ color: 0x4a5468, emissive: 0x161b26 });
+  private dark = new THREE.MeshLambertMaterial({ color: 0x2a3242, emissive: 0x10141d });
+  private amber = new THREE.MeshBasicMaterial({ color: 0xffb35c });
   private boltMat = new THREE.LineBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
   private warnTex = glowTexture('rgba(255,200,110,0.9)', 'rgba(255,150,40,0.15)', 64);
+  private lampTex = glowTexture('rgba(255,190,110,0.95)', 'rgba(230,140,50,0.22)', 64);
+  private sparkTex = glowTexture('rgba(220,245,255,0.95)', 'rgba(110,200,255,0.28)', 64);
+
+  private makeLamp(tex: THREE.CanvasTexture, scale: number, x: number, y: number, z: number): THREE.Sprite {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.7 }));
+    sp.scale.setScalar(scale);
+    sp.position.set(x, y, z);
+    return sp;
+  }
   spawnedCount = 0;
 
   constructor(private scene: THREE.Scene) {}
@@ -61,6 +77,11 @@ export class Obstacles {
       rod.position.y = 0.9;
       rod.rotation.z = 0.5;
       root.add(rod);
+      // Kırık izolatör kaçak akım arkı yapar — titreyen soğuk parıltı
+      const spark = this.makeLamp(this.sparkTex, 2.2, 0, 0.8, 0);
+      o.lamps = [spark];
+      o.flicker = true;
+      root.add(spark);
       o.depth = 1.6;
     } else if (type === 'platform') {
       const deck = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.24, 2.4), this.steel);
@@ -73,6 +94,9 @@ export class Obstacles {
       const lamp = new THREE.Mesh(lampGeo, this.amber);
       lamp.position.set(0.9, 1.2, 1.1);
       root.add(deck, rail, rail2, lamp);
+      // İki uçta nabız atan şantiye ikaz lambası
+      o.lamps = [this.makeLamp(this.lampTex, 1.7, -1.0, 1.25, 0), this.makeLamp(this.lampTex, 1.7, 1.0, 1.25, 0)];
+      root.add(...o.lamps);
       o.depth = 2.4;
     } else if (type === 'crane') {
       const mast = new THREE.Mesh(new THREE.BoxGeometry(0.6, 22, 0.6), this.steel);
@@ -84,10 +108,13 @@ export class Obstacles {
       const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), this.amber);
       lamp.position.y = 3.0;
       root.add(mast, arm, cage, lamp);
+      // Havacılık tipi ikaz feneri (kol ucu) + sepette çalışma ışığı
+      o.lamps = [this.makeLamp(this.lampTex, 2.4, 0, 3.0, 0), this.makeLamp(this.lampTex, 1.5, 0, 0.6, 0.8)];
+      root.add(...o.lamps);
       o.depth = 2.2;
     } else if (type === 'flock') {
       o.birds = [];
-      const bmat = new THREE.MeshLambertMaterial({ color: 0x151a24 });
+      const bmat = new THREE.MeshLambertMaterial({ color: 0x38404f, emissive: 0x0c0f16 });
       for (let i = 0; i < 9; i++) {
         const b = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.5, 5), bmat);
         b.rotation.x = Math.PI / 2;
@@ -159,6 +186,15 @@ export class Obstacles {
       if (!o.active) continue;
       o.z += dz;
       o.timer += dt;
+      // İkaz ışıkları: amber lambalar nabız atar, izolatör arkı düzensiz titrer
+      if (o.lamps) {
+        for (let li = 0; li < o.lamps.length; li++) {
+          const lm = o.lamps[li].material as THREE.SpriteMaterial;
+          lm.opacity = o.flicker
+            ? 0.3 + 0.65 * Math.abs(Math.sin(o.timer * 19 + li * 2.1) * Math.sin(o.timer * 7.3))
+            : 0.45 + 0.4 * Math.sin(o.timer * 4.6 + li * Math.PI);
+        }
+      }
       // Konum: kablo sarkmasını izleyen tipler
       const cable = cableHeightAt(o.z - corridorOffset);
       if (o.type === 'insulator' || o.type === 'platform') o.root.position.set(CFG.laneX[o.lane], cable - 0.1, o.z);
