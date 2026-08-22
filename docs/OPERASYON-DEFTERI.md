@@ -1,7 +1,7 @@
 # VOLTAN — OPERASYON DEFTERİ
 
 Tek kaynak: neyin canlı olduğu, neyin zamanlanmış olduğu, neyin kimde
-beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-09**.
+beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-22**.
 
 ## 1. Canlı sistemler
 
@@ -34,10 +34,11 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-09**.
 
 | Girdi | Kimde | Bloke ettiği iş |
 |---|---|---|
+| **Dizinlerdeki YANLIŞ ADRES düzeltmesi** (elektrikpaketleri.com, puan5.com, Crunchbase vb. "Bağlar Mah. Mimar Sinan Cad. No:35 K:21 D:264 Bağcılar" gösteriyor; doğrusu Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34660 Kadıköy) | Sahip/eklenti | **Yapay zekâ yanıtları bu yanlış adresi tekrarlıyor** (2026-08-22 görünürlük testinde doğrulandı). Marka varlık (entity) tutarlılığı; GBP başvurusu. |
+| GSC sitemap yeniden gönderimi (17 URL) | Sahip/eklenti | Ana sayfa indekste ESKİ başlıkla duruyor (4 Ağustos öncesi sürüm); rehber kütüphanesi henüz indekste değil. `lastmod` tarihleri 2026-08-22'de gerçek değerlerine çekildi — yeniden gönderim tazeliği tetikler. |
 | Hukuki metin onayları + F1-F6 teyitleri (ana paket) | Avukat | TASLAK şerhlerinin kalkması; rehberdeki RG ihtiyat notu; varlık yayılımı (adres/unvan teyidi) |
 | EK-1 (ticari ileti/İYS) cevapları | Avukat | Satış motoru aktivasyonu (motor zaten PASİF — acele yok) |
 | DMARC kaydı (`_dmarc` TXT, p=none) | Sahip/eklenti | Mail itibar korumasının tamamlanması (önerildi, acil değil) |
-| GSC sitemap yeniden gönderimi (16 URL) | Sahip/eklenti | Yeni sayfaların hızlı taranması |
 | Resend API anahtarının domain kısıtı | Sahip (Resend paneli) | Hijyen (düşük öncelik) |
 | Kullanılmayan Zapier LinkedIn bağlantısının silinmesi | Sahip | Hijyen (düşük öncelik) |
 | voltan.com.tr → voltage.com.tr sunucu tarafı 301 (Cloudflare zone Redirect Rule) | Sahip/eklenti | GSC "Alternate page with proper canonical" bulgusunun kapanması. Repo `_redirects` kuralları mevcut ama alan adı Pages projesine bağlı olmadığı için çalışmıyor; zone seviyesinde kural gerekli. Sonrasında GSC'de "Validate fix". SEO değeri kaybı YOK (canonical konsolidasyonu çalışıyor) — hijyen işi. |
