@@ -26,7 +26,10 @@
 /kullanim-kosullari
   Cache-Control: public, max-age=300, must-revalidate
 
-# Canlı PTF veri sayfası (uzantısız temiz URL) — statik kabuk, veriyi tarayıcı çeker
+# Canlı PTF veri sayfası — artık SUNUCU TARAFINDA render edilir
+# (functions/canli-ptf.js): saatlik tablo ve özet değerler HTML'e gömülür, böylece
+# arama motorları rakamları görür. Tarayıcı JS'i canlı tazelemeyi devralır.
+# 300 sn: veri saatlik değişir, bu pencere hem taze hem ucuzdur.
 /canli-ptf
   Cache-Control: public, max-age=300, must-revalidate
 

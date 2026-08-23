@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Canlı PTF — Güncel Gün Öncesi Elektrik Fiyatı | Voltage</title>
-<meta name="description" content="Bugünün saatlik PTF verisi: canlı gün öncesi elektrik fiyatı, 24 saatlik grafik ve günün min-maks-ortalama değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.">
+<title>Saatlik PTF Fiyatları — Bugünkü Gün Öncesi Elektrik Fiyatı | Voltage</title>
+<meta name="description" content="Bugünün saatlik PTF fiyatları: saat saat tablo, canlı gün öncesi elektrik fiyatı, günün en düşük, en yüksek ve ortalama değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="canonical" href="https://voltage.com.tr/canli-ptf">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -12,12 +12,12 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://voltage.com.tr/canli-ptf">
-<meta property="og:title" content="Canlı PTF — Güncel Gün Öncesi Elektrik Fiyatı | Voltage">
-<meta property="og:description" content="Bugünün saatlik PTF verisi: canlı gün öncesi elektrik fiyatı, 24 saatlik grafik ve günün min-maks-ortalama değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.">
+<meta property="og:title" content="Saatlik PTF Fiyatları — Bugünkü Gün Öncesi Elektrik Fiyatı | Voltage">
+<meta property="og:description" content="Bugünün saatlik PTF fiyatları: saat saat tablo, canlı gün öncesi elektrik fiyatı, günün en düşük, en yüksek ve ortalama değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.">
 <meta property="og:image" content="https://voltage.com.tr/og/canli-ptf.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Voltage Enerji paylaşım görseli: Canlı PTF — Güncel Gün Öncesi Elektrik Fiyatı">
+<meta property="og:image:alt" content="Voltage Enerji paylaşım görseli: Saatlik PTF Fiyatları — Bugünkü Gün Öncesi Elektrik Fiyatı">
 <meta property="og:site_name" content="Voltage Enerji">
 <meta property="og:locale" content="tr_TR">
 <meta name="twitter:card" content="summary_large_image">
@@ -31,7 +31,7 @@
 {"@type":"BreadcrumbList","itemListElement":[
 {"@type":"ListItem","position":1,"name":"Ana Sayfa","item":"https://voltage.com.tr/"},
 {"@type":"ListItem","position":2,"name":"Canlı PTF"}]},
-{"@type":"WebPage","image":"https://voltage.com.tr/og/canli-ptf.jpg","name":"Canlı PTF — Güncel Gün Öncesi Elektrik Fiyatı","url":"https://voltage.com.tr/canli-ptf","description":"Bugünün saatlik PTF verisi: canlı gün öncesi elektrik fiyatı, 24 saatlik grafik ve günün min-maks-ortalama değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.","inLanguage":"tr-TR","datePublished":"2026-08-05","dateModified":"2026-08-05","publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/canli-ptf","creditText":"Veri: EPİAŞ Şeffaflık Platformu — sunum ve grafik düzeni: Voltage Enerji","isBasedOn":{"@type":"WebSite","name":"EPİAŞ Şeffaflık Platformu","url":"https://seffaflik.epias.com.tr/"},"about":{"@type":"Thing","name":"Piyasa Takas Fiyatı (PTF)"}},
+{"@type":"WebPage","image":"https://voltage.com.tr/og/canli-ptf.jpg","name":"Saatlik PTF Fiyatları — Bugünkü Gün Öncesi Elektrik Fiyatı","url":"https://voltage.com.tr/canli-ptf","description":"Bugünün saatlik PTF fiyatları: saat saat tablo, canlı gün öncesi elektrik fiyatı, günün en düşük, en yüksek ve ortalama değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.","inLanguage":"tr-TR","datePublished":"2026-08-05","dateModified":"2026-08-05","publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/canli-ptf","creditText":"Veri: EPİAŞ Şeffaflık Platformu — sunum ve grafik düzeni: Voltage Enerji","isBasedOn":{"@type":"WebSite","name":"EPİAŞ Şeffaflık Platformu","url":"https://seffaflik.epias.com.tr/"},"about":{"@type":"Thing","name":"Piyasa Takas Fiyatı (PTF)"}},
 {"@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"PTF ne sıklıkla güncellenir?","acceptedAnswer":{"@type":"Answer","text":"PTF, ertesi günün 24 saati için Gün Öncesi Piyasası sonuçlarıyla birlikte ilan edilir; gün içinde o günün saatlik değerleri sabittir. Bu sayfa ise içinde bulunulan saatin değerini ve günün serisini gün boyunca düzenli aralıklarla tazeler, her görünümde son senkron zamanını gösterir."}},
 {"@type":"Question","name":"Veri kaynağınız nedir?","acceptedAnswer":{"@type":"Answer","text":"EPİAŞ Şeffaflık Platformu. Veriyi kendi altyapımızla (Cloudflare üzerinde çalışan bir veri aracımızla) çekip sayfada sunuyoruz; ara katman yalnızca aktarım ve önbellekleme yapar."}},
@@ -79,6 +79,16 @@ blockquote a { color: var(--accent-ink); }
 .live-stamp.stale { color: var(--accent); }
 .live-stamp.waiting { color: rgba(245,243,236,0.55); }
 .note { font-size: 12.5px; line-height: 1.65; color: var(--ink-muted); max-width: 720px; margin: 0 0 34px; padding-left: 12px; border-left: 2px solid var(--line-strong); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.ptf-table-wrap { overflow-x: auto; margin: 0 0 34px; border: 1px solid var(--line-strong); }
+.ptf-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.ptf-table th { text-align: left; font-weight: 500; font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); padding: 12px 16px; border-bottom: 1px solid var(--line-strong); background: var(--paper-warm); }
+.ptf-table td { padding: 9px 16px; border-bottom: 1px solid var(--line); color: var(--ink-soft); }
+.ptf-table tr:last-child td { border-bottom: 0; }
+.ptf-table td:last-child { text-align: right; }
+.ptf-table tr.now td { background: rgba(201,169,97,0.10); color: var(--ink); font-weight: 500; }
+.ptf-table .ptf-wait, .ptf-table .empty { color: var(--ink-muted); }
+@media (min-width: 720px) { .ptf-table { font-size: 13.5px; } }
 
 .cta { margin: 44px 0 0; padding: 28px 24px; border: 1px solid var(--line-strong); background: var(--paper-warm); text-align: center; }
 .cta p { margin: 0 auto 16px; }
@@ -127,7 +137,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 <body>
 <div class="page">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › Canlı PTF</nav>
-  <h1>Canlı PTF — Güncel Gün Öncesi Elektrik Fiyatı</h1>
+  <h1>Saatlik PTF Fiyatları — Bugünkü Gün Öncesi Elektrik Fiyatı</h1>
   <div class="updated">Sayfa metni yayın / son güncelleme: 05.08.2026 · Veri: EPİAŞ Şeffaflık Platformu</div>
 
   <p>Bu sayfa, Türkiye elektrik piyasasında bugün geçerli olan saatlik <strong>Piyasa Takas Fiyatı'nı (PTF)</strong> gösterir: içinde bulunduğumuz saatin fiyatı, günün 24 saatlik serisi ve günün en düşük, en yüksek ve ortalama değerleri. Veri, <strong>EPİAŞ Şeffaflık Platformu</strong>'ndan kendi altyapımızla çekilir ve gün boyunca düzenli aralıklarla tazelenir; her değerin yanında hangi saate ait olduğu ve en son ne zaman senkronize edildiği yazar.</p>
@@ -189,6 +199,20 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
       <span class="live-stamp waiting" id="pStamp">—</span>
     </div>
   </section>
+
+  <h2 id="saatlik-tablo">Bugünün saatlik PTF fiyatları</h2>
+  <p>Aşağıdaki tablo, Gün Öncesi Piyasası'nda bugünün her saati için oluşan Piyasa Takas Fiyatı'nı listeler. Değer gelmeyen saatler boş bırakılır — tahmini rakamla doldurulmaz.</p>
+  <div class="ptf-table-wrap">
+    <table class="ptf-table">
+      <caption class="sr-only">Bugünün saatlik Piyasa Takas Fiyatı (PTF) değerleri, ₺/MWh</caption>
+      <thead>
+        <tr><th scope="col">Saat</th><th scope="col">PTF (₺/MWh)</th></tr>
+      </thead>
+      <tbody id="pTable">
+        <tr><td colspan="2" class="ptf-wait">Veri bekleniyor…</td></tr>
+      </tbody>
+    </table>
+  </div>
 
   <p class="note">Bu sayfadaki PTF verileri EPİAŞ Şeffaflık Platformu kaynaklıdır ve yalnızca bilgilendirme amaçlıdır; gecikmeli, eksik veya hatalı olabilir. Ticari karar ve işlemlerde EPİAŞ'ın resmî yayınları esas alınmalıdır.</p>
 
@@ -290,7 +314,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   var $ = function(id){ return document.getElementById(id); };
   var elMode = $('pMode'), elStamp = $('pStamp'), elNow = $('pNow');
   var elMin = $('pMin'), elMax = $('pMax'), elAvg = $('pAvg'), elMinH = $('pMinH'), elMaxH = $('pMaxH');
-  var elMo = $('pMo'), elMoK = $('pMoK');
+  var elMo = $('pMo'), elMoK = $('pMoK'), elTable = $('pTable');
   var elLine = $('pLine'), elArea = $('pArea'), elDot = $('pDot');
   if(!elNow) return;
 
@@ -374,6 +398,20 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     if(elDot) elDot.style.display = 'none';
   }
 
+  /* Saatlik tablo — sunucu tarafında da aynı satırlar basılır (functions/canli-ptf.js).
+     Değer gelmeyen saat "—" kalır; asla uydurma/taşıma yapılmaz. */
+  function renderTable(ps){
+    if(!elTable) return;
+    if(!ps){ elTable.innerHTML = '<tr><td colspan="2" class="ptf-wait">Veri bekleniyor…</td></tr>'; return; }
+    var rows = '', h, v, cls;
+    for(h = 0; h < 24; h++){
+      v = Number.isFinite(ps[h]) ? fmt(ps[h]) : '—';
+      cls = (h === state.hour && Number.isFinite(ps[h])) ? ' class="now"' : '';
+      rows += '<tr' + cls + '><td>' + hh(h) + ':00</td><td>' + v + '</td></tr>';
+    }
+    elTable.innerHTML = rows;
+  }
+
   function render(){
     var cls = state.mode === 'live' ? '' : (state.mode === 'stale' ? ' stale' : ' waiting');
     if(elMode){ elMode.textContent = modeText(); elMode.className = 'live-mode' + cls; }
@@ -395,7 +433,8 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
       }
       else { resetFigures(); }
       drawChart(ps);
-    } else { resetFigures(); clearChart(); }
+      renderTable(ps);
+    } else { resetFigures(); clearChart(); renderTable(null); }
     if(elMo && elMoK){
       if(state.month && Number.isFinite(state.month.avg)){
         elMo.textContent = fmt(state.month.avg);
