@@ -315,6 +315,15 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   var elMode = $('pMode'), elStamp = $('pStamp'), elNow = $('pNow');
   var elMin = $('pMin'), elMax = $('pMax'), elAvg = $('pAvg'), elMinH = $('pMinH'), elMaxH = $('pMaxH');
   var elMo = $('pMo'), elMoK = $('pMoK'), elTable = $('pTable');
+  /* Sunucu render'ı işareti (functions/canli-ptf.js body'ye data-ssr="1" basar) */
+  var ssr = document.body && document.body.getAttribute('data-ssr') === '1';
+
+  /* Sunucunun bastığı rakamlara DOKUNMADAN yalnız tazelik iddiasını düşürür:
+     "CANLI" → "SON SENKRON". Veri silinmez; dürüstlük merdiveni korunur. */
+  function degradeSsrClaim(){
+    if(elMode){ elMode.textContent = lang() === 'en' ? 'LAST SYNC' : 'SON SENKRON'; elMode.className = 'live-mode stale'; }
+    if(elStamp) elStamp.className = 'live-stamp stale';
+  }
   var elLine = $('pLine'), elArea = $('pArea'), elDot = $('pDot');
   if(!elNow) return;
 
@@ -504,7 +513,10 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     else if(!applyCache()){              /* 2) önbellekteki gerçek veri  3) dürüst bekleme */
       /* Tazelik iddiası düşer: canlı senkron başarısızsa CANLI denmez */
       if(state.mode === 'live') state = { mode: 'stale', hour: state.hour, syncTs: state.syncTs || Date.now(), prices: state.prices, price: state.price, month: state.month };
-      render();
+      /* Sunucu render'ı varsa ve elimizde henüz veri yoksa: sunucunun bastığı
+         GERÇEK rakamları SİLME (QA DEF-1). Yalnız tazelik iddiasını düşür. */
+      if(ssr && !state.prices) degradeSsrClaim();
+      else render();
     }
     var stats = await fetchStats();
     if(stats){
@@ -514,7 +526,9 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     }
   }
 
-  render();
+  /* Sunucu tarafında render edilmiş sayfada ilk boyamayı ATLA: aksi hâlde boş
+     başlangıç durumu, sunucunun bastığı gerçek rakamların üzerine yazardı. */
+  if(!ssr) render();
   sync();
   setInterval(sync, 15 * 60 * 1000);
 })();

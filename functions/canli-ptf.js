@@ -113,13 +113,16 @@ export function inject(html, prices, stats) {
     const isNow = nowH !== null && h === nowH && v !== null;
     rows += `<tr${isNow ? ' class="now"' : ''}><td>${hh(h)}:00</td><td>${v !== null ? fmt(v) : '—'}</td></tr>`;
   }
-  html = html.replace(/(<tbody id="pTable">)[\s\S]*?(<\/tbody>)/, `$1${rows}$2`);
+  // Fonksiyonla değiştir: değer içindeki $&, $', $1 gibi diziler desen olarak
+  // yorumlanmasın (QA DEF-9 — bugün değerler sayı ama kapı kapalı kalsın).
+  html = html.replace(/(<tbody id="pTable">)[\s\S]*?(<\/tbody>)/, (m, a, b) => a + rows + b);
 
-  // Anlık değer + durum damgası
+  // Anlık değer + durum damgası. İkisi BİRLİKTE basılır: saat bilinmiyorsa
+  // "CANLI" iddiası da edilmez (QA DEF-10).
   const nowPrice = nowH !== null ? prices[nowH] : null;
   html = swap(html, '<span id="pNow">—</span>', `<span id="pNow">${nowPrice !== null ? fmt(nowPrice) : '—'}</span>`);
-  html = swap(html, '<span class="live-mode waiting" id="pMode">—</span>', '<span class="live-mode" id="pMode">CANLI</span>');
   if (nowH !== null) {
+    html = swap(html, '<span class="live-mode waiting" id="pMode">—</span>', '<span class="live-mode" id="pMode">CANLI</span>');
     html = swap(html, '<span class="live-stamp waiting" id="pStamp">—</span>', `<span class="live-stamp" id="pStamp">SAAT ${hh(nowH)}:00 · EPİAŞ</span>`);
   }
 
@@ -136,17 +139,23 @@ export function inject(html, prices, stats) {
   }
 
   // Aylık ortalama (opsiyonel — gelmezse "—" kalır)
+  // Sözleşme alanı `monthRange` (bkz. CHANGELOG "/ptf/stats"); istemciler de
+  // bunu okur. Dönem etiketi olmadan sayı basılmaz — atıfsız rakam yayınlamayız.
   if (stats && Number.isFinite(stats.monthAvg)) {
-    html = swap(html, '<div class="cv" id="pMo">—</div>', `<div class="cv" id="pMo">${fmt(stats.monthAvg)}</div>`);
-    const label = periodLabel(stats.range);
+    const label = periodLabel(stats.monthRange);
     if (label) {
+      html = swap(html, '<div class="cv" id="pMo">—</div>', `<div class="cv" id="pMo">${fmt(stats.monthAvg)}</div>`);
       html = swap(html, '<div class="ck" id="pMoK">Aylık Ortalama</div>', `<div class="ck" id="pMoK">Aylık Ortalama${label}</div>`);
     }
   }
 
   // Tazelik sinyali: sayfanın birincil içeriği (fiyat serisi) her gün değişir.
   const d = istanbulDate();
-  if (d) html = html.replace(/"dateModified":"\d{4}-\d{2}-\d{2}"/, `"dateModified":"${d}"`);
+  if (d) html = html.replace(/"dateModified":"\d{4}-\d{2}-\d{2}"/, () => `"dateModified":"${d}"`);
+
+  // İstemciye "bu sayfa sunucuda dolduruldu" işareti: sayfadaki JS ilk boyamada
+  // bu gerçek rakamların üzerine BOŞ durum yazmasın (QA DEF-1).
+  html = swap(html, '<body>', '<body data-ssr="1">');
 
   return html;
 }
@@ -160,39 +169,34 @@ function htmlResponse(html, maxAge, sMaxAge) {
   });
 }
 
-/**
- * Statik kabuğu getirir. Önce temiz URL (/canli-ptf), tutmazsa açık dosya yolu
- * (/canli-ptf.html) denenir — ASSETS'in temiz URL çözümüne bağımlı kalmayız.
- * ASSETS, Function'ları tetiklemez; döngü riski yoktur.
- */
-async function fetchShell(env, request) {
-  const direct = await env.ASSETS.fetch(request);
-  if (direct.ok) return direct;
-  const url = new URL(request.url);
-  return env.ASSETS.fetch(new Request(new URL('/canli-ptf.html', url.origin), request));
-}
-
 export async function onRequestGet(context) {
-  const { request, env } = context;
-  const shell = await fetchShell(env, request);
-
+  const { request } = context;
+  let shell = null;
   try {
-    if (!shell.ok) return shell;
-    const url = new URL(request.url);
+    // context.next() → Pages'in kendi varlık hattı. ASSETS binding'ine ve temiz
+    // URL çözümüne bağımlı değiliz; 301 yönlendirmesi de doğmaz (QA DEF-3/DEF-4).
+    shell = await context.next();
+    if (!shell || shell.status !== 200) return shell;
 
     // QA kancası: SSR'ı atla, dürüst bekleme hâlini göster
-    if (url.searchParams.has('ptfoff')) return shell;
+    if (new URL(request.url).searchParams.has('ptfoff')) return shell;
 
     const html = await shell.clone().text();
-    const prices = pricesFrom(await fetchJson(PROXY + '/ptf/today'));
+    // İki uç paralel çekilir: bozuk proxy'de TTFB iki katına çıkmasın (QA DEF-8)
+    const [today, stats] = await Promise.all([fetchJson(PROXY + '/ptf/today'), fetchJson(PROXY + '/ptf/stats')]);
+    const prices = pricesFrom(today);
     // Dürüstlük: gerçek veri yoksa kabuk olduğu gibi döner ("—" + VERİ BEKLENİYOR)
     if (!prices) return htmlResponse(html, 30, 60);
 
-    const stats = await fetchJson(PROXY + '/ptf/stats');
     return htmlResponse(inject(html, prices, stats), 60, 300);
   } catch (e) {
-    // SSR'da ne olursa olsun sayfa AYAKTA kalır: statik kabuk servis edilir.
+    // SSR'da ne olursa olsun sayfa AYAKTA kalır.
     console.error('canli-ptf SSR failed, serving static shell:', e && e.message);
-    return shell;
+    if (shell) return shell;
+    try { return await context.next(); } catch (_) { /* aşağıda 503 */ }
+    return new Response('Sayfa geçici olarak yüklenemedi.', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
   }
 }
+
+// HEAD istekleri (izleme araçları, bazı tarayıcı botları) 405 almasın.
+export const onRequestHead = onRequestGet;
