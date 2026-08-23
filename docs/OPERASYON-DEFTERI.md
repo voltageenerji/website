@@ -13,6 +13,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | Haftalık/aylık lead raporu | ✅ Kurulu | GitHub Actions cron → `/api/report`. Pazartesi 08:30 (haftalık), ayın 1'i 08:45 (aylık) TRT. İlk otomatik: 2026-08-10. |
 | Rehber kütüphanesi | ✅ Canlı | 11 sayfa (`/rehber`). Tümü hukuk onaylı, sıfır tasarruf vaadi, FAQPage şemalı. |
 | Yapay zekâ görünürlüğü | ✅ Canlı | robots.txt AI-tarayıcı izinleri, `/llms.txt`, FAQ şemaları. Etki tarayıcı ziyaretleriyle birikir. |
+| İletişim adresi okunabilirliği | ✅ Düzeltildi 2026-08-23 | Cloudflare "Email Address Obfuscation" AÇIKMIŞ → `info@voltage.com.tr` JS ile gizleniyordu. Kapatıldı; ham kaynakta 7 düz metin geçiş (JSON-LD `ContactPoint` dahil), `data-cfemail`/`email-protection` = 0. GSC'deki 2 adet `/cdn-cgi/l/email-protection` 404'ü kendiliğinden düşecek. |
 | LinkedIn otomasyonu | ✅ DEVREDE | Kuyruk (`linkedin-queue.json`) → `/feed/linkedin` → Zapier "Voltage Enerji - RSS to LinkedIn" → sayfa (ID 10004014). İlk gönderi 05.08 yayınlandı, sahip teyitli. |
 | Canlı PTF bandı | ✅ Canlı | epias-proxy Worker (`/ptf/today`, `/ptf/stats`). Dürüst durum merdiveni: CANLI / SON SENKRON / VERİ BEKLENİYOR. |
 | GSC + Bing | ✅ Doğrulandı (3 mülk, hepsi Domain tipi) | **2026-08-23 ölçümü: 18 sayfa indexed, 0 "crawled – not indexed".** Rehberlerin tamamı dizinde; ana sayfa 22.08'de taranmış. Kalan 9 "not indexed" zararsız artık: 5×404 (eski `/ptf/*` uçları + Cloudflare artefaktı), 2× HTTP→HTTPS, 1× robots (`/api/lead`, doğru), 1× www→non-www canonical. Site haritası 23.08'de yeniden gönderildi (17 URL, Success). **Sorun dizinleme değil, sıralama ve bayat snippet.** |
@@ -26,6 +27,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | 2026-08-10 Pzt 08:30 | İlk otomatik haftalık lead raporu (mail) |
 | 2026-08-20 | Zapier deneme planı biter → poll 2 dk → ~15 dk olur (gönderiler 10:00–10:25 aralığına kayar) |
 | 2026-08-26 Çar ~10:00 | LinkedIn: canlı PTF bandı gönderisi (otomatik) |
+| 2026-08-29 Cmt 09:00–10:00 UTC | Cloudflare bakım penceresi — zone yapılandırma değişiklikleri başarısız olabilir. **O saatlerde Cloudflare ayarı değiştirmeyin.** |
 | 2026-09-01 Salı 08:45 | İlk otomatik aylık lead raporu |
 | 2026-09-09 / 09-23 / 10-07 | LinkedIn: rehber lansmanı / serbest tüketici 2026 / ilke postu (otomatik) |
 | 2026-12 (EPDK kurul kararı dönemi) | SEO Faz 3 sezon oyunu: "Serbest Tüketici 2027" güncellemesi — Kasım'da hazırlık |
@@ -37,7 +39,6 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | **Crunchbase "VERIFY NOW" doğrulaması** (şirket e-postasıyla sahiplik teyidi) | Sahip | 17 alanın 14'ü kilitli: Website (`www.` fazlalığı), LinkedIn (`tr.` → `www.`), açıklamalar, kuruluş yılı, e-posta düzeltilemiyor. Adres 2026-08-23'te eklendi (bölüm boştu). |
 | **ACİL: +90 216 479 0510 numarasının Crunchbase'den SİLİNMESİ** | Sahip (VERIFY NOW gerekli) | Sahip 2026-08-23'te teyit etti: **bu numara şirkete ait DEĞİL**. Adımıza kayıtlı yanlış numara kamuya açık — yayılmadan kaldırılmalı. Alan kilitli, önce Crunchbase doğrulaması şart. Numara başka dizinlerde de aranmalı. |
 | Kanonik kurumsal telefon numarası (varsa) | Sahip | GBP telefonsuz da kurulabilir (web sitesi yeterli). Yeni/doğru numara verilirse NAP paketine ve siteye eklenir. **Teyit edilmemiş hiçbir numara hiçbir kanalda yayınlanmaz.** |
-| **Cloudflare "Email Address Obfuscation" kapatılması** (Scrape Shield) | Sahip/eklenti | GSC'de `/cdn-cgi/l/email-protection` 404'ü bu özelliğin AÇIK olduğunu gösteriyor → `info@voltage.com.tr` sayfalarda JS ile gizleniyor, **yapay zekâlar ve Google iletişim adresimizi okuyamıyor**. Varlık (entity) tutarlılığını doğrudan baltalar. |
 | Yanlış "Bağcılar / Mimar Sinan Cad." adresinin kaynağı | Sahip/eklenti (araştırma) | Crunchbase'de DEĞİLMİŞ (orası boştu, düzeltildi). elektrikpaketleri.com ve puan5.com açılmıyor. Kaynak henüz bulunamadı — yapay zekâ yanıtlarında görülmeye devam ederse yeniden aranacak. |
 | Hukuki metin onayları + F1-F6 teyitleri (ana paket) | Avukat | TASLAK şerhlerinin kalkması; rehberdeki RG ihtiyat notu; varlık yayılımı (adres/unvan teyidi) |
 | EK-1 (ticari ileti/İYS) cevapları | Avukat | Satış motoru aktivasyonu (motor zaten PASİF — acele yok) |
