@@ -32,6 +32,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | 2026-08-29 Cmt 09:00–10:00 UTC | Cloudflare bakım penceresi — zone yapılandırma değişiklikleri başarısız olabilir. **O saatlerde Cloudflare ayarı değiştirmeyin.** |
 | 2026-09-01 Salı 08:45 | İlk otomatik aylık lead raporu |
 | 2026-09-09 / 09-23 / 10-07 | LinkedIn: rehber lansmanı / serbest tüketici 2026 / ilke postu (otomatik) |
+| 2031-03 (en geç 06.09.2031) | **Marka yenileme: 2011/70573.** Koruma 06.09.2031'de biter; yenileme penceresi 6 ay önce açılır. Kayıtlı vekil olmadığı için hatırlatma tebligatı doğrudan şirkete gelir — adres güncel olmalı. |
 | 2026-12 (EPDK kurul kararı dönemi) | SEO Faz 3 sezon oyunu: "Serbest Tüketici 2027" güncellemesi — Kasım'da hazırlık |
 
 ## 3. Bekleyen girdiler (kimde)
@@ -42,7 +43,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | **ACİL: +90 216 479 0510 numarasının Crunchbase'den SİLİNMESİ** | Sahip (VERIFY NOW gerekli) | Sahip 2026-08-23'te teyit etti: **bu numara şirkete ait DEĞİL**. Adımıza kayıtlı yanlış numara kamuya açık — yayılmadan kaldırılmalı. Alan kilitli, önce Crunchbase doğrulaması şart. Numara başka dizinlerde de aranmalı. |
 | Kanonik kurumsal telefon numarası (varsa) | Sahip | GBP telefonsuz da kurulabilir (web sitesi yeterli). Yeni/doğru numara verilirse NAP paketine ve siteye eklenir. **Teyit edilmemiş hiçbir numara hiçbir kanalda yayınlanmaz.** |
 | **Facebook sayfası kurulumu** (facebook.com/voltageenerji) | Sahip (Meta kişisel hesap gerekli) | Kimlik/NAP varlığı. Görseller hazır: `docs/brand/fb-profile.png`, `fb-cover.png`. Kurallar: telefon YAZILMAZ (doğru numara yok), Messenger KAPALI (KVKK aydınlatma metni bu kanalı kapsamıyor — avukat dönüşüne kadar), sıfır tasarruf vaadi. Sayfa canlıya girince URL bana bildirilecek → `sameAs` (index.html JSON-LD) ve `llms.txt`'e eklenecek. |
-| **MARKA TESCİL DURUMU (TÜRKPATENT) sorgulanmalı** | Sahip/eklenti | Buradan sorgulanamadı (turkpatent.gov.tr egress engelli, arama motoru kayıt döndürmedi). Kritik: ticaret unvanı tescili marka koruması SAĞLAMAZ. "Voltage" adını taşıyan başka firmalar var; çakışan sınıfta tescil varsa marka kullanımımız riske girer, yoksa acilen başvurulmalı. İlgili Nice sınıfları: 4 (elektrik enerjisi), 35 (satış hizmetleri), 39 (elektrik dağıtımı/nakli), 40 (enerji üretimi). Sonuç gelene kadar hiçbir kanalda ® / ™ kullanılmaz. |
+| **Marka: vekile sorulacak 3 soru** | Sahip → marka vekili | Tescil DOĞRULANDI (aşağı bkz.). Açık kalanlar: (1) Nice 39/40 kayıtlı ama **35 (satış/ticaret hizmetleri) ve 4 (elektrik enerjisi) YOK** — "toptan satış" faaliyeti için yeterli mi? (2) Kayıtta **vekil yok**; TÜRKPATENT'teki tebligat adresi güncel mi (yanlış Bağcılar adresi riski)? (3) Tescilli logo eski yeşil-mavi tasarım; mevcut görsel kimlik için ayrı başvuru gerekir mi? |
 | Yanlış "Bağcılar / Mimar Sinan Cad." adresinin kaynağı | Sahip/eklenti (araştırma) | Crunchbase'de DEĞİLMİŞ (orası boştu, düzeltildi). elektrikpaketleri.com ve puan5.com açılmıyor. Kaynak henüz bulunamadı — yapay zekâ yanıtlarında görülmeye devam ederse yeniden aranacak. |
 | Hukuki metin onayları + F1-F6 teyitleri (ana paket) | Avukat | TASLAK şerhlerinin kalkması; rehberdeki RG ihtiyat notu; varlık yayılımı (adres/unvan teyidi) |
 | EK-1 (ticari ileti/İYS) cevapları | Avukat | Satış motoru aktivasyonu (motor zaten PASİF — acele yok) |
@@ -67,6 +68,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | Sıfır tasarruf vaadi | Yayın ilkesi | Tüm kanallar (site, rehber, LinkedIn, mail) |
 | İç dokümanlar servis dışı | 2026-08-05 | `/docs/*`, CLAUDE.md, DEPLOY.md, CHANGELOG.md → 302 |
 | Prop trading yasağı / fiyat sabitleme kapısı | 180g planı | Sabit fiyat taahhüdü öncesi pozisyon kontrolü (şirket pasif satışta — uyuyan kural) |
+| Marka tescili DOĞRULANDI: "voltage enerji" 2011/70573 | 2026-08-23 | TÜRKPATENT kaydı: başvuru 06.09.2011, tescil 23.11.2012, sahibi Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (5318978), Nice 39/40, hizmet markası. Koruma dönemi 06.09.2021'de yenilendi. **Sonraki yenileme: 06.09.2031** (6 ay önce başlanmalı). Numara sitede, schema'da ve llms.txt'te yayında. |
 | voltan.com.tr AYRI SİTE DEĞİL, takma ad (alias) | 2026-08-09 | Tek kanonik alan: voltage.com.tr. voltan.* türevleri yalnızca 301 ile yönlenir; ayrı içerik/canonical/sitemap asla kurulmaz. |
 
 ## 5. Erişim haritası (kimlik bilgisi İÇERMEZ)
