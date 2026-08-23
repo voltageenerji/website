@@ -1,7 +1,7 @@
 # VOLTAN — OPERASYON DEFTERİ
 
 Tek kaynak: neyin canlı olduğu, neyin zamanlanmış olduğu, neyin kimde
-beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-22**.
+beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 
 ## 1. Canlı sistemler
 
@@ -15,7 +15,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-22**.
 | Yapay zekâ görünürlüğü | ✅ Canlı | robots.txt AI-tarayıcı izinleri, `/llms.txt`, FAQ şemaları. Etki tarayıcı ziyaretleriyle birikir. |
 | LinkedIn otomasyonu | ✅ DEVREDE | Kuyruk (`linkedin-queue.json`) → `/feed/linkedin` → Zapier "Voltage Enerji - RSS to LinkedIn" → sayfa (ID 10004014). İlk gönderi 05.08 yayınlandı, sahip teyitli. |
 | Canlı PTF bandı | ✅ Canlı | epias-proxy Worker (`/ptf/today`, `/ptf/stats`). Dürüst durum merdiveni: CANLI / SON SENKRON / VERİ BEKLENİYOR. |
-| GSC + Bing | ✅ Doğrulandı (3 mülk) | Veri birikiyor; ilk anlamlı okuma ~2 hafta. |
+| GSC + Bing | ✅ Doğrulandı (3 mülk, hepsi Domain tipi) | **2026-08-23 ölçümü: 18 sayfa indexed, 0 "crawled – not indexed".** Rehberlerin tamamı dizinde; ana sayfa 22.08'de taranmış. Kalan 9 "not indexed" zararsız artık: 5×404 (eski `/ptf/*` uçları + Cloudflare artefaktı), 2× HTTP→HTTPS, 1× robots (`/api/lead`, doğru), 1× www→non-www canonical. Site haritası 23.08'de yeniden gönderildi (17 URL, Success). **Sorun dizinleme değil, sıralama ve bayat snippet.** |
 | 404 deneyimi "Transmission Dash" | ✅ Canlı | İnteraktif 3B mini oyun (Three.js, `/g404/game.js`, 150 KB gz). JS/WebGL yoksa veya hareket azaltma açıksa statik yedek linkler görünür; her koşulda gerçek HTTP 404 döner, noindex. Kaynak: `game404/` (build: `npm run build` + `dist/game.js → g404/`). |
 | 404 oyunu lider tablosu | ✅ Canlı | `/api/score` (GET/POST/DELETE). Hesap yok — yalnız takma ad; `voltage-leads` KV'de tek anahtar `lb:board` (en iyi 50, ilk 20 gösterilir; aynı isimde yalnız en iyi skor). KVKK notu: kişisel veri toplanmaz (isim serbest takma ad, IP/UA kaydedilmez). İsim sansürü sunucu tarafında (TR+EN küfür/hakaret, leetspeak katlamalı; sahip kararı 2026-08-09: "bu kadarı yeterli" — bilinen kaçaklar dokümante, güvence sıfırlamadır). **SIFIRLAMA:** GitHub → Actions → `leaderboard-reset` → Run workflow (REPORT_TOKEN ile korunan DELETE atar); Orchestrator da tetikleyebilir. Kalıcı QA testleri: `docs/qa/`. |
 
@@ -34,8 +34,10 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-22**.
 
 | Girdi | Kimde | Bloke ettiği iş |
 |---|---|---|
-| **Dizinlerdeki YANLIŞ ADRES düzeltmesi** (elektrikpaketleri.com, puan5.com, Crunchbase vb. "Bağlar Mah. Mimar Sinan Cad. No:35 K:21 D:264 Bağcılar" gösteriyor; doğrusu Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34660 Kadıköy) | Sahip/eklenti | **Yapay zekâ yanıtları bu yanlış adresi tekrarlıyor** (2026-08-22 görünürlük testinde doğrulandı). Marka varlık (entity) tutarlılığı; GBP başvurusu. |
-| GSC sitemap yeniden gönderimi (17 URL) | Sahip/eklenti | Ana sayfa indekste ESKİ başlıkla duruyor (4 Ağustos öncesi sürüm); rehber kütüphanesi henüz indekste değil. `lastmod` tarihleri 2026-08-22'de gerçek değerlerine çekildi — yeniden gönderim tazeliği tetikler. |
+| **Crunchbase "VERIFY NOW" doğrulaması** (şirket e-postasıyla sahiplik teyidi) | Sahip | 17 alanın 14'ü kilitli: Website (`www.` fazlalığı), LinkedIn (`tr.` → `www.`), açıklamalar, kuruluş yılı, e-posta düzeltilemiyor. Adres 2026-08-23'te eklendi (bölüm boştu). |
+| **Kurumsal telefon teyidi: +90 216 479 0510** | Sahip | Numara Crunchbase'de zaten YAYINDA (2. bağımsız kaynak). Teyit edilirse GBP başvurusu ve NAP paketi açılır; edilmezse Crunchbase'den silinmesi gerekir. |
+| **Cloudflare "Email Address Obfuscation" kapatılması** (Scrape Shield) | Sahip/eklenti | GSC'de `/cdn-cgi/l/email-protection` 404'ü bu özelliğin AÇIK olduğunu gösteriyor → `info@voltage.com.tr` sayfalarda JS ile gizleniyor, **yapay zekâlar ve Google iletişim adresimizi okuyamıyor**. Varlık (entity) tutarlılığını doğrudan baltalar. |
+| Yanlış "Bağcılar / Mimar Sinan Cad." adresinin kaynağı | Sahip/eklenti (araştırma) | Crunchbase'de DEĞİLMİŞ (orası boştu, düzeltildi). elektrikpaketleri.com ve puan5.com açılmıyor. Kaynak henüz bulunamadı — yapay zekâ yanıtlarında görülmeye devam ederse yeniden aranacak. |
 | Hukuki metin onayları + F1-F6 teyitleri (ana paket) | Avukat | TASLAK şerhlerinin kalkması; rehberdeki RG ihtiyat notu; varlık yayılımı (adres/unvan teyidi) |
 | EK-1 (ticari ileti/İYS) cevapları | Avukat | Satış motoru aktivasyonu (motor zaten PASİF — acele yok) |
 | DMARC kaydı (`_dmarc` TXT, p=none) | Sahip/eklenti | Mail itibar korumasının tamamlanması (önerildi, acil değil) |
