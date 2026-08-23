@@ -35,7 +35,8 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | Girdi | Kimde | Bloke ettiği iş |
 |---|---|---|
 | **Crunchbase "VERIFY NOW" doğrulaması** (şirket e-postasıyla sahiplik teyidi) | Sahip | 17 alanın 14'ü kilitli: Website (`www.` fazlalığı), LinkedIn (`tr.` → `www.`), açıklamalar, kuruluş yılı, e-posta düzeltilemiyor. Adres 2026-08-23'te eklendi (bölüm boştu). |
-| **Kurumsal telefon teyidi: +90 216 479 0510** | Sahip | Numara Crunchbase'de zaten YAYINDA (2. bağımsız kaynak). Teyit edilirse GBP başvurusu ve NAP paketi açılır; edilmezse Crunchbase'den silinmesi gerekir. |
+| **ACİL: +90 216 479 0510 numarasının Crunchbase'den SİLİNMESİ** | Sahip (VERIFY NOW gerekli) | Sahip 2026-08-23'te teyit etti: **bu numara şirkete ait DEĞİL**. Adımıza kayıtlı yanlış numara kamuya açık — yayılmadan kaldırılmalı. Alan kilitli, önce Crunchbase doğrulaması şart. Numara başka dizinlerde de aranmalı. |
+| Kanonik kurumsal telefon numarası (varsa) | Sahip | GBP telefonsuz da kurulabilir (web sitesi yeterli). Yeni/doğru numara verilirse NAP paketine ve siteye eklenir. **Teyit edilmemiş hiçbir numara hiçbir kanalda yayınlanmaz.** |
 | **Cloudflare "Email Address Obfuscation" kapatılması** (Scrape Shield) | Sahip/eklenti | GSC'de `/cdn-cgi/l/email-protection` 404'ü bu özelliğin AÇIK olduğunu gösteriyor → `info@voltage.com.tr` sayfalarda JS ile gizleniyor, **yapay zekâlar ve Google iletişim adresimizi okuyamıyor**. Varlık (entity) tutarlılığını doğrudan baltalar. |
 | Yanlış "Bağcılar / Mimar Sinan Cad." adresinin kaynağı | Sahip/eklenti (araştırma) | Crunchbase'de DEĞİLMİŞ (orası boştu, düzeltildi). elektrikpaketleri.com ve puan5.com açılmıyor. Kaynak henüz bulunamadı — yapay zekâ yanıtlarında görülmeye devam ederse yeniden aranacak. |
 | Hukuki metin onayları + F1-F6 teyitleri (ana paket) | Avukat | TASLAK şerhlerinin kalkması; rehberdeki RG ihtiyat notu; varlık yayılımı (adres/unvan teyidi) |
