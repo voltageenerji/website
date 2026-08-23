@@ -1942,9 +1942,12 @@ async function fetchPtfLive(){
     } else if(lgUpd){ lgUpd.textContent = stampText(); }
     if(lgMo && lgMoK){
       const L = lang();
-      if(state.month && Number.isFinite(state.month.avg)){
+      /* D\u00F6nem etiketi \u00E7\u00F6z\u00FClemiyorsa say\u0131 da bas\u0131lmaz: hangi d\u00F6neme ait oldu\u011Fu
+         yaz\u0131lamayan bir ortalama yay\u0131nlanmaz (canli-ptf ve sunucuyla ayn\u0131 kural). */
+      const moLabel = state.month ? periodLabel(state.month.range) : '';
+      if(state.month && Number.isFinite(state.month.avg) && moLabel){
         lgMo.textContent = fmt(state.month.avg) + ' \u20BA/MWh';
-        lgMoK.textContent = (L === 'en' ? 'MONTHLY AVG \u00B7 ' : 'AYLIK ORTALAMA \u00B7 ') + periodLabel(state.month.range);
+        lgMoK.textContent = (L === 'en' ? 'MONTHLY AVG \u00B7 ' : 'AYLIK ORTALAMA \u00B7 ') + moLabel;
       } else {
         lgMo.textContent = '\u2014';
         lgMoK.textContent = L === 'en' ? 'MONTHLY AVG' : 'AYLIK ORTALAMA';

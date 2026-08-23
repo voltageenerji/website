@@ -445,9 +445,12 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
       renderTable(ps);
     } else { resetFigures(); clearChart(); renderTable(null); }
     if(elMo && elMoK){
-      if(state.month && Number.isFinite(state.month.avg)){
+      /* Dönem etiketi çözülemiyorsa sayı da basılmaz: atıfsız rakam yayınlamayız
+         (sunucu tarafıyla aynı kural — QA DEF-15). */
+      var moLabel = state.month ? periodLabel(state.month.range) : '';
+      if(state.month && Number.isFinite(state.month.avg) && moLabel){
         elMo.textContent = fmt(state.month.avg);
-        elMoK.textContent = 'Aylık Ortalama' + periodLabel(state.month.range);
+        elMoK.textContent = 'Aylık Ortalama' + moLabel;
       } else { elMo.textContent = '—'; elMoK.textContent = 'Aylık Ortalama'; }
     }
   }
@@ -508,22 +511,27 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   }
 
   async function sync(){
-    var data = await fetchToday();
-    if(data) applyData(data);            /* 1) canlı gerçek veri */
-    else if(!applyCache()){              /* 2) önbellekteki gerçek veri  3) dürüst bekleme */
-      /* Tazelik iddiası düşer: canlı senkron başarısızsa CANLI denmez */
-      if(state.mode === 'live') state = { mode: 'stale', hour: state.hour, syncTs: state.syncTs || Date.now(), prices: state.prices, price: state.price, month: state.month };
-      /* Sunucu render'ı varsa ve elimizde henüz veri yoksa: sunucunun bastığı
-         GERÇEK rakamları SİLME (QA DEF-1). Yalnız tazelik iddiasını düşür. */
-      if(ssr && !state.prices) degradeSsrClaim();
-      else render();
-    }
-    var stats = await fetchStats();
+    /* İki uç PARALEL çekilir: aylık ortalama ilk boyamadan önce bilinsin, aksi
+       hâlde hücre "—" yazıp saniyeler sonra dolar (QA DEF-14). */
+    var res = await Promise.all([fetchToday(), fetchStats()]);
+    var data = res[0], stats = res[1];
     if(stats){
       state.month = { avg: stats.monthAvg, range: stats.monthRange || '' };
       try{ var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null') || {}; c.month = state.month; localStorage.setItem(CACHE_KEY, JSON.stringify(c)); }catch(e){}
-      render();
     }
+
+    /* TAZELİK MERDİVENİ (üstteki alttakini yener):
+       1) canlı gerçek veri
+       2) sunucunun bu istekte çektiği veri — önceki oturumdan kalan önbelleği
+          YENER, çünkü saniyeler önce alınmıştır (QA DEF-13)
+       3) önbellekteki gerçek veri
+       4) dürüst bekleme */
+    if(data){ applyData(data); return; }
+    if(ssr && !state.prices){ degradeSsrClaim(); return; }
+    if(applyCache()) return;
+    /* Tazelik iddiası düşer: canlı senkron başarısızsa CANLI denmez */
+    if(state.mode === 'live') state = { mode: 'stale', hour: state.hour, syncTs: state.syncTs || Date.now(), prices: state.prices, price: state.price, month: state.month };
+    render();
   }
 
   /* Sunucu tarafında render edilmiş sayfada ilk boyamayı ATLA: aksi hâlde boş

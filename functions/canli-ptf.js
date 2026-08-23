@@ -93,9 +93,13 @@ function periodLabel(range) {
   return ' · ' + parseInt(m[3], 10) + '–' + parseInt(m[4], 10) + ' ' + ad;
 }
 
-/** Tek bir çapayı güvenle değiştirir; çapa yoksa HTML'e dokunmaz. */
+/**
+ * Tek bir çapayı güvenle değiştirir; çapa yoksa HTML'e dokunmaz.
+ * Fonksiyon biçimi zorunlu: değer içindeki $&, $', $1 dizileri desen olarak
+ * yorumlanıp belgeyi bozmasın (QA DEF-9).
+ */
 function swap(html, anchor, replacement) {
-  return html.includes(anchor) ? html.replace(anchor, replacement) : html;
+  return html.includes(anchor) ? html.replace(anchor, () => replacement) : html;
 }
 
 export function inject(html, prices, stats) {
@@ -176,7 +180,9 @@ export async function onRequestGet(context) {
     // context.next() → Pages'in kendi varlık hattı. ASSETS binding'ine ve temiz
     // URL çözümüne bağımlı değiliz; 301 yönlendirmesi de doğmaz (QA DEF-3/DEF-4).
     shell = await context.next();
-    if (!shell || shell.status !== 200) return shell;
+    // null dönerse catch'e düşsün: null döndürmek runtime 500 demektir.
+    if (!shell) throw new Error('next() returned no response');
+    if (shell.status !== 200) return shell;
 
     // QA kancası: SSR'ı atla, dürüst bekleme hâlini göster
     if (new URL(request.url).searchParams.has('ptfoff')) return shell;
@@ -199,4 +205,8 @@ export async function onRequestGet(context) {
 }
 
 // HEAD istekleri (izleme araçları, bazı tarayıcı botları) 405 almasın.
-export const onRequestHead = onRequestGet;
+// SSR yolundan GEÇMEZ: gövdesiz bir yanıt için EPİAŞ'a iki alt istek atmanın
+// anlamı yok; başlıklar varlık hattından gelir (QA DEF-12 maliyet notu).
+export async function onRequestHead(context) {
+  return context.next();
+}
