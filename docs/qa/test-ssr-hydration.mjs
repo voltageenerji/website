@@ -46,6 +46,18 @@ async function run({ name, seedCache, proxyWorks }) {
     await ctx.addInitScript(([k, v]) => { try { localStorage.setItem(k, v); } catch (e) {} },
       [CACHE_KEY, JSON.stringify({ ts: Date.now() - 86400000, hour: 12, price: 999.5, prices: null, date: new Date(Date.now() - 86400000).toDateString(), month: null })]);
   }
+  // Aylık ortalama hücresine yapılan HER yazımı kaydet: tek seferde ve
+  // etiketiyle yazılmalı, "—" gösterip sonra dolmamalı (QA DEF-14/N1).
+  await ctx.addInitScript(() => {
+    window.__moWrites = [];
+    document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById('pMo');
+      if (!el) return;
+      window.__moWrites.push(el.textContent.trim());
+      new MutationObserver(() => window.__moWrites.push(el.textContent.trim()))
+        .observe(el, { childList: true, characterData: true, subtree: true });
+    });
+  });
   const page = await ctx.newPage();
   const errs = [];
   page.on('pageerror', (e) => errs.push(String(e)));
@@ -57,8 +69,6 @@ async function run({ name, seedCache, proxyWorks }) {
   });
 
   await page.goto(`http://localhost:${PORT}/ssr.html`, { waitUntil: 'domcontentloaded' });
-  const moWrites = [];
-  await page.exposeFunction('__moWrite', (v) => moWrites.push(v));
   await page.waitForTimeout(3000);
 
   const s = await page.evaluate(() => ({
@@ -69,6 +79,7 @@ async function run({ name, seedCache, proxyWorks }) {
     moK: document.getElementById('pMoK').textContent.trim(),
     rows: document.querySelectorAll('#pTable tr').length,
     waiting: document.getElementById('pTable').textContent.includes('Veri bekleniyor'),
+    moWrites: window.__moWrites || [],
   }));
   console.log(`\n${name}: ${JSON.stringify(s)}`);
   ok(`${name} · tablo 24 satır kalır`, s.rows === 24, `-> ${s.rows}`);
@@ -77,6 +88,8 @@ async function run({ name, seedCache, proxyWorks }) {
   ok(`${name} · günün en düşüğü korunur`, s.min === '1.800,00', `-> ${s.min}`);
   ok(`${name} · aylık ortalama atıflı`, s.mo === '2.222,22' && /1–23 AĞU/.test(s.moK), `-> ${s.mo} / ${s.moK}`);
   ok(`${name} · sayfa hatası yok`, errs.length === 0, errs.join(' | '));
+  // Titreme testi: hücre "—" yazıp sonra dolmamalı
+  ok(`${name} · aylık ortalama titremez`, !s.moWrites.includes('—'), `-> ${JSON.stringify(s.moWrites)}`);
   await ctx.close();
   return s;
 }
