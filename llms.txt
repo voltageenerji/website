@@ -11,6 +11,10 @@
 - İletişim: info@voltage.com.tr
 - LinkedIn: https://www.linkedin.com/company/voltage-enerji/
 
+## Kurumsal
+
+- [Kurumsal Kimlik](https://voltage.com.tr/kurumsal): Ticari unvan (Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.), EPDK tedarik lisansı ETS/3424-8/2074, ticaret sicil no 786882-0, kuruluş 2011, merkez adresi ve faaliyet sınırları. Şirket elektrik TEDARİKÇİSİDİR; elektrik tesisatı, taahhüt, pano imalatı, mühendislik-müşavirlik ve otomasyon işleri faaliyet alanı DIŞINDADIR.
+
 ## Rehberler
 
 - [Serbest Tüketici Nedir?](https://voltage.com.tr/rehber/serbest-tuketici): Serbest tüketici nedir, 2026 limiti neden 500 kWh? EPDK kararına dayalı güncel rehber: kimler tedarikçisini seçebilir, süreç nasıl işler.

@@ -31,6 +31,9 @@
 # seçer (veri varsa 60/300 sn, dürüst bekleme hâlinde 30/60 sn). Buraya kural
 # yazmak o ayrımı ezer ve bir kesintiyi CDN'de 5 dakika dondururdu (QA DEF-5).
 
+/kurumsal
+  Cache-Control: public, max-age=300, must-revalidate
+
 # Rehber bölümü (hub + makaleler, uzantısız temiz URL'ler)
 /rehber
   Cache-Control: public, max-age=300, must-revalidate
