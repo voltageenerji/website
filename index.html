@@ -949,6 +949,9 @@ section {
 .cl-legal { display: flex; gap: 20px; }
 .cl-legal a { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: rgba(245,243,236,0.6); }
 .cl-legal a:hover { color: var(--accent); }
+.cl-subwrap { display: inline-flex; align-items: flex-start; }
+.cl-reg { font-family: var(--mono); font-size: 9px; line-height: 1; letter-spacing: 0; margin-left: 1px; color: var(--accent); opacity: 0.75; }
+.cl-markline .cl-reg { color: inherit; margin-left: 0; }
 .cl-markline { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; color: rgba(245,243,236,0.75); }
 
 @media (max-width: 1024px) {
@@ -1627,7 +1630,7 @@ body.menu-open { overflow: hidden; }
             <circle cx="24" cy="24" r="1.8" fill="currentColor"></circle>
           </svg>
         </div>
-        <div class="cl-name">Voltage <span class="cl-sub" data-tr="ENERJİ" data-en="ENERGY">ENERJİ</span></div>
+        <div class="cl-name">Voltage <span class="cl-subwrap"><span class="cl-sub" data-tr="ENERJİ" data-en="ENERGY">ENERJİ</span><span class="cl-reg" aria-hidden="true">®</span></span></div>
       </div>
       <nav class="cl-nav" aria-label="Footer">
         <a href="#hakkimizda" data-tr="Hakkımızda" data-en="About">Hakkımızda</a>
@@ -1663,7 +1666,7 @@ body.menu-open { overflow: hidden; }
         <a href="/cerez-politikasi" data-tr="Çerez Politikası" data-en="Cookie Policy">Çerez Politikası</a>
         <a href="/kullanim-kosullari" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a>
       </div>
-      <span class="cl-markline">VOLTAGE ENERJİ</span>
+      <span class="cl-markline">VOLTAGE ENERJİ<span class="cl-reg" aria-hidden="true">®</span></span>
     </div>
   </div>
 </footer>
