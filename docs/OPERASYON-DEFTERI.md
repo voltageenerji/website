@@ -60,6 +60,12 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | Müşteri portalı → mobil uygulama | Kapılı plan (sahip kararı 2026-08-08, **kapsamı 2026-08-26'da netleşti**) | Portal kapsamı: müşteriye kullanıcı adı/şifre (self-signup YOK) → fatura görüntüleme → ödenmemiş faturada ödeme linki. Mimari ve karar kaydı: **`docs/PORTAL-MIMARISI.md`**. Sıra: (1) veri altyapısı [tetik: ilk sözleşmeli müşteri] → (2) portal → (3) mobil uygulama. Erken kararlar alındı: KV değil D1, hosted checkout (kart verisi bize gelmez), ödeme durumu yalnız imzalı webhook'tan. |
 | ChatGPT Ads Türkiye lansmanı | Dış gelişme (izleme) | Pasif — TRde aktif değil (canlı: US/CA/AU/NZ/UK/JP/KR, 2026-08). Şartlar: TR lansmanı + aktif satış kararı + ölçüm temeli. Organik katman (llms.txt/FAQ şema/Bing) zaten kurulu. |
 
+## 3.1 OLAY KAYDI
+
+| Olay | Tarih | Durum |
+|---|---|---|
+| **Kamuya açık CI günlüğünde müşteri firma adı ifşası** | Tespit ve müdahale: 2026-08-26 | **KAPATILDI.** Rapor ucu yanıtında `companies[]` alanı vardı; iş akışı yanıt gövdesini genel-okunur GitHub Actions günlüğüne yazdırıyordu (repo public). Doğrulandı: 24.08 koşusunda gerçek bir firma adı düz metin hâlde. **Müdahale:** 4 koşunun günlükleri API ile silindi (204), `companies` yanıttan tamamen kaldırıldı, iş akışı artık yalnız HTTP durum kodu yazdırıyor. **Etkilenen veri kümesi:** ~2026-07-29 – 2026-08-23 arasındaki 4 haftalık pencereye düşen lead'lerin firma adı + sektör + tüketim aralığı (telefon/e-posta sızmadı). Kesin liste KV'den `receivedAt` aralığıyla çıkarılabilir. **Not:** GitHub günlük okunma sayısı tutmaz — kimsenin eriştiği tespit edilemez. **Sahipte:** KVKK m.12 bildirim yükümlülüğü değerlendirmesi (avukat). |
+
 ## 4. Karar kayıtları (aktif kısıtlar)
 
 | Karar | Tarih | Kapsam |

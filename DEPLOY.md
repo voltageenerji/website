@@ -243,9 +243,15 @@ listesi açılmalı. Yanlış parolada "Kullanıcı adı veya parola hatalı" g�
   `Referrer-Policy: no-referrer`. robots.txt'te de kapalı.
 - Panel verisi CSV olarak indirilebilir — indirilen dosya kişisel veri içerir,
   paylaşımına dikkat edin.
-- Parolayı değiştirmek: Adım 1'i tekrarlayın, `ADMIN_PASS_HASH` değerini
-  güncelleyin. `ADMIN_SESSION_SECRET` değerini değiştirmek **tüm açık
-  oturumları anında düşürür** (cihaz kaybı durumunda bunu yapın).
+- Parolayı değiştirmek: Adım 1'i tekrarlayın, `ADMIN_PASS_HASH` değerini güncelleyin.
+- **Cihaz kaybı / acil oturum kapatma:** `ADMIN_SESSION_SECRET` değerini yeni bir
+  rastgele değerle değiştirin. Bu, **o anda açık olan TÜM oturumları anında
+  geçersiz kılar** — kaybolan cihazdaki açık panel dahil. Tek kaldıraç budur;
+  panelde "diğer oturumları kapat" düğmesi yoktur (tasarım gereği, bkz. güvenlik notları).
+- **Parola değiştirdikten sonra girişi mutlaka test edin.** `ADMIN_PASS_HASH`
+  yapıştırılırken sonu kırpılırsa (90 karakterlik tek satır) giriş **tamamen
+  kilitlenir** — bu güvenli taraftır ama sizi dışarıda bırakır. Doğru davranış:
+  yeni özeti kaydedin, deployment'ı yenileyin, hemen giriş yapıp doğrulayın.
 
 ### Rapor dönemleri
 

@@ -282,5 +282,44 @@ ok('bozuk kayıt sayımda görünür (dürüst toplam)', data.total === 5, `-> $
   ok('N3: kenar başlığı kova belirler', k3 !== k1);
 }
 
+
+// --------------------------------------------------------------------------
+// QA N9/N10 REGRESYONU
+// --------------------------------------------------------------------------
+{
+  // N9: sayaç okunamıyorsa "15 dk bekle" DEĞİL, altyapı hatası bildirilmeli
+  const patlak = { get: async () => { throw new Error('kv down'); }, put: async () => {}, delete: async () => {} };
+  ok('N9: KV yoksa sebep "unavailable"', (await checkRateLimit(null, 'k')).reason === 'unavailable');
+  ok('N9: KV hata verirse sebep "unavailable"', (await checkRateLimit(patlak, 'k')).reason === 'unavailable');
+  const rNoKv = await post({ user: 'emirhan', pass: PASS }, ENV({ LEADS: undefined }));
+  const dNoKv = await rNoKv.json();
+  ok('N9: KV yokken 503 rate_limit_unavailable (429 DEĞİL)',
+    rNoKv.status === 503 && dNoKv.error === 'rate_limit_unavailable', `-> ${rNoKv.status} ${dNoKv.error}`);
+  // Gerçek sınır aşımı hâlâ 429 olmalı
+  const env2 = ENV();
+  const hdr = { 'CF-Connecting-IP': '7.7.7.7' };
+  for (let i = 0; i < 8; i++) await post({ user: 'emirhan', pass: 'yanlis' }, env2, hdr);
+  const rLimit = await post({ user: 'emirhan', pass: PASS }, env2, hdr);
+  ok('N9: gerçek sınır aşımı hâlâ 429', rLimit.status === 429 && (await rLimit.json()).error === 'too_many_attempts');
+}
+{
+  // N10: ms alanı FARKLI GENİŞLİKTE anahtarlarda da hiçbir kayıt atlanmamalı
+  const karisik = {};
+  for (const k of ['lead:9000:a', 'lead:1750000000000:a', 'lead:1750000000000:b', 'lead:900000:z'])
+    karisik[k] = JSON.stringify({ ad: 'X', sirket: k, eposta: 'x@y.z' });
+
+  const seen = [];
+  let cur = null, guard = 0;
+  do {
+    const u = 'https://voltage.com.tr/api/admin/leads?limit=1' + (cur ? '&before=' + encodeURIComponent(cur) : '');
+    const rr = await getLeads(ENV({ LEADS: makeKV(karisik) }), u, token);
+    const dd = await rr.json();
+    for (const rec of dd.records) seen.push(rec.id);
+    cur = dd.nextBefore;
+  } while (cur && ++guard < 20);
+  ok('N10: karışık genişlikli anahtarlarda kayıp yok', seen.length === 4, `-> ${seen.length}: ${seen}`);
+  ok('N10: mükerrer yok', new Set(seen).size === seen.length);
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

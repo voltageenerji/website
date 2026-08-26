@@ -162,6 +162,7 @@ td.note { max-width: 280px; color: var(--ink-soft); font-size: 12.5px; }
   var ERRORS = {
     invalid_credentials: 'Kullanıcı adı veya parola hatalı.',
     too_many_attempts: 'Çok fazla hatalı deneme. 15 dakika bekleyip tekrar deneyin.',
+    rate_limit_unavailable: 'Giriş güvenlik sayacına ulaşılamıyor, bu yüzden giriş geçici olarak kapalı. Beklemek düzeltmez — Cloudflare KV bağlantısını (LEADS) kontrol edin.',
     not_configured: 'Panel henüz yapılandırılmamış. Cloudflare ortam değişkenleri eksik (ADMIN_USER, ADMIN_PASS_HASH, ADMIN_SESSION_SECRET).',
     no_persistence: 'Veri deposuna ulaşılamıyor. Talepler kaydedilmiş olabilir ama şu an okunamıyor.',
     unauthorized: 'Oturum süresi doldu. Tekrar giriş yapın.',
@@ -286,7 +287,7 @@ td.note { max-width: 280px; color: var(--ink-soft); font-size: 12.5px; }
     show($('emptyState'), list.length === 0);
     show($('moreBtn'), !!state.nextBefore);
     $('countLine').textContent = list.length + ' kayıt gösteriliyor · toplam ' + state.total +
-      (state.truncated ? ' (liste çok büyük, kısaltıldı)' : '');
+      (state.truncated ? ' · UYARI: kayıt sayısı tarama sınırını aştı, EN YENİ kayıtlar bu listede eksik olabilir' : '');
     stats();
   }
 

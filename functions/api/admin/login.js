@@ -56,7 +56,14 @@ export async function onRequestPost(context) {
   const kv = env.LEADS || null;
   const rlKey = await rateLimitKey(request);
   const rl = await checkRateLimit(kv, rlKey);
-  if (rl.blocked) return json({ ok: false, error: 'too_many_attempts' }, 429);
+  if (rl.blocked) {
+    // Sayaç okunamıyorsa bu bir kilit DEĞİL, altyapı arızasıdır: operatöre
+    // "15 dakika bekleyin" demek, beklemekle düzelmeyecek bir durum için
+    // saatler kaybettirirdi (QA N9).
+    return rl.reason === 'unavailable'
+      ? json({ ok: false, error: 'rate_limit_unavailable' }, 503)
+      : json({ ok: false, error: 'too_many_attempts' }, 429);
+  }
 
   let body;
   try {

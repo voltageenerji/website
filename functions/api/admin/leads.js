@@ -47,8 +47,6 @@ export async function onRequestGet(context) {
   const url = new URL(request.url);
   // DİKKAT: Number(null) === 0 ve 0 "finite"tir. Parametre yokken varsayılana
   // düşmek için pozitiflik şart — aksi hâlde limit 1'e çöker (test yakaladı).
-  // DİKKAT: Number(null) === 0 ve 0 "finite"tir. Parametre yokken varsayılana
-  // düşmek için pozitiflik şart — aksi hâlde limit 1'e çöker (test yakaladı).
   const limitRaw = Number(url.searchParams.get('limit'));
   const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? Math.min(MAX_LIMIT, Math.floor(limitRaw)) : DEFAULT_LIMIT;
   // Cursor artık TAM ANAHTAR (QA B4). Yoksa en baştan (en yeniden) başla.
@@ -69,9 +67,12 @@ export async function onRequestGet(context) {
   } while (cursor);
 
   const total = keys.length;
-  // Toplam sıralama: önce ms azalan, eşitlikte anahtar azalan. Anahtar
-  // benzersiz olduğundan sıralama kararlı ve tekrarlanabilir (QA B4).
-  keys.sort((a, b) => (b.ts - a.ts) || (a.name < b.name ? 1 : a.name > b.name ? -1 : 0));
+  // Sıralama ile sayfa filtresi AYNI düzeni kullanmalı (QA N10). Filtre
+  // sözlüksel (`k.name < beforeKey`); bu yüzden sıralama da yalnızca ada göre
+  // yapılır. Sayısal ts ile karışık kullanılırsa, ms alanı farklı genişlikte
+  // anahtarlar (geçmiş veri aktarımı, farklı anahtar üreticisi) girdiğinde iki
+  // düzen ayrışır ve B4'ün aynısı — sessizce atlanan kayıt — geri gelirdi.
+  keys.sort((a, b) => (a.name < b.name ? 1 : a.name > b.name ? -1 : 0));
 
   // 2) Sayfayı seç ve YALNIZCA o sayfanın değerlerini oku.
   // Cursor tam anahtar: sözlük olarak beforeKey'den ÖNCEKİLER (aynı ms grubunun
