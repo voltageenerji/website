@@ -78,7 +78,7 @@ export async function onRequestPost(context) {
   // İKİ doğrulama da HER ZAMAN çalışır: erken çıkış, yanıt süresinden
   // kullanıcı adının doğru olup olmadığını ele verirdi.
   const [userOk, passOk] = await Promise.all([
-    timingSafeEqual(user, env.ADMIN_USER),
+    timingSafeEqual(user, String(env.ADMIN_USER).trim()),
     verifyPassword(pass, env.ADMIN_PASS_HASH),
   ]);
 

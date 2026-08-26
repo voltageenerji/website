@@ -321,5 +321,20 @@ ok('bozuk kayıt sayımda görünür (dürüst toplam)', data.total === 5, `-> $
   ok('N10: mükerrer yok', new Set(seen).size === seen.length);
 }
 
+
+// --------------------------------------------------------------------------
+// Yapıştırma kazası: değerin sonundaki boşluk/satır sonu girişi engellememeli
+// --------------------------------------------------------------------------
+ok('hash sonunda boşluk varsa yine doğrular', await verifyPassword(PASS, HASH + '  '));
+ok('hash sonunda satır sonu varsa yine doğrular', await verifyPassword(PASS, HASH + '\n'));
+ok('hash başında boşluk varsa yine doğrular', await verifyPassword(PASS, '  ' + HASH));
+ok('boşluklu hash ile YANLIŞ parola yine reddedilir', !(await verifyPassword('yanlis-parola-777', HASH + '\n')));
+{
+  const rSpace = await post({ user: 'emirhan', pass: PASS }, ENV({ ADMIN_USER: 'emirhan ', ADMIN_PASS_HASH: HASH + '\n' }));
+  ok('boşluklu ADMIN_USER + boşluklu hash ile giriş çalışır', rSpace.status === 200, `-> ${rSpace.status}`);
+  const rWrongUser = await post({ user: 'baskasi', pass: PASS }, ENV({ ADMIN_USER: 'emirhan ' }));
+  ok('kırpma yanlış kullanıcıyı kabul ETMEZ', rWrongUser.status === 401);
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
