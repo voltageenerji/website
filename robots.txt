@@ -6,6 +6,9 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 Disallow: /docs/
 Disallow: /feed/
 
@@ -14,57 +17,99 @@ Disallow: /feed/
 User-agent: GPTBot
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: Claude-Web
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: anthropic-ai
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: Perplexity-User
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: Google-Extended
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: Amazonbot
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: Bingbot
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: CCBot
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 User-agent: meta-externalagent
 Allow: /
 Disallow: /api/
+Disallow: /panel
+Disallow: /lib/
+Disallow: /tools/
 
 Sitemap: https://voltage.com.tr/sitemap.xml

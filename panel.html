@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yönetim Paneli | Voltage Enerji</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" sizes="48x48 32x32 16x16" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#0A0E1A; --ink-soft:#1A2032; --ink-muted:#4A5264; --line:#E4E2DC; --line-strong:#D6D2C6; --paper:#F5F3EC; --paper-warm:#EDEAE0; --accent:#C9A961; --accent-dark:#A68A44; --accent-ink:#826829; --red:#9B3A2F; --mono:'IBM Plex Mono',Consolas,monospace; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Archivo', -apple-system, sans-serif; background: var(--paper); color: var(--ink); font-size: 15px; line-height: 1.6; }
+a { color: var(--accent-ink); }
+.mono { font-family: var(--mono); }
+[hidden] { display: none !important; }
+
+/* ---- Giriş ---- */
+.login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.login-card { width: min(400px, 100%); border: 1px solid var(--line-strong); border-top: 2px solid var(--accent); background: #fff; padding: 34px 32px; }
+.login-mark { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 8px; }
+.login-card h1 { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 26px; margin-bottom: 6px; }
+.login-card .sub { color: var(--ink-muted); font-size: 13px; margin-bottom: 24px; }
+label { display: block; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; }
+input[type=text], input[type=password], input[type=search] {
+  width: 100%; padding: 12px 14px; font-size: 15px; font-family: 'Archivo', sans-serif;
+  border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink); outline: none;
+}
+input:focus { border-color: var(--accent-dark); }
+.field { margin-bottom: 16px; }
+button { font-family: 'Archivo', sans-serif; cursor: pointer; }
+.btn { display: inline-block; padding: 12px 22px; font-size: 14px; font-weight: 500; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); transition: background .25s, border-color .25s; }
+.btn:hover:not(:disabled) { background: var(--accent-dark); border-color: var(--accent-dark); }
+.btn:disabled { opacity: .55; cursor: progress; }
+.btn-ghost { background: transparent; color: var(--ink-muted); border-color: var(--line-strong); }
+.btn-ghost:hover:not(:disabled) { background: transparent; color: var(--ink); border-color: var(--accent-dark); }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+.msg { margin-top: 14px; font-size: 13px; padding: 10px 12px; border-left: 2px solid var(--red); background: rgba(155,58,47,.06); color: var(--red); }
+.msg.info { border-color: var(--accent-dark); background: rgba(201,169,97,.1); color: var(--accent-ink); }
+.login-note { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--ink-muted); line-height: 1.6; }
+
+/* ---- Panel ---- */
+.top { border-bottom: 1px solid var(--line-strong); background: #fff; }
+.top-in { max-width: 1240px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.top-mark { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-ink); }
+.top-sp { flex: 1; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 26px 24px 80px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line-strong); border: 1px solid var(--line-strong); margin-bottom: 24px; }
+.stat { background: #fff; padding: 16px 18px; }
+.stat .v { font-family: var(--mono); font-size: 24px; font-weight: 500; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-top: 6px; }
+.bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.bar input[type=search] { flex: 1; min-width: 220px; }
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line-strong); background: #fff; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead th { position: sticky; top: 0; background: var(--paper-warm); text-align: left; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); font-weight: 500; padding: 11px 14px; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
+tbody td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr:hover { background: rgba(201,169,97,.05); }
+td.ts { font-family: var(--mono); font-size: 12px; color: var(--ink-muted); white-space: nowrap; }
+td.name { font-weight: 500; white-space: nowrap; }
+td.co { min-width: 150px; }
+td.contact a { display: block; white-space: nowrap; font-size: 12.5px; }
+td.note { max-width: 280px; color: var(--ink-soft); font-size: 12.5px; }
+.empty { padding: 40px 20px; text-align: center; color: var(--ink-muted); font-size: 14px; }
+.foot { margin-top: 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.count { font-family: var(--mono); font-size: 11.5px; color: var(--ink-muted); }
+.kvkk { margin-top: 30px; padding: 14px 16px; border-left: 2px solid var(--line-strong); font-size: 12px; color: var(--ink-muted); line-height: 1.65; }
+</style>
+</head>
+<body>
+
+<!-- ---------- GİRİŞ ---------- -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <div class="login-mark">Voltage Enerji</div>
+    <h1>Yönetim Paneli</h1>
+    <div class="sub">Gelen teklif taleplerini görüntülemek için giriş yapın.</div>
+    <form id="loginForm" autocomplete="on">
+      <div class="field">
+        <label for="u">Kullanıcı adı</label>
+        <input id="u" name="username" type="text" autocomplete="username" required autocapitalize="none" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="p">Parola</label>
+        <input id="p" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn" id="loginBtn" type="submit">Giriş Yap</button>
+      <div class="msg" id="loginMsg" hidden role="alert"></div>
+    </form>
+    <div class="login-note">Bu panel kişisel veri içerir. Oturum 8 saat sonra kendiliğinden kapanır; ortak kullanılan bir cihazda işiniz bittiğinde <strong>Çıkış</strong> yapın.</div>
+  </div>
+</div>
+
+<!-- ---------- PANEL ---------- -->
+<div id="panelView" hidden>
+  <div class="top">
+    <div class="top-in">
+      <span class="top-mark">Voltage Enerji · Yönetim</span>
+      <span class="top-sp"></span>
+      <a class="mono" style="font-size:11.5px;" href="/" target="_blank" rel="noopener">Siteyi aç ↗</a>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn" type="button">Çıkış</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><div class="v" id="sTotal">—</div><div class="k">Toplam Talep</div></div>
+      <div class="stat"><div class="v" id="sWeek">—</div><div class="k">Son 7 Gün</div></div>
+      <div class="stat"><div class="v" id="sMonth">—</div><div class="k">Son 30 Gün</div></div>
+      <div class="stat"><div class="v" id="sLast">—</div><div class="k">Son Talep</div></div>
+    </div>
+
+    <div class="bar">
+      <input type="search" id="q" placeholder="Ara: ad, şirket, e-posta, telefon, sektör, not…" autocomplete="off">
+      <button class="btn btn-ghost btn-sm" id="csvBtn" type="button">CSV indir</button>
+      <button class="btn btn-ghost btn-sm" id="reloadBtn" type="button">Yenile</button>
+    </div>
+
+    <div class="msg" id="panelMsg" hidden role="alert"></div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tarih</th><th>Ad Soyad</th><th>Şirket</th><th>İletişim</th>
+            <th>Aylık Tüketim</th><th>Sektör</th><th>Not</th><th>Kaynak</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="emptyState" hidden>Henüz talep yok.</div>
+    </div>
+
+    <div class="foot">
+      <button class="btn btn-ghost btn-sm" id="moreBtn" type="button" hidden>Daha fazla yükle</button>
+      <span class="count" id="countLine"></span>
+    </div>
+
+    <div class="kvkk"><strong>KVKK:</strong> Bu ekrandaki ad, telefon ve e-posta bilgileri kişisel veridir. Yalnızca teklif sürecinin yürütülmesi amacıyla işlenir; ekran görüntüsü alıp üçüncü kişilerle paylaşmayın, cihazınızı başkasına açık bırakmayın.</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { records: [], nextBefore: null, total: 0, truncated: false };
+
+  var fmtDate = new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  function show(el, on) { el.hidden = !on; }
+  function setMsg(el, text, kind) {
+    el.textContent = text;
+    el.className = 'msg' + (kind === 'info' ? ' info' : '');
+    show(el, !!text);
+  }
+
+  var ERRORS = {
+    invalid_credentials: 'Kullanıcı adı veya parola hatalı.',
+    too_many_attempts: 'Çok fazla hatalı deneme. 15 dakika bekleyip tekrar deneyin.',
+    not_configured: 'Panel henüz yapılandırılmamış. Cloudflare ortam değişkenleri eksik (ADMIN_USER, ADMIN_PASS_HASH, ADMIN_SESSION_SECRET).',
+    no_persistence: 'Veri deposuna ulaşılamıyor. Talepler kaydedilmiş olabilir ama şu an okunamıyor.',
+    unauthorized: 'Oturum süresi doldu. Tekrar giriş yapın.',
+    forbidden: 'İstek reddedildi.'
+  };
+  function errText(code) { return ERRORS[code] || 'Beklenmeyen bir hata oluştu (' + (code || 'bilinmiyor') + ').'; }
+
+  /* ---------- Giriş ---------- */
+  $('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = $('loginBtn');
+    btn.disabled = true;
+    setMsg($('loginMsg'), '');
+    try {
+      var r = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user: $('u').value, pass: $('p').value })
+      });
+      var data = await r.json().catch(function () { return {}; });
+      if (data.ok) { $('p').value = ''; enterPanel(); return; }
+      setMsg($('loginMsg'), errText(data.error));
+    } catch (err) {
+      setMsg($('loginMsg'), 'Sunucuya ulaşılamadı. Bağlantınızı kontrol edin.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  $('logoutBtn').addEventListener('click', async function () {
+    try { await fetch('/api/admin/login', { method: 'DELETE' }); } catch (e) {}
+    location.reload();
+  });
+
+  /* ---------- Veri ---------- */
+  function enterPanel() {
+    show($('loginView'), false);
+    show($('panelView'), true);
+    state = { records: [], nextBefore: null, total: 0, truncated: false };
+    load(true);
+  }
+
+  async function load(reset) {
+    setMsg($('panelMsg'), '');
+    var url = '/api/admin/leads?limit=100' + (!reset && state.nextBefore ? '&before=' + state.nextBefore : '');
+    var r, data;
+    try {
+      r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      data = await r.json().catch(function () { return {}; });
+    } catch (e) {
+      setMsg($('panelMsg'), 'Veri alınamadı. Bağlantınızı kontrol edin.');
+      return;
+    }
+    if (!data.ok) {
+      if (data.error === 'unauthorized') { show($('panelView'), false); show($('loginView'), true); setMsg($('loginMsg'), errText('unauthorized'), 'info'); return; }
+      setMsg($('panelMsg'), errText(data.error));
+      return;
+    }
+    if (reset) state.records = [];
+    state.records = state.records.concat(data.records || []);
+    state.nextBefore = data.nextBefore;
+    state.total = data.total || 0;
+    state.truncated = !!data.truncated;
+    render();
+  }
+
+  function stats() {
+    var now = Date.now(), d7 = now - 7 * 864e5, d30 = now - 30 * 864e5;
+    var w = 0, m = 0;
+    for (var i = 0; i < state.records.length; i++) {
+      if (state.records[i].ts >= d7) w++;
+      if (state.records[i].ts >= d30) m++;
+    }
+    $('sTotal').textContent = state.total;
+    $('sWeek').textContent = w;
+    $('sMonth').textContent = m;
+    $('sLast').textContent = state.records.length ? fmtDate.format(new Date(state.records[0].ts)).replace(',', '') : '—';
+  }
+
+  function filtered() {
+    var q = $('q').value.trim().toLocaleLowerCase('tr');
+    if (!q) return state.records;
+    return state.records.filter(function (r) {
+      return [r.ad, r.soyad, r.sirket, r.eposta, r.telefon, r.sektor, r.tuketim, r.mesaj]
+        .join(' ').toLocaleLowerCase('tr').indexOf(q) !== -1;
+    });
+  }
+
+  function cell(text, cls) {
+    var td = document.createElement('td');
+    if (cls) td.className = cls;
+    td.textContent = text || '—';   /* textContent → enjeksiyon imkânsız */
+    return td;
+  }
+
+  function render() {
+    var list = filtered();
+    var tb = $('rows');
+    tb.innerHTML = '';
+    for (var i = 0; i < list.length; i++) {
+      var r = list[i], tr = document.createElement('tr');
+      tr.appendChild(cell(fmtDate.format(new Date(r.ts)), 'ts'));
+      tr.appendChild(cell((r.ad + ' ' + r.soyad).trim(), 'name'));
+      tr.appendChild(cell(r.sirket, 'co'));
+
+      var td = document.createElement('td');
+      td.className = 'contact';
+      if (r.telefon) { var a1 = document.createElement('a'); a1.href = 'tel:' + r.telefon.replace(/\s/g, ''); a1.textContent = r.telefon; td.appendChild(a1); }
+      if (r.eposta) { var a2 = document.createElement('a'); a2.href = 'mailto:' + r.eposta; a2.textContent = r.eposta; td.appendChild(a2); }
+      if (!td.childNodes.length) td.textContent = '—';
+      tr.appendChild(td);
+
+      tr.appendChild(cell(r.tuketim));
+      tr.appendChild(cell(r.sektor));
+      tr.appendChild(cell(r.mesaj, 'note'));
+      var utm = r.utm && Object.keys(r.utm).length
+        ? Object.keys(r.utm).map(function (k) { return k.replace('utm_', '') + '=' + r.utm[k]; }).join(' · ')
+        : (r.lang === 'en' ? 'site (EN)' : 'site');
+      tr.appendChild(cell(utm, 'ts'));
+      tb.appendChild(tr);
+    }
+    show($('emptyState'), list.length === 0);
+    show($('moreBtn'), !!state.nextBefore);
+    $('countLine').textContent = list.length + ' kayıt gösteriliyor · toplam ' + state.total +
+      (state.truncated ? ' (liste çok büyük, kısaltıldı)' : '');
+    stats();
+  }
+
+  $('q').addEventListener('input', render);
+  $('moreBtn').addEventListener('click', function () { load(false); });
+  $('reloadBtn').addEventListener('click', function () { state.nextBefore = null; load(true); });
+
+  /* ---------- CSV ---------- */
+  $('csvBtn').addEventListener('click', function () {
+    var list = filtered();
+    if (!list.length) return;
+    var head = ['Tarih', 'Ad', 'Soyad', 'Sirket', 'Telefon', 'Eposta', 'Tuketim', 'Sektor', 'Not', 'Dil'];
+    var esc = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+    var lines = [head.join(';')];
+    for (var i = 0; i < list.length; i++) {
+      var r = list[i];
+      lines.push([fmtDate.format(new Date(r.ts)), r.ad, r.soyad, r.sirket, r.telefon, r.eposta, r.tuketim, r.sektor, r.mesaj, r.lang].map(esc).join(';'));
+    }
+    /* BOM: Excel'in Türkçe karakterleri doğru okuması için */
+    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'voltage-talepler-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+  /* Oturum zaten açıksa doğrudan panele gir (çerez HttpOnly, JS okuyamaz —
+     tek dürüst yol veri ucunu denemektir). */
+  (async function () {
+    try {
+      var r = await fetch('/api/admin/leads?limit=1');
+      var d = await r.json().catch(function () { return {}; });
+      if (d.ok) enterPanel();
+    } catch (e) { /* giriş ekranı zaten görünür */ }
+  })();
+})();
+</script>
+</body>
+</html>

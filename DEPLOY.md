@@ -198,6 +198,63 @@ kayıt görünmeli (e-posta gelmese bile kayıt esastır).
 
 ---
 
+## 5.5.2) Yönetim paneli (/panel) — KURULUM
+
+Panel gelen tüm teklif taleplerini kullanıcı adı + parola ile gösterir.
+**Gerçek kişisel veri gösterir**; aşağıdaki üç değişken tanımlanmadan panel
+açılmaz (503 `not_configured` döner — yarı çalışan bir kapı bırakmıyoruz).
+
+### Adım 1 — parola özetini üret (parola hiçbir yere gönderilmez)
+
+Kendi bilgisayarınızda, repo kökünde:
+
+```sh
+node tools/admin-hash.mjs
+```
+
+Parolayı iki kez sorar (en az 12 karakter), sonra Cloudflare'a yapıştırılacak
+satırları basar. **Parolanın kendisi hiçbir yerde saklanmaz** — unutursanız
+aracı yeniden çalıştırıp yeni bir özet üretirsiniz.
+
+### Adım 2 — Cloudflare ortam değişkenleri
+
+Workers & Pages → proje → Settings → Environment variables → **Production**:
+
+| Değişken | Değer | Şifreli? |
+|---|---|---|
+| `ADMIN_USER` | seçtiğiniz kullanıcı adı (örn. `emirhan`) | hayır |
+| `ADMIN_PASS_HASH` | `admin-hash.mjs` çıktısındaki `pbkdf2$...` satırı | **evet (Encrypt)** |
+| `ADMIN_SESSION_SECRET` | aracın ürettiği rastgele dize | **evet (Encrypt)** |
+
+Kaydettikten sonra **yeni bir deployment** gerekir (Deployments → Retry deployment).
+
+### Adım 3 — doğrulama
+
+`https://voltage.com.tr/panel` → giriş ekranı gelmeli, doğru bilgiyle talep
+listesi açılmalı. Yanlış parolada "Kullanıcı adı veya parola hatalı" görünür;
+15 dakikada 8 hatalı denemeden sonra IP geçici olarak kilitlenir.
+
+### Güvenlik ve KVKK notları
+
+- Oturum çerezi HttpOnly + Secure + SameSite=Strict; **8 saat** sonra kendiliğinden düşer.
+- Parola PBKDF2-SHA256 (210.000 tur) ile saklanır; düz metin hiçbir yerde yok.
+- Kaba kuvvet sayacında **IP ham tutulmaz** (SHA-256 özeti, 15 dk TTL).
+- `/panel` ve `/api/admin/*`: `no-store`, `noindex`, `X-Frame-Options: DENY`,
+  `Referrer-Policy: no-referrer`. robots.txt'te de kapalı.
+- Panel verisi CSV olarak indirilebilir — indirilen dosya kişisel veri içerir,
+  paylaşımına dikkat edin.
+- Parolayı değiştirmek: Adım 1'i tekrarlayın, `ADMIN_PASS_HASH` değerini
+  güncelleyin. `ADMIN_SESSION_SECRET` değerini değiştirmek **tüm açık
+  oturumları anında düşürür** (cihaz kaybı durumunda bunu yapın).
+
+### Rapor dönemleri
+
+`/api/report?period=` → `weekly` | `monthly` | `quarterly` | `semiannual` | `yearly`.
+Zamanlama `.github/workflows/lead-reports.yml` içindedir (haftalık Pazartesi,
+aylık ayın 1'i, 3 aylık Oca/Nis/Tem/Eki, 6 aylık Oca/Tem, yıllık 1 Ocak).
+Elle tetikleme: Actions → Lead Reports → Run workflow → dönem seç.
+
+
 ## 5.6) Cloudflare Web Analytics (çerezsiz, opsiyonel)
 
 1. Dashboard → **Analytics & Logs → Web Analytics** → site ekle → token'ı kopyala.

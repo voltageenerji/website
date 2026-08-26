@@ -1,5 +1,5 @@
 /**
- * GET /api/report — lead özet raporu (haftalık / aylık), e-posta ile gönderilir.
+ * GET /api/report — lead özet raporu (haftalık/aylık/3-6 aylık/yıllık), e-posta ile gönderilir.
  * Cloudflare Pages Function (plain JS, zero dependencies).
  *
  * Koruma: `Authorization: Bearer <REPORT_TOKEN>` zorunlu (env.REPORT_TOKEN ile
@@ -10,7 +10,7 @@
  *   - env `REPORT_TOKEN`
  *   - env `RESEND_API_KEY` + `LEAD_NOTIFY_TO` + `MAIL_FROM`
  *
- * Sorgu: ?period=weekly|monthly (varsayılan weekly).
+ * Sorgu: ?period=weekly|monthly|quarterly|semiannual|yearly (varsayılan weekly).
  *
  * Pencere mantığı (Europe/Istanbul — Türkiye 2016'dan beri kalıcı UTC+3,
  * DST yok; bu yüzden sabit +3 saat ofsetle hesaplamak güvenlidir):
@@ -30,6 +30,15 @@
  */
 
 const IST_OFFSET_MS = 3 * 60 * 60 * 1000; // Europe/Istanbul = kalıcı UTC+3
+
+/** Desteklenen dönemler ve e-posta konusundaki Türkçe adları. */
+export const PERIODS = {
+  weekly: 'Haftalık',
+  monthly: 'Aylık',
+  quarterly: '3 Aylık',
+  semiannual: '6 Aylık',
+  yearly: 'Yıllık',
+};
 const MAX_REPORT_LEADS = 500;
 
 function json(body, status = 200) {
@@ -57,13 +66,19 @@ async function tokenEquals(a, b) {
 }
 
 /** Rapor penceresi [from, to) epoch-ms olarak + insan-okur etiket. */
-function computeWindow(period, nowMs) {
+export function computeWindow(period, nowMs) {
   // İstanbul "duvar saati" — UTC getter'ları İstanbul yerel değerlerini verir.
   const ist = new Date(nowMs + IST_OFFSET_MS);
   const y = ist.getUTCFullYear();
   const m = ist.getUTCMonth();
   const d = ist.getUTCDate();
   const todayMidnightMs = Date.UTC(y, m, d) - IST_OFFSET_MS; // bugün 00:00 İst (epoch)
+
+  const dayFmt = new Intl.DateTimeFormat('tr-TR', {
+    timeZone: 'Europe/Istanbul', day: '2-digit', month: '2-digit', year: 'numeric',
+  });
+  /** [from, to) aralığını "01.01.2026 – 31.03.2026" biçiminde etiketler. */
+  const spanLabel = (from, to) => `${dayFmt.format(new Date(from))} – ${dayFmt.format(new Date(to - 24 * 60 * 60 * 1000))}`;
 
   if (period === 'monthly') {
     // Önceki takvim ayı: [geçen ayın 1'i, bu ayın 1'i) İstanbul saatiyle.
@@ -73,6 +88,24 @@ function computeWindow(period, nowMs) {
       timeZone: 'Europe/Istanbul', month: 'long', year: 'numeric',
     }).format(new Date(from));
     return { from, to, label };
+  }
+
+  // Çeyrek / yarıyıl: tamamlanmış TAKVİM dönemleri. Ayın 1'inde çalıştırılır;
+  // örn. 1 Nisan'da koşan quarterly = Ocak–Mart. Böylece dönemler çakışmaz
+  // ve her ay yeniden aynı veriyi raporlamayız.
+  if (period === 'quarterly' || period === 'semiannual') {
+    const span = period === 'quarterly' ? 3 : 6;
+    const endMonth = Math.floor(m / span) * span; // içinde bulunulan dönemin ilk ayı
+    const from = Date.UTC(y, endMonth - span, 1) - IST_OFFSET_MS;
+    const to = Date.UTC(y, endMonth, 1) - IST_OFFSET_MS;
+    return { from, to, label: spanLabel(from, to) };
+  }
+
+  if (period === 'yearly') {
+    // Önceki takvim yılı: [1 Ocak (y-1), 1 Ocak y)
+    const from = Date.UTC(y - 1, 0, 1) - IST_OFFSET_MS;
+    const to = Date.UTC(y, 0, 1) - IST_OFFSET_MS;
+    return { from, to, label: String(y - 1) };
   }
 
   // weekly: son 7 tam gün: [bugün 00:00 − 7g, bugün 00:00)
@@ -153,9 +186,7 @@ function breakdownText(title, counts) {
 
 /** Rapor e-postası: konu + HTML + düz metin. Sıfır lead de geçerli rapordur. */
 function buildReportEmail(period, windowLabel, agg, records) {
-  const subject = period === 'monthly'
-    ? `Voltage Lead Raporu — Aylık ${windowLabel}`
-    : `Voltage Lead Raporu — Haftalık ${windowLabel}`;
+  const subject = `Voltage Lead Raporu — ${PERIODS[period] || PERIODS.weekly} ${windowLabel}`;
 
   if (agg.total === 0) {
     const emptyHtml = `<!doctype html>
@@ -263,7 +294,8 @@ export async function onRequestGet(context) {
   }
 
   const url = new URL(request.url);
-  const period = url.searchParams.get('period') === 'monthly' ? 'monthly' : 'weekly';
+  const requested = url.searchParams.get('period') || 'weekly';
+  const period = PERIODS[requested] ? requested : 'weekly';
   const { from, to, label } = computeWindow(period, Date.now());
 
   // Anahtar listesi (pencere filtresi anahtar timestamp'inden — kayıt fetch yok).

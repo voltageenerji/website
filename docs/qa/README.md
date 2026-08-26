@@ -9,6 +9,8 @@ CI'da sessizce yeşil görünmezler.
 |---|---|
 | `node docs/qa/test-score.mjs` | `/api/score` lider tablosu: doğrulama, sansür, yetki, KV hata yolları, 50 kayıt sınırı |
 | `node docs/qa/test-ssr-ptf.mjs` | `/canli-ptf` sunucu render'ı: biçimlendirme, eksik saat dürüstlüğü, `onRequestGet` dayanıklılık matrisi |
+| `node docs/qa/test-admin.mjs` | **Panel kimlik doğrulama:** PBKDF2, oturum imzası/süresi, kurcalama, kaba kuvvet, veri ucu yetkilendirme ve sayfalama |
+| `node docs/qa/test-report-windows.mjs` | Rapor dönemleri (haftalık/aylık/3-6 aylık/yıllık) — bitişiklik: ne boşluk ne çakışma |
 
 ## Tarayıcı gerektirenler (Playwright)
 
@@ -28,6 +30,7 @@ export CHROMIUM_PATH=/opt/pw-browsers/chromium   # yoksa: npx playwright install
 | `node docs/qa/smoke4.mjs` | Sansürlü isim reddedildiğinde arayüz davranışı |
 | `node docs/qa/qa-lb-submit.mjs` | Çift gönderim koruması, yeniden başlatma, düşük skor senaryosu |
 | `node docs/qa/censor-probe.mjs` | İsim sansürünün bilinen kaçakları ve yanlış pozitifleri |
+| `node docs/qa/test-panel.mjs` | **Panel uçtan uca:** gerçek fonksiyon modülleri + gerçek arayüz — giriş, yanlış parola, listeleme, arama, sayfalama, CSV, çıkış, XSS kaçışı |
 
 ## Değişmez kurallar (her testin koruduğu)
 
@@ -39,3 +42,5 @@ export CHROMIUM_PATH=/opt/pw-browsers/chromium   # yoksa: npx playwright install
    (hem sunucu hem istemci).
 4. **Sayfa asla kırılmaz:** sunucu render'ında ne olursa olsun statik kabuk servis edilir.
 5. **Kalıcılık yoksa sahte başarı yok:** `/api/*` uçları 503 döner.
+6. **Panel kapısı:** yapılandırma eksikse panel açılmaz (503); yanlış kullanıcı
+   ile yanlış parola AYNI yanıtı verir; oturumsuz veri ucu 401.

@@ -56,6 +56,19 @@
   Cache-Control: public, max-age=300
   X-Robots-Tag: noindex
 
+# Yönetim paneli — kişisel veri gösterir: asla cache'lenmez, asla indekslenmez,
+# çerçevelenemez ve referrer sızdırmaz.
+/panel
+  Cache-Control: no-store, private
+  X-Robots-Tag: noindex, nofollow, noarchive
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+
+/api/admin/*
+  Cache-Control: no-store, private
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+
 # API (Pages Functions) — asla cache'leme, asla indeksleme (O1)
 /api/*
   Cache-Control: no-store

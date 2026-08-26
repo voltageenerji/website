@@ -20,6 +20,8 @@ https://www.voltan.com/* https://voltage.com.tr/:splat 301
 # İç dokümanlar herkese açık servis edilmez (repo = Pages çıktı dizini)
 # (game404 = oyunun TypeScript kaynağı; derlenmiş hali /g404/game.js servis edilir)
 /game404/* / 302
+/lib/* / 302
+/tools/* / 302
 /docs/* / 302
 /CLAUDE.md / 302
 /DEPLOY.md / 302

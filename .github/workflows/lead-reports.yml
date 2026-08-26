@@ -1,26 +1,31 @@
 # Lead raporu zamanlayıcısı — voltage.com.tr/api/report tetikleyicisi.
 #
-# İki cron:
-#   - '30 5 * * 1' → her Pazartesi 05:30 UTC = 08:30 İstanbul → HAFTALIK rapor
-#   - '45 5 1 * *' → her ayın 1'i 05:45 UTC = 08:45 İstanbul → AYLIK rapor
-# Dönem seçimi: hangi cron ifadesinin tetiklediği github.event.schedule ile
-# ayırt edilir (aşağıdaki "Determine period" adımı). Ayın 1'i Pazartesi'ye
-# denk gelirse iki rapor da gönderilir — bu bilinçli (dönemler farklı).
+# Cron'lar (hepsi UTC; İstanbul = UTC+3, DST yok):
+#   '30 5 * * 1'        → Pazartesi 08:30 İst   → HAFTALIK  (son 7 tam gün)
+#   '45 5 1 * *'        → ayın 1'i 08:45 İst    → AYLIK     (önceki takvim ayı)
+#   '0 6 1 1,4,7,10 *'  → Oca/Nis/Tem/Eki 1'i 09:00 İst → 3 AYLIK (önceki çeyrek)
+#   '15 6 1 1,7 *'      → Oca/Tem 1'i 09:15 İst → 6 AYLIK  (önceki yarıyıl)
+#   '30 6 1 1 *'        → 1 Ocak 09:30 İst      → YILLIK    (önceki takvim yılı)
 #
-# Manuel test: Actions → "Lead Reports" → Run workflow → period seç.
+# 1 Ocak'ta dört rapor birden gider (aylık + 3 aylık + 6 aylık + yıllık) ve
+# bu BİLİNÇLİDİR: dönemler farklıdır, biri diğerinin yerine geçmez. Dakikalar
+# kasten kaydırıldı ki aynı anda çalışıp e-posta sağlayıcısını zorlamasınlar.
 #
-# Gerekli repo secret: REPORT_TOKEN (Cloudflare Pages'teki REPORT_TOKEN ile
-# birebir aynı değer). Bkz. DEPLOY.md "Lead bildirimleri ve raporlar".
+# Dönem seçimi github.event.schedule ile ayırt edilir. Manuel test:
+# Actions → "Lead Reports" → Run workflow → dönem seç.
 #
-# curl -fsS: 2xx dışı yanıtta adım (ve job) FAIL olur — kırık pipeline
-# Actions'ta kırmızı görünür, asla sessiz kalmaz.
+# Gerekli repo secret: REPORT_TOKEN (Cloudflare Pages'teki değerle birebir aynı).
+# curl -fsS: 2xx dışı yanıtta adım FAIL olur — kırık pipeline asla sessiz kalmaz.
 
 name: Lead Reports
 
 on:
   schedule:
-    - cron: '30 5 * * 1'   # haftalık — Pazartesi 08:30 İstanbul
-    - cron: '45 5 1 * *'   # aylık — ayın 1'i 08:45 İstanbul
+    - cron: '30 5 * * 1'          # haftalık
+    - cron: '45 5 1 * *'          # aylık
+    - cron: '0 6 1 1,4,7,10 *'    # 3 aylık
+    - cron: '15 6 1 1,7 *'        # 6 aylık
+    - cron: '30 6 1 1 *'          # yıllık
   workflow_dispatch:
     inputs:
       period:
@@ -31,6 +36,9 @@ on:
         options:
           - weekly
           - monthly
+          - quarterly
+          - semiannual
+          - yearly
 
 jobs:
   send-report:
@@ -39,13 +47,16 @@ jobs:
       - name: Determine period
         id: period
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "period=${{ inputs.period }}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.schedule }}" = "45 5 1 * *" ]; then
-            echo "period=monthly" >> "$GITHUB_OUTPUT"
-          else
-            echo "period=weekly" >> "$GITHUB_OUTPUT"
-          fi
+          case "${{ github.event_name }}:${{ github.event.schedule }}" in
+            workflow_dispatch:*)          PERIOD="${{ inputs.period }}" ;;
+            *":45 5 1 * *")               PERIOD="monthly" ;;
+            *":0 6 1 1,4,7,10 *")         PERIOD="quarterly" ;;
+            *":15 6 1 1,7 *")             PERIOD="semiannual" ;;
+            *":30 6 1 1 *")               PERIOD="yearly" ;;
+            *)                            PERIOD="weekly" ;;
+          esac
+          echo "period=$PERIOD" >> "$GITHUB_OUTPUT"
+          echo "Seçilen dönem: $PERIOD"
 
       - name: Call report endpoint
         env:
