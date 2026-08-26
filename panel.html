@@ -299,7 +299,14 @@ td.note { max-width: 280px; color: var(--ink-soft); font-size: 12.5px; }
     var list = filtered();
     if (!list.length) return;
     var head = ['Tarih', 'Ad', 'Soyad', 'Sirket', 'Telefon', 'Eposta', 'Tuketim', 'Sektor', 'Not', 'Dil'];
-    var esc = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+    // Formül enjeksiyonuna karşı (QA B3): Excel/LibreOffice, hücre =,+,-,@,tab
+    // veya CR ile başlıyorsa onu FORMÜL sayıp çalıştırır. Böyle değerlerin
+    // başına tek tırnak koyarak metin olmaya zorlarız (tırnak hücrede görünmez).
+    var esc = function (v) {
+      var s = String(v == null ? '' : v);
+      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
     var lines = [head.join(';')];
     for (var i = 0; i < list.length; i++) {
       var r = list[i];

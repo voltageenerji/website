@@ -34,7 +34,11 @@ for (let i = 0; i < 128; i++) {
     ad: `Ad${i}`, soyad: `Soyad${i}`, sirket: i === 0 ? 'Zebra Tekstil A.Ş.' : `Firma ${i}`,
     telefon: `053200000${String(i).padStart(2, '0')}`, eposta: `k${i}@ornek.com`,
     tuketim: '250 MWh', sektor: SECTORS[i % SECTORS.length],
-    mesaj: i === 0 ? 'Aciliyeti var, "tırnaklı" ve <etiketli> not' : `Not ${i}`,
+    mesaj: i === 0 ? 'Aciliyeti var, "tırnaklı" ve <etiketli> not'
+      : i === 1 ? "=cmd|'/c calc.exe'!A1"
+      : i === 2 ? '+HYPERLINK("http://kotu.example","tikla")'
+      : i === 3 ? '-2+3+cmd|\' /C calc\'!A0'
+      : i === 4 ? '@SUM(1+1)' : `Not ${i}`,
     lang: 'tr', utm: i % 7 === 0 ? { utm_source: 'linkedin' } : {},
     receivedAt: new Date(ts).toISOString(),
   }));
@@ -155,6 +159,17 @@ ok('mükerrer kayıt yok', await page.evaluate(() => {
 // 7) CSV
 const dl = await Promise.all([page.waitForEvent('download', { timeout: 10000 }), page.click('#csvBtn')]).then((x) => x[0]).catch(() => null);
 ok('CSV indirilir', !!dl && /voltage-talepler-\d{4}-\d{2}-\d{2}\.csv/.test(dl.suggestedFilename()), dl ? dl.suggestedFilename() : 'indirme yok');
+
+// QA B3: hiçbir hücre formül tetikleyicisiyle BAŞLAMAMALI (Excel onu çalıştırır)
+if (dl) {
+  const { readFileSync: rf } = await import('node:fs');
+  const csv = rf(await dl.path(), 'utf8');
+  const cells = csv.match(/"(?:[^"]|"")*"/g) || [];
+  const dangerous = cells.filter((c) => /^"[=+\-@\t\r]/.test(c));
+  ok('B3: CSV formül enjeksiyonuna kapalı', dangerous.length === 0, `-> ${dangerous.slice(0, 3).join(' | ')}`);
+  ok('B3: kaçışlı hâli hâlâ okunur', csv.includes("'=cmd|'/c calc.exe'!A1") || csv.includes("\"'=cmd"), 'değer kaybolmamalı');
+  ok('B3: CSV gerçekten veri içeriyor', cells.length > 50, `-> ${cells.length} hücre`);
+}
 
 // 8) Çıkış → panel kapanır, veri erişilemez olur
 await page.click('#logoutBtn');

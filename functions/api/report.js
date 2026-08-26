@@ -24,7 +24,9 @@
  * fetch edilir (tüm store okunmaz). Rapor tablosu 500 kayıtla sınırlıdır;
  * aşılırsa `truncated: true` (toplam sayaç yine doğrudur).
  *
- * Yanıt JSON'u PII içermez: sayımlar + şirket adları (loglanabilir).
+ * Yanıt JSON'u YALNIZCA sayımlar içerir — hiçbir tekil müşteri verisi (şirket
+ * adı dahil) döndürülmez. Uç, genel-okunur bir CI günlüğüne yansıyabilir; tekil
+ * ayrıntı yalnızca hedef alıcıya giden e-postadadır.
  *
  * Kurulum: bkz. DEPLOY.md "Lead bildirimleri ve raporlar".
  */
@@ -295,7 +297,9 @@ export async function onRequestGet(context) {
 
   const url = new URL(request.url);
   const requested = url.searchParams.get('period') || 'weekly';
-  const period = PERIODS[requested] ? requested : 'weekly';
+  // hasOwnProperty: 'constructor', '__proto__' gibi prototip zinciri adları
+  // allowlist'i geçmesin (QA N4).
+  const period = Object.prototype.hasOwnProperty.call(PERIODS, requested) ? requested : 'weekly';
   const { from, to, label } = computeWindow(period, Date.now());
 
   // Anahtar listesi (pencere filtresi anahtar timestamp'inden — kayıt fetch yok).
@@ -343,7 +347,10 @@ export async function onRequestGet(context) {
     return json({ ok: false, error: 'email_send_failed' }, 502);
   }
 
-  // Çağırana PII'siz özet (loglanabilir): sayımlar + şirket adları.
+  // Çağırana YALNIZCA sayımlar döner — hiçbir tekil müşteri verisi (şirket adı
+  // dahil) HTTP yanıtında YER ALMAZ. Bu uç bir CI iş akışıyla çağrılıyor ve
+  // yanıt gövdesi genel-okunur bir günlüğe düşebilir (QA B2). Ayrıntı yalnızca
+  // hedef alıcıya giden e-postada bulunur.
   return json({
     ok: true,
     period,
@@ -354,7 +361,6 @@ export async function onRequestGet(context) {
     bySektor: agg.bySektor,
     byLang: agg.byLang,
     byUtmSource: agg.byUtmSource,
-    companies: records.map((r) => r.sirket || '—'),
     emailed: true,
   });
 }

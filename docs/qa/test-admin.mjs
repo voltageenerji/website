@@ -146,7 +146,7 @@ ok('çıkış çerezi siler', /Max-Age=0/.test(r.headers.get('Set-Cookie') || ''
   ok('sınır aşılınca bloke', (await checkRateLimit(env.LEADS, key)).blocked);
   await clearFailures(env.LEADS, key);
   ok('başarılı girişten sonra sayaç sıfırlanır', !(await checkRateLimit(env.LEADS, key)).blocked);
-  ok('KV yoksa engellemez', !(await checkRateLimit(null, key)).blocked);
+  ok('KV yoksa ENGELLER (kapalı çöker — QA N2)', (await checkRateLimit(null, key)).blocked);
   ok('pencere dolunca sıfırlanır', await (async () => {
     await recordFailure(env.LEADS, key, 0);
     for (let i = 0; i < 20; i++) await recordFailure(env.LEADS, key, 0);
@@ -197,9 +197,9 @@ ok('veri ucu noindex', (r.headers.get('X-Robots-Tag') || '').includes('noindex')
 r = await getLeads(ENV({ LEADS: makeKV(seeded) }), 'https://voltage.com.tr/api/admin/leads?limit=2', token);
 data = await r.json();
 ok('limit uygulanır', data.records.length === 2 && data.count === 2);
-ok('sonraki sayfa işaretçisi', data.nextBefore === 3000, `-> ${data.nextBefore}`);
+ok('sonraki sayfa işaretçisi TAM ANAHTAR', data.nextBefore === 'lead:3000:aaa3000', `-> ${data.nextBefore}`);
 
-r = await getLeads(ENV({ LEADS: makeKV(seeded) }), `https://voltage.com.tr/api/admin/leads?limit=2&before=${data.nextBefore}`, token);
+r = await getLeads(ENV({ LEADS: makeKV(seeded) }), `https://voltage.com.tr/api/admin/leads?limit=2&before=${encodeURIComponent(data.nextBefore)}`, token);
 data = await r.json();
 ok('ikinci sayfa eskiler', data.records.map((x) => x.ts).join() === '2000,1000');
 ok('son sayfada nextBefore null', data.nextBefore === null);
@@ -217,6 +217,70 @@ r = await getLeads(ENV({ LEADS: withBroken }), undefined, token);
 data = await r.json();
 ok('bozuk kayıt sayfayı düşürmez', r.status === 200 && data.records.length === 4, `-> ${data.records.length}`);
 ok('bozuk kayıt sayımda görünür (dürüst toplam)', data.total === 5, `-> ${data.total}`);
+
+
+// --------------------------------------------------------------------------
+// QA B1 REGRESYONU: kırpılmış/bozuk özet HİÇBİR parolayı kabul etmemeli.
+// Eski kod `expected.length * 8` = 0 bit türetip 0 baytı 0 baytla kıyaslıyor
+// ve HER parolaya true diyordu — tam kimlik doğrulama baypası.
+// --------------------------------------------------------------------------
+{
+  const parts = HASH.split('$');
+  const kirik = [
+    `pbkdf2$${parts[1]}$${parts[2]}$`,        // son '$' sonrası kayıp (kopyala-yapıştır)
+    `pbkdf2$${parts[1]}$$`,                   // tuz da kayıp
+    `pbkdf2$${parts[1]}$${parts[2]}$YWJj`,    // 3 baytlık özet
+    `pbkdf2$${parts[1]}$${parts[2]}$${parts[3].slice(0, 20)}`, // yarım özet
+  ];
+  for (const k of kirik) {
+    ok(`B1: kırpılmış özet reddedilir (${k.slice(-10)})`, !(await verifyPassword('herhangi-bir-parola', k)));
+    ok(`B1: kırpılmış özetle boş parola da reddedilir`, !(await verifyPassword('', k)));
+    const r1 = await post({ user: 'emirhan', pass: 'saldirgan-tahmini' }, ENV({ ADMIN_PASS_HASH: k }));
+    ok(`B1: uçtan uca giriş reddedilir (${k.slice(-10)})`, r1.status === 401, `-> ${r1.status}`);
+  }
+  ok('B1: sağlam özet hâlâ çalışıyor', await verifyPassword(PASS, HASH));
+}
+
+// --------------------------------------------------------------------------
+// QA B4 REGRESYONU: aynı milisaniyeyi paylaşan kayıtlar sayfalamada
+// ATLANMAMALI. Eski cursor sadece ms idi; sayfa sınırı bir ms grubunun
+// ortasına düştüğünde grubun kalanı hiçbir sayfada görünmüyordu.
+// --------------------------------------------------------------------------
+{
+  const dup = {};
+  for (const [k, v] of [
+    [`lead:3000:a`, 1], [`lead:2000:a`, 2], [`lead:2000:b`, 3], [`lead:2000:c`, 4], [`lead:1000:a`, 5],
+  ]) dup[k] = JSON.stringify({ ad: 'X', soyad: String(v), sirket: k, eposta: 'x@y.z' });
+
+  const seen = [];
+  let cur = null, guard = 0;
+  do {
+    const u = 'https://voltage.com.tr/api/admin/leads?limit=2' + (cur ? '&before=' + encodeURIComponent(cur) : '');
+    const rr = await getLeads(ENV({ LEADS: makeKV(dup) }), u, token);
+    const dd = await rr.json();
+    for (const rec of dd.records) seen.push(rec.id);
+    cur = dd.nextBefore;
+  } while (cur && ++guard < 10);
+
+  ok('B4: aynı ms\'li kayıtların TAMAMI görünür', seen.length === 5, `-> ${seen.length}: ${seen}`);
+  ok('B4: mükerrer kayıt yok', new Set(seen).size === seen.length);
+  ok('B4: sıra en yeniden eskiye', seen[0] === 'lead:3000:a' && seen[4] === 'lead:1000:a', `-> ${seen}`);
+  ok('B4: aynı ms grubu kendi içinde kararlı', seen.slice(1, 4).join() === 'lead:2000:c,lead:2000:b,lead:2000:a', `-> ${seen.slice(1,4)}`);
+}
+
+// --------------------------------------------------------------------------
+// QA N2/N3 REGRESYONU: sınırlayıcı KAPALI çöker, XFF ile baypas edilemez
+// --------------------------------------------------------------------------
+{
+  ok('N2: KV yoksa engeller (kapalı çöker)', (await checkRateLimit(null, 'k')).blocked);
+  const patlak = { get: async () => { throw new Error('kv down'); }, put: async () => {}, delete: async () => {} };
+  ok('N2: KV hata verirse engeller', (await checkRateLimit(patlak, 'k')).blocked);
+  const k1 = await rateLimitKey(new Request('https://x/', { headers: { 'X-Forwarded-For': '1.1.1.1' } }));
+  const k2 = await rateLimitKey(new Request('https://x/', { headers: { 'X-Forwarded-For': '2.2.2.2' } }));
+  ok('N3: XFF kovayı değiştiremez', k1 === k2, 'saldırgan başlık değiştirerek sınırı aşabilirdi');
+  const k3 = await rateLimitKey(new Request('https://x/', { headers: { 'CF-Connecting-IP': '3.3.3.3' } }));
+  ok('N3: kenar başlığı kova belirler', k3 !== k1);
+}
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

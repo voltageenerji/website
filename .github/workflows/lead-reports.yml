@@ -66,6 +66,10 @@ jobs:
             echo "::error::REPORT_TOKEN secret tanımlı değil"
             exit 1
           fi
-          curl -fsS \
+          # -o /dev/null: yanıt GÖVDESİ ASLA günlüğe yazılmaz. Bu günlük
+          # genel-okunur (repo public); gövde müşteri verisi taşıyabilir (QA B2).
+          # Yalnızca HTTP durum kodu yazdırılır; 2xx dışı -f ile job'ı düşürür.
+          HTTP=$(curl -fsS -o /dev/null -w '%{http_code}' \
             -H "Authorization: Bearer $REPORT_TOKEN" \
-            "https://voltage.com.tr/api/report?period=${{ steps.period.outputs.period }}"
+            "https://voltage.com.tr/api/report?period=${{ steps.period.outputs.period }}")
+          echo "Rapor ucu yanıtı: HTTP $HTTP"
