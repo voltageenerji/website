@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Süreç kuralı (TECHNICAL-AUDIT.md O5): indekslenebilir bir sayfayı değiştiren
-     her commit, AYNI commit'te o sayfanın <lastmod> değerini günceller.
-     hreflang xhtml:link blokları prerendered /en/ yayınlanana kadar EKLENMEZ (Y1/§6.6). -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Süreç kuralı (TECHNICAL-AUDIT.md O5): indekslenebilir bir sayfayı değiştiren
+       her commit, AYNI commit'te o sayfanın <lastmod> değerini günceller.
+       hreflang xhtml:link blokları prerendered /en/ yayınlanana kadar EKLENMEZ (Y1/§6.6).
+       NOT: yorum bloğu KÖK ÖĞE İÇİNE alındı; XML bildirimi ile <urlset> arasındaki
+       yorum bazı katı ayrıştırıcılarda "processing error" tetikliyordu (GSC 2026-08). -->
   <url>
     <loc>https://voltage.com.tr/</loc>
     <lastmod>2026-08-10</lastmod>
