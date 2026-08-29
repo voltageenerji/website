@@ -62,6 +62,29 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | Müşteri portalı → mobil uygulama | Kapılı plan (sahip kararı 2026-08-08, **kapsamı 2026-08-26'da netleşti**) | Portal kapsamı: müşteriye kullanıcı adı/şifre (self-signup YOK) → fatura görüntüleme → ödenmemiş faturada ödeme linki. Mimari ve karar kaydı: **`docs/PORTAL-MIMARISI.md`**. Sıra: (1) veri altyapısı [tetik: ilk sözleşmeli müşteri] → (2) portal → (3) mobil uygulama. Erken kararlar alındı: KV değil D1, hosted checkout (kart verisi bize gelmez), ödeme durumu yalnız imzalı webhook'tan. |
 | ChatGPT Ads Türkiye lansmanı | Dış gelişme (izleme) | Pasif — TRde aktif değil (canlı: US/CA/AU/NZ/UK/JP/KR, 2026-08). Şartlar: TR lansmanı + aktif satış kararı + ölçüm temeli. Organik katman (llms.txt/FAQ şema/Bing) zaten kurulu. |
 
+## 3.05 GSC İLK OKUMA (2026-08-29)
+
+İlk anlamlı performans penceresi (3 Ağu – 27 Ağu): **38 tıklama, 1.190 gösterim,
+CTR %3,2, ort. pozisyon 10,4.** Önceki dönem sıfır (mülk bu tarihte başlıyor).
+
+Okuma (Orchestrator yorumu):
+- **İçerik çalışıyor:** rehber sayfaları sıralanıyor — tedarikci-degistirme **poz 5,7**,
+  tekstil-elektrik **poz 4,4**, serbest-tuketici poz 13,1. "Rehberler aylar alır"
+  endişesi boşa çıktı.
+- **Ana sorun tıklama değil pozisyon:** yüksek gösterim/sıfır tıklama alan sayfalar
+  (ptf-nedir 140/0, canli-ptf 275/6) poz 11-13'te = 2. sayfa. Başlıklar zaten iyi;
+  düzeltilecek şey başlık değil, pozisyon (zaman + otorite + iç linkleme).
+  **Başlık kurcalama YAPILMADI** — küçük veri setinde ölçülemez, iyi başlığı bozmak risk.
+- **Marka:** "voltan elektrik" poz 2,2 %11 CTR (iyi). "voltan" tek başına poz 4,6/0 tıklama
+  (üstte başka voltan'lar var). "voltes enerji"/"voltag" yanlış yazımları gösterim alıyor.
+- **Ana sayfa başlığı DÜZELDİ:** Google artık "Kurumsal ve Endüstriyel..." görüyor,
+  eski "İndirimli Elektrik Reçeteniz" gitti. 29.08'de tarandı.
+- Cihaz: masaüstü 23 tık / mobil 15. Ülke: %97 TR.
+
+**Aksiyon alınan:** sitemap "Temporary processing error" — XML bildirimi ile kök arası
+yorum riskini ortadan kaldırmak için yorum kök içine taşındı (deploy edildi). Eklenti
+GSC'de sitemap'i yeniden göndermeli; hata sürerse Google tarafı geçici demektir.
+
 ## 3.1 OLAY KAYDI
 
 | Olay | Tarih | Durum |
