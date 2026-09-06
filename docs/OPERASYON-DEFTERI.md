@@ -47,7 +47,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | **Facebook sayfası kurulumu** (facebook.com/voltageenerji) | Sahip (Meta kişisel hesap gerekli) | Kimlik/NAP varlığı. Görseller hazır: `docs/brand/fb-profile.png`, `fb-cover.png`. Kurallar: telefon YAZILMAZ (doğru numara yok), Messenger KAPALI (KVKK aydınlatma metni bu kanalı kapsamıyor — avukat dönüşüne kadar), sıfır tasarruf vaadi. Sayfa canlıya girince URL bana bildirilecek → `sameAs` (index.html JSON-LD) ve `llms.txt`'e eklenecek. |
 | **Marka: vekile sorulacak 4 soru** (sınıf içerikleri 2026-08-23 teyit edildi) | Sahip → marka vekili | Tescil bizde ve geçerli. **Kapsanan:** Sınıf 39 içinde "Elektrik dağıtım hizmetleri", Sınıf 40 içinde "Enerji üretimi hizmetleri". **Kapsanmayan:** Sınıf 35 (satış/ticaret hizmetleri — asıl faaliyetimiz "toptan satış") ve Sınıf 4 (mal olarak elektrik enerjisi). SORULAR: (1) EPDK mevzuatında "dağıtım" şebeke işletmeciliği, bizim işimiz "tedarik/satış" — 39/40 tescili fiilî faaliyetimizi koruyor mu, 35 ve/veya 4 için ek başvuru gerekir mi? (2) Tescilli olduğumuz sınıflarda (şebeke dağıtımı, enerji üretimi) fiilen faaliyet göstermiyoruz — **SMK m.9 kullanmama nedeniyle iptal** riski var mı? (3) Kayıtta vekil yok; TÜRKPATENT tebligat adresi güncel mi (yanlış Bağcılar adresi riski)? (4) Tescilli logo eski yeşil-mavi tasarım; mevcut görsel kimlik için ayrı başvuru gerekir mi? |
 | **Portal için 4 girdi** (faturalama sistemi/API, ödeme sağlayıcısı tercihi, firma başına kullanıcı sayısı, fatura dışı içerik) | Sahip | Portal Aşama 1 (veri modeli) bu girdiler gelmeden başlamaz. Ayrıntı: `docs/PORTAL-MIMARISI.md` §6. |
-| **Dizin düzeltmeleri: elektrikpaketleri.com (Bağcılar adresi) + encazip.com (1.000 kWh eşiği, kurucu bilgisi)** | Sahip/eklenti | 05.09 testinde yapay zekâ İKİSİNİ de kaynak olarak kullanıyor ve yanlış veriyi tekrarlıyor. encazip büyük bir karşılaştırma portalı — profil sahiplenme/düzeltme mekanizması muhtemelen var; sahip kurucu bilgisinin doğruluğunu teyit etmeli. elektrikpaketleri sahipten de açılmıyor; alternatif: doğru NAP sinyallerini güçlendirip (GBP, Facebook, Crunchbase VERIFY) dizini gölgede bırakmak. |
+| **elektrikpaketleri.com — Bağcılar adresi** (tek kalan canlı yanlış kaynak) | Sahip/eklenti | encazip ve puan5 KAPALI (06.09 teyit) — onlar için yapılacak iş YOK, hayalet kendiliğinden söner. elektrikpaketleri DNS'te yaşıyor ama sahibe/sandbox'a açılmıyor (Cloudflare bot koruması olası). Yol: (a) eklenti farklı tarayıcı/ağdan deneyip "düzeltme/iletişim" bulur; (b) bulamazsa doğru NAP sinyalleriyle gölgede bırakılır: GBP, Facebook, Crunchbase VERIFY — üçü de sahipte bekliyor. |
 | Hukuki metin onayları + F1-F6 teyitleri (ana paket) | Avukat | TASLAK şerhlerinin kalkması; rehberdeki RG ihtiyat notu; varlık yayılımı (adres/unvan teyidi) |
 | EK-1 (ticari ileti/İYS) cevapları | Avukat | Satış motoru aktivasyonu (motor zaten PASİF — acele yok) |
 | DMARC kaydı (`_dmarc` TXT, p=none) | Sahip/eklenti | Mail itibar korumasının tamamlanması (önerildi, acil değil) |
@@ -99,13 +99,18 @@ GSC 29.08'de tedarikci-degistirme #5,7 / tekstil #4,4 gösteriyordu. Gerçek sı
 
 **Yapay zekâ üçüncü taraf verisi karıştırıyor — 3 hata/şüphe:**
 1. **Bağcılar adresi HÂLÂ tekrarlanıyor** — kaynak kesinleşti: elektrikpaketleri.com (Crunchbase değil).
-2. **encazip.com: "yıllık 1.000 kWh ve üzeri" eşiği** — BAYAT (2026 limiti 500 kWh). Hakkımızda yanlış bilgi.
-3. **encazip.com: kurucu ortaklar** (Karamancı Holding, Karel Elektrik Üretim, B. Ardıç, D. ve M. Karamancı;
-   kuruluş 08.08.2011) — doğruluğu SAHİPTEN teyit edilmeli; eskiyse düzeltme hedefi.
+2. **encazip.com — DÜZELTME (06.09): site KAPALI.** Sahip teyit etti; DNS doğruladı (www çözümlenmiyor,
+   kök alan adı Squarespace park IP'sinde). Arama motorunun ve yapay zekânın gösterdiği "1.000 kWh eşiği"
+   ve kurucu bilgisi **ölü sitenin dizin hayaleti** — ~2022 tarihli önbellek (1.000 kWh o yılın serbest
+   tüketici limitiydi). Orchestrator ilk okumada ENOTFOUND sinyalini yanlış yorumladı.
+   **Düzeltilemez, sahiplenilemez; dizin yeniden taradıkça kendiliğinden düşer.** Bizim kaldıracımız:
+   canlı, doğrulanabilir birinci taraf sinyalleri güçlü tutmak (kurumsal sayfa, schema kimlikleri, llms.txt).
 
 **Sonuç:** kimlik tarafı güçlü ve iyileşiyor; konu otoritesi henüz yok (5 haftalık site — beklenen).
-En yüksek kaldıraç değişmedi: **iki dizin (elektrikpaketleri, encazip) yapay zekâya yanlış veri besliyor.**
-Her iki site de sandbox'tan erişilemez; düzeltme sahip/eklenti tarafında.
+Kaldıraç: **elektrikpaketleri.com** (DNS'te Cloudflare arkasında yaşıyor; sahibe ve sandbox'a açılmıyor —
+muhtemelen bot koruması) Bağcılar adresini yayıyor. encazip ve puan5 ÖLÜ; onlara dair yapay zekâ verisi
+dizin hayaleti, zamanla söner. Öğrenilen: yapay zekâ özetleri aylar önce kapanmış sitelerin içeriğini
+tekrarlayabilir; "kaynak canlı mı?" kontrolü her görünürlük testinin parçası olmalı.
 
 ## 3.1 OLAY KAYDI
 
