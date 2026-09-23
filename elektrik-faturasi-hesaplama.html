@@ -225,10 +225,10 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   var LEVELS = [100, 200, 300, 400, 500, 750, 1000, 2000, 5000];
   function t2() {
     var out = $('t2Out'), birim = num($('t2Birim').value), kwh = num($('t2Kwh').value);
-    var bi = $('t2Birim'); if (bi.dataset.full && bi.value === tl4.format(Number(bi.dataset.full))) birim = Number(bi.dataset.full); /* 1. araçtan gelen değer: yuvarlanmamış hâli */
+    var bi = $('t2Birim'), fromT1 = !!bi.dataset.full && bi.value === tl4.format(Number(bi.dataset.full)); if (fromT1) birim = Number(bi.dataset.full); /* 1. araçtan gelen değer: yuvarlanmamış hâli */
     if (birim === null) { set(out, '', 'Birim maliyeti girdiğinizde 100 kWh\'ten 5.000 kWh\'e kadar tahmini tutarlar burada listelenir.'); return; }
     if (isNaN(birim) || birim === 0) { set(out, 'warn', 'Lütfen geçerli bir birim maliyet girin.'); return; }
-    if (birim > 100) { set(out, 'warn', 'Birim maliyet olağandışı yüksek görünüyor; ondalık ayırıcı olarak virgül kullanın (örn. 4,71).'); return; }
+    if (birim > 100) { set(out, 'warn', fromT1 ? 'Birim maliyet olağandışı yüksek; fatura toplamını ve tüketimi kontrol edin.' : 'Birim maliyet olağandışı yüksek görünüyor; ondalık ayırıcı olarak virgül kullanın (örn. 4,71).'); return; }
     var h = '';
     if (kwh !== null && !isNaN(kwh) && kwh > 0) h += kwhF.format(kwh) + ' kWh için tahmini fatura:<span class="big">' + tl.format(kwh * birim) + ' TL</span>';
     h += '<table><thead><tr><th>Tüketim</th><th>Tahmini tutar</th></tr></thead><tbody>';
@@ -244,7 +244,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     if (isNaN(kwh)) { set(out, 'warn', 'Lütfen geçerli bir yıllık tüketim girin.'); return; }
     var lim = SKTT[grup], h;
     if (kwh <= SERBEST) {
-      h = '<strong>Serbest tüketici limitini aşmıyorsunuz.</strong><br>Yıllık ' + kwh2.format(kwh) + ' kWh, 2026 limiti olan ' + kwhF.format(SERBEST) + ' kWh\'i aşmıyor. Serbest tüketici olmak için tüketimin bu limitin üzerinde olması gerekir. Elektriğinizi görevli tedarik şirketinden düzenlenmiş tarifeyle almaya devam edersiniz.';
+      h = '<strong>Girdiğiniz tüketime göre serbest tüketici limitini aşmıyorsunuz.</strong><br>Yıllık ' + kwh2.format(kwh) + ' kWh, 2026 limiti olan ' + kwhF.format(SERBEST) + ' kWh\'i aşmıyor. Serbest tüketici olmak için tüketimin bu limitin üzerinde olması gerekir; yıl içindeki tüketiminiz bu limiti aşarsa durumunuz değişir.';
       set(out, '', h); return;
     }
     if (kwh <= lim) {
