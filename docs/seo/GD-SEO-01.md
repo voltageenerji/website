@@ -10,7 +10,7 @@
 ## Veri kuralları (bu raporun tamamı için)
 
 - **Arama hacmi rakamı yoktur.** Elimizde Google Ads Keyword Planner, Semrush veya Ahrefs erişimi yok. Hacim sütunları bu yüzden `NOT VERIFIED` yazar. Göreli talep yorumu yalnızca SERP'teki rekabet yoğunluğundan çıkarılmıştır ve öyle etiketlenmiştir.
-- **Pozisyonlar yalnızca Google Search Console'dan gelir.** Son GSC okuması 29.08.2026 tarihlidir (son 28 gün ortalaması). GSC'de görünmeyen her sorgu `NOT RANKING / NOT VERIFIED` olarak işaretlidir. Bu, "sıralamıyoruz" demek değildir; "doğrulanmış veri yok" demektir.
+- **Pozisyonlar yalnızca Google Search Console'dan gelir.** Son GSC okuması 29.08.2026 tarihlidir. Mülkte veri 03.08.2026'dan başlar; okuma 03.08–27.08 aralığını kapsar ("son 3 ay" seçili olsa da daha eski veri yoktur). *Düzeltme, GD-SEO-02: bu rapor ilk sürümünde aralığı "son 28 gün" diye yazmıştı.* GSC'de görünmeyen her sorgu `NOT RANKING / NOT VERIFIED` olarak işaretlidir. Bu, "sıralamıyoruz" demek değildir; "doğrulanmış veri yok" demektir.
 - **SERP gözlemi sınırlıdır.** Kullanılabilen web arama aracı ABD konumludur. Google TR'nin ilk 10'u, featured snippet, AI Overview ve People Also Ask kutuları bu araçla görülemez. Aşağıdaki SERP analizi, sorgu başına dönen alan adları ve sayfa türleri üzerinden yapılmıştır. Kişiselleştirilmemiş Google TR kontrolü sahibin tarayıcısından yapılmalıdır (§16).
 - **Tarife fiyatları doğrulanamadı.** EPDK sitesi bu ortamdan erişilemiyor. İkincil kaynaklar 2026 mesken birim fiyatı, kademe yapısı ve KDV oranı konusunda birbiriyle çelişiyor (bir kaynak 0-240 kWh iki kademe, diğeri dört kademe; KDV için %10 ve %20 birlikte geçiyor). Bu yüzden hiçbir sayfaya tarife fiyatı gömülmedi.
 
@@ -28,7 +28,7 @@ Doğrulanmış düzenleyici veriler:
 
 ## 1. Executive Summary
 
-Voltage'ın organik görünürlüğü **marka ve B2B rehber sorgularında** yoğunlaşmış durumda. Son GSC okumasında 28 günde 38 tıklama ve yaklaşık 1,19 bin gösterim var. Tıklamaların çoğu marka sorgularından ve tedarikçi değiştirme / sektör rehberlerinden geliyor.
+Voltage'ın organik görünürlüğü **marka ve B2B rehber sorgularında** yoğunlaşmış durumda. Son GSC okumasında (03.08–27.08) 38 tıklama ve yaklaşık 1,19 bin gösterim var. Tıklamaların çoğu marka sorgularından ve tedarikçi değiştirme / sektör rehberlerinden geliyor.
 
 Brief'in ana sorusu şuydu: insanlar gerçekte ne arıyor ve biz neredeyiz? Cevap üç parçalı:
 
@@ -44,7 +44,7 @@ Brief'in ana sorusu şuydu: insanlar gerçekte ne arıyor ve biz neredeyiz? Ceva
 
 ## 2. Current Search Visibility
 
-Kaynak: GSC, 29.08.2026 okuması (son 28 gün).
+Kaynak: GSC, 29.08.2026 okuması (03.08–27.08.2026; mülkün ilk verisi).
 
 | Metrik | Değer |
 |---|---|

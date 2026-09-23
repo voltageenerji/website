@@ -120,5 +120,20 @@ body = await r.text();
 ok('?ptfoff SSR atlar', body.includes('Veri bekleniyor') && !body.includes('<body data-ssr'));
 globalThis.fetch = realFetch;
 
+// --- Phase 2: tarihli günlük özet ---
+{
+  const o = inject(SHELL, full, null);
+  const bugunTR = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-').reverse().join('.');
+  ok('ozet tarihli', o.includes(`<p class="day-sum" id="pSum">${bugunTR} Gün Öncesi Piyasası PTF özeti (24 saatin tamamı)`));
+  ok('ozet min saatli', o.includes('en düşük 1.800,00 TL/MWh (00:00)'));
+  ok('ozet max saatli', o.includes('en yüksek 2.950,00 TL/MWh (23:00)'));
+  ok('ozet kaynakli', /id="pSum">[^<]*Kaynak: EPİAŞ/.test(o));
+  const part = Array(24).fill(null); part[5] = 1500; part[6] = 1700;
+  const op = inject(SHELL, part, null);
+  ok('ozet eksik saat kapsami', op.includes('(2/24 saat)'));
+  ok('ozet eksik veride uydurma yok', op.includes('aritmetik ortalama 1.600,00 TL/MWh'));
+  ok('kabukta ozet bos', SHELL.includes('<p class="day-sum" id="pSum"></p>'));
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

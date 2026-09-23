@@ -140,6 +140,18 @@ export function inject(html, prices, stats) {
     html = swap(html, '<div class="cv" id="pAvg">—</div>', `<div class="cv" id="pAvg">${fmt(avg)}</div>`);
     html = swap(html, '<div class="ch" id="pMinH"></div>', `<div class="ch" id="pMinH">${hh(idx[vals.indexOf(min)])}:00</div>`);
     html = swap(html, '<div class="ch" id="pMaxH"></div>', `<div class="ch" id="pMaxH">${hh(idx[vals.indexOf(max)])}:00</div>`);
+
+    // Tarihli günlük özet — taranabilir, atıflı tek cümle. Tarih bilinmiyorsa
+    // basılmaz (tarihsiz rakam yayınlamayız). Kaç saatin verisi olduğunu da yazar:
+    // eksik saat varsa özet bunu gizlemez.
+    const ymd = istanbulDate();
+    if (ymd) {
+      const [y, mo, da] = ymd.split('-');
+      const cover = vals.length === 24 ? '24 saatin tamamı' : `${vals.length}/24 saat`;
+      const sum = `${da}.${mo}.${y} Gün Öncesi Piyasası PTF özeti (${cover}): aritmetik ortalama ${fmt(avg)} TL/MWh; ` +
+        `en düşük ${fmt(min)} TL/MWh (${hh(idx[vals.indexOf(min)])}:00); en yüksek ${fmt(max)} TL/MWh (${hh(idx[vals.indexOf(max)])}:00). Kaynak: EPİAŞ Şeffaflık Platformu.`;
+      html = swap(html, '<p class="day-sum" id="pSum"></p>', `<p class="day-sum" id="pSum">${sum}</p>`);
+    }
   }
 
   // Aylık ortalama (opsiyonel — gelmezse "—" kalır)
