@@ -288,6 +288,22 @@ Mevcut URL'lerin hiçbiri değiştirilmedi.
 
 Tarayıcı testi (Playwright, 1280 px ve 375 px): 38/38 kontrol geçti. Doğrulama sırasında bulunan hata: Araç 1'den Araç 2'ye aktarılan birim maliyet 2 haneye yuvarlanıyordu; 1.000 kWh'te 3 TL sapma yapıyordu. Tam hassasiyetle aktarılacak şekilde düzeltildi.
 
+### İnceleme turu (QA + Hukuk & Uyum)
+
+| Bulgu | Kaynak | Karar |
+|---|---|---|
+| Tam 500 kWh "serbest tüketici" sayılıyordu (6446 md. 3: "daha fazla") | QA + Hukuk | Düzeltildi |
+| 1. araç geçersizleşince 2. araç eski birim maliyetle tablo göstermeye devam ediyordu | QA | Düzeltildi |
+| "Vergiler tedarikçiden bağımsız, aynı kalır" ifadesi: oranlar sabit ama tutarlar enerji bedeliyle değişir | Hukuk | Düzeltildi |
+| SKTT testi "son 12 ay" diye anlatılıyordu; sonuç kesin dille veriliyordu | Hukuk + QA | Takvim yılı esası, başlangıç zamanı ve "olabilir" dili |
+| Araç çıktısında feragat yoktu (ekran görüntüsü teklif gibi okunabilirdi) | Hukuk | "Teklif veya taahhüt değildir" notu eklendi |
+| "Mesken tarifesi kademelidir" doğrulanmamış veri | Hukuk + QA | Koşullu dile çevrildi |
+| İtiraz yolları eksikti | Hukuk | Düzenleyen şirket, dağıtım şirketi, EPDK, tüketici hakem heyeti (6502) |
+| Sabit fiyat "garanti" gibi okunuyordu | Hukuk | Sözleşme istisnaları eklendi |
+| serbest-tuketici H2 "SKTT nedir?" yeni sayfayla çakışıyordu | QA | H2 yeniden adlandırıldı |
+| Kurumsal SSS'deki lisans tarihi ve marka no. "doğrulanmamış" | Hukuk | **Reddedildi:** bu oturumda TÜRKPATENT kaydı ve lisans bilgisi doğrulanmıştı; kimlik tablosunda zaten yayında |
+| SKTT'nin PTF tabanlı olduğu ifadesi | QA | **Korundu:** mevcut yayındaki rehberle ve Hukuk değerlendirmesiyle tutarlı |
+
 ---
 
 ## 16. Remaining Work
