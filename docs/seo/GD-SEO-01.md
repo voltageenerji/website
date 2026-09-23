@@ -3,7 +3,7 @@
 **Tarama tarihi:** 23.09.2026
 **Domain:** voltage.com.tr
 **Hazırlayan:** Orkestratör (SEO birimi + Webmaster + QA + Hukuk & Uyum)
-**Durum:** Audit + uygulama + doğrulama tamamlandı. Yayın QA ve Hukuk onayına bağlıdır (bkz. §15).
+**Durum:** Audit + uygulama + doğrulama tamamlandı. Hukuk & Uyum: CLEAR WITH CHANGES (değişiklikler uygulandı). QA: iki tur sonunda RELEASE. 23.09.2026'da main'e yayınlandı (4f15412).
 
 ---
 
