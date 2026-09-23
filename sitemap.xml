@@ -37,19 +37,19 @@
   </url>
   <url>
     <loc>https://voltage.com.tr/rehber</loc>
-    <lastmod>2026-08-08</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://voltage.com.tr/rehber/serbest-tuketici</loc>
-    <lastmod>2026-08-08</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://voltage.com.tr/rehber/tedarikci-degistirme</loc>
-    <lastmod>2026-08-08</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -61,7 +61,7 @@
   </url>
   <url>
     <loc>https://voltage.com.tr/rehber/ptf-nedir</loc>
-    <lastmod>2026-08-08</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -111,6 +111,24 @@
     <loc>https://voltage.com.tr/kurumsal</loc>
     <lastmod>2026-08-23</lastmod>
     <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://voltage.com.tr/elektrik-faturasi-hesaplama</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://voltage.com.tr/rehber/sktt</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://voltage.com.tr/rehber/elektrik-faturasi-neden-yuksek</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 </urlset>

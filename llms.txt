@@ -23,6 +23,8 @@
 - [Elektrik Tedarikçisi Nasıl Değiştirilir?](https://voltage.com.tr/rehber/tedarikci-degistirme): Elektrik tedarikçisi değiştirme adım adım: sayaç değişir mi, elektrik kesilir mi, ne kadar sürer? EPDK mevzuatına dayalı dürüst süreç rehberi.
 - [OSB Elektrik Tedariki](https://voltage.com.tr/rehber/osb-elektrik-tedariki): OSB katılımcısı tedarikçisini seçebilir mi? OSB tarifesi ile ikili anlaşmanın karşılaştırması, süreç ve dikkat edilecek sözleşme başlıkları.
 - [PTF Nedir?](https://voltage.com.tr/rehber/ptf-nedir): PTF (Piyasa Takas Fiyatı) nedir, Gün Öncesi Piyasası'nda nasıl oluşur, neden değişir? EPİAŞ verisine dayalı açıklama ve canlı saatlik fiyat.
+- [Son Kaynak Tedarik Tarifesi (SKTT)](https://voltage.com.tr/rehber/sktt): SKTT nedir? 2026 limitleri mesken 4.000 kWh, diğer abone grupları 15.000 kWh (EPDK Kurul Kararı 13912, RG 31.10.2025). Ne zaman uygulanır, nasıl çıkılır.
+- [Elektrik Faturası Neden Yüksek Geldi?](https://voltage.com.tr/rehber/elektrik-faturasi-neden-yuksek): Yüksek faturanın tüketimden mi fiyattan mı kaynaklandığını ayırt etmek için kontrol listesi ve itiraz yolları.
 - [Tekstil Fabrikasında Elektrik Maliyeti](https://voltage.com.tr/rehber/tekstil-elektrik): İplik, dokuma ve boyahane hatlarında elektrik maliyeti nasıl yönetilir? Tekstil yük profiline göre sabit, endeksli ve hibrit tedarik modelleri.
 - [Demir-Çelik Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/demir-celik-elektrik): Ark ocağı, indüksiyon ve haddehane yüklerinde elektrik maliyeti nasıl yönetilir? PTF saatlik profiline dayalı tedarik modelleri ve süreç.
 - [Kimya Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/kimya-elektrik): Sürekli proses yükleri, dar dengeleme toleransı ve kesintisiz üretim: kimya ve petrokimya tesislerinde sabit, endeksli ve hibrit tedarik modelleri.
@@ -30,6 +32,10 @@
 - [Soğuk Zincir ve Depolarda Elektrik Maliyeti](https://voltage.com.tr/rehber/soguk-zincir-elektrik): Kompresör yükleri, gece öne-soğutma ve saat planlaması: soğuk zincir depoları ve lojistik tesisleri için elektrik tedarik modelleri ve süreç.
 - [Cam ve Seramik Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/cam-seramik-elektrik): Fırın sürekliliği ve kesinti toleransı olmayan yükler: cam ve seramik tesislerinde elektrik maliyeti, ısıl-elektrik ayrımı ve tedarik modelleri.
 - [Yenilenebilir Üreticiler için Portföy Hizmetleri](https://voltage.com.tr/rehber/yenilenebilir-ureticiler): GES-RES üreticileri için üretim portföy hizmetleri: tahmin ve dengesizlik yönetimi, YEK-G belgelendirme desteği, dengeden sorumlu taraf ilişkisi.
+
+## Araçlar
+
+- [Elektrik Faturası Hesaplama](https://voltage.com.tr/elektrik-faturasi-hesaplama): Faturadaki gerçek kWh maliyetini hesaplama, farklı tüketimlerde tahmini tutar ve SKTT / serbest tüketici durum kontrolü. Tarife fiyatı gömülü değildir; hesap kullanıcının kendi faturasıyla yapılır. Sonuçlar tahminidir.
 
 ## Canlı Veri
 
