@@ -44,7 +44,6 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | **Crunchbase "VERIFY NOW" doğrulaması** (şirket e-postasıyla sahiplik teyidi) | Sahip | 17 alanın 14'ü kilitli: Website (`www.` fazlalığı), LinkedIn (`tr.` → `www.`), açıklamalar, kuruluş yılı, e-posta düzeltilemiyor. Adres 2026-08-23'te eklendi (bölüm boştu). |
 | **ACİL: +90 216 479 0510 numarasının Crunchbase'den SİLİNMESİ** | Sahip (VERIFY NOW gerekli) | Sahip 2026-08-23'te teyit etti: **bu numara şirkete ait DEĞİL**. Adımıza kayıtlı yanlış numara kamuya açık — yayılmadan kaldırılmalı. Alan kilitli, önce Crunchbase doğrulaması şart. Numara başka dizinlerde de aranmalı. |
 | Kanonik kurumsal telefon numarası (varsa) | Sahip | GBP telefonsuz da kurulabilir (web sitesi yeterli). Yeni/doğru numara verilirse NAP paketine ve siteye eklenir. **Teyit edilmemiş hiçbir numara hiçbir kanalda yayınlanmaz.** |
-| **Facebook sayfası kurulumu** (facebook.com/voltageenerji) | Sahip (Meta kişisel hesap gerekli) | Kimlik/NAP varlığı. Görseller hazır: `docs/brand/fb-profile.png`, `fb-cover.png`. Kurallar: telefon YAZILMAZ (doğru numara yok), Messenger KAPALI (KVKK aydınlatma metni bu kanalı kapsamıyor — avukat dönüşüne kadar), sıfır tasarruf vaadi. Sayfa canlıya girince URL bana bildirilecek → `sameAs` (index.html JSON-LD) ve `llms.txt`'e eklenecek. |
 | **Marka: vekile sorulacak 4 soru** (sınıf içerikleri 2026-08-23 teyit edildi) | Sahip → marka vekili | Tescil bizde ve geçerli. **Kapsanan:** Sınıf 39 içinde "Elektrik dağıtım hizmetleri", Sınıf 40 içinde "Enerji üretimi hizmetleri". **Kapsanmayan:** Sınıf 35 (satış/ticaret hizmetleri — asıl faaliyetimiz "toptan satış") ve Sınıf 4 (mal olarak elektrik enerjisi). SORULAR: (1) EPDK mevzuatında "dağıtım" şebeke işletmeciliği, bizim işimiz "tedarik/satış" — 39/40 tescili fiilî faaliyetimizi koruyor mu, 35 ve/veya 4 için ek başvuru gerekir mi? (2) Tescilli olduğumuz sınıflarda (şebeke dağıtımı, enerji üretimi) fiilen faaliyet göstermiyoruz — **SMK m.9 kullanmama nedeniyle iptal** riski var mı? (3) Kayıtta vekil yok; TÜRKPATENT tebligat adresi güncel mi (yanlış Bağcılar adresi riski)? (4) Tescilli logo eski yeşil-mavi tasarım; mevcut görsel kimlik için ayrı başvuru gerekir mi? |
 | **Portal için 4 girdi** (faturalama sistemi/API, ödeme sağlayıcısı tercihi, firma başına kullanıcı sayısı, fatura dışı içerik) | Sahip | Portal Aşama 1 (veri modeli) bu girdiler gelmeden başlamaz. Ayrıntı: `docs/PORTAL-MIMARISI.md` §6. |
 | **elektrikpaketleri.com — Bağcılar adresi** (tek kalan canlı yanlış kaynak) | Sahip/eklenti | encazip ve puan5 KAPALI (06.09 teyit) — onlar için yapılacak iş YOK, hayalet kendiliğinden söner. elektrikpaketleri DNS'te yaşıyor ama sahibe/sandbox'a açılmıyor (Cloudflare bot koruması olası). Yol: (a) eklenti farklı tarayıcı/ağdan deneyip "düzeltme/iletişim" bulur; (b) bulamazsa doğru NAP sinyalleriyle gölgede bırakılır: GBP, Facebook, Crunchbase VERIFY — üçü de sahipte bekliyor. |
@@ -111,6 +110,15 @@ Kaldıraç: **elektrikpaketleri.com** (DNS'te Cloudflare arkasında yaşıyor; s
 muhtemelen bot koruması) Bağcılar adresini yayıyor. encazip ve puan5 ÖLÜ; onlara dair yapay zekâ verisi
 dizin hayaleti, zamanla söner. Öğrenilen: yapay zekâ özetleri aylar önce kapanmış sitelerin içeriğini
 tekrarlayabilir; "kaynak canlı mı?" kontrolü her görünürlük testinin parçası olmalı.
+
+## 3.07 KONTROL #3 (2026-09-23)
+- Testler: 204/204 yeşil; sitemap 18 URL geçerli; JSON-LD hatasız; repo=main.
+- **Facebook sayfası canlı ve "Voltage Enerji" aramasında #1** → sameAs, llms.txt, /kurumsal'a eklendi.
+- "Voltage Enerji" çıplak aramasında www.voltage.com.tr ESKİ başlıkla ("İndirimli Elektrik Reçeteniz") hâlâ
+  indekste — www kök alana 301 ve canonical'lı; bayat dizin kaydı, zamanla düşer. Kök alan yeni başlıkla görünüyor.
+- Yapay zekâ bu turda ana sayfamızdan alıntı yaptı (GÖP+ikili karma model, PTF analizi). Bağcılar adresi bu
+  turda GÖRÜLMEDİ (tek tur, kesin değil). Alıntılanan tüm kaynaklar canlı (ölü kaynak kontrolü uygulandı).
+- Konu sorgularında (tedarikçi değiştirme, serbest tüketici) bu motorda hâlâ yokuz; gerçek sıralama GSC'de.
 
 ## 3.1 OLAY KAYDI
 
