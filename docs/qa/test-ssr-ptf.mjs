@@ -1,6 +1,6 @@
 // /canli-ptf sunucu render'ı — dürüstlük ve SEO çıktısı testleri.
 import { readFileSync } from 'node:fs';
-import { inject, pricesFrom, toPrice, onRequestGet } from '../../functions/canli-ptf.js';
+import { inject, pricesFrom, toPrice, onRequestGet, summaryDateOk, dataDateFrom } from '../../functions/canli-ptf.js';
 
 const SHELL = readFileSync(new URL('../../canli-ptf.html', import.meta.url), 'utf8');
 let pass = 0, fail = 0;
@@ -122,17 +122,30 @@ globalThis.fetch = realFetch;
 
 // --- Phase 2: tarihli günlük özet ---
 {
-  const o = inject(SHELL, full, null);
-  const bugunTR = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-').reverse().join('.');
+  const bugunISO = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const bugunTR = bugunISO.split('-').reverse().join('.');
+  const o = inject(SHELL, full, null, bugunISO);
   ok('ozet tarihli', o.includes(`<p class="day-sum" id="pSum">${bugunTR} Gün Öncesi Piyasası PTF özeti (24 saatin tamamı)`));
   ok('ozet min saatli', o.includes('en düşük 1.800,00 TL/MWh (00:00)'));
   ok('ozet max saatli', o.includes('en yüksek 2.950,00 TL/MWh (23:00)'));
-  ok('ozet kaynakli', /id="pSum">[^<]*Kaynak: EPİAŞ/.test(o));
+  ok('ozet kaynak + hesaplama beyanı', /id="pSum">[^<]*Veri: EPİAŞ Şeffaflık Platformu; ortalama, en düşük ve en yüksek değerler Voltage Enerji tarafından bu veriden hesaplanmıştır\./.test(o));
   const part = Array(24).fill(null); part[5] = 1500; part[6] = 1700;
-  const op = inject(SHELL, part, null);
+  const op = inject(SHELL, part, null, bugunISO);
   ok('ozet eksik saat kapsami', op.includes('(2/24 saat)'));
   ok('ozet eksik veride uydurma yok', op.includes('aritmetik ortalama 1.600,00 TL/MWh'));
   ok('kabukta ozet bos', SHELL.includes('<p class="day-sum" id="pSum"></p>'));
+  // Tarih kapısı (Hukuk, GD-SEO-02)
+  const dun = inject(SHELL, full, null, '2000-01-01');
+  ok('veri gunu uyusmazsa ozet basilmaz', dun.includes('<p class="day-sum" id="pSum"></p>'));
+  ok('veri gunu uyusmazsa tablo yine basilir', /<td>00:00<\/td><td>1\.800,00<\/td>/.test(dun));
+  ok('summaryDateOk eslesen gun', summaryDateOk('2026-09-23', '2026-09-23', 0) === true);
+  ok('summaryDateOk farkli gun', summaryDateOk('2026-09-22', '2026-09-23', 12) === false);
+  ok('summaryDateOk gunsuz, gece yarisi ilk saat', summaryDateOk(null, '2026-09-23', 0) === false);
+  ok('summaryDateOk gunsuz, saat bilinmiyor', summaryDateOk(null, '2026-09-23', null) === false);
+  ok('summaryDateOk gunsuz, 01:00 sonrasi', summaryDateOk(null, '2026-09-23', 1) === true);
+  ok('dataDateFrom ust alan', dataDateFrom({ date: '2026-09-23T00:00:00+03:00', items: [] }) === '2026-09-23');
+  ok('dataDateFrom kalem alani', dataDateFrom({ items: [{ hour: 0, price: 1, date: '2026-09-23T00:00:00+03:00' }] }) === '2026-09-23');
+  ok('dataDateFrom yok', dataDateFrom({ items: [{ hour: 0, price: 1 }] }) === null);
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);

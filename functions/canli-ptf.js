@@ -102,7 +102,28 @@ function swap(html, anchor, replacement) {
   return html.includes(anchor) ? html.replace(anchor, () => replacement) : html;
 }
 
-export function inject(html, prices, stats) {
+/**
+ * Özetin tarihi sunucu saatinden gelir; verinin günü farklıysa YANLIŞ TARİH
+ * basılır (Hukuk, GD-SEO-02). Kural:
+ *   - Veri kendi gününü taşıyorsa (YYYY-MM-DD) ve bugünle eşleşmiyorsa → basma.
+ *   - Veri gün taşımıyorsa gece yarısından sonraki ilk saatte (00:00–00:59)
+ *     basma: önbellek pencereleri (fetch 120 sn + CDN 300 sn) bu aralıkta
+ *     önceki günün serisini taşıyabilir.
+ */
+export function summaryDateOk(dataDate, ymd, nowH) {
+  if (typeof dataDate === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dataDate)) return dataDate.slice(0, 10) === ymd;
+  return nowH !== null && nowH >= 1;
+}
+
+/** Proxy yanıtındaki gün bilgisi (varsa): data.date veya ilk kalemin date/time alanı. */
+export function dataDateFrom(data) {
+  if (!data) return null;
+  const c = [data.date, data.day, data.items && data.items[0] && (data.items[0].date || data.items[0].time)];
+  for (const v of c) if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0, 10);
+  return null;
+}
+
+export function inject(html, prices, stats, dataDate) {
   const nowH = istanbulHour();
   const vals = [];
   const idx = [];
@@ -145,11 +166,12 @@ export function inject(html, prices, stats) {
     // basılmaz (tarihsiz rakam yayınlamayız). Kaç saatin verisi olduğunu da yazar:
     // eksik saat varsa özet bunu gizlemez.
     const ymd = istanbulDate();
-    if (ymd) {
+    if (ymd && summaryDateOk(dataDate, ymd, nowH)) {
       const [y, mo, da] = ymd.split('-');
       const cover = vals.length === 24 ? '24 saatin tamamı' : `${vals.length}/24 saat`;
       const sum = `${da}.${mo}.${y} Gün Öncesi Piyasası PTF özeti (${cover}): aritmetik ortalama ${fmt(avg)} TL/MWh; ` +
-        `en düşük ${fmt(min)} TL/MWh (${hh(idx[vals.indexOf(min)])}:00); en yüksek ${fmt(max)} TL/MWh (${hh(idx[vals.indexOf(max)])}:00). Kaynak: EPİAŞ Şeffaflık Platformu.`;
+        `en düşük ${fmt(min)} TL/MWh (${hh(idx[vals.indexOf(min)])}:00); en yüksek ${fmt(max)} TL/MWh (${hh(idx[vals.indexOf(max)])}:00). ` +
+        'Veri: EPİAŞ Şeffaflık Platformu; ortalama, en düşük ve en yüksek değerler Voltage Enerji tarafından bu veriden hesaplanmıştır.';
       html = swap(html, '<p class="day-sum" id="pSum"></p>', `<p class="day-sum" id="pSum">${sum}</p>`);
     }
   }
@@ -206,7 +228,7 @@ export async function onRequestGet(context) {
     // Dürüstlük: gerçek veri yoksa kabuk olduğu gibi döner ("—" + VERİ BEKLENİYOR)
     if (!prices) return htmlResponse(html, 30, 60);
 
-    return htmlResponse(inject(html, prices, stats), 60, 300);
+    return htmlResponse(inject(html, prices, stats, dataDateFrom(today)), 60, 300);
   } catch (e) {
     // SSR'da ne olursa olsun sayfa AYAKTA kalır.
     console.error('canli-ptf SSR failed, serving static shell:', e && e.message);
