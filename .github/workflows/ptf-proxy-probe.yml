@@ -2,6 +2,7 @@
 # GitHub'ın ağından epias-proxy Worker'ını, canlı siteyi ve EPİAŞ uç noktasını
 # yoklar; yalnızca HTTP durumlarını ve yanıt başlarını yazdırır. Hiçbir secret
 # kullanmaz, hiçbir şeyi değiştirmez. Tanı bitince silinecek.
+# Çalıştırma 2: şifre güncellemesi sonrası doğrulama.
 name: PTF Proxy Probe
 
 on:
@@ -28,6 +29,10 @@ jobs:
             curl -sS -i -m 25 -H 'Origin: https://voltage.com.tr' "$P$path" | head -c 2500 || echo "CURL HATASI: $?"
             echo
           done
+          echo "=================== /ptf/today icerik ozeti"
+          curl -sS -m 25 -H 'Origin: https://voltage.com.tr' "$P/ptf/today" | jq -c '{saat_sayisi: (.items|length), ilk: .items[0], son: .items[-1], diger_alanlar: (del(.items)|keys)}' || echo "JSON OKUNAMADI"
+          echo "=================== /ptf/stats"
+          curl -sS -m 25 -H 'Origin: https://voltage.com.tr' "$P/ptf/stats" | head -c 600; echo
 
       - name: Canli site SSR durumu
         run: |
