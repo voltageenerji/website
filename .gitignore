@@ -29,3 +29,4 @@ dist/
 # Yedekler
 *.bak
 *.backup
+__pycache__/
