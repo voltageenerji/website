@@ -29,6 +29,10 @@ Visual and interaction design for the Voltage Enerji brand and website:
 - Mobile-first: most Turkish consumer traffic is mobile.
 - Justify design recommendations with usability or conversion reasoning, not
   taste alone.
+- External reference library: `docs/design/kaynaklar/ai-design-skills/` (MIT,
+  pinned copy). Read its `VOLTAGE-NOTU.md` first: only the checklist sections it
+  lists apply; its font, color, spacing and sample-content rules conflict with
+  the canonical design and Legal rules and must not be applied.
 
 ## Inputs
 
