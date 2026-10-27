@@ -1,6 +1,6 @@
-# Süreç akışı animasyonu — ONAY BEKLİYOR
+# Süreç akışı animasyonu — UYGULANMAYACAK
 
-**Durum:** Önizleme. Canlı ana sayfaya (`index.html`) uygulanmadı.
+**Durum:** Sahip kararı 27.10.2026: **uygulanmayacak, ana sayfa olduğu gibi kalır.** Gerekçe: mobil önizlemede fark algılanmadı. Yama yalnızca kayıt için tutuluyor; sahibin yeni bir talimatı olmadan `index.html`'e uygulanmaz.
 **Kaynak yöntem:** `docs/design/kaynaklar/ai-design-skills/skills/design-to-motion/SKILL.md`, website bağlamı, "Flow, connectors" hikâyesi. Uyarlama kuralları için `docs/design/kaynaklar/ai-design-skills/VOLTAGE-NOTU.md`.
 **Hazırlanma:** 27.10.2026
 
@@ -33,7 +33,7 @@ Ana sayfadaki "Teklif'ten ilk faturaya, beş adım" bölümü (04 Süreç):
 | Ekran dışında durma / geri gelince devam | Geçti |
 | Sayfa hatası | Yok |
 
-## Onay sonrası canlıya alma
+## Canlıya alma (yalnızca sahip yeniden isterse)
 
 ```bash
 python3 -I docs/design/onizleme/surec-akisi/surec_patch.py index.html
