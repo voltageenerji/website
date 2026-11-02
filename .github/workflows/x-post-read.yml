@@ -11,42 +11,14 @@ jobs:
   read:
     runs-on: ubuntu-latest
     steps:
-      - name: Paylasim (fxtwitter)
+      - name: Makale metni (fxtwitter)
         run: |
-          curl -sS -m 25 -A 'Mozilla/5.0' "https://api.fxtwitter.com/nicholasdulait/status/2117194945668714566" -o t.json || true
-          jq '{code, author: .tweet.author.name, handle: .tweet.author.screen_name, date: .tweet.created_at,
-               text: .tweet.text, replying_to: .tweet.replying_to, likes: .tweet.likes, retweets: .tweet.retweets,
-               replies: .tweet.replies, views: .tweet.views,
-               quote: (.tweet.quote | if . then {author: .author.screen_name, text: .text, media: [.media.all[]? | {type, url, altText}]} else null end),
-               media: [.tweet.media.all[]? | {type, url, altText, width, height}],
-               article: .tweet.article}' t.json || head -c 3000 t.json
-          jq -r '.tweet.raw_text.facets[]? | select(.type=="url") | .replacement // .original' t.json 2>/dev/null > links.txt || true
-          jq -r '.. | strings | select(test("^https?://"))' t.json | grep -v -E 'pbs.twimg|video.twimg|abs.twimg|x.com/|twitter.com/|fxtwitter' | sort -u >> links.txt || true
-          sort -u links.txt -o links.txt; echo "--- linkler"; cat links.txt
-
-      - name: Yedek kaynak (vxtwitter)
-        run: |
-          curl -sS -m 25 -A 'Mozilla/5.0' "https://api.vxtwitter.com/nicholasdulait/status/2117194945668714566" | jq '{user_name, user_screen_name, date, text, likes, retweets, mediaURLs, qrtURL}' || true
-
-      - name: Linklenen sayfalar
-        run: |
-          [ -s links.txt ] || { echo "link yok"; exit 0; }
-          while read -r u; do
-            echo "=================== $u"
-            curl -sSL -m 25 -A 'Mozilla/5.0' -o page.html -w 'HTTP %{http_code} -> %{url_effective}\n' "$u" || continue
-            python3 - <<'PY'
-          import re, html
-          s = open('page.html', encoding='utf-8', errors='ignore').read()
-          g = lambda p: (re.search(p, s, re.S | re.I).group(1).strip() if re.search(p, s, re.S | re.I) else '')
-          print('TITLE:', html.unescape(g(r'<title[^>]*>(.*?)</title>'))[:200])
-          print('DESC :', html.unescape(g(r'<meta[^>]+(?:name|property)="(?:og:)?description"[^>]+content="([^"]*)"'))[:400])
-          t = re.sub(r'<script.*?</script>|<style.*?</style>', ' ', s, flags=re.S | re.I)
-          t = html.unescape(re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', t)))
-          print('TEXT :', t[:3500])
-          PY
-            if echo "$u" | grep -q 'github.com/[^/]*/[^/]*'; then
-              repo=$(echo "$u" | sed -E 's#https?://github.com/([^/]+/[^/?#]+).*#\1#')
-              echo "--- README ($repo)"
-              curl -sSL -m 25 "https://raw.githubusercontent.com/$repo/HEAD/README.md" | head -c 6000 || true
-            fi
-          done < links.txt
+          curl -sS -m 25 -A 'Mozilla/5.0' "https://api.fxtwitter.com/nicholasdulait/status/2117194945668714566" -o t.json
+          jq -r '"YAZAR: \(.tweet.author.name) (@\(.tweet.author.screen_name))  TARIH: \(.tweet.created_at)",
+                 "BEGENI: \(.tweet.likes)  RT: \(.tweet.retweets)  YANIT: \(.tweet.replies)  GORUNTULENME: \(.tweet.views)",
+                 "TWEET METNI: \(.tweet.text)",
+                 "MAKALE BASLIGI: \(.tweet.article.title // "-")",
+                 "MAKALE OZETI: \(.tweet.article.preview_text // "-")",
+                 "----- MAKALE GOVDESI -----"' t.json
+          jq -r '.tweet.article.content.blocks[]? | (if .type == "header-one" or .type == "header-two" then "\n## " + .text elif .type == "unordered-list-item" or .type == "ordered-list-item" then "- " + .text elif .type == "atomic" then "[gorsel/ek]" else .text end)' t.json | sed '/^$/N;/^\n$/D'
+          echo "----- ANAHTARLAR -----"; jq -r '.tweet.article | keys? // [] | join(",")' t.json
