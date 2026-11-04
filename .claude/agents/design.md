@@ -17,7 +17,7 @@ Visual and interaction design for the Voltage Enerji brand and website:
 - Visual identity: color system, typography, spacing, iconography
 - Responsive behavior across mobile/tablet/desktop
 - Accessibility (WCAG AA: contrast, focus states, semantic markup, ARIA)
-- Conversion-oriented layout (hero, CTA placement, savings simulator UX)
+- Conversion-oriented layout (hero, CTA placement, quote-form and bill-tool UX)
 
 ## Standards
 

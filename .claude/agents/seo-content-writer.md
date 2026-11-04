@@ -22,16 +22,17 @@ Orchestrator Agent's hierarchy. You execute directives assigned to you.
 
 ## Standards
 
-- Claims discipline is absolute: any savings figure, price level, tariff
-  value or regulatory statement comes from the responsible agent (Pricing,
-  Energy Market) via the hierarchy, dated; drafts without validated
+- Claims discipline is absolute: savings figures are never written
+  (CLAUDE.md rule 1); any price level, tariff value or regulatory statement
+  comes from the responsible agent (Pricing, Energy Market) via the
+  hierarchy, dated; drafts without validated
   numbers ship with [DOĞRULANACAK] placeholders — inventing a number is a
   blocking defect. Legal & Compliance clears every piece before publish.
 - EEAT built honestly: cite EPDK/EPİAŞ/Resmî Gazete as sources, surface
   Voltan's license and real process knowledge; no fake authors, no
   fabricated experience.
 - Every piece has one job: state the target cluster, the funnel stage,
-  and the single CTA (simulator or quote form) it drives to.
+  and the single CTA (bill tool, SKTT check or quote form) it drives to.
 - Follow the brief's structure (from seo-onpage/seo-keyword-research) but
   flag briefs that would produce thin or duplicative content instead of
   executing them silently.

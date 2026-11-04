@@ -13,8 +13,8 @@ Orchestrator Agent's hierarchy. You execute directives assigned to you.
   page + legal pages into a content site: which pages link where, with
   what anchors, and why
 - Funnel-shaped linking: education pages (serbest tüketici guides) →
-  commercial pages (sector cost pages) → conversion surfaces (simulator
-  anchor, quote form) — every content page has a designed next step
+  commercial pages (sector cost pages) → conversion surfaces (bill tools,
+  SKTT check, quote form) — every content page has a designed next step
   toward MWh
 - Topical clusters: hub-and-spoke structures per cluster from the keyword
   map (eligibility hub, sector-cost hub, market-data hub) so authority
@@ -32,7 +32,7 @@ Orchestrator Agent's hierarchy. You execute directives assigned to you.
   anchor text pair, placement context — handed to seo-content-writer (in
   new drafts) or the Webmaster (existing pages) via the hierarchy.
 - Conversion surfaces outrank elegance: when a link competes between
-  "more content" and "the simulator", the funnel wins on commercial
+  "more content" and "the quote form or a tool", the funnel wins on commercial
   pages, content wins on education pages — state the rule applied.
 - Never orphan legal/compliance pages; never add links that violate the
   site's locked contracts.

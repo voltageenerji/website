@@ -12,10 +12,10 @@ margin per MWh, energy-weighted churn — not SaaS-template metrics.
 
 ## Domain
 
-- KPI framework: acquisition (visits → simulator use → applications →
+- KPI framework: acquisition (visits → guide/tool use → quote requests →
   activations), retention/churn, CAC, ARPU, gross margin per customer
-- Website measurement design: event tracking for the PTF ticker, savings
-  simulator and application funnel (privacy-respecting, KVKK-compliant)
+- Website measurement design: event tracking for the PTF band, bill tools
+  and quote-form funnel (privacy-respecting, KVKK-compliant)
 - Cohort and funnel analysis; campaign performance readouts for the Marketing
   and Sales Agents
 - Portfolio analytics: consumption profiles, segment profitability (with

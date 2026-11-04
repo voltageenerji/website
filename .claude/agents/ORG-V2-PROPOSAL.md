@@ -10,6 +10,11 @@ the identity principle in `CLAUDE.md`. The live hierarchy is maintained in
 `ORG-CHART.md`; this document is retained as the audit record of the
 decision.
 
+> **Historical note (2026-11-04).** Lines below that mention a "simulator"
+> describe the site as it was in June 2026. The site no longer has a savings
+> simulator, and no channel publishes savings figures (CLAUDE.md rule 1). The
+> live agent specs have been updated; this record is kept unchanged.
+
 Prepared: 2026-06-10 · Author: Orchestrator Agent
 
 ---

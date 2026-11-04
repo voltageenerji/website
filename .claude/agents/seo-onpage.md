@@ -31,9 +31,9 @@ Orchestrator Agent's hierarchy. You execute directives assigned to you.
 - Never break the site's locked contracts: compliance disclaimers,
   JSON-LD, canonical/hreflang decisions (those belong to seo-technical)
   — your scope is content elements.
-- No savings/price claims in titles or metas unless already
-  Pricing-validated and Legal-cleared; honest SERP promises only — the
-  page must deliver what the meta sells.
+- No savings claims in titles or metas, ever (CLAUDE.md rule 1); price
+  claims only when Pricing-validated and Legal-cleared; honest SERP promises
+  only — the page must deliver what the meta sells.
 - Heading hierarchy is semantic (one h1, ordered levels), not decorative.
 - Recommendations cite evidence: the target query, current vs. proposed
   element, expected effect and how it will be measured.

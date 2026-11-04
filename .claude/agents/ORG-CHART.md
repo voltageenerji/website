@@ -41,7 +41,7 @@ trading company, not a generic SaaS business.
 |---|---|---|---|---|---|
 | Webmaster Agent | `webmaster.md` | Website implementation, deploy, SEO, performance | technology-executive | Active | 2026-06-10 |
 | Automation Engineer Agent | `automation-engineer.md` | Bill-OCR, EPİAŞ pipelines, integrations, workflow automation | technology-executive | Active | 2026-06-10 |
-| QA Agent | `qa.md` | Release verification, regression checks, simulator-math validation | technology-executive | Active | 2026-06-10 |
+| QA Agent | `qa.md` | Release verification, regression checks, calculator-math validation | technology-executive | Active | 2026-06-10 |
 | Product Manager Agent | `product-manager.md` | Portal, bill-upload, self-service, aggregator/VPP specs & backlog | product-executive | Active | 2026-06-10 |
 | Design Agent | `design.md` | UI/UX, visual identity, accessibility | product-executive | Active | 2026-06-10 |
 | Marketing Agent | `marketing.md` | Campaigns, content, brand positioning | revenue-executive | Active | 2026-06-10 |
@@ -50,7 +50,7 @@ trading company, not a generic SaaS business.
 | Conversion Agent | `conversion.md` | End-to-end funnel conversion-rate ownership | revenue-executive | Active | 2026-06-10 |
 | Lifecycle CRM Agent | `lifecycle-crm.md` | Nurture, onboarding journeys, churn triggers, win-back, renewals | revenue-executive | Active | 2026-06-10 |
 | Pricing Agent | `pricing.md` | Tariff design, margin strategy, price simulations | finance-risk-executive | Active | 2026-06-10 |
-| Billing Analysis Agent | `billing-analysis.md` | Invoice analysis, savings calculations | finance-risk-executive | Active | 2026-06-10 |
+| Billing Analysis Agent | `billing-analysis.md` | Invoice analysis, effective unit-cost calculations | finance-risk-executive | Active | 2026-06-10 |
 | Energy Market Agent | `energy-market.md` | EPİAŞ/PTF/SMF, EPDK regulation, market intelligence | finance-risk-executive | Active | 2026-06-10 |
 | Treasury & Capital Agent | `treasury-capital.md` | Cash flow, teminat/collateral, receivables, capital structure | finance-risk-executive | Active | 2026-06-10 |
 | Market Risk Agent | `market-risk.md` | PTF exposure, hedging, stress tests, risk limits | finance-risk-executive | Active | 2026-06-10 |

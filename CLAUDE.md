@@ -17,7 +17,7 @@ it before any non-trivial task; record new decisions and incidents there).
 
 1. **Zero savings claims.** No savings % or ₺ amount, no "en ucuz", no price or
    continuity guarantee on any channel (site, guides, LinkedIn, mail, offers).
-   The site has no savings simulator; agent specs that mention one are outdated.
+   The site has no savings simulator.
 2. **No invented data.** Never fabricate numbers, customers, testimonials or
    credentials. Regulatory facts are dated and sourced (EPDK, EPİAŞ, Resmî
    Gazete); anything unverified is not published. No hard-coded tariff prices.

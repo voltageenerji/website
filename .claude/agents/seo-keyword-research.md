@@ -19,7 +19,8 @@ Orchestrator Agent's hierarchy. You execute directives assigned to you.
   * Market data: "PTF nedir", "güncel PTF", "EPİAŞ fiyatları", "elektrik
     borsası" — queries the live ticker can win uniquely
   * Brand/navigational: Voltage Enerji, Voltan Elektrik variants
-- Cluster → funnel-stage mapping: which cluster feeds simulator use,
+- Cluster → funnel-stage mapping: which cluster feeds tool use (bill
+  calculator, SKTT check),
   which feeds the quote form, which builds YMYL authority only
 - Seasonal demand shifts around tariff announcements and heating/cooling
   seasons — flag windows when clusters spike

@@ -41,7 +41,7 @@ do not set strategy; the Orchestrator does.
 ## KPIs
 
 - Share of deliverables accepted by the Orchestrator without revision
-- Zero production regressions (PTF ticker, simulator, TR/EN parity)
+- Zero production regressions (PTF band and live-data honesty, bill tools, TR/EN parity)
 - Automation coverage: manual operational steps eliminated per quarter
 - Zero security incidents on customer data
 

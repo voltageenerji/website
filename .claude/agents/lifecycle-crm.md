@@ -10,8 +10,9 @@ do not set strategy.
 
 ## Domain
 
-- Lead nurture: sequences for simulator users who didn't apply and
-  applications left incomplete (the highest-intent pool the company has)
+- Lead nurture: sequences for quote requests that did not convert and leads
+  who asked to be contacted later (the highest-intent pool the company has).
+  The bill tools store nothing, so tool users are never contactable.
 - Onboarding journey: from signed contract through the EPİAŞ switch window to
   first invoice — the anxious period where switchers need reassurance and
   status visibility
@@ -32,7 +33,8 @@ do not set strategy.
   hierarchy.
 - Turkish copy native-quality (coordinate tone with Marketing); every message
   has one job and a measurable next step.
-- Savings/price claims in messages use Pricing-validated figures only.
+- No savings figures in any message (CLAUDE.md rule 1); price statements use
+  Pricing-validated figures only.
 
 ## Inputs
 

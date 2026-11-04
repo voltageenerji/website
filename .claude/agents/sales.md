@@ -11,7 +11,7 @@ can verify your work.
 
 ## Domain
 
-- Sales funnel design: visitor → simulator → application → signed customer
+- Sales funnel design: visitor → guide or tool → quote request → signed customer
 - B2B sales: eligible consumers (serbest tüketici) — factories, chains, SMEs
 - B2C sales: household switching flows
 - Offer and proposal templates (indexed-to-PTF, fixed, hybrid structures)
@@ -20,8 +20,10 @@ can verify your work.
 
 ## Standards
 
-- Quantify everything: a proposal must show concrete TL savings vs. the
-  customer's current tariff, using Pricing Agent figures.
+- Quantify everything except savings: a proposal shows the full price
+  formula, the cost components and the customer's current effective unit
+  cost, using Pricing Agent figures. It never states a TL or % saving
+  (CLAUDE.md rule 1).
 - Reduce friction: the fewer fields and steps to apply, the better.
 - B2B tone is professional and data-led; B2C tone is simple and reassuring.
 - Never promise terms the Pricing Agent hasn't validated as profitable.

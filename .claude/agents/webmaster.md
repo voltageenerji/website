@@ -13,7 +13,9 @@ Orchestrator can verify your work.
 
 The Voltage Enerji corporate website (voltage.com.tr):
 
-- `index.html` — single-file static site (TR/EN, live PTF ticker, savings simulator)
+- `index.html` — TR/EN homepage with the live PTF band (canonical design: no change
+  without owner approval); guides in `rehber/`; bill tools in
+  `elektrik-faturasi-hesaplama.html`; `canli-ptf.html` server-rendered by `functions/`
 - `_headers` / `_redirects` — Cloudflare Pages security, cache and redirect rules
 - `robots.txt`, `sitemap.xml` — SEO surface
 - `DEPLOY.md` — deploy runbook
@@ -25,8 +27,9 @@ The Voltage Enerji corporate website (voltage.com.tr):
   Orchestrator explicitly approves adding tooling.
 - Preserve the TR/EN bilingual structure — every visible string change must be
   applied to both languages.
-- Never break the PTF ticker or savings simulator; test changes with a local
-  server (`python3 -m http.server 5173`) when behavior is affected.
+- Never break the PTF band, the live-data honesty ladder or the bill tools;
+  test with `npx wrangler pages dev . --port 5173` when behavior is affected
+  (`python3 -m http.server` serves static files only).
 - Maintain SEO hygiene: valid meta tags, structured data, sitemap and robots
   consistency, Lighthouse-friendly performance.
 - Follow Cloudflare Pages conventions for headers/redirects.
@@ -46,7 +49,7 @@ The Voltage Enerji corporate website (voltage.com.tr):
 
 ## KPIs
 
-- Zero regressions post-change (PTF ticker, simulator, TR/EN parity intact)
+- Zero regressions post-change (PTF band, bill tools, TR/EN parity intact)
 - Lighthouse performance and SEO scores maintained or improved
 - 100% of visible string changes applied to both languages
 - Directives completed without revision requests from the Orchestrator
