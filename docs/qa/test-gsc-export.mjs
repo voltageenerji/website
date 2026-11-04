@@ -130,6 +130,9 @@ const REPO_DIR = fileURLToPath(new URL('../..', import.meta.url));
 const badOut = join(REPO_DIR, 'docs', 'seo', 'gsc-test-cikti');
 const rOut = await runTool({ GSC_SA_KEY_B64: KEY_B64 }, ['--out', badOut]);
 ok('repo içi --out reddediliyor', rOut.code === 1 && rOut.err.includes('repo içinde') && !existsSync(badOut));
+const lookalike = join(REPO_DIR, 'gsc-data2');
+const rLook = await runTool({ GSC_SA_KEY_B64: KEY_B64 }, ['--out', lookalike]);
+ok('gsc-data2 gibi benzer ad reddediliyor', rLook.code === 1 && rLook.err.includes('repo içinde') && !existsSync(lookalike));
 const rKf = await runTool({ GSC_SA_KEY_FILE: join(REPO_DIR, 'docs', 'yok-anahtar.json') }, []);
 ok('repo içi anahtar dosyası reddediliyor', rKf.code === 1 && rKf.err.includes('repo içinde'));
 

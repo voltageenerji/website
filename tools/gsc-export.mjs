@@ -46,7 +46,9 @@ function insideRepo(p) {
   return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
 }
 // Çıktı repoya girmez: repo içindeyse yalnızca git'e girmeyen gsc-data/ altına izin var
-if (insideRepo(OUT) && !resolve(OUT).startsWith(join(REPO, 'gsc-data'))) {
+const relData = relative(join(REPO, 'gsc-data'), OUT);
+const underData = relData === '' || (!relData.startsWith('..') && !isAbsolute(relData));
+if (insideRepo(OUT) && !underData) {
   fail(`Çıktı klasörü repo içinde (${relative(REPO, OUT) || '.'}). Repo herkese açık: gsc-data/ veya repo dışı bir klasör kullanın.`);
 }
 

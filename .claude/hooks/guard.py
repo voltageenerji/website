@@ -81,7 +81,8 @@ def index_write_rx(project):
 def texts(tool, inp):
     if tool == 'Bash':
         return [inp.get('command', '')]
-    out = [inp.get('content', ''), inp.get('new_string', ''), inp.get('new_source', '')]
+    out = [inp.get('content', ''), inp.get('new_string', ''), inp.get('new_source', ''),
+           inp.get('body', ''), inp.get('message', '')]   # GitHub yorum, PR ve commit metinleri
     for e in inp.get('edits', []) or []:
         out.append(e.get('new_string', ''))
     for f in inp.get('files', []) or []:          # mcp__github__push_files

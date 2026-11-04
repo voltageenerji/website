@@ -2,7 +2,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|mcp__github__create_or_update_file|mcp__github__push_files",
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|mcp__github__.*",
         "hooks": [
           {
             "type": "command",

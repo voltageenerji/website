@@ -72,6 +72,13 @@ for name, tool, inp in [
 check('GitHub push_files index.html → ask', run('mcp__github__push_files', {'files': [{'path': 'index.html', 'content': 'x'}]})[1] == 'ask')
 check('GitHub create_or_update_file index.html → ask', run('mcp__github__create_or_update_file', {'path': 'index.html', 'content': 'x'})[1] == 'ask')
 check('GitHub create_or_update_file rehber → serbest', run('mcp__github__create_or_update_file', {'path': 'rehber/sktt.html', 'content': 'x'})[1] is None)
+# QA turu 2: diğer GitHub araçları
+check('GitHub delete_file index.html → ask', run('mcp__github__delete_file', {'path': 'index.html', 'message': 'sil'})[1] == 'ask')
+check('GitHub yorumunda sır → engel', run('mcp__github__add_issue_comment', {'body': 'anahtar: RESEND_API_KEY=re_AbCdEf12_' + 'x9Y' * 8})[0] == 2)
+check('GitHub PR gövdesinde Bearer → engel', run('mcp__github__create_pull_request', {'title': 't', 'body': 'Authorization: Bearer ' + 'a1b2' * 16})[0] == 2)
+check('GitHub sıradan yorum → serbest', run('mcp__github__add_issue_comment', {'body': 'Teşekkürler, düzeltildi.'}) == (0, None, ''))
+settings = json.load(open(os.path.join(ROOT, '.claude', 'settings.json')))
+check('settings: tüm GitHub araçları eşleşiyor', 'mcp__github__.*' in settings['hooks']['PreToolUse'][0]['matcher'])
 check('UTF-8 olmayan konsolda onay yolu çökmüyor', subprocess.run([sys.executable, '-I', HOOK], input=json.dumps({'tool_name': 'Write', 'tool_input': {'file_path': 'index.html', 'content': 'x'}}),
       capture_output=True, text=True, env=dict(os.environ, CLAUDE_PROJECT_DIR=ROOT, PYTHONIOENCODING='cp1252')).returncode == 0)
 check('JSON nesne değilse serbest', run(None, None, raw='[1, 2]')[0] == 0)
