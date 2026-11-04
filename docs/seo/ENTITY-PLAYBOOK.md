@@ -128,7 +128,7 @@ her profile eklenir. Aşağıdaki dizgiler karakteri karakterine kullanılır.
 
 Onay sonrası şablon (tek satır, her dizinde aynı):
 `Voltage Enerji (Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.) ·
-[ONAYLI ADRES] · +90 216 479 05 10 · https://voltage.com.tr/`
+[ONAYLI ADRES] · [ONAYLI TELEFON — teyitli numara yoksa alan boş bırakılır] · https://voltage.com.tr/`
 
 ---
 

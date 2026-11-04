@@ -403,7 +403,7 @@ New element (additive — coordinate `track()` wiring with Webmaster):
 
 ```html
 <div class="mobile-cta-bar" id="mobileCtaBar">
-  <a href="tel:+902164790510" class="mcb-tel" aria-label="Telefon">[phone svg]</a>
+  <!-- telefon düğmesi YOK: şirketin teyitli bir numarası yok; eski numara şirkete ait değil (sahip teyidi 2026-08-23) -->
   <a href="#simulator" class="mcb-sim" data-tr="Tasarrufu Hesapla" data-en="Estimate Savings">Tasarrufu Hesapla</a>
   <a href="#iletisim" class="mcb-quote" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
 </div>
