@@ -32,8 +32,8 @@ it before any non-trivial task; record new decisions and incidents there).
    only, never response bodies with customer data. Temporary workflows are
    removed after use.
 7. **Internal files are never served.** `/docs/*`, `/lib/*`, `/tools/*`,
-   `/.claude/*`, `/.github/*`, `CLAUDE.md`, `DEPLOY.md`, `CHANGELOG.md` → 302 in
-   `_redirects`.
+   `/game404/*`, `/.claude/*`, `/.github/*`, `CLAUDE.md`, `DEPLOY.md`,
+   `CHANGELOG.md`, `README.md`, `.gitignore` → 302 in `_redirects`.
 8. **Release gate.** QA verdict (plus Legal & Compliance for public claims)
    before anything reaches `main`. Deploy = push the working branch, then
    fast-forward `main` to it.
@@ -181,7 +181,9 @@ architect. Then command your agents accordingly.
   out of scope here). If the live band shows only "—", check the proxy first.
 - Search Console data: `tools/gsc-export.mjs` (official API, setup in
   `docs/seo/GSC-API-KURULUM.md`). Never commit its output.
-- Deploy process: see `DEPLOY.md`. Local preview: `python3 -m http.server 5173`.
+- Deploy process: see `DEPLOY.md`. Local preview with clean URLs, Functions and
+  `_redirects`: `npx wrangler pages dev . --port 5173`; `python3 -m http.server
+  5173` serves static files only.
 - The site is bilingual (Turkish primary, English secondary). All
   customer-facing copy must exist in both languages and the Turkish must read
   natively — never machine-translated.

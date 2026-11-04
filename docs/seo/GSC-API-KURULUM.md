@@ -1,6 +1,6 @@
 # Search Console API kurulumu (bir kerelik, yaklaşık 10 dakika)
 
-Amaç: Claude oturumlarının Search Console verisini resmî Google API'siyle kendisi çekmesi. Böylece Chrome eklentisine ekran okutmaya gerek kalmaz. Veri üçüncü bir şirkete açılmaz.
+Amaç: Claude oturumlarının Search Console verisini resmî Google API'siyle kendisi çekmesi. Böylece Chrome eklentisine ekran okutmaya gerek kalmaz. Veri yalnızca Google ile Claude oturumu arasında taşınır; ayrıca bir SEO aracına veya tarayıcı eklentisine verilmez.
 
 Araç: `tools/gsc-export.mjs`. Test: `node docs/qa/test-gsc-export.mjs`.
 
@@ -15,13 +15,13 @@ Araç: `tools/gsc-export.mjs`. Test: `node docs/qa/test-gsc-export.mjs`.
 
 1. https://console.cloud.google.com adresine şirket Google hesabıyla girin.
 2. Üstteki proje seçiciden **New Project** oluşturun. Ad örneği: `voltage-search-console`.
-3. **APIs & Services → Library** bölümünde "Google Search Console API" aratın ve **Enable** deyin.
+3. **APIs & Services → Library** bölümünde "Google Search Console API" aratın ve **Enable**'a tıklayın.
 
 ## 2. Servis hesabı ve anahtar
 
 1. **IAM & Admin → Service Accounts → Create service account.** Ad örneği: `gsc-okuyucu`. Rol vermeyin; rol gerekmez.
 2. Oluşan hesaba tıklayın, **Keys → Add key → Create new key → JSON**. Bir `.json` dosyası iner.
-3. Hesabın e-posta adresini kopyalayın. `...@voltage-search-console.iam.gserviceaccount.com` biçimindedir.
+3. Hesabın e-posta adresini kopyalayın. `...@<proje-kimliği>.iam.gserviceaccount.com` biçimindedir. Proje kimliği, proje adından farklı olabilir.
 
 ## 3. Search Console'da yetki
 
@@ -34,7 +34,7 @@ Araç: `tools/gsc-export.mjs`. Test: `node docs/qa/test-gsc-export.mjs`.
 1. İnen JSON dosyasını tek satır base64'e çevirin:
    - macOS / Linux terminal: `base64 -i dosya.json | tr -d '\n' | pbcopy` (Linux'ta `pbcopy` yerine `xclip -selection clipboard`)
    - Windows PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("dosya.json")) | Set-Clipboard`
-2. Claude oturumunun başlık çubuğundaki ortam menüsünden **Edit** deyin. **Environment variables** bölümüne şunu ekleyin:
+2. Claude oturumunun başlık çubuğundaki ortam menüsünden **Edit**'e tıklayın. **Environment variables** bölümüne şunu ekleyin (Network secrets bölümüne değil: araç anahtarla kendisi imza attığı için anahtarı okuyabilmesi gerekir):
    - Ad: `GSC_SA_KEY_B64`
    - Değer: panodaki base64 metni
 3. Kaydedin. **Yeni açılan oturumlar** değişkeni görür; açık oturum görmez.
@@ -54,6 +54,7 @@ node tools/gsc-export.mjs --inspect  # + site haritasındaki URL'lerin dizin dur
 | Dosya | İçerik |
 |---|---|
 | `OZET.md` | Toplamlar, ilk 20 sorgu, 8–20 bandı, sayfalar |
+| `meta.json`, `totals.json` | Tarih aralıkları ve toplamlar |
 | `*_28d.csv` | Bu dönemin sorgu, sayfa, sorgu×sayfa, cihaz ve ülke kırılımları |
 | `*_prev28d.csv` | Önceki 28 günün kırılımları |
 | `*_90d.csv` | 90 günlük kırılımlar |
@@ -61,7 +62,9 @@ node tools/gsc-export.mjs --inspect  # + site haritasındaki URL'lerin dizin dur
 | `sitemaps.json` | Site haritası durumu |
 | `url_inspection.csv` | Yalnızca `--inspect` ile: URL'lerin dizin durumu |
 
-Veri 2–3 gün geriden gelir; araç dönem sonunu 3 gün geri alır ve tarih aralığını her çıktıya yazar.
+Veri 2–3 gün geriden gelir; araç dönem sonunu 3 gün geri alır. Tarih aralıkları `OZET.md` ve `meta.json` içinde yazar.
+
+URL denetimi bir URL'de hata verirse performans verisi yine de yazılır; o URL `url_inspection.csv` içinde `ERROR` olarak görünür.
 
 ## Sık görülen hatalar
 
@@ -71,6 +74,8 @@ Veri 2–3 gün geriden gelir; araç dönem sonunu 3 gün geri alır ve tarih ar
 | `Erişim reddedildi (403)` | Adım 3 (mülke kullanıcı ekleme) veya adım 1.3 (API etkin değil) |
 | `Google erişim belirteci alınamadı` | Anahtar silinmiş olabilir; adım 2'den yeni anahtar |
 | `Repo herkese açık … CI` | Araç bilerek GitHub Actions içinde çalışmaz; Claude oturumunda çalıştırın |
+| `Çıktı klasörü repo içinde` | `gsc-data/` (varsayılan) veya repo dışı bir klasör kullanın |
+| Anahtar oluştururken "Service account key creation is disabled" | Kuruluş politikası `iam.disableServiceAccountKeyCreation` açık (yeni Google Cloud kuruluşlarında varsayılan). IAM & Admin → Organization Policies → "Disable service account key creation" → bu proje için **Not enforced** (Organization Policy Administrator yetkisi gerekir). |
 
 ## Anahtarı iptal etmek
 

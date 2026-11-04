@@ -35,3 +35,5 @@ __pycache__/
 gsc-data/
 *service-account*.json
 gsc-key*.json
+# Google Cloud anahtarının varsayılan adı: <proje-id>-<12 hex>.json
+*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].json

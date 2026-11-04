@@ -132,14 +132,14 @@ tekrarlayabilir; "kaynak canlı mı?" kontrolü her görünürlük testinin par�
 
 | Karar | Tarih | Kapsam |
 |---|---|---|
-| Main tasarımı kanonik | 2026-08-04 | Site tasarımına dokunulmaz; içerik sayfaları şablon uyumlu eklenebilir |
+| Main tasarımı kanonik | 2026-08-04 | Ana sayfa (`index.html`) tasarımı ve yapısı sahibin açık onayı olmadan değişmez; önce önizleme. Diğer sayfalar mevcut şablonla eklenir ve düzenlenir (CLAUDE.md madde 4) |
 | Satış motoru PASİF | 2026-08-05 | Hiçbir soğuk erişim yok; aktivasyon = sahip talimatı + hukuk onayı |
 | Sıfır tasarruf vaadi | Yayın ilkesi | Tüm kanallar (site, rehber, LinkedIn, mail) |
-| İç dokümanlar servis dışı | 2026-08-05 | `/docs/*`, CLAUDE.md, DEPLOY.md, CHANGELOG.md → 302 |
+| İç dokümanlar servis dışı | 2026-08-05, genişletme 2026-11-04 | `/docs/*`, `/lib/*`, `/tools/*`, `/game404/*`, `/.claude/*`, `/.github/*`, CLAUDE.md, DEPLOY.md, CHANGELOG.md, README.md, .gitignore → 302. 2026-11-04 ölçümü: `/.claude/agents/*` ve `/.github/workflows/*` canlıda 200 dönüyordu (ajan tanımları ve CI iş akışları açıktı; sır içermiyordu) |
 | Prop trading yasağı / fiyat sabitleme kapısı | 180g planı | Sabit fiyat taahhüdü öncesi pozisyon kontrolü (şirket pasif satışta — uyuyan kural) |
 | Marka tescili DOĞRULANDI: "voltage enerji" 2011/70573 | 2026-08-23 | TÜRKPATENT kaydı: başvuru 06.09.2011, tescil 23.11.2012, sahibi Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (5318978), Nice 39/40, hizmet markası. Koruma dönemi 06.09.2021'de yenilendi. **Sonraki yenileme: 06.09.2031** (6 ay önce başlanmalı). Numara sitede, schema'da ve llms.txt'te yayında. |
 | Sırlar sohbete/repoya ASLA yapıştırılmaz | 2026-08-26 | `ADMIN_SESSION_SECRET`, `ADMIN_PASS_HASH`, `REPORT_TOKEN`, API anahtarları yalnız Cloudflare/GitHub'ın şifreli alanlarına girilir. Oturum anahtarını bilen kişi PAROLASIZ geçerli çerez imzalayabilir. Yanlışlıkla paylaşılan her değer derhal yeniden üretilir. Orchestrator bu değerleri görmeye ihtiyaç duymaz; doğrulama için "giriş çalıştı mı" bilgisi yeterlidir. |
-| Kesin kurallar CLAUDE.md'de; dosya bazlı kurallar ve koruma kancaları | 2026-11-04 | `CLAUDE.md` başındaki 11 kural her oturum yüklenir ve ajan tanımlarının önüne geçer. `.claude/rules/` içindeki kurallar ilgili dosyaya dokunulunca yüklenir. `.claude/hooks/guard.py`: şifre biçimindeki değerleri engeller, `index.html` değişikliğinde sahibin onayını sorar (test: `python3 -I docs/qa/test-guard.py`). Kanca güvenlik ağıdır; kabukla yapılan her yazmayı yakalayamaz. |
+| Kesin kurallar CLAUDE.md'de; dosya bazlı kurallar ve koruma kancaları | 2026-11-04 | `CLAUDE.md` başındaki 11 kural, bu tarihten sonra açılan her oturumda yüklenir ve ajan tanımlarının önüne geçer. `.claude/rules/` içindeki kurallar ilgili dosyaya dokunulunca yüklenir. `.claude/hooks/guard.py`: şifre biçimindeki değerleri engeller, `index.html` değişikliğinde sahibin onayını sorar (test: `python3 -I docs/qa/test-guard.py`). Kanca güvenlik ağıdır; kabukla yapılan her yazmayı yakalayamaz. |
 | voltan.com.tr AYRI SİTE DEĞİL, takma ad (alias) | 2026-08-09 | Tek kanonik alan: voltage.com.tr. voltan.* türevleri yalnızca 301 ile yönlenir; ayrı içerik/canonical/sitemap asla kurulmaz. |
 
 ## 5. Erişim haritası (kimlik bilgisi İÇERMEZ)

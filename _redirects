@@ -29,3 +29,5 @@ https://www.voltan.com/* https://voltage.com.tr/:splat 301
 # Ajan tanımları, kurallar, kancalar ve CI iş akışları da iç dosyadır
 /.claude/* / 302
 /.github/* / 302
+/README.md / 302
+/.gitignore / 302

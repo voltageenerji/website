@@ -55,9 +55,8 @@ Telefon numarası bugün sitede yayınlı değil ve bu belgenin **en kritik eksi
 - **Sahip aksiyonu:** kurumsal sabit hat (tercihen `+90 216 …` — İstanbul Anadolu
   yakası alan kodu, adresle tutarlı) numarasını teyit et. Format her yerde
   uluslararası ve aynı olacak: `+90 216 XXX XX XX`.
-- **Not (arşiv bulgusu, doğrulanmamış):** ENTITY-PLAYBOOK 2026-07-27 kaydında
-  sitede `+90-216-479-0510` numarası görünüyordu. Bu numara hâlâ geçerliyse
-  doğrudan kullanılabilir; **sahip teyit etmeden kullanılmaz.**
+- **Not:** Eski kayıtlarda geçen 216 479 numarası şirkete ait DEĞİL (sahip teyidi
+  2026-08-23). Hiçbir dizinde, profilde veya sayfada kullanılmaz.
 
 ### 0.3 BLOKER — adresin "mağaza vitrini" niteliği (Bölüm 1.C kararı için)
 

@@ -20,7 +20,7 @@ const PEM_BODY = PEM.split('\n')[5]; // anahtarın ortasından bir satır: çık
 
 let mode = 'ok';
 const seen = { jwtValid: false, scope: null, aud: null, pages: 0, inspected: 0, auth: true };
-const QUERIES = ['elektrik tedarikçi değiştirme', 'ptf', 'serbest tüketici limiti 2026', '=HYPERLINK("http://x")', 'sktt nedir'];
+const QUERIES = ['elektrik tedarikçi değiştirme', 'ptf', 'serbest tüketici limiti 2026', '=HYPERLINK("http://x")', 'sktt nedir', '\t+SUM(1)'];
 
 const server = createServer((req, res) => {
   let body = '';
@@ -38,6 +38,7 @@ const server = createServer((req, res) => {
     }
     if (req.headers.authorization !== 'Bearer sahte-belirtec') seen.auth = false;
     if (mode === 'forbidden') return send(403, { error: { message: 'User does not have sufficient permission' } });
+    if (mode === 'inspect403' && req.url === '/v1/urlInspection/index:inspect') { seen.inspected++; return send(403, { error: { message: 'Insufficient permission for URL inspection' } }); }
     if (req.url.endsWith('/searchAnalytics/query')) {
       seen.pages++;
       const q = JSON.parse(body);
@@ -87,8 +88,9 @@ for (const f of ['meta.json', 'totals.json', 'queries_28d.csv', 'queries_prev28d
   ok(`dosya: ${f}`, existsSync(join(dir, f)));
 }
 const qcsv = readFileSync(join(dir, 'queries_28d.csv'), 'utf8').trim().split('\n');
-ok('sayfalama: 5 sorgunun hepsi alındı (sayfa boyu 2)', qcsv.length === 6, String(qcsv.length));
+ok('sayfalama: 6 sorgunun hepsi alındı (sayfa boyu 2)', qcsv.length === 7, String(qcsv.length));
 ok('CSV formül enjeksiyonu engelli', qcsv.some((l) => l.startsWith('"\'=HYPERLINK') || l.startsWith("'=HYPERLINK")));
+ok('CSV: sekmeyle başlayan hücre de korunuyor', qcsv.some((l) => l.startsWith("'\t+SUM")));
 const band = readFileSync(join(dir, 'band_8_20.csv'), 'utf8');
 ok('8–20 bandı yalnızca 8 ≤ poz ≤ 20', band.includes('ptf') && band.includes('serbest') && !band.includes('tedarikçi değiştirme,0'));
 const ozet = readFileSync(join(dir, 'OZET.md'), 'utf8');
@@ -112,6 +114,25 @@ ok('403: Türkçe yol gösterici mesaj ve servis hesabı adı', r403.err.include
 ok('403: anahtar mesajda yok', !r403.err.includes(PEM_BODY));
 mode = 'ok';
 
+// 2b) URL denetimi 403 (Kısıtlı izin): performans verisi kaybolmaz, denetim ERROR olarak kaydedilir
+mode = 'inspect403'; seen.inspected = 0;
+const dir2 = mkdtempSync(join(tmpdir(), 'gsc-test-'));
+const rI = await runTool({ GSC_SA_KEY_B64: KEY_B64 }, ['--out', dir2, '--inspect']);
+ok('denetim 403: çıkış kodu 0', rI.code === 0, rI.err);
+ok('denetim 403: performans dosyaları yazıldı', existsSync(join(dir2, 'OZET.md')) && existsSync(join(dir2, 'queries_28d.csv')));
+ok('denetim 403: ERROR kaydı ve "Tam" izin önerisi', readFileSync(join(dir2, 'url_inspection.csv'), 'utf8').includes('ERROR') && rI.err.includes('Tam'));
+ok('denetim 403: ilk 403\'te duruyor (kota israfı yok)', seen.inspected === 1, String(seen.inspected));
+rmSync(dir2, { recursive: true, force: true });
+mode = 'ok';
+
+// 2c) Repo herkese açık: çıktı ve anahtar dosyası repo içine konamaz
+const REPO_DIR = fileURLToPath(new URL('../..', import.meta.url));
+const badOut = join(REPO_DIR, 'docs', 'seo', 'gsc-test-cikti');
+const rOut = await runTool({ GSC_SA_KEY_B64: KEY_B64 }, ['--out', badOut]);
+ok('repo içi --out reddediliyor', rOut.code === 1 && rOut.err.includes('repo içinde') && !existsSync(badOut));
+const rKf = await runTool({ GSC_SA_KEY_FILE: join(REPO_DIR, 'docs', 'yok-anahtar.json') }, []);
+ok('repo içi anahtar dosyası reddediliyor', rKf.code === 1 && rKf.err.includes('repo içinde'));
+
 // 3) Anahtar yok / bozuk / CI
 const rNo = await runTool({}, []);
 ok('anahtar yok: kurulum rehberine yönlendiriyor', rNo.code === 1 && rNo.err.includes('GSC-API-KURULUM.md'));
@@ -119,6 +140,8 @@ const rBad = await runTool({ GSC_SA_KEY_B64: Buffer.from('bozuk').toString('base
 ok('bozuk anahtar: anlaşılır hata', rBad.code === 1 && rBad.err.includes('geçerli bir JSON değil'));
 const rCi = await runTool({ GSC_SA_KEY_B64: KEY_B64, GITHUB_ACTIONS: 'true' }, []);
 ok('GitHub Actions içinde çalışmayı reddediyor', rCi.code === 1 && rCi.err.includes('herkese açık'));
+const rCi2 = await runTool({ GSC_SA_KEY_B64: KEY_B64, GITHUB_ACTIONS: 'true', GSC_ALLOW_CI: '1' }, []);
+ok('CI atlama yolu yok (GSC_ALLOW_CI etkisiz)', rCi2.code === 1 && rCi2.err.includes('herkese açık'));
 
 server.close();
 console.log(`\n${pass} passed, ${fail} failed`);
