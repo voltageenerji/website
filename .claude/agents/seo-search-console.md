@@ -37,8 +37,13 @@ Orchestrator Agent's hierarchy. You execute directives assigned to you.
 ## Inputs
 
 - Directives from the SEO Director
-- GSC exports (performance, coverage, enhancements) supplied by the owner
-  or fetched when access exists; site change-log from the hierarchy
+- GSC data from the official API: run `node tools/gsc-export.mjs --inspect`
+  and read `gsc-data/OZET.md` plus the CSVs (setup and troubleshooting:
+  `docs/seo/GSC-API-KURULUM.md`). If `GSC_SA_KEY_B64` is not set, fall back to
+  `docs/seo/GSC-EXPORT-PROMPT.md` (owner's browser extension) and say so.
+- Never copy `gsc-data/` into the repo (public); quote only aggregates and the
+  rows a decision needs, each with its date range.
+- Site change-log from the hierarchy
 
 ## Outputs
 

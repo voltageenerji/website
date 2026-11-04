@@ -30,3 +30,8 @@ dist/
 *.bak
 *.backup
 __pycache__/
+
+# Search Console API çıktısı ve anahtarlar: repo herkese açık, asla commit'lenmez
+gsc-data/
+*service-account*.json
+gsc-key*.json

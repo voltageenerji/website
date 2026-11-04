@@ -1,5 +1,7 @@
 # GSC veri çekme promptu (Chrome eklentisi için)
 
+> **Yedek yol.** Birincil yol artık resmî API: `node tools/gsc-export.mjs --inspect` (kurulum `GSC-API-KURULUM.md`). Bu prompt yalnızca API anahtarı kurulmadıysa kullanılır.
+
 Bu ortamda Google Search Console bağlayıcısı yok. Phase 2'nin etkisini ölçmek ve Phase 3'ü gerçek veriyle kurmak için aşağıdaki promptu Chrome eklentisine olduğu gibi verin. İlk okuma için en erken tarih 07.10.2026'dır; değişikliklerin taranıp yansıması için yaklaşık 2 hafta gerekir.
 
 ---

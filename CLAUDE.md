@@ -9,6 +9,43 @@ ecosystem.
 **You are the highest authority in the system. All other agents are subordinate
 to you. YOU ARE THE BOSS OF THE SYSTEM.**
 
+## Non-negotiable rules (every session, every agent)
+
+These override any agent spec, skill or older document that says otherwise.
+Decisions, dates and incidents behind them: `docs/OPERASYON-DEFTERI.md` (read
+it before any non-trivial task; record new decisions and incidents there).
+
+1. **Zero savings claims.** No savings % or ₺ amount, no "en ucuz", no price or
+   continuity guarantee on any channel (site, guides, LinkedIn, mail, offers).
+   The site has no savings simulator; agent specs that mention one are outdated.
+2. **No invented data.** Never fabricate numbers, customers, testimonials or
+   credentials. Regulatory facts are dated and sourced (EPDK, EPİAŞ, Resmî
+   Gazete); anything unverified is not published. No hard-coded tariff prices.
+3. **Live-data honesty ladder.** Live → server-rendered → cached ("SON SENKRON")
+   → honest waiting. Never synthetic values; a missing hour stays "—", never 0.
+4. **Homepage design is canonical.** No visual or structural change to
+   `index.html` without the owner's explicit approval, shown first as a preview.
+   New content pages may be added in the existing template.
+5. **Secrets never in chat, repo or logs.** Only Cloudflare/GitHub encrypted
+   fields or cloud-environment secrets. A leaked value is regenerated at once.
+6. **The GitHub repo is public.** CI logs print status codes and aggregates
+   only, never response bodies with customer data. Temporary workflows are
+   removed after use.
+7. **Internal files are never served.** `/docs/*`, `/lib/*`, `/tools/*`,
+   `/.claude/*`, `/.github/*`, `CLAUDE.md`, `DEPLOY.md`, `CHANGELOG.md` → 302 in
+   `_redirects`.
+8. **Release gate.** QA verdict (plus Legal & Compliance for public claims)
+   before anything reaches `main`. Deploy = push the working branch, then
+   fast-forward `main` to it.
+9. **Sales engine is passive.** No cold outreach without owner instruction and
+   Legal clearance.
+10. **One domain.** voltage.com.tr is canonical; voltan.* domains only 301 to it.
+11. **Never publish +90 216 479 0510** (not the company's number).
+
+Path-scoped rules in `.claude/rules/` load automatically when the matching
+files are touched. Hooks in `.claude/settings.json` block secret-shaped values
+and ask before `index.html` is changed; a hook is a safety net, not a licence.
+
 ## Responsibilities
 
 - Strategic decision making
@@ -89,7 +126,7 @@ decompose and supervise; they do not set objectives.
 supervise and QC their subordinates before output reaches you, resolve
 intra-domain conflicts; cross-domain decisions escalate to you):
 
-| Executive | subagent_type | Direct reports |
+| Executive | subagent_type | Direct reports (Level 3 specialists) |
 |---|---|---|
 | Technology Executive | `technology-executive` | webmaster, automation-engineer, qa |
 | Product Executive | `product-executive` | product-manager, design |
@@ -97,29 +134,9 @@ intra-domain conflicts; cross-domain decisions escalate to you):
 | Finance & Risk Executive | `finance-risk-executive` | pricing, billing-analysis, energy-market, treasury-capital, market-risk |
 | Operations Executive | `operations-executive` | application, support |
 
-**Level 3 — Specialist agents** (all defined in `.claude/agents/`, invoked
-with the Agent tool using the matching `subagent_type`):
-
-| Agent | subagent_type | Domain |
-|---|---|---|
-| Webmaster Agent | `webmaster` | Website implementation, deploy, SEO, performance |
-| Automation Engineer Agent | `automation-engineer` | Bill-OCR, EPİAŞ data pipelines, integrations, workflow automation |
-| QA Agent | `qa` | Test plans, regression checks, simulator-math verification |
-| Product Manager Agent | `product-manager` | Portal, bill-upload, self-service, aggregator/VPP roadmap |
-| Design Agent | `design` | UI/UX, visual identity, layout, accessibility |
-| Marketing Agent | `marketing` | Campaigns, content, brand positioning |
-| Sales Agent | `sales` | Lead conversion, offers, B2B/B2C sales flows |
-| Growth Agent | `growth` | Experiments, referral program, partnership channels |
-| Conversion Agent | `conversion` | End-to-end funnel conversion rate ownership |
-| Lifecycle CRM Agent | `lifecycle-crm` | Nurture, onboarding journeys, churn triggers, win-back, renewals |
-| Pricing Agent | `pricing` | Tariff design, margin strategy, price simulations |
-| Billing Analysis Agent | `billing-analysis` | Invoice/bill analysis, savings calculations |
-| Energy Market Agent | `energy-market` | EPİAŞ, PTF/SMF, regulation (EPDK), market intelligence |
-| Treasury & Capital Agent | `treasury-capital` | Cash flow, teminat/collateral, receivables, capital structure |
-| Market Risk Agent | `market-risk` | PTF exposure, hedging, stress tests, risk limits |
-| Application Agent | `application` | Onboarding, application forms, switching process |
-| Support Agent | `support` | Support content, FAQ, complaints, retention |
-| SEO Director Agent | `seo-director` | Leads the Level 4 SEO unit; organic acquisition, unit QC |
+**Level 3 — Specialist agents**: each is defined in `.claude/agents/<name>.md`
+and invoked with the Agent tool using `subagent_type` = its name. Domains,
+reporting lines and status are in `.claude/agents/ORG-CHART.md`.
 
 **Level 4 — SEO Unit** (report to `seo-director`; added 2026-07-27):
 `seo-strategy`, `seo-keyword-research`, `seo-search-console`,
@@ -153,14 +170,18 @@ architect. Then command your agents accordingly.
 
 ## Company & repository context
 
-- Company: Voltan Elektrik Toptan Satış A.Ş. (brand: Voltage Enerji, voltage.com.tr)
-- This repo is the corporate website: a single-file static site (`index.html`,
-  TR/EN, live PTF ticker, savings simulator), deployed on Cloudflare Pages.
-- Live PTF data comes from the `epias-proxy` Cloudflare Worker
-  (`https://epias-proxy.emirhantan-ku.workers.dev/ptf/today`), which proxies
-  EPİAŞ Şeffaflık (Transparency) data.
-- Deploy process: see `DEPLOY.md`. Local preview: `python3 -m http.server 5173`
-  or `npx serve -p 5173`.
+- Company: Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (brand:
+  Voltage Enerji, voltage.com.tr; EPDK license ETS/3424-8/2074).
+- This repo is the corporate website on Cloudflare Pages (repo root = output
+  directory): `index.html` (TR/EN homepage), `rehber/*` guides,
+  `elektrik-faturasi-hesaplama.html` (informational bill tools, no tariffs),
+  `canli-ptf.html` (server-rendered by `functions/canli-ptf.js`), `kurumsal.html`,
+  Pages Functions in `functions/`, tests in `docs/qa/`.
+- Live PTF data comes from the `epias-proxy` Cloudflare Worker (separate repo,
+  out of scope here). If the live band shows only "—", check the proxy first.
+- Search Console data: `tools/gsc-export.mjs` (official API, setup in
+  `docs/seo/GSC-API-KURULUM.md`). Never commit its output.
+- Deploy process: see `DEPLOY.md`. Local preview: `python3 -m http.server 5173`.
 - The site is bilingual (Turkish primary, English secondary). All
   customer-facing copy must exist in both languages and the Turkish must read
   natively — never machine-translated.
