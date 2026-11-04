@@ -130,7 +130,10 @@ def main():
     reason = ('Ana sayfa (index.html) kanonik tasarım: değişiklik için sahibin bu konuşmadaki '
               'açık onayı gerekir (CLAUDE.md madde 4). Onay yoksa önce önizleme hazırlayın.')
     path = inp.get('file_path') or inp.get('notebook_path') or inp.get('path')
-    if tool != 'Bash' and is_homepage(path, project):
+    # Yalnızca yazan araçlar: GitHub'dan index.html okumak (get_file_contents, list_commits) onay istemez
+    writes = ('Write', 'Edit', 'MultiEdit', 'NotebookEdit', 'mcp__github__create_or_update_file',
+              'mcp__github__push_files', 'mcp__github__delete_file')
+    if tool in writes and is_homepage(path, project):
         ask(reason)
     for f in inp.get('files', []) or []:
         if is_homepage(f.get('path'), project):

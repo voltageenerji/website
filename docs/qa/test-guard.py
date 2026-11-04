@@ -77,6 +77,8 @@ check('GitHub delete_file index.html → ask', run('mcp__github__delete_file', {
 check('GitHub yorumunda sır → engel', run('mcp__github__add_issue_comment', {'body': 'anahtar: RESEND_API_KEY=re_AbCdEf12_' + 'x9Y' * 8})[0] == 2)
 check('GitHub PR gövdesinde Bearer → engel', run('mcp__github__create_pull_request', {'title': 't', 'body': 'Authorization: Bearer ' + 'a1b2' * 16})[0] == 2)
 check('GitHub sıradan yorum → serbest', run('mcp__github__add_issue_comment', {'body': 'Teşekkürler, düzeltildi.'}) == (0, None, ''))
+check('GitHub get_file_contents index.html (okuma) → serbest', run('mcp__github__get_file_contents', {'owner': 'voltageenerji', 'repo': 'website', 'path': 'index.html'}) == (0, None, ''))
+check('GitHub list_commits path=index.html (okuma) → serbest', run('mcp__github__list_commits', {'path': 'index.html'}) == (0, None, ''))
 settings = json.load(open(os.path.join(ROOT, '.claude', 'settings.json')))
 check('settings: tüm GitHub araçları eşleşiyor', 'mcp__github__.*' in settings['hooks']['PreToolUse'][0]['matcher'])
 check('UTF-8 olmayan konsolda onay yolu çökmüyor', subprocess.run([sys.executable, '-I', HOOK], input=json.dumps({'tool_name': 'Write', 'tool_input': {'file_path': 'index.html', 'content': 'x'}}),
