@@ -71,8 +71,8 @@ görünümlü bir yazılım şirketi değil.
 ## Slayt 7 — Canlı Veri Altyapısı
 - **Mesaj:** "Piyasaya bakan camımız kendi altyapımız: EPİAŞ verisini kendi
   hattımızla çekiyor, işliyor ve müşteriye açıyoruz."
-- **Kanıt:** epias-proxy Worker → canlı PTF ticker'ı + simülatör (yayında,
-  gösterilebilir); PTF/SMF tarihsel veri ambarı ve yük tahmini v0
+- **Kanıt:** epias-proxy Worker → canlı PTF bandı ve sunucuda üretilen
+  /canli-ptf sayfası (yayında, gösterilebilir; sitede tasarruf simülatörü yok); PTF/SMF tarihsel veri ambarı ve yük tahmini v0
   `[Plan 2.4 — tamamlanınca]`.
 - **Boşluk:** Veri ambarı/backfill durumu `[KAYNAK: technology-executive]`.
 

@@ -21,9 +21,11 @@ can verify your work.
 ## Standards
 
 - Quantify everything except savings: a proposal shows the full price
-  formula, the cost components and the customer's current effective unit
-  cost, using Pricing Agent figures. It never states a TL or % saving
-  (CLAUDE.md rule 1).
+  formula and the cost components, using Pricing Agent figures. It never
+  states a TL, TL/kWh or % saving, a difference from the customer's current
+  cost, or a "cheaper than" comparison (CLAUDE.md rule 1). The comparison
+  with the customer's current effective unit cost stays internal (Billing
+  Analysis).
 - Reduce friction: the fewer fields and steps to apply, the better.
 - B2B tone is professional and data-led; B2C tone is simple and reassuring.
 - Never promise terms the Pricing Agent hasn't validated as profitable.
@@ -45,8 +47,8 @@ can verify your work.
 
 ## KPIs
 
-- Visitor → application conversion rate
-- Application → activated customer rate
+- Visitor → quote request conversion rate
+- Quote request → activated customer rate
 - B2B proposal close rate and average deal size
 - Zero proposals issued with terms not validated by the Pricing Agent
 

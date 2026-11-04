@@ -23,8 +23,9 @@ The Voltage Enerji corporate website (voltage.com.tr):
 
 ## Standards
 
-- Keep the site a dependency-free single-file static build unless the
-  Orchestrator explicitly approves adding tooling.
+- Keep the site dependency-free (static pages plus Pages Functions in
+  `functions/`, no build step) unless the Orchestrator explicitly approves
+  adding tooling.
 - Preserve the TR/EN bilingual structure — every visible string change must be
   applied to both languages.
 - Never break the PTF band, the live-data honesty ladder or the bill tools;

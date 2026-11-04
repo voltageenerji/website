@@ -29,7 +29,7 @@ Orchestrator can verify your work.
   invent figures.
 - Comply with Turkish advertising and energy-market communication rules
   (no misleading guarantees, EPDK-sensitive claims flagged for review).
-- Every piece of content needs a clear CTA tied to the application funnel.
+- Every piece of content needs a clear CTA tied to the quote-request funnel.
 
 ## Inputs
 

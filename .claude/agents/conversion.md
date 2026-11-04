@@ -51,7 +51,7 @@ activated customers.
 
 - End-to-end visitor → activated-customer conversion rate trend
 - Tool-result → quote-form-start rate (bill calculator, SKTT check)
-- Application completion rate (started → submitted), mobile specifically
+- Quote-form completion rate (started → submitted), mobile specifically
 - Win rate and cumulative lift of executed tests
 
 ## Reporting

@@ -37,7 +37,8 @@ Orchestrator Agent's hierarchy. You execute directives assigned to you.
 - Turkish morphology matters: cover inflected and question forms
   natively; EN terms only for the EN page set.
 - Respect the mesken gate: household-savings keywords are mapped but
-  flagged "do not target with savings promises" per the mesken verdict.
+  flagged "do not target"; no keyword on any page is targeted with a savings
+  promise (CLAUDE.md rule 1).
 
 ## Inputs
 

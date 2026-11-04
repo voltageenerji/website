@@ -33,7 +33,12 @@
   Tek bir "OSB elektrik tedariki" araması, binlerce genel fatura aramasından
   değerlidir. Öncelik sırası buna göredir, ham talebe göre değil.
 
-**Mevcut hedef yüzeyler:** `/` (tek sayfa; çapalar: `#hizmetler`, `#simulator`,
+> **Düzeltme (2026-11-04):** Bu harita yazıldığında sitede bir tasarruf simülatörü vardı; artık yok ve
+> hiçbir kanalda tasarruf rakamı yayımlanmaz (CLAUDE.md madde 1). Aşağıda simülatöre giden yönlendirmeler
+> fatura araçlarına (`/elektrik-faturasi-hesaplama`) veya teklif formuna (`/#iletisim`) çevrildi.
+> Güncel sorgu→sayfa sahipliği: `KEYWORD-OWNERSHIP-MAP.md`.
+
+**Mevcut hedef yüzeyler:** `/` (çapalar: `#hizmetler`,
 `#yaklasim`, `#hakkimizda`, `#iletisim`+form), `/kvkk`, `/cerez-politikasi`,
 `/kullanim-kosullari`. Sayfada sahiplenilmiş sektörler: OSB, tekstil,
 demir-çelik, kimya, soğuk zincir, cam, veri merkezi.
@@ -56,7 +61,7 @@ SERP'te sektör-spesifik ticari sayfayla güçlü değil** — açık boşluk.
 |---|---|---|---|---|
 | osb elektrik tedariki · osb'de elektrik nereden alınır · osb katılımcısı tedarikçi değiştirebilir mi · osb elektrik birim fiyatı 2026 | Alt | Düşük-Orta | **YENİ:** `/osb-elektrik-tedariki` | OSB SERP'i OSB'lerin kendi siteleriyle dolu; açı: "OSB tarifesi vs ikili anlaşma karşılaştırması" |
 | fabrika elektrik tedariki · fabrikalar için elektrik anlaşması · yüksek tüketimli tesis elektrik | Alt | Düşük | `/osb-elektrik-tedariki` + `/#iletisim` | Ayrı sayfa açma — OSB sayfası kapsar (kanibalizasyon önlemi) |
-| sanayi elektrik fiyatları · sanayi elektriği kaç tl · sanayi elektrik birim fiyatı 2026 · orta gerilim elektrik fiyatı | Orta-Alt | Orta | **YENİ:** `/sanayi-elektrik-fiyatlari` (2. dalga) | Fiyat sayısı yayını Pricing+Legal onayına tabi; onaysız sürümde metodoloji + simülatör CTA |
+| sanayi elektrik fiyatları · sanayi elektriği kaç tl · sanayi elektrik birim fiyatı 2026 · orta gerilim elektrik fiyatı | Orta-Alt | Orta | **YENİ:** `/sanayi-elektrik-fiyatlari` (2. dalga) | Fiyat sayısı yayını Pricing+Legal onayına tabi; onaysız sürümde metodoloji + fatura aracı CTA |
 | kurumsal elektrik teklifi · kurumsal elektrik tedarikçileri · ikili anlaşma elektrik teklifi al | Alt | Düşük | `/` (ana sayfa title zaten hedefliyor) + form | Ana sayfanın birincil sorgu seti; yeni sayfa AÇMA — kanibalizasyon riski |
 | tekstil fabrikası elektrik maliyeti · tekstilde enerji maliyeti · iplik/boyahane elektrik tüketimi | Orta-Alt | Düşük | **YENİ:** `/tekstil-elektrik` | Sektör kartından iç link |
 | demir çelik elektrik tüketimi · ark ocağı elektrik maliyeti · döküm tesisi elektrik tedariki | Orta-Alt | Düşük | **YENİ:** `/demir-celik-elektrik` | En yüksek MWh/tesis sektörü; PTF saatlik profil açısı güçlü |
@@ -71,7 +76,7 @@ uzun kuyruğunu alır. Sektör sayfaları ana sayfadaki sektör kartlarından
 
 ## 2. Küme B — Uygunluk / Eğitim (serbest tüketici)
 
-**Niyet:** bilgi → değerlendirme. **Huni:** üst-orta; simülatörü ve formu besler.
+**Niyet:** bilgi → değerlendirme. **Huni:** üst-orta; fatura araçlarını ve teklif formunu besler.
 **MWh önceliği: 2/5.** YMYL otorite temelini kurar; B2B karar vericisi de bu
 sorgularla araştırmaya başlar. **Talep:** Yüksek (nitel tahmin; gerekçe: limit
 kararı ulusal haber oldu — AA, CNBC-e, Milli Gazete aynı SERP'te).
@@ -131,7 +136,7 @@ için sayfa yayını mesken checker (2.6) hazır olana dek **beklemede**.
 | elektrik faturası neden yüksek geldi · fatura nasıl düşer **[MG]** | Üst | Yüksek | Hedeflenmez (v1) | Mesken kapısı; checker sonrası yeniden değerlendirilir |
 | kademeli tarife nedir · 4000 kwh sınırı · kademe sınırı 2026 · devlet desteği kalkan aboneler **[MG — kama kesişimi]** | Üst | Yüksek (mevsimsel zirve) | **YENİ (koşullu, 2.6'ya bağlı):** `/kademe-2026` veya checker sayfası | De-sübvanse kama TAM bu sorgunun içinde; tasarruf vaadi olmadan "gerçek maliyet fiyatına geçenler için seçenekler" çerçevesi — legal-compliance onayı şart |
 | elektrik kwh fiyatı 2026 · elektrik birim fiyatı · 1 kwh elektrik kaç tl **[MG ağırlıklı]** | Üst | Yüksek | Hedeflenmez (v1); B2B varyantı `/sanayi-elektrik-fiyatlari`'na | "sanayi/ticarethane kwh fiyatı" varyantları B2B sayfasına — mesken varyantından niyet ayrımı net tutulmalı |
-| işletme elektrik gideri düşürme · fabrika enerji maliyeti azaltma · elektrik maliyet analizi | Orta | Düşük-Orta | Küme A sektör sayfaları + `/#simulator` | B2B-temiz alt küme; simülatör ana besleyicisi |
+| işletme elektrik gideri düşürme · fabrika enerji maliyeti azaltma · elektrik maliyet analizi | Orta | Düşük-Orta | Küme A sektör sayfaları + `/elektrik-faturasi-hesaplama` | B2B-temiz alt küme; fatura aracının ve teklif formunun ana besleyicisi |
 
 ---
 
@@ -171,7 +176,7 @@ elektrikpaketleri, puan5 ve LinkedIn ilk sayfada. Riskler: (a) encazip profili
 Sıralama = MWh ağırlığı × SERP boşluğu × plan 2.3 hizası. **İlk 6 = birinci
 içerik dalgası** (plan 2.3: serbest tüketici rehberi ✓, tedarikçi değiştirme ✓,
 sektör maliyet sayfaları OSB/tekstil/çelik ✓✓✓, PTF açıklayıcı ✓). Her sayfa
-çalışan formda/simülatörde bitmeli (1.1 ön koşul).
+çalışan formda veya fatura aracında bitmeli (1.1 ön koşul).
 
 | # | Sayfa (URL önerisi) | Küme | Gerekçe | Dalga |
 |---|---|---|---|---|
@@ -194,7 +199,7 @@ olan: 2 (ana sayfa jenerik B2B + marka) → ilk dalga sonrası 8/11.
 
 1. Sektör kartları link değil — sektör sayfaları açılınca kartlar `<a>` olmalı (seo-onpage).
 2. Tek sayfa mimarisi tüm kümeleri `/`'e yığıyor; çok sayfalı yapıya geçişte
-   çapa bölümleri (ör. `#simulator`) yeni sayfalardan kanonik iç linkle beslenmeli.
+   çapa bölümleri (ör. `#iletisim`) yeni sayfalardan kanonik iç linkle beslenmeli.
 3. EN sayfa seti (plan 3.5) için EN anahtar kelime haritası ayrı görev — bu
    haritadan çeviri türetilmez.
 4. encazip/elektrikpaketleri profillerindeki bayat serbest tüketici bilgisi

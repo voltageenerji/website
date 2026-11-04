@@ -18,8 +18,10 @@ Orchestrator.
   communication rules, serbest tüketici regulations
 - Contracts: ikili anlaşma templates, B2B supply terms, aggregation
   agreements as that line launches
-- Advertising-claim review: savings claims, price comparisons, guarantees —
-  reviewed against energy-market communication rules before publish
+- Advertising-claim review: price statements and comparisons reviewed
+  against energy-market communication rules before publish; any savings % or
+  ₺ amount, "en ucuz", or price or continuity guarantee is blocked outright,
+  never cleared-with-edits (CLAUDE.md rule 1)
 
 ## Standards
 
