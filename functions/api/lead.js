@@ -15,6 +15,23 @@
  */
 
 const REQUIRED_FIELDS = ['ad', 'soyad', 'sirket', 'telefon', 'eposta', 'tuketim', 'sektor'];
+const TARIFELER = ['og-sanayi', 'ag-sanayi', 'og-ticarethane', 'ag-ticarethane', 'mesken', 'tarimsal', 'bilmiyorum'];
+// Fatura ekleri: KV'de `fatura:<lead anahtarı>:<sıra>` (ikili, metadata: ad/tür/boyut). Kişisel veri: loglara yazılmaz.
+const FATURA_TURLER = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const FATURA_EN_FAZLA = 3;
+const FATURA_BOYUT = 8 * 1024 * 1024;
+
+/** base64 → Uint8Array; geçersizse null. */
+function b64Bayt(s) {
+  try {
+    const bin = atob(String(s || ''));
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  } catch (e) {
+    return null;
+  }
+}
 const MAX_LEN = 1000;
 
 function json(body, status = 200) {
@@ -66,6 +83,8 @@ function buildLeadEmail(lead, kvKey) {
     ['E-posta', lead.eposta],
     ['Aylık Tüketim', lead.tuketim],
     ['Sektör', lead.sektor],
+    ['Tarife', lead.tarife || '—'],
+    ['Fatura eki', lead.faturalar && lead.faturalar.length ? `${lead.faturalar.length} dosya (Voltan OS pipeline'da)` : '—'],
     ['Not', lead.mesaj || '—'],
     ['Dil', lead.lang === 'en' ? 'İngilizce' : 'Türkçe'],
     ['Kaynak/UTM', utmStr],
@@ -157,6 +176,17 @@ export async function onRequestPost(context) {
   for (const f of REQUIRED_FIELDS) {
     if (!clean(body[f])) return json({ ok: false, error: 'missing_field', field: f }, 400);
   }
+  // Fatura ekleri (opsiyonel): sayı, tür ve boyut sunucuda yeniden denetlenir
+  const gelenFaturalar = Array.isArray(body.faturalar) ? body.faturalar : [];
+  if (gelenFaturalar.length > FATURA_EN_FAZLA) return json({ ok: false, error: 'too_many_files' }, 400);
+  const faturaBaytlari = [];
+  for (const f of gelenFaturalar) {
+    const tur = clean(f && f.tur, 60);
+    const bayt = b64Bayt(f && f.veri);
+    if (!FATURA_TURLER.includes(tur) || !bayt || bayt.length === 0) return json({ ok: false, error: 'invalid_file' }, 400);
+    if (bayt.length > FATURA_BOYUT) return json({ ok: false, error: 'file_too_large' }, 400);
+    faturaBaytlari.push({ ad: clean(f.ad, 120) || 'fatura', tur, bayt });
+  }
   if (body.kvkk !== true) {
     return json({ ok: false, error: 'kvkk_required' }, 400);
   }
@@ -180,6 +210,8 @@ export async function onRequestPost(context) {
     eposta: clean(body.eposta, 254),
     tuketim: clean(body.tuketim, 40),
     sektor: clean(body.sektor, 60),
+    tarife: TARIFELER.includes(clean(body.tarife, 40)) ? clean(body.tarife, 40) : '',
+    faturalar: [],
     mesaj: clean(body.mesaj, 2000),
     kvkk: true,
     lang: body.lang === 'en' ? 'en' : 'tr',
@@ -196,6 +228,13 @@ export async function onRequestPost(context) {
   if (env.LEADS) {
     try {
       const key = `lead:${Date.now()}:${crypto.randomUUID().slice(0, 8)}`;
+      // Önce ekler, sonra talep: talep kaydı görüldüğünde ekleri hazır olsun
+      for (let i = 0; i < faturaBaytlari.length; i++) {
+        const f = faturaBaytlari[i];
+        const fKey = `fatura:${key}:${i}`;
+        await env.LEADS.put(fKey, f.bayt, { metadata: { ad: f.ad, tur: f.tur, boyut: f.bayt.length } });
+        lead.faturalar.push({ anahtar: fKey, ad: f.ad, tur: f.tur, boyut: f.bayt.length });
+      }
       await env.LEADS.put(key, JSON.stringify(lead));
       stored = true;
       kvKey = key;

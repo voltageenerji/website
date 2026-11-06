@@ -618,6 +618,7 @@ section {
   min-height: 80px;
   line-height: 1.5;
 }
+.form-hint { display: block; margin-top: 4px; font-size: 12px; color: var(--muted, #6b7280); }
 .form-select {
   appearance: none;
   -webkit-appearance: none;
@@ -1587,6 +1588,27 @@ body.menu-open { overflow: hidden; }
           </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="lead-tarife" data-tr="Tarife / Abone Grubu" data-en="Tariff / Subscriber Group">Tarife / Abone Grubu</label>
+            <select class="form-select" id="lead-tarife" name="tarife" required>
+              <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
+              <option value="og-sanayi" data-tr="Sanayi · OG" data-en="Industry · MV">Sanayi · OG</option>
+              <option value="ag-sanayi" data-tr="Sanayi · AG" data-en="Industry · LV">Sanayi · AG</option>
+              <option value="og-ticarethane" data-tr="Ticarethane · OG" data-en="Commercial · MV">Ticarethane · OG</option>
+              <option value="ag-ticarethane" data-tr="Ticarethane · AG" data-en="Commercial · LV">Ticarethane · AG</option>
+              <option value="mesken" data-tr="Mesken" data-en="Residential">Mesken</option>
+              <option value="tarimsal" data-tr="Tarımsal Faaliyet" data-en="Agricultural">Tarımsal Faaliyet</option>
+              <option value="bilmiyorum" data-tr="Bilmiyorum" data-en="Not sure">Bilmiyorum</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lead-fatura" data-tr="Son faturanız (opsiyonel)" data-en="Latest invoice (optional)">Son faturanız (opsiyonel)</label>
+            <input type="file" class="form-input" id="lead-fatura" name="fatura" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic" multiple>
+            <small class="form-hint" data-tr="PDF ya da fotoğraf · en fazla 3 dosya, her biri 8 MB" data-en="PDF or photo · up to 3 files, 8 MB each">PDF ya da fotoğraf · en fazla 3 dosya, her biri 8 MB</small>
+          </div>
+        </div>
+
         <div class="form-group">
           <label class="form-label" for="lead-mesaj" data-tr="Notunuz (opsiyonel)" data-en="Your Note (optional)">Notunuz (opsiyonel)</label>
           <textarea class="form-textarea" id="lead-mesaj" name="mesaj" data-tr-placeholder="Mevcut sözleşme detayları, ihtiyaçlar..." data-en-placeholder="Current contract details, requirements..." placeholder="Mevcut sözleşme detayları, ihtiyaçlar..."></textarea>
@@ -2082,12 +2104,39 @@ async function fetchPtfLive(){
     } catch(e) {}
     return utm;
   }
+  const FATURA_TURLER = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+  function faturalariOku(input){
+    const dosyalar = Array.from((input && input.files) || []);
+    const t = L();
+    if(dosyalar.length > 3) return Promise.reject(new Error(t === 'en' ? 'Up to 3 invoice files.' : 'En fazla 3 fatura dosyası yükleyebilirsiniz.'));
+    for(const f of dosyalar){
+      if(f.size > 8 * 1024 * 1024) return Promise.reject(new Error(t === 'en' ? 'Each file must be 8 MB or smaller.' : 'Her dosya en fazla 8 MB olabilir.'));
+      if(FATURA_TURLER.indexOf(f.type) < 0) return Promise.reject(new Error(t === 'en' ? 'Please upload PDF, JPG or PNG.' : 'Lütfen PDF, JPG ya da PNG yükleyin.'));
+    }
+    return Promise.all(dosyalar.map(function(f){
+      return new Promise(function(ok, hata){
+        const r = new FileReader();
+        r.onload = function(){ ok({ ad: f.name.slice(0, 120), tur: f.type, veri: String(r.result).split(',')[1] || '' }); };
+        r.onerror = function(){ hata(new Error(t === 'en' ? 'File could not be read.' : 'Dosya okunamadı.')); };
+        r.readAsDataURL(f);
+      });
+    }));
+  }
   form.addEventListener('submit', async function(e){
     e.preventDefault();
     if(btn) btn.disabled = true;
     if(btnLabel) btnLabel.textContent = TXT.busy[L()];
     if(status){ status.className = 'form-status'; status.textContent = ''; }
     const fd = new FormData(form);
+    // Fatura dosyaları: en fazla 3, her biri 8 MB; base64 olarak gönderilir (sunucu tür ve boyutu yeniden denetler)
+    let faturalar = [];
+    try { faturalar = await faturalariOku(form.querySelector('#lead-fatura')); }
+    catch(errF) {
+      if(status){ status.className = 'form-status error'; status.textContent = errF.message; }
+      if(btn) btn.disabled = false;
+      if(btnLabel) btnLabel.textContent = TXT.btn[L()];
+      return;
+    }
     const payload = {
       ad: fd.get('ad') || '',
       soyad: fd.get('soyad') || '',
@@ -2096,6 +2145,8 @@ async function fetchPtfLive(){
       eposta: fd.get('eposta') || '',
       tuketim: fd.get('tuketim') || '',
       sektor: fd.get('sektor') || '',
+      tarife: fd.get('tarife') || '',
+      faturalar: faturalar,
       mesaj: fd.get('mesaj') || '',
       kvkk: fd.get('kvkk') === 'on',
       website: fd.get('website') || '',
