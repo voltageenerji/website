@@ -38,7 +38,7 @@ setini gösterir.
   taşıyor: `[EPDK-LISANS-NO]`, `[MERSIS-NO]`, `[TICARET-SICIL-NO]`. Bu
   yer tutucular canlıya bu hâlde çıkmamalı (webmaster/Teknoloji hattına not).
 - **Adres (site):** Acıbadem Mah. Elysium Elit Koşuyolu B-18, Kadıköy,
-  İstanbul 34660. E-posta: info@voltage.com.tr. (Bu kayıtta geçen telefon numarası şirkete ait DEĞİL — sahip teyidi 2026-08-23; hiçbir kanalda kullanılmaz.)
+  İstanbul 34718. E-posta: info@voltage.com.tr. (Bu kayıtta geçen telefon numarası şirkete ait DEĞİL — sahip teyidi 2026-08-23; hiçbir kanalda kullanılmaz.)
 - **İç tutarsızlık:** Depo talimat dosyası (CLAUDE.md) tüzel kişiyi
   "Voltan Elektrik Toptan Satış A.Ş." (İthalat/İhracat'sız) yazıyor; site ise
   tam ünvanı kullanıyor. Hangisinin sicildeki güncel ünvan olduğu
