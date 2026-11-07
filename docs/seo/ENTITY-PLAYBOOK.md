@@ -37,7 +37,7 @@ setini gösterir.
 - **Footer** tam ünvanı doğru yazıyor; lisans satırı MUST-FILL yer tutucuları
   taşıyor: `[EPDK-LISANS-NO]`, `[MERSIS-NO]`, `[TICARET-SICIL-NO]`. Bu
   yer tutucular canlıya bu hâlde çıkmamalı (webmaster/Teknoloji hattına not).
-- **Adres (site):** Acıbadem Mah. Elysium Elit Koşuyolu B-18, Kadıköy,
+- **Adres (site):** Acıbadem Mah. Nakkaş Sk. No:9/1 İç Kapı No:10, Kadıköy,
   İstanbul 34718. E-posta: info@voltage.com.tr. (Bu kayıtta geçen telefon numarası şirkete ait DEĞİL — sahip teyidi 2026-08-23; hiçbir kanalda kullanılmaz.)
 - **İç tutarsızlık:** Depo talimat dosyası (CLAUDE.md) tüzel kişiyi
   "Voltan Elektrik Toptan Satış A.Ş." (İthalat/İhracat'sız) yazıyor; site ise

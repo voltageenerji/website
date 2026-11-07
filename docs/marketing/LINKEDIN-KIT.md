@@ -71,7 +71,7 @@
 | Telefon/E-posta (varsa alan) | info@voltage.com.tr |
 | Kuruluş yılı | 2011 |
 | Şirket türü | Anonim Şirket (özel) |
-| Merkez / Konum | Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34718 Kadıköy, İstanbul, Türkiye |
+| Merkez / Konum | Acıbadem Mah. Nakkaş Sk. No:9/1 İç Kapı No:10, 34718 Kadıköy, İstanbul, Türkiye |
 | Ticaret Sicil (hakkında/künye içinde) | 786882-0 · İstanbul |
 | EPDK Lisansı (hakkında/künye içinde) | ETS/3424-8/2074 |
 

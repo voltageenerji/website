@@ -10,7 +10,7 @@ fiziken klasöre girince işaretlenir; "var olduğu biliniyor" işaretlenmez.
 **Referans künye (siteden doğrulanmış):** EPDK Tedarik Lisansı
 ETS/3424-8/2074 · Veriliş 19.09.2011, Kurul Kararı 3424-8 · Geçerlilik 2031
 (+20 yıl yenileme opsiyonu 2051+) · Ticaret Sicil 786882-0 İstanbul ·
-Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34718 Kadıköy · İstanbul.
+Acıbadem Mah. Nakkaş Sk. No:9/1 İç Kapı No:10, 34718 Kadıköy · İstanbul.
 
 ---
 
