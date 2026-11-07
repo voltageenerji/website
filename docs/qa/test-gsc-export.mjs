@@ -214,6 +214,24 @@ for (const host of ['https://ornek.example', 'https://iamcredentials.googleapis.
 }
 rmSync(bin, { recursive: true, force: true });
 
+// 5) Otomatik yol: hazır belirteç (GSC_ACCESS_TOKEN) ve yalnızca gizli seo-veri reposunda CI
+const ciPub = await runTool({ GSC_ACCESS_TOKEN: 'sahte-belirtec', GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: 'voltageenerji/website' }, []);
+ok('CI: herkese açık site reposunda reddediliyor', ciPub.code === 1 && ciPub.err.includes('herkese açık'));
+const ciOther = await runTool({ GSC_ACCESS_TOKEN: 'sahte-belirtec', GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: 'baskasi/seo-veri' }, []);
+ok('CI: başka hesabın aynı adlı reposunda reddediliyor', ciOther.code === 1 && ciOther.err.includes('herkese açık'));
+seen.auth = true; seen.inspected = 0;
+const dir6 = mkdtempSync(join(tmpdir(), 'gsc-test-'));
+const ciOk = await runTool({ GSC_ACCESS_TOKEN: 'sahte-belirtec', GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: 'voltageenerji/seo-veri',
+  GSC_SA_KEY_B64: Buffer.from('kullanilmamali').toString('base64'), GSC_IMPERSONATE: 'kullanilmamali' }, ['--out', dir6, '--inspect', '--quiet']);
+ok('CI seo-veri: hazır belirteçle çalışıyor (diğer yolların önüne geçer)', ciOk.code === 0 && seen.auth && existsSync(join(dir6, 'OZET.md')) && existsSync(join(dir6, 'url_inspection.csv')), ciOk.err);
+ok('CI seo-veri: belirteç çıktıda yok', !ciOk.out.includes('sahte-belirtec') && !ciOk.err.includes('sahte-belirtec'));
+ok('--quiet: sorgu ve URL ekrana basılmıyor', !ciOk.out.includes('serbest') && !ciOk.out.includes('/rehber/') && ciOk.out.includes('URL denetimi'));
+rmSync(dir6, { recursive: true, force: true });
+for (const bad of ['', 'satir\nsonu', 'bosluk var']) {
+  const rB = await runTool({ GSC_ACCESS_TOKEN: bad }, []);
+  ok(`GSC_ACCESS_TOKEN bozuk biçim reddediliyor ${JSON.stringify(bad)}`, rB.code === 1 && rB.err.includes('GSC_ACCESS_TOKEN') && (bad === '' || !rB.err.includes(bad)));
+}
+
 server.close();
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -18,8 +18,14 @@
  *                    Kişinin servis hesabında "Service Account Token Creator" rolü olmalı.
  *                    Tanımlıysa anahtar değişkenlerinin önüne geçer.
  *
- * Kurallar (CLAUDE.md 5 ve 6): anahtar hiçbir zaman ekrana veya dosyaya yazılmaz; çıktı
- * repoya girmez; repo herkese açık olduğu için GitHub Actions içinde çalışmayı reddeder.
+ * Otomatik yol (haftalık, gizli voltageenerji/seo-veri reposu):
+ *   GSC_ACCESS_TOKEN hazır, salt okunur erişim belirteci. seo-veri iş akışı bunu GitHub OIDC ve
+ *                    Workload Identity Federation ile anahtarsız alır. Diğer kimlik yollarının önüne geçer.
+ *   --quiet          sorgu ve URL'leri ekrana basmaz (CI günlüğü için)
+ *
+ * Kurallar (CLAUDE.md 5 ve 6): anahtar ve belirteç hiçbir zaman ekrana veya dosyaya yazılmaz;
+ * çıktı site reposuna girmez. GitHub Actions içinde yalnızca gizli seo-veri reposunda çalışır;
+ * site reposu herkese açık olduğu için orada reddeder.
  * Bağımlılık yok: Node 18+ (fetch, crypto).
  */
 import { createSign } from 'node:crypto';
@@ -48,10 +54,12 @@ const LAG_DAYS = 3; // Search Console verisi 2–3 gün geriden gelir
 const args = process.argv.slice(2);
 const OUT = resolve(args.includes('--out') ? args[args.indexOf('--out') + 1] : join(REPO, 'gsc-data'));
 const INSPECT = args.includes('--inspect');
+const QUIET = args.includes('--quiet');
+const CI_REPO = 'voltageenerji/seo-veri';   // gizli veri reposu; site reposu herkese açık
 
 function fail(msg, code = 1) { console.error('HATA: ' + msg); process.exit(code); }
 
-if (process.env.GITHUB_ACTIONS === 'true') {
+if (process.env.GITHUB_ACTIONS === 'true' && process.env.GITHUB_REPOSITORY !== CI_REPO) {
   fail('Repo herkese açık: Search Console verisi CI günlüğüne veya artefaktına konmaz. Aracı Claude oturumunda çalıştırın.');
 }
 
@@ -219,7 +227,12 @@ function summary(w, t, tp, q, qPrev, pages, band) {
 async function main() {
   let token;
   const imp = (process.env.GSC_IMPERSONATE || '').trim();
-  if (imp) {
+  const ready = (process.env.GSC_ACCESS_TOKEN || '').trim();
+  if (process.env.GSC_ACCESS_TOKEN !== undefined) {
+    if (!TOKEN_RX.test(ready)) fail('GSC_ACCESS_TOKEN boş veya biçimi bozuk (tek satır, boşluksuz olmalı).');
+    process.env.__GSC_EMAIL = 'hazır belirteç (GSC_ACCESS_TOKEN)';
+    token = ready;
+  } else if (imp) {
     if (!/^[a-z0-9][a-z0-9-]{0,62}@[a-z0-9-]+(\.[a-z0-9-]+)*\.gserviceaccount\.com$/.test(imp)) fail('GSC_IMPERSONATE bir servis hesabı e-postası olmalı (ör. gsc-okuyucu@<proje>.iam.gserviceaccount.com).');
     process.env.__GSC_EMAIL = imp;
     token = await impersonatedToken(imp);
@@ -285,12 +298,12 @@ async function main() {
     files++;
   }
 
-  console.log(md);
-  console.log(`Dosyalar: ${OUT}/ (${files} dosya). Bu klasör git'e girmez; repoya kopyalamayın.`);
+  if (!QUIET) console.log(md);
+  console.log(`Dosyalar: ${OUT}/ (${files} dosya).` + (QUIET ? '' : " Bu klasör git'e girmez; site reposuna kopyalamayın."));
   if (inspections) {
     const notIndexed = inspections.filter((i) => i.verdict !== 'PASS');
     console.log(`URL denetimi: ${inspections.length} URL, ${notIndexed.length} tanesi dizinde değil, sorunlu veya denetlenemedi.`);
-    for (const i of notIndexed) console.log(`  ${i.url}  ${i.verdict}  ${i.coverageState || ''}`);
+    if (!QUIET) for (const i of notIndexed) console.log(`  ${i.url}  ${i.verdict}  ${i.coverageState || ''}`);
   }
 }
 
