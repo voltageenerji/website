@@ -13,59 +13,71 @@ jobs:
   read:
     runs-on: ubuntu-latest
     steps:
-      - name: Paylasim (fxtwitter)
+      - name: Makale gorselleri (OCR)
         run: |
-          curl -sS -m 25 -A 'Mozilla/5.0' "https://api.fxtwitter.com/vengeonsp/status/2118661285868863578" -o t.json || true
-          echo "boyut: $(wc -c < t.json) bayt"
-          jq -r '"KOD: \(.code)",
-                 "YAZAR: \(.tweet.author.name) (@\(.tweet.author.screen_name))  TARIH: \(.tweet.created_at)",
-                 "BEGENI: \(.tweet.likes)  RT: \(.tweet.retweets)  YANIT: \(.tweet.replies)  GORUNTULENME: \(.tweet.views)  YER_IMI: \(.tweet.bookmarks)",
-                 "YANITLANAN: \(.tweet.replying_to // "-")",
-                 "TWEET METNI:", (.tweet.text // "-")' t.json || head -c 3000 t.json
-          echo "----- ALINTI -----"
-          jq '.tweet.quote | if . then {author: .author.screen_name, name: .author.name, date: .created_at, text: .text,
-               likes: .likes, views: .views, media: [.media.all[]? | {type, url, altText}],
-               article_title: .article.title, article_preview: .article.preview_text} else "yok" end' t.json || true
-          echo "----- MEDYA -----"
-          jq '[.tweet.media.all[]? | {type, url, altText, width, height}]' t.json || true
-          echo "----- MAKALE -----"
-          jq -r '.tweet.article | if . then "BASLIK: \(.title // "-")\nOZET: \(.preview_text // "-")\nANAHTARLAR: \(keys | join(","))" else "makale yok" end' t.json || true
-          jq -r '.tweet.article.content.blocks[]? | (if (.type|test("^header")) then "\n## " + .text elif (.type|test("list-item")) then "- " + .text elif .type == "atomic" then "[gorsel/ek]" else .text end)' t.json | sed '/^$/N;/^\n$/D' || true
-          echo "----- ALINTI MAKALESI -----"
-          jq -r '.tweet.quote.article.content.blocks[]? | (if (.type|test("^header")) then "\n## " + .text elif (.type|test("list-item")) then "- " + .text elif .type == "atomic" then "[gorsel/ek]" else .text end)' t.json | sed '/^$/N;/^\n$/D' || true
-          jq -r '.tweet.raw_text.facets[]? | select(.type=="url") | .replacement // .original' t.json 2>/dev/null > links.txt || true
-          jq -r '.. | strings | select(test("^https?://"))' t.json | grep -v -E 'twimg\.com|//x\.com/|//(www\.)?twitter\.com/|fxtwitter|t\.co/' | sort -u >> links.txt || true
-          sort -u links.txt -o links.txt; echo "----- LINKLER -----"; cat links.txt
+          sudo apt-get -qq update >/dev/null && sudo apt-get -qq install -y tesseract-ocr >/dev/null
+          curl -sS -m 25 -A 'Mozilla/5.0' "https://api.fxtwitter.com/vengeonsp/status/2118661285868863578" -o t.json
+          python3 - <<'PY' > items.tsv
+          import json, re
+          d = json.load(open('t.json'))
+          a = d['tweet']['article']
+          em = a['content'].get('entityMap', {})
+          if isinstance(em, list):
+              em = {str(e.get('key')): e.get('value', e) for e in em}
+          def walk(o, f):
+              if isinstance(o, dict):
+                  for k, v in o.items():
+                      f(k, v); walk(v, f)
+              elif isinstance(o, list):
+                  for v in o: walk(v, f)
+          url_of = {}
+          for m in a.get('media_entities', []) or []:
+              urls, ids = [], []
+              walk(m, lambda k, v: urls.append(v) if isinstance(v, str) and 'pbs.twimg.com' in v else None)
+              walk(m, lambda k, v: ids.append(str(v)) if re.search(r'(^|_)id$|media_?id|media_key', k, re.I) and isinstance(v, (str, int)) else None)
+              for i in ids:
+                  if urls: url_of[i] = urls[0]
+          section = 'Giris'
+          for b in a['content']['blocks']:
+              if b.get('type', '').startswith('header'):
+                  section = b['text']
+              if b.get('type') != 'atomic':
+                  continue
+              for r in b.get('entityRanges', []):
+                  e = em.get(str(r.get('key')), {})
+                  found = []
+                  walk(e, lambda k, v: found.append((k, str(v))) if isinstance(v, (str, int)) and k not in ('mutability',) else None)
+                  mids = [v for k, v in found if re.search(r'media_?id', k, re.I)]
+                  u = next((url_of[m] for m in mids if m in url_of), '')
+                  extra = ' '.join(f'{k}={v}' for k, v in found if k not in ('localMediaId', 'mediaCategory') and not re.search(r'media_?id', k, re.I))[:300]
+                  print(f"{section}\t{e.get('type', '?')}\t{u}\t{extra}")
+          PY
+          echo "atomik oge sayisi: $(wc -l < items.tsv)"
+          n=0
+          while IFS=$'\t' read -r sec typ url extra; do
+            n=$((n+1))
+            echo "=================== [$n] BOLUM: $sec | TUR: $typ | $extra"
+            [ -n "$url" ] || continue
+            curl -sS -m 25 -o img "$url" || continue
+            tesseract img - 2>/dev/null | sed '/^\s*$/d' | head -c 3500
+          done < items.tsv
 
-      - name: Yedek kaynak (vxtwitter)
+      - name: ChatSEO fiyat ve gizlilik sayfalari
         run: |
-          curl -sS -m 25 -A 'Mozilla/5.0' "https://api.vxtwitter.com/vengeonsp/status/2118661285868863578" -o v.json || true
-          jq '{user_name, user_screen_name, date, text, likes, retweets, replies, mediaURLs, qrtURL, article: (.article // null | if . then {title, preview_text} else null end)}' v.json || head -c 2000 v.json
-
-      - name: Linklenen sayfalar
-        run: |
-          [ -s links.txt ] || { echo "link yok"; exit 0; }
+          curl -sSL -m 25 -A 'Mozilla/5.0' -o home.html https://chatseo.app/
+          grep -oE 'href="[^"]+"' home.html | sed -E 's/href="([^"]+)"/\1/' | grep -iE 'pric|tarif|privacy|confidential|legal|terms|cgu|cgv|mention|about|dpa|gdpr|rgpd' | sed -E 's#^/#https://chatseo.app/#' | sort -u | head -12 > cl.txt
+          cat cl.txt
           while read -r u; do
             echo "=================== $u"
-            curl -sSL -m 25 -A 'Mozilla/5.0' -o page.html -w 'HTTP %{http_code} -> %{url_effective}\n' "$u" || continue
+            curl -sSL -m 25 -A 'Mozilla/5.0' -o p.html -w 'HTTP %{http_code} -> %{url_effective}\n' "$u" || continue
             python3 - <<'PY'
           import re, html
-          s = open('page.html', encoding='utf-8', errors='ignore').read()
-          def g(p):
-              m = re.search(p, s, re.S | re.I)
-              return m.group(1).strip() if m else ''
-          print('TITLE:', html.unescape(g(r'<title[^>]*>(.*?)</title>'))[:200])
-          print('DESC :', html.unescape(g(r'<meta[^>]+(?:name|property)="(?:og:)?description"[^>]+content="([^"]*)"'))[:400])
+          s = open('p.html', encoding='utf-8', errors='ignore').read()
           t = re.sub(r'<script.*?</script>|<style.*?</style>', ' ', s, flags=re.S | re.I)
           t = html.unescape(re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', t)))
           print('TEXT :', t[:3000])
+          for kw in ['€', '$', 'host', 'server', 'Search Console', 'subprocessor', 'sous-traitant', 'OpenAI', 'Anthropic', 'transfer', 'Turkish', 'Türkçe']:
+              for m in list(re.finditer(re.escape(kw), t))[:2]:
+                  print(f'  [{kw}] ...{t[max(0, m.start()-150):m.end()+150]}...')
           PY
-            if echo "$u" | grep -qE 'github\.com/[^/]+/[^/]+'; then
-              repo=$(echo "$u" | sed -E 's#https?://(www\.)?github\.com/([^/]+/[^/?#]+).*#\2#; s#\.git$##')
-              echo "--- REPO META ($repo)"
-              curl -sS -m 25 "https://api.github.com/repos/$repo" | jq '{full_name, description, stargazers_count, forks_count, open_issues_count, license: .license.spdx_id, created_at, pushed_at, archived, language, homepage}' || true
-              echo "--- README ($repo)"
-              curl -sSL -m 25 "https://raw.githubusercontent.com/$repo/HEAD/README.md" | head -c 8000 || true
-              echo
-            fi
-          done < links.txt
+          done < cl.txt
