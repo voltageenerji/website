@@ -47,7 +47,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | **Marka: vekile sorulacak 4 soru** (sınıf içerikleri 2026-08-23 teyit edildi) | Sahip → marka vekili | Tescil bizde ve geçerli. **Kapsanan:** Sınıf 39 içinde "Elektrik dağıtım hizmetleri", Sınıf 40 içinde "Enerji üretimi hizmetleri". **Kapsanmayan:** Sınıf 35 (satış/ticaret hizmetleri — asıl faaliyetimiz "toptan satış") ve Sınıf 4 (mal olarak elektrik enerjisi). SORULAR: (1) EPDK mevzuatında "dağıtım" şebeke işletmeciliği, bizim işimiz "tedarik/satış" — 39/40 tescili fiilî faaliyetimizi koruyor mu, 35 ve/veya 4 için ek başvuru gerekir mi? (2) Tescilli olduğumuz sınıflarda (şebeke dağıtımı, enerji üretimi) fiilen faaliyet göstermiyoruz — **SMK m.9 kullanmama nedeniyle iptal** riski var mı? (3) Kayıtta vekil yok; TÜRKPATENT tebligat adresi güncel mi (yanlış Bağcılar adresi riski)? (4) Tescilli logo eski yeşil-mavi tasarım; mevcut görsel kimlik için ayrı başvuru gerekir mi? |
 | **Portal için 4 girdi** (faturalama sistemi/API, ödeme sağlayıcısı tercihi, firma başına kullanıcı sayısı, fatura dışı içerik) | Sahip | Portal Aşama 1 (veri modeli) bu girdiler gelmeden başlamaz. Ayrıntı: `docs/PORTAL-MIMARISI.md` §6. |
 | **elektrikpaketleri.com — Bağcılar adresi** (tek kalan canlı yanlış kaynak) | Sahip/eklenti | encazip ve puan5 KAPALI (06.09 teyit) — onlar için yapılacak iş YOK, hayalet kendiliğinden söner. elektrikpaketleri DNS'te yaşıyor ama sahibe/sandbox'a açılmıyor (Cloudflare bot koruması olası). Yol: (a) eklenti farklı tarayıcı/ağdan deneyip "düzeltme/iletişim" bulur; (b) bulamazsa doğru NAP sinyalleriyle gölgede bırakılır: GBP, Facebook, Crunchbase VERIFY — üçü de sahipte bekliyor. |
-| **Search Console API servis hesabı** (`GSC_SA_KEY_B64`) | Sahip | Claude oturumlarının GSC verisini kendisi çekmesi (`tools/gsc-export.mjs`). Kurulum: `docs/seo/GSC-API-KURULUM.md` (Cloud projesi, servis hesabı, GSC'de Kısıtlı kullanıcı, ortam değişkeni). O zamana kadar yedek yol: `docs/seo/GSC-EXPORT-PROMPT.md`. |
+| ~~Search Console API servis hesabı~~ **KAPANDI 2026-11-07** | — | Anahtar oluşturma kuruluş politikasıyla kapalı; politika açık bırakıldı. Bunun yerine anahtarsız yol kuruldu ve ilk veri çekildi (bkz. §3.08 ve §4). Tek kalan girdi: veri çekilecek her oturumda sahibin bir kez Google girişi yapması (telefondan yaklaşık 1 dakika). |
 | Hukuki metin onayları + F1-F6 teyitleri (ana paket) | Avukat | TASLAK şerhlerinin kalkması; rehberdeki RG ihtiyat notu; varlık yayılımı (adres/unvan teyidi) |
 | **KVKK aydınlatma metni: avukat paketine eklenen 4 madde** (Hukuk incelemesi 2026-11-04) | Avukat → Hukuk ajanı | (1) `kvkk.html` notu metni hâlâ "taslak" diyor, oysa form bu metne atıf yapıyor: avukat onayıyla not kaldırılmalı. (2) §5'te Resend Inc. (ABD) veri işleyen ve bulut barındırma alıcı olarak adlandırılmamış; KVKK m.9 (7499 s. Kanun, yürürlük 01.06.2024) yurt dışı aktarım: standart sözözleşme + 5 iş günü içinde Kurul'a bildirim. Önce automation-engineer işleyen listesini ve sözleşme durumunu çıkarır. (3) Sayfa kaynağındaki iç inceleme yorumları (satır 2–7, 71–75) herkese görünüyor: risk kaydına taşınmalı. (4) Formdaki tek kutu "okudum" ile "onay veriyorum"u birleştiriyor; aydınlatma ve açık rıza ayrı adımlar olmalı (teklif talebi için m.5/2-c yeterli). Ayrıca: VERBİS/MERSİS/EPDK kayıtlarında eski numara varsa düzeltilmeli. |
 | EK-1 (ticari ileti/İYS) cevapları | Avukat | Satış motoru aktivasyonu (motor zaten PASİF — acele yok) |
@@ -122,6 +122,19 @@ tekrarlayabilir; "kaynak canlı mı?" kontrolü her görünürlük testinin par�
   turda GÖRÜLMEDİ (tek tur, kesin değil). Alıntılanan tüm kaynaklar canlı (ölü kaynak kontrolü uygulandı).
 - Konu sorgularında (tedarikçi değiştirme, serbest tüketici) bu motorda hâlâ yokuz; gerçek sıralama GSC'de.
 
+## 3.08 GSC API İLK OKUMA (2026-11-07, resmî API, `tools/gsc-export.mjs --inspect`)
+- **Dönem 2026-10-08 – 2026-11-04** (önceki: 2026-09-10 – 2026-10-07), veri durumu final.
+  - Tıklama 46 (önceki 14), gösterim 1.796 (651), CTR %2,6 (%2,2), ortalama pozisyon 6,8 (11,1), sorgu 80 (54).
+  - Gösterimin %95'i Türkiye'den; masaüstü ve mobil yakın (929 / 856 gösterim).
+- **URL denetimi:** site haritasındaki 21 URL'nin 20'si dizinde. `/kurumsal` "Keşfedildi - şu anda dizine eklenmiş değil".
+- **3–10. sıra, CTR < %2:** 40 sorgu, 340 gösterim.
+  - En büyükleri: `ptf` (60 gösterim, poz. 6,5), `ptf nedir` (43; 8,3), serbest tüketici limiti 2026 varyantları (toplam 68; 9,3–9,8), `smf nedir` (21; 7,3).
+  - `/rehber/serbest-tuketici` 310 gösterimde 2 tık (CTR %0,6).
+- **Marka (volt\*):** 134 gösterim / 7 tık (önceki 133 / 2).
+  - `voltan` 42 gösterim, poz. 4,0, 0 tık: yasal unvan aramasında ilk 3'te değiliz.
+  - Marka sorgularının bir kısmı `/kvkk` ve `/kullanim-kosullari` sayfalarına düşüyor.
+- Ham veri `gsc-data/` (git dışı). Analiz ve aksiyon planı: seo-search-console (GD-SEO-02 güncellemesi).
+
 ## 3.1 OLAY KAYDI
 
 | Olay | Tarih | Durum |
@@ -141,6 +154,7 @@ tekrarlayabilir; "kaynak canlı mı?" kontrolü her görünürlük testinin par�
 | Marka tescili DOĞRULANDI: "voltage enerji" 2011/70573 | 2026-08-23 | TÜRKPATENT kaydı: başvuru 06.09.2011, tescil 23.11.2012, sahibi Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (5318978), Nice 39/40, hizmet markası. Koruma dönemi 06.09.2021'de yenilendi. **Sonraki yenileme: 06.09.2031** (6 ay önce başlanmalı). Numara sitede, schema'da ve llms.txt'te yayında. |
 | Sırlar sohbete/repoya ASLA yapıştırılmaz | 2026-08-26 | `ADMIN_SESSION_SECRET`, `ADMIN_PASS_HASH`, `REPORT_TOKEN`, API anahtarları yalnız Cloudflare/GitHub'ın şifreli alanlarına girilir. Oturum anahtarını bilen kişi PAROLASIZ geçerli çerez imzalayabilir. Yanlışlıkla paylaşılan her değer derhal yeniden üretilir. Orchestrator bu değerleri görmeye ihtiyaç duymaz; doğrulama için "giriş çalıştı mı" bilgisi yeterlidir. |
 | Kesin kurallar CLAUDE.md'de; dosya bazlı kurallar ve koruma kancaları | 2026-11-04 | `CLAUDE.md` başındaki 11 kural, bu tarihten sonra açılan her oturumda yüklenir ve ajan tanımlarının önüne geçer. `.claude/rules/` içindeki kurallar ilgili dosyaya dokunulunca yüklenir. `.claude/hooks/guard.py`: şifre biçimindeki değerleri engeller, `index.html` değişikliğinde sahibin onayını sorar (test: `python3 -I docs/qa/test-guard.py`). Kanca güvenlik ağıdır; kabukla yapılan her yazmayı yakalayamaz. |
+| Search Console erişimi anahtarsız (servis hesabı adına kısa ömürlü belirteç) | 2026-11-07 | `iam.disableServiceAccountKeyCreation` kuruluş politikası AÇIK kalır; servis hesabı anahtarı oluşturulmaz. Sahip oturumda `gcloud auth login --no-launch-browser` ile giriş yapar; sohbete yalnızca PKCE'li tek kullanımlık kod yapıştırılır, şifre ya da anahtar asla yapıştırılmaz. Projenin bulunduğu **@voltan.com.tr** hesabı seçilir; kişisel gmail hesabının projeye erişimi yoktur. Araç: `GSC_IMPERSONATE=… node tools/gsc-export.mjs` (1 saatlik, `webmasters.readonly`). İş bitince `gcloud auth revoke --all`. Bulut oturumunda `CLOUDSDK_AUTH_ACCESS_TOKEN` yer tutucusu gcloud girişini ezer: elle komutlarda `env -u CLOUDSDK_AUTH_ACCESS_TOKEN`. |
 | voltan.com.tr AYRI SİTE DEĞİL, takma ad (alias) | 2026-08-09 | Tek kanonik alan: voltage.com.tr. voltan.* türevleri yalnızca 301 ile yönlenir; ayrı içerik/canonical/sitemap asla kurulmaz. |
 
 ## 5. Erişim haritası (kimlik bilgisi İÇERMEZ)
@@ -153,5 +167,5 @@ tekrarlayabilir; "kaynak canlı mı?" kontrolü her görünürlük testinin par�
 | Zapier "Voltage Enerji - RSS to LinkedIn" | zapier.com | Sahip |
 | LinkedIn sayfası (ID 10004014) | linkedin.com/company/voltage-enerji | Sahip |
 | GSC/Bing mülkleri | Google/Bing hesapları | Sahip |
-| GSC API servis hesabı (`gsc-okuyucu`, salt okunur) | Google Cloud projesi + bulut ortamı değişkeni `GSC_SA_KEY_B64` | Sahip |
+| GSC API servis hesabı (`gsc-okuyucu@voltage-search-console.iam.gserviceaccount.com`, projede rolü yok, GSC'de Kısıtlı) | Google Cloud projesi `voltage-search-console` (kuruluş voltan.com.tr). **Anahtarı yok.** Erişim: sahibin @voltan.com.tr hesabının yalnızca bu servis hesabı üzerindeki Service Account Token Creator rolü + projede açık IAM Credentials API (2026-11-07). Oturum girişi iş bitince `gcloud auth revoke --all` ile silinir. | Sahip |
 | epias-proxy Worker | Ayrı repo (bu oturumun kapsamı dışında) | Sahip |
