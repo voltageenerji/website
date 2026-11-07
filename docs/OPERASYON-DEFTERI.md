@@ -36,6 +36,7 @@ beklediği. Güncelleyen: Orchestrator. Son güncelleme: **2026-08-23**.
 | 2026-09-09 / 09-23 / 10-07 | LinkedIn: rehber lansmanı / serbest tüketici 2026 / ilke postu (otomatik) |
 | 2031-03 (en geç 06.09.2031) | **Marka yenileme: 2011/70573.** Koruma 06.09.2031'de biter; yenileme penceresi 6 ay önce açılır. Kayıtlı vekil olmadığı için hatırlatma tebligatı doğrudan şirkete gelir — adres güncel olmalı. |
 | 2026-12 (EPDK kurul kararı dönemi) | SEO Faz 3 sezon oyunu: "Serbest Tüketici 2027" güncellemesi — Kasım'da hazırlık |
+| **2027-01-01** | **DGP uzlaştırma dönemi 1 saatten 15 dakikaya iniyor.** Kaynak: DUY m.91(2), RG 21.01.2025 sayı 32789, Geçici Madde 40. Dengesizlik maddesi m.110(1) de aynı gün değişiyor. Ek bir DUY değişikliği de var: RG 19.10.2026 sayı 33405 veya 21.10.2026 sayı 33407; tek mi iki mi olduğu **NOT VERIFIED**. Birincil metinler bu ortamdan okunamadı, Hukuk teyit edecek. **Etkisi:** saat içinde dalgalanan yük ve üretimde dengesizlik hacmi ve MWh başına maliyet büyük olasılıkla artar. Büyüklük, portföyün 15 dakikalık sayaç verisi olmadan tahmin edilemez. **Yapılacaklar:** 2027 teslimatlı her teklifte dengesizlik bileşeni 15 dakikaya göre yeniden fiyatlanır (Pricing, Market Risk). Müşteri sözleşmelerindeki "saatlik" dengesizlik maddeleri gözden geçirilir (Hukuk). `rehber/ptf-nedir` SMF ve dengesizlik satırları yeniden kontrol edilir (Webmaster). PTF saatlik kalır; `/ptf/today` beslemesi değişmez. |
 
 ## 3. Bekleyen girdiler (kimde)
 
