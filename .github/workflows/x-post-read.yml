@@ -1,0 +1,71 @@
+# GEÇİCİ — herkese açık bir X paylaşımını okumak için. Secret kullanmaz. İş bitince silinecek.
+name: X Post Read
+
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: ['.github/workflows/x-post-read.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Paylasim (fxtwitter)
+        run: |
+          curl -sS -m 25 -A 'Mozilla/5.0' "https://api.fxtwitter.com/vengeonsp/status/2118661285868863578" -o t.json || true
+          echo "boyut: $(wc -c < t.json) bayt"
+          jq -r '"KOD: \(.code)",
+                 "YAZAR: \(.tweet.author.name) (@\(.tweet.author.screen_name))  TARIH: \(.tweet.created_at)",
+                 "BEGENI: \(.tweet.likes)  RT: \(.tweet.retweets)  YANIT: \(.tweet.replies)  GORUNTULENME: \(.tweet.views)  YER_IMI: \(.tweet.bookmarks)",
+                 "YANITLANAN: \(.tweet.replying_to // "-")",
+                 "TWEET METNI:", (.tweet.text // "-")' t.json || head -c 3000 t.json
+          echo "----- ALINTI -----"
+          jq '.tweet.quote | if . then {author: .author.screen_name, name: .author.name, date: .created_at, text: .text,
+               likes: .likes, views: .views, media: [.media.all[]? | {type, url, altText}],
+               article_title: .article.title, article_preview: .article.preview_text} else "yok" end' t.json || true
+          echo "----- MEDYA -----"
+          jq '[.tweet.media.all[]? | {type, url, altText, width, height}]' t.json || true
+          echo "----- MAKALE -----"
+          jq -r '.tweet.article | if . then "BASLIK: \(.title // "-")\nOZET: \(.preview_text // "-")\nANAHTARLAR: \(keys | join(","))" else "makale yok" end' t.json || true
+          jq -r '.tweet.article.content.blocks[]? | (if (.type|test("^header")) then "\n## " + .text elif (.type|test("list-item")) then "- " + .text elif .type == "atomic" then "[gorsel/ek]" else .text end)' t.json | sed '/^$/N;/^\n$/D' || true
+          echo "----- ALINTI MAKALESI -----"
+          jq -r '.tweet.quote.article.content.blocks[]? | (if (.type|test("^header")) then "\n## " + .text elif (.type|test("list-item")) then "- " + .text elif .type == "atomic" then "[gorsel/ek]" else .text end)' t.json | sed '/^$/N;/^\n$/D' || true
+          jq -r '.tweet.raw_text.facets[]? | select(.type=="url") | .replacement // .original' t.json 2>/dev/null > links.txt || true
+          jq -r '.. | strings | select(test("^https?://"))' t.json | grep -v -E 'twimg\.com|//x\.com/|//(www\.)?twitter\.com/|fxtwitter|t\.co/' | sort -u >> links.txt || true
+          sort -u links.txt -o links.txt; echo "----- LINKLER -----"; cat links.txt
+
+      - name: Yedek kaynak (vxtwitter)
+        run: |
+          curl -sS -m 25 -A 'Mozilla/5.0' "https://api.vxtwitter.com/vengeonsp/status/2118661285868863578" -o v.json || true
+          jq '{user_name, user_screen_name, date, text, likes, retweets, replies, mediaURLs, qrtURL, article: (.article // null | if . then {title, preview_text} else null end)}' v.json || head -c 2000 v.json
+
+      - name: Linklenen sayfalar
+        run: |
+          [ -s links.txt ] || { echo "link yok"; exit 0; }
+          while read -r u; do
+            echo "=================== $u"
+            curl -sSL -m 25 -A 'Mozilla/5.0' -o page.html -w 'HTTP %{http_code} -> %{url_effective}\n' "$u" || continue
+            python3 - <<'PY'
+          import re, html
+          s = open('page.html', encoding='utf-8', errors='ignore').read()
+          def g(p):
+              m = re.search(p, s, re.S | re.I)
+              return m.group(1).strip() if m else ''
+          print('TITLE:', html.unescape(g(r'<title[^>]*>(.*?)</title>'))[:200])
+          print('DESC :', html.unescape(g(r'<meta[^>]+(?:name|property)="(?:og:)?description"[^>]+content="([^"]*)"'))[:400])
+          t = re.sub(r'<script.*?</script>|<style.*?</style>', ' ', s, flags=re.S | re.I)
+          t = html.unescape(re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', t)))
+          print('TEXT :', t[:3000])
+          PY
+            if echo "$u" | grep -qE 'github\.com/[^/]+/[^/]+'; then
+              repo=$(echo "$u" | sed -E 's#https?://(www\.)?github\.com/([^/]+/[^/?#]+).*#\2#; s#\.git$##')
+              echo "--- REPO META ($repo)"
+              curl -sS -m 25 "https://api.github.com/repos/$repo" | jq '{full_name, description, stargazers_count, forks_count, open_issues_count, license: .license.spdx_id, created_at, pushed_at, archived, language, homepage}' || true
+              echo "--- README ($repo)"
+              curl -sSL -m 25 "https://raw.githubusercontent.com/$repo/HEAD/README.md" | head -c 8000 || true
+              echo
+            fi
+          done < links.txt
