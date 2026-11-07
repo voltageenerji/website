@@ -40,7 +40,8 @@ const server = createServer((req, res) => {
     if (req.url.startsWith('/v1/projects/-/serviceAccounts/')) {   // anahtarsız yol (IAM Credentials)
       seen.impUrl = req.url; seen.impAuth = req.headers.authorization === 'Bearer ' + USER_TOKEN;
       const b = JSON.parse(body || '{}'); seen.impScope = b.scope; seen.impLifetime = b.lifetime;
-      if (mode === 'imp403') return send(403, { error: { message: 'Permission iam.serviceAccounts.getAccessToken denied' } });
+      if (mode === 'imp403') return send(403, { error: { message: 'Permission iam.serviceAccounts.getAccessToken denied for ' + USER_TOKEN } });
+      if (mode === 'impNewline') return send(200, { accessToken: 'sahte\nbelirtec', expireTime: '2026-11-07T12:00:00Z' });
       return send(200, { accessToken: 'sahte-belirtec', expireTime: '2026-11-07T12:00:00Z' });
     }
     if (req.headers.authorization !== 'Bearer sahte-belirtec') seen.auth = false;
@@ -115,10 +116,12 @@ rmSync(dir, { recursive: true, force: true });
 
 // 2) Servis hesabı mülke eklenmemiş (403)
 mode = 'forbidden';
-const r403 = await runTool({ GSC_SA_KEY_B64: KEY_B64 }, ['--out', mkdtempSync(join(tmpdir(), 'gsc-test-'))]);
+const dir403 = mkdtempSync(join(tmpdir(), 'gsc-test-'));
+const r403 = await runTool({ GSC_SA_KEY_B64: KEY_B64 }, ['--out', dir403]);
 ok('403: çıkış kodu 1', r403.code === 1);
 ok('403: Türkçe yol gösterici mesaj ve servis hesabı adı', r403.err.includes('Erişim reddedildi') && r403.err.includes(EMAIL));
 ok('403: anahtar mesajda yok', !r403.err.includes(PEM_BODY));
+rmSync(dir403, { recursive: true, force: true });
 mode = 'ok';
 
 // 2b) URL denetimi 403 (Kısıtlı izin): performans verisi kaybolmaz, denetim ERROR olarak kaydedilir
@@ -156,8 +159,9 @@ ok('CI atlama yolu yok (GSC_ALLOW_CI etkisiz)', rCi2.code === 1 && rCi2.err.incl
 // 4) Anahtarsız yol: GSC_IMPERSONATE + gcloud ile giriş yapmış kişi
 const bin = mkdtempSync(join(tmpdir(), 'gsc-gcloud-'));
 const fakeOk = join(bin, 'gcloud-girisli'), fakeNo = join(bin, 'gcloud-girissiz');
-// Yer tutucu CLOUDSDK_AUTH_ACCESS_TOKEN gcloud'a ulaşırsa sahte gcloud yanlış kimlik döndürür
-writeFileSync(fakeOk, `#!/bin/sh\n[ -n "$CLOUDSDK_AUTH_ACCESS_TOKEN" ] && echo yer-tutucu && exit 0\n[ "$1 $2" = "auth print-access-token" ] && echo ${USER_TOKEN} && exit 0\nexit 3\n`);
+// Yer tutucu CLOUDSDK_AUTH_ACCESS_TOKEN gcloud'a ulaşırsa veya gcloud dosya günlüğü açıksa
+// sahte gcloud yanlış kimlik döndürür (gerçek gcloud belirteci ~/.config/gcloud/logs'a yazar)
+writeFileSync(fakeOk, `#!/bin/sh\n[ -n "$CLOUDSDK_AUTH_ACCESS_TOKEN" ] && echo yer-tutucu && exit 0\n[ "$CLOUDSDK_CORE_DISABLE_FILE_LOGGING" = 1 ] || { echo gunluk-acik; exit 0; }\n[ "$1 $2" = "auth print-access-token" ] && echo ${USER_TOKEN} && exit 0\nexit 3\n`);
 writeFileSync(fakeNo, '#!/bin/sh\necho "ERROR: (gcloud.auth.print-access-token) You do not currently have an active account selected." >&2\nexit 1\n');
 chmodSync(fakeOk, 0o755); chmodSync(fakeNo, 0o755);
 const impEnv = (extra) => ({ GSC_IMPERSONATE: EMAIL, GSC_GCLOUD: fakeOk, GSC_IAM_BASE: BASE, ...extra });
@@ -166,12 +170,16 @@ const dir4 = mkdtempSync(join(tmpdir(), 'gsc-test-'));
 const rImp = await runTool(impEnv({ GSC_SA_KEY_B64: Buffer.from('kullanilmamali').toString('base64'), CLOUDSDK_AUTH_ACCESS_TOKEN: 'yer-tutucu' }), ['--out', dir4]);
 ok('anahtarsız: çıkış kodu 0', rImp.code === 0, rImp.err);
 ok('anahtarsız: doğru servis hesabı adresi', seen.impUrl === `/v1/projects/-/serviceAccounts/${EMAIL}:generateAccessToken`, seen.impUrl);
-ok('anahtarsız: kişi belirteciyle istek (yer tutucu CLOUDSDK_AUTH_ACCESS_TOKEN etkisiz)', seen.impAuth === true);
+ok('anahtarsız: kişi belirteciyle istek (yer tutucu etkisiz, gcloud dosya günlüğü kapalı)', seen.impAuth === true);
 ok('anahtarsız: yalnızca salt okunur kapsam, 1 saat', JSON.stringify(seen.impScope) === '["https://www.googleapis.com/auth/webmasters.readonly"]' && seen.impLifetime === '3600s');
 ok('anahtarsız: API çağrıları servis hesabı belirteciyle', seen.auth);
 ok('anahtarsız: dosyalar yazıldı', existsSync(join(dir4, 'OZET.md')) && existsSync(join(dir4, 'queries_28d.csv')));
 ok('anahtarsız: kişi belirteci çıktıda yok', !rImp.out.includes(USER_TOKEN) && !rImp.err.includes(USER_TOKEN));
-for (const f of ['totals.json', 'meta.json', 'OZET.md']) ok(`anahtarsız: kişi belirteci ${f} içinde yok`, !readFileSync(join(dir4, f), 'utf8').includes(USER_TOKEN));
+ok('anahtarsız: servis hesabı belirteci çıktıda yok', !rImp.out.includes('sahte-belirtec') && !rImp.err.includes('sahte-belirtec'));
+for (const f of ['totals.json', 'meta.json', 'OZET.md']) {
+  const t = existsSync(join(dir4, f)) ? readFileSync(join(dir4, f), 'utf8') : '';
+  ok(`anahtarsız: belirteçler ${f} içinde yok`, t !== '' && !t.includes(USER_TOKEN) && !t.includes('sahte-belirtec'));
+}
 rmSync(dir4, { recursive: true, force: true });
 const rNoLogin = await runTool(impEnv({ GSC_GCLOUD: fakeNo }), []);
 ok('anahtarsız: gcloud girişi yoksa yol gösteriyor', rNoLogin.code === 1 && rNoLogin.err.includes('gcloud auth login'));
@@ -181,14 +189,27 @@ mode = 'imp403';
 const dir5 = mkdtempSync(join(tmpdir(), 'gsc-test-'));
 const rImp403 = await runTool(impEnv({}), ['--out', dir5]);
 ok('anahtarsız 403: rol eksikliği anlatılıyor', rImp403.code === 1 && rImp403.err.includes('Service Account Token Creator') && rImp403.err.includes(EMAIL));
-ok('anahtarsız 403: kişi belirteci mesajda yok', !rImp403.err.includes(USER_TOKEN));
+ok('anahtarsız 403: kişi belirteci mesajda yok (Google mesajı belirteci yineleseydi bile)', !rImp403.err.includes(USER_TOKEN) && rImp403.err.includes('<belirteç>'));
 ok('anahtarsız 403: dosya yazılmadı', !existsSync(join(dir5, 'OZET.md')));
 rmSync(dir5, { recursive: true, force: true });
 mode = 'ok';
-const rBadEmail = await runTool(impEnv({ GSC_IMPERSONATE: 'gsc-okuyucu/../x' }), []);
-ok('anahtarsız: geçersiz e-posta reddediliyor', rBadEmail.code === 1 && rBadEmail.err.includes('servis hesabı e-postası'));
+for (const bad of ['gsc-okuyucu/../x', 'a\\..\\..\\..\\x@y.iam.gserviceaccount.com', 'x@y.com', 'x@y.iam.gserviceaccount.com:signBlob', 'x%2F@y.iam.gserviceaccount.com', 'x\u200b@y.iam.gserviceaccount.com']) {
+  const rB = await runTool(impEnv({ GSC_IMPERSONATE: bad }), []);
+  ok(`anahtarsız: geçersiz e-posta reddediliyor ${JSON.stringify(bad)}`, rB.code === 1 && rB.err.includes('servis hesabı e-postası'));
+}
 const rImpCi = await runTool(impEnv({ GITHUB_ACTIONS: 'true' }), []);
 ok('anahtarsız: GitHub Actions içinde de reddediliyor', rImpCi.code === 1 && rImpCi.err.includes('herkese açık'));
+// Belirteç biçimi bozuksa (fazladan satır, satır sonu) başlık hatası belirteci ekrana taşımamalı
+const fakeTwo = join(bin, 'gcloud-iki-satir');
+writeFileSync(fakeTwo, `#!/bin/sh\nprintf '${USER_TOKEN}\\nUpdates are available\\n'\n`); chmodSync(fakeTwo, 0o755);
+const rTwo = await runTool(impEnv({ GSC_GCLOUD: fakeTwo }), []);
+ok('anahtarsız: iki satırlı gcloud çıktısı reddediliyor, belirteç basılmıyor', rTwo.code === 1 && !rTwo.err.includes(USER_TOKEN) && !rTwo.out.includes(USER_TOKEN));
+mode = 'impNewline';
+const rNl = await runTool(impEnv({}), []);
+ok('anahtarsız: satır sonlu servis hesabı belirteci reddediliyor, basılmıyor', rNl.code === 1 && !rNl.err.includes('sahte') && !rNl.out.includes('sahte'));
+mode = 'ok';
+const rIamHost = await runTool(impEnv({ GSC_IAM_BASE: 'https://ornek.example' }), []);
+ok('anahtarsız: GSC_IAM_BASE yalnızca Google veya yerel test sunucusu', rIamHost.code === 1 && rIamHost.err.includes('GSC_IAM_BASE'));
 rmSync(bin, { recursive: true, force: true });
 
 server.close();

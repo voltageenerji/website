@@ -34,6 +34,12 @@ const TOKEN_URL = process.env.GSC_TOKEN_URL || 'https://oauth2.googleapis.com/to
 const API = process.env.GSC_API_BASE || 'https://searchconsole.googleapis.com';
 const IAM = process.env.GSC_IAM_BASE || 'https://iamcredentials.googleapis.com';
 const GCLOUD = process.env.GSC_GCLOUD || 'gcloud';
+const TOKEN_RX = /^[\x21-\x7e]+$/;
+// Kişinin tam yetkili Google Cloud belirteci yalnızca Google'a veya yerel test sunucusuna gider
+if (!/^(https:\/\/iamcredentials\.googleapis\.com|http:\/\/(127\.0\.0\.1|localhost):\d+)$/.test(IAM)) {
+  console.error('HATA: GSC_IAM_BASE yalnızca iamcredentials.googleapis.com veya yerel test sunucusu olabilir.');
+  process.exit(1);
+}
 const SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
 const SITE = process.env.GSC_SITE || 'sc-domain:voltage.com.tr';
 const ROW_LIMIT = Number(process.env.GSC_ROW_LIMIT) || 25000;
@@ -109,19 +115,21 @@ async function impersonatedToken(email) {
   // gcloud girişinin önüne geçer; burada giriş yapan kişinin kimliği istendiği için çıkarılır.
   const env = { ...process.env };
   delete env.CLOUDSDK_AUTH_ACCESS_TOKEN;
+  env.CLOUDSDK_CORE_DISABLE_FILE_LOGGING = '1';   // gcloud, yazdırdığı belirteci ~/.config/gcloud/logs altına kaydeder
   try {
     // Belirteç yalnızca bellekte tutulur; stdout ekrana basılmaz
     user = execFileSync(GCLOUD, ['auth', 'print-access-token'], { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60000 }).trim();
-  } catch (e) { fail(noLogin); }
-  if (!user) fail(noLogin);
+  } catch (e) { fail(e && e.code === 'ETIMEDOUT' ? 'gcloud 60 saniyede yanıt vermedi.' : noLogin); }
+  // Tek satır, boşluksuz yazdırılabilir ASCII değilse kullanma: başlık hatası belirteci mesaja taşır
+  if (!TOKEN_RX.test(user)) fail(noLogin);
   const r = await fetch(`${IAM}/v1/projects/-/serviceAccounts/${email}:generateAccessToken`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${user}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ scope: [SCOPE], lifetime: '3600s' }),
   });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok || !j.accessToken) {
-    const gmsg = (j.error && j.error.message) || '';
+  if (!r.ok || typeof j.accessToken !== 'string' || !TOKEN_RX.test(j.accessToken)) {
+    const gmsg = ((j.error && j.error.message) || '').split(user).join('<belirteç>');
     fail(`Servis hesabı adına belirteç alınamadı (HTTP ${r.status}). ` +
       (r.status === 403 ? `Giriş yapan hesabın ${email} üzerinde "Service Account Token Creator" rolü olmalı ve ` +
         'projede IAM Service Account Credentials API açık olmalı. ' : '') + (gmsg ? `Google: ${gmsg}` : ''));
@@ -212,7 +220,7 @@ async function main() {
   let token;
   const imp = (process.env.GSC_IMPERSONATE || '').trim();
   if (imp) {
-    if (!/^[^\s/?#@]+@[^\s/?#@]+\.[A-Za-z]{2,}$/.test(imp)) fail('GSC_IMPERSONATE bir servis hesabı e-postası olmalı (ör. gsc-okuyucu@<proje>.iam.gserviceaccount.com).');
+    if (!/^[a-z0-9][a-z0-9-]{0,62}@[a-z0-9-]+(\.[a-z0-9-]+)*\.gserviceaccount\.com$/.test(imp)) fail('GSC_IMPERSONATE bir servis hesabı e-postası olmalı (ör. gsc-okuyucu@<proje>.iam.gserviceaccount.com).');
     process.env.__GSC_EMAIL = imp;
     token = await impersonatedToken(imp);
   } else {

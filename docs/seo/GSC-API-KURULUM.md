@@ -66,13 +66,14 @@ Veri 2–3 gün geriden gelir; araç dönem sonunu 3 gün geri alır. Tarih aral
 
 URL denetimi bir URL'de hata verirse performans verisi yine de yazılır; o URL `url_inspection.csv` içinde `ERROR` olarak görünür.
 
-## Anahtarsız yol (bugün kullanılan)
+## Anahtarsız yol (2026-11-07'den beri kullanılan)
 
-voltan.com.tr kuruluşunda servis hesabı anahtarı oluşturmak kuruluş politikasıyla kapalı (`iam.disableServiceAccountKeyCreation`). Politika açık kalıyor; anahtar yerine şu yol kullanılıyor:
+voltan.com.tr kuruluşunda servis hesabı anahtarı oluşturmak kuruluş politikasıyla kapalı (`iam.disableServiceAccountKeyCreation`). Politika yürürlükte kalıyor; anahtar yerine şu yol kullanılıyor:
 
 - **Kimlik:** Sahip, Claude oturumunda bir kez Google'a giriş yapar. Claude `gcloud auth login --no-launch-browser` çalıştırır, sahip verilen bağlantıyı telefonda açar ve çıkan tek kullanımlık kodu sohbete yapıştırır. Kod PKCE ile o oturumdaki bekleyen girişe bağlıdır, birkaç dakikada geçersiz olur.
   - **Hesap:** Girişte projenin bulunduğu **@voltan.com.tr** hesabı seçilmelidir. Kişisel gmail hesabının projeye erişimi yoktur.
   - **Yer tutucu değişken:** Claude bulut oturumlarında `CLOUDSDK_AUTH_ACCESS_TOKEN` vekil sunucu için bir yer tutucudur ve gcloud girişinin önüne geçer. Elle çalıştırılan gcloud komutlarının başına `env -u CLOUDSDK_AUTH_ACCESS_TOKEN` eklenir. Araç bunu kendisi yapar.
+  - **Günlük dosyası:** gcloud, ekrana yazdırdığı erişim belirtecini ve girişte aldığı yenileme belirtecini `~/.config/gcloud/logs/` altına düz metin olarak kaydeder. Elle çalıştırılan her gcloud komutu `env -u CLOUDSDK_AUTH_ACCESS_TOKEN CLOUDSDK_CORE_DISABLE_FILE_LOGGING=1 gcloud …` biçiminde çalıştırılır. Araç bunu kendisi yapar.
 - **Belirteç:** Araç, sahibin kimliğiyle `gsc-okuyucu` adına 1 saatlik, salt okunur (`webmasters.readonly`) bir belirteç alır.
   ```bash
   GSC_IMPERSONATE=gsc-okuyucu@voltage-search-console.iam.gserviceaccount.com node tools/gsc-export.mjs --inspect
@@ -81,7 +82,7 @@ voltan.com.tr kuruluşunda servis hesabı anahtarı oluşturmak kuruluş politik
   - Projede **IAM Service Account Credentials API** açık.
   - Sahibin hesabının `gsc-okuyucu` üzerinde **Service Account Token Creator** rolü var.
   - `gsc-okuyucu`, Search Console'da Kısıtlı kullanıcı.
-- **İş bitince:** `gcloud auth revoke --all` ile oturumdaki Google erişimi silinir.
+- **İş bitince:** `gcloud auth revoke --all` çalıştırılır, ardından `rm -rf ~/.config/gcloud/logs ~/.config/gcloud/credentials.db ~/.config/gcloud/access_tokens.db` ile günlük ve kimlik kalıntısı silinir.
 - **Bedeli:** Her yeni oturumda giriş tekrarlanır. Tam otomatik kullanım için anahtar gerekir. O durumda kuruluş politikasının yalnızca bu proje için kapatılması gerekir; bu, sahibin açık kararıyla yapılır.
 
 ## Sık görülen hatalar
