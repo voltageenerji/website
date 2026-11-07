@@ -1,0 +1,32 @@
+# GEÇİCİ — canlı robots.txt'nin repodakiyle aynı olup olmadığını ve yapay zekâ tarayıcı
+# kimlikleriyle yapılan isteklerin durum kodlarını kontrol eder. Secret kullanmaz; yalnızca
+# herkese açık içerik ve durum kodları yazdırır. İş bitince silinecek.
+name: AI Bot Check
+
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: ['.github/workflows/ai-bot-check.yml']
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: robots.txt karsilastirma
+        run: |
+          curl -sS -m 20 -A 'Mozilla/5.0' -D h.txt https://voltage.com.tr/robots.txt -o live.txt
+          echo "HTTP: $(head -1 h.txt)"; grep -i 'content-type\|cf-cache-status\|server:' h.txt
+          if diff -q robots.txt live.txt >/dev/null; then echo "CANLI robots.txt = REPO (Cloudflare degistirmiyor)"; else echo "FARK VAR:"; diff robots.txt live.txt | head -60; fi
+      - name: Tarayici kimlikleriyle durum kodlari (sahte UA, yalnizca gosterge)
+        run: |
+          for ua in "Mozilla/5.0" "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OAI-SearchBot/1.3; +https://openai.com/searchbot" \
+                    "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.3; +https://openai.com/gptbot" \
+                    "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ChatGPT-User/1.0; +https://openai.com/bot" \
+                    "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)" \
+                    "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)" \
+                    "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)"; do
+            for p in / /rehber/ptf-nedir /llms.txt; do
+              printf '%-14s %-22s %s\n' "$(echo "$ua" | grep -oE 'OAI-SearchBot|GPTBot|ChatGPT-User|PerplexityBot|ClaudeBot|bingbot' || echo tarayici)" "$p" "$(curl -sS -m 20 -A "$ua" -o /dev/null -w '%{http_code}' https://voltage.com.tr$p)"
+            done
+          done
