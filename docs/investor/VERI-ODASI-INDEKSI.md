@@ -32,7 +32,7 @@ Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34660 Kadıköy · İstanbul.
 |---|---|---|---|
 | [ ] | EPDK Tedarik Lisansı sureti (ETS/3424-8/2074) | Sahip | Lisans no/tarih/geçerlilik sitede yayında; **belgenin kendisi** veri odasına girecek |
 | [ ] | Lisans tadil/yenileme yazışmaları (varsa) | Sahip / Hukuk | 2031 geçerlilik + yenileme hakkının teyidi |
-| [ ] | EPİAŞ Piyasa Katılımcısı (PK) kayıt belgesi | Sahip | GÖP/GİP katılımı sitede beyan; PK belgesi ile doğrulanacak (Plan 1.8 doğrulama kalemi) |
+| [ ] | EPİAŞ Piyasa Katılımcısı (PK) kayıt belgesi | Sahip | GÖP/GİP katılımı sitede beyan; sahip 07.11.2026'da teyit etti. PK belgesi veri odasına eklenecek (Plan 1.8 doğrulama kalemi) |
 | [ ] | Takasbank / teminat hesap dokümantasyonu | Sahip / Treasury-Capital | Teminat metodolojisi notu ile birlikte |
 | [ ] | EPDK uyum yazışmaları / bildirimler (son 3 yıl) | Sahip / Hukuk | Ceza/uyarı varsa aynı hızla dosyaya girer — kötü haber saklanmaz |
 | [x] | Lisans künyesinin kamuya açık beyanı | — | index.html'de yayında (Exhibit A + footer): lisans no, sicil, adres |

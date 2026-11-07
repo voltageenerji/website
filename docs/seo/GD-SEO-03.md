@@ -352,7 +352,7 @@ Aracın kendi "önceki dönem"i (13.10–09.11) yayın öncesi günleri de içer
 Uygulanan set, §3'teki listeden Hukuk ve Enerji Piyasası incelemesiyle şu noktalarda ayrıldı:
 
 - **SMF cümlesi:** "saatlik" ifadesi çıkarıldı. DGP uzlaştırma dönemi 01.01.2027'de 15 dakikaya iniyor (DUY m.91(2), RG 21.01.2025 sayı 32789; ikincil kaynaklardan, birincil metin Hukuk teyidinde). Aynı nedenle tablodaki SMF satırı, "saatlerde" → "dönemlerde" ve "geçmiş saatlik serisi" → "geçmiş serileri" düzeltildi. "PTF'yi kim belirler?" SSS'ine EPDK'nın asgari ve azami fiyat limitleri eklendi; rakam verilmedi.
-- **GÖP/GİP katılım iddiası:** ptf-nedir SSS'indeki "bugün GÖP ile GİP'in aktif katılımcısıdır" ifadesi kaldırıldı. Yerine yalnızca lisans bilgisi yazıldı. Sahip güncel katılımı teyit ederse geri eklenir. Aynı ifade beş sektör rehberinde ve ana sayfada duruyor (bkz. defter §3).
+- **GÖP/GİP katılım iddiası:** ilk yayında (e5ae4f5) sahip teyidi beklendiği için kaldırılmıştı. Sahip aynı gün teyit etti; cümle geri eklendi. Sayfa, Hukuk'un onayladığı 24 maddelik setle bayt bayt aynıdır.
 - **Kontrol sayfaları artık yalnız bağlantı değil:**
   - `/rehber/tedarikci-degistirme`: "Elektrik kesilir mi?" cevabı kural 1'e göre yeniden yazıldı.
   - `/rehber/serbest-tuketici`: kaynaksız "mesken abonelerinin büyük bölümü", "katbekat" ve "fiilen tüm tüketici tabanı" ifadeleri değişti.
