@@ -152,7 +152,8 @@ async function api(token, method, path, body, { soft = false } = {}) {
     body: body ? JSON.stringify(body) : undefined,
   });
   const j = await r.json().catch(() => ({}));
-  const gmsg = (j.error && j.error.message) || '';
+  // Google mesajı belirteci yinelese bile ekrana taşınmaz (anahtarsız yoldaki kişi belirteci gibi)
+  const gmsg = String((j.error && j.error.message) || '').split(token).join('<belirteç>');
   if (!r.ok && soft) return { __status: r.status, __message: gmsg };
   if (r.status === 403) {
     fail(`Erişim reddedildi (403): servis hesabı (${process.env.__GSC_EMAIL}) ${SITE} mülküne erişemiyor. ` +
@@ -230,7 +231,7 @@ async function main() {
   const ready = (process.env.GSC_ACCESS_TOKEN || '').trim();
   if (process.env.GSC_ACCESS_TOKEN !== undefined) {
     if (!TOKEN_RX.test(ready)) fail('GSC_ACCESS_TOKEN boş veya biçimi bozuk (tek satır, boşluksuz olmalı).');
-    process.env.__GSC_EMAIL = 'hazır belirteç (GSC_ACCESS_TOKEN)';
+    process.env.__GSC_EMAIL = 'GSC_ACCESS_TOKEN ile verilen hesap';
     token = ready;
   } else if (imp) {
     if (!/^[a-z0-9][a-z0-9-]{0,62}@[a-z0-9-]+(\.[a-z0-9-]+)*\.gserviceaccount\.com$/.test(imp)) fail('GSC_IMPERSONATE bir servis hesabı e-postası olmalı (ör. gsc-okuyucu@<proje>.iam.gserviceaccount.com).');

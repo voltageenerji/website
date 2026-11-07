@@ -9,7 +9,7 @@ Araç: `tools/gsc-export.mjs`. Test: `node docs/qa/test-gsc-export.mjs`.
 - **Salt okunur.** Kapsam `webmasters.readonly`. Araç Search Console'da hiçbir ayarı değiştiremez, dizin talebi gönderemez, site haritası silemez.
 - **Yalnızca eklediğiniz mülk.** Servis hesabını hangi mülke kullanıcı olarak eklerseniz yalnızca onu görür.
 - **Anahtar sohbete gelmez.** Anahtar bulut ortamının ayarlarına girilir; Claude onu ekrana veya dosyaya yazmaz. Repodaki koruma kancası, anahtar biçimindeki bir değerin repoya yazılmasını engeller.
-- **Çıktı repoya girmez.** Repo herkese açık. Veriler git'e girmeyen `gsc-data/` klasörüne yazılır.
+- **Çıktı site reposuna girmez.** Site reposu herkese açık. Elle çalıştırmada veriler git'e girmeyen `gsc-data/` klasörüne, haftalık otomatik çekimde yalnızca gizli `voltageenerji/seo-veri` reposuna yazılır.
 
 ## 1. Google Cloud projesi ve API
 
@@ -83,7 +83,19 @@ voltan.com.tr kuruluşunda servis hesabı anahtarı oluşturmak kuruluş politik
   - Sahibin hesabının `gsc-okuyucu` üzerinde **Service Account Token Creator** rolü var.
   - `gsc-okuyucu`, Search Console'da Kısıtlı kullanıcı.
 - **İş bitince:** `gcloud auth revoke --all` çalıştırılır, ardından `rm -rf ~/.config/gcloud/logs ~/.config/gcloud/credentials.db ~/.config/gcloud/access_tokens.db` ile günlük ve kimlik kalıntısı silinir.
-- **Bedeli:** Her yeni oturumda giriş tekrarlanır. Tam otomatik kullanım için anahtar gerekir. O durumda kuruluş politikasının yalnızca bu proje için kapatılması gerekir; bu, sahibin açık kararıyla yapılır.
+- **Bedeli:** Her yeni oturumda giriş tekrarlanır. Haftalık otomatik çekim için anahtar gerekmez; bkz. "Otomatik yol".
+
+## Otomatik yol (haftalık; 2026-11-07'de kuruldu)
+
+Search Console verisi her pazartesi 07:17'de (TR) kendiliğinden çekilir ve gizli `voltageenerji/seo-veri` reposuna işlenir. Saklanan anahtar, şifre veya belirteç yoktur.
+
+- **Nasıl çalışır:** `seo-veri` reposundaki `.github/workflows/gsc-haftalik.yml`, GitHub'ın kimlik belirteciyle (OIDC) Google'a bağlanır. Google bu kimliği Workload Identity Federation ile doğrular ve `gsc-okuyucu` adına kısa ömürlü, salt okunur (`webmasters.readonly`) bir erişim belirteci verir. İş akışı belirteci `GSC_ACCESS_TOKEN` değişkeniyle araca geçirir. Bu değişken tanımlıysa araç diğer kimlik yollarına bakmaz.
+- **Google kime belirteç verir:** Havuz `github`, sağlayıcı `seo-veri`. Sağlayıcının öznitelik koşulu (attribute condition) yalnızca GitHub hesap kimliği `277330074` olan hesabın `voltageenerji/seo-veri` reposunu ve yalnızca `main` dalını kabul eder. `gsc-okuyucu` üzerindeki Workload Identity User rolü yalnızca bu repoya verilidir. Herkese açık site reposunun iş akışları, fork'lar, başka hesaplardaki aynı adlı repolar ve diğer dallar belirteç alamaz.
+- **Araçtaki ikinci kilit:** GitHub Actions içinde `GITHUB_REPOSITORY` tam olarak `voltageenerji/seo-veri` değilse araç çalışmayı reddeder. Bu kilit kazara kullanımı önler; asıl kilit Google tarafındaki koşuldur.
+- **Günlük:** Araç `--quiet` ile çalışır. İş akışı günlüğüne yalnızca dosya sayısı ve URL denetimi toplamı yazılır; sorgu, sayfa veya URL yazılmaz. Belirteci GitHub maskeler; araç onu hiçbir yere yazmaz.
+- **Veri nerede:** `seo-veri` reposunda `data/son/` (en son çekim) ve `data/YYYY-AA-GG/` (haftalık arşiv). Dosyalar elle çalıştırmadakiyle aynıdır (bkz. adım 5). Repo gizli kalır; veri site reposuna, bir artefakta veya herkese açık bir yere kopyalanmaz. `docs/seo/` raporları yalnızca toplamları ve karar için gereken sorguları, tarih aralığıyla aktarır.
+- **Güven sınırı:** İş akışı aracı her çalıştırmada site reposunun `main` dalından alır. `main`'e giren her değişiklik bir sonraki pazartesi gerçek belirteçle çalışır. Bu yüzden `tools/gsc-export.mjs` değişikliklerinin QA kararı `node docs/qa/test-gsc-export.mjs` sonucunu içerir.
+- **Elle çalıştırma:** `seo-veri` → Actions → "GSC haftalık" → Run workflow (dal: `main`). İş akışı dosyası `main`'de her değiştiğinde de çalışır.
 
 ## Sık görülen hatalar
 
@@ -92,7 +104,10 @@ voltan.com.tr kuruluşunda servis hesabı anahtarı oluşturmak kuruluş politik
 | `GSC_SA_KEY_B64 tanımlı değil` | Adım 4; ardından yeni oturum açın |
 | `Erişim reddedildi (403)` | Adım 3 (mülke kullanıcı ekleme) veya adım 1.3 (API etkin değil) |
 | `Google erişim belirteci alınamadı` | Anahtar silinmiş olabilir; adım 2'den yeni anahtar |
-| `Repo herkese açık … CI` | Araç bilerek GitHub Actions içinde çalışmaz; Claude oturumunda çalıştırın |
+| `Repo herkese açık … CI` | Araç GitHub Actions içinde yalnızca gizli `voltageenerji/seo-veri` reposunda çalışır; başka her repoda (site reposu dahil) bilerek reddeder. Elle çekim için Claude oturumunda çalıştırın |
+| `GSC_ACCESS_TOKEN boş veya biçimi bozuk` | Otomatik yol: iş akışındaki "Google kimliği" adımı belirteç üretmedi, o adımın günlüğüne bakın. Elle çalıştırmada bu değişkeni tanımlamayın |
+| İş akışında `unauthorized_client` veya "rejected by the attribute condition" | Google bu çalıştırmaya güvenmedi: iş akışı `main` dalında mı, repo adı ve `seo-veri` sağlayıcısının koşulu doğru mu? |
+| İş akışında `iam.serviceAccounts.getAccessToken` izni reddedildi | `gsc-okuyucu` üzerindeki Workload Identity User bağlaması eksik veya repo adı farklı |
 | `Çıktı klasörü repo içinde` | `gsc-data/` (varsayılan) veya repo dışı bir klasör kullanın |
 | `gcloud oturumu yok` | Anahtarsız yol: önce `gcloud auth login --no-launch-browser` |
 | `Servis hesabı adına belirteç alınamadı (HTTP 403)` | Anahtarsız yol ön koşulları: Token Creator rolü ve IAM Credentials API |
@@ -101,3 +116,5 @@ voltan.com.tr kuruluşunda servis hesabı anahtarı oluşturmak kuruluş politik
 ## Anahtarı iptal etmek
 
 Google Cloud → IAM & Admin → Service Accounts → `gsc-okuyucu` → Keys → anahtarı silin. Search Console → Kullanıcılar ve izinler → servis hesabını kaldırın. Bulut ortamından `GSC_SA_KEY_B64` değişkenini silin.
+
+**Otomatik yolu durdurmak:** Geçici olarak `seo-veri` → Actions → "GSC haftalık" → Disable workflow. Kalıcı olarak sağlayıcıyı kapatın: `env -u CLOUDSDK_AUTH_ACCESS_TOKEN CLOUDSDK_CORE_DISABLE_FILE_LOGGING=1 gcloud iam workload-identity-pools providers update-oidc seo-veri --location=global --workload-identity-pool=github --project=voltage-search-console --disabled`

@@ -3,7 +3,7 @@
 // Gerçek Google'a bağlanmaz. Anahtar çalışma anında üretilir; dosyaya yazılmaz.
 import { createServer } from 'node:http';
 import { generateKeyPairSync, createVerify } from 'node:crypto';
-import { mkdtempSync, readFileSync, existsSync, rmSync, writeFileSync, chmodSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, existsSync, rmSync, writeFileSync, chmodSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -46,6 +46,7 @@ const server = createServer((req, res) => {
     }
     if (req.headers.authorization !== 'Bearer sahte-belirtec') seen.auth = false;
     if (mode === 'forbidden') return send(403, { error: { message: 'User does not have sufficient permission' } });
+    if (mode === 'tokenEcho') return send(403, { error: { message: 'Bad credentials: ' + (req.headers.authorization || '') } });
     if (mode === 'inspect403' && req.url === '/v1/urlInspection/index:inspect') { seen.inspected++; return send(403, { error: { message: 'Insufficient permission for URL inspection' } }); }
     if (req.url.endsWith('/searchAnalytics/query')) {
       seen.pages++;
@@ -70,7 +71,10 @@ const server = createServer((req, res) => {
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const BASE = `http://127.0.0.1:${server.address().port}`;
 
+// Olumsuz testler gerçek gsc-data/ klasörüne asla yazmamalı: --out verilmeyen her çağrı buraya gider
+const NOWRITE = mkdtempSync(join(tmpdir(), 'gsc-hic-'));
 function runTool(extraEnv, args) {
+  if (!args.includes('--out')) args = [...args, '--out', NOWRITE];
   const env = { PATH: process.env.PATH, GSC_TOKEN_URL: BASE + '/token', GSC_API_BASE: BASE, GSC_ROW_LIMIT: '2', ...extraEnv };
   return new Promise((resolve) => {
     // Sunucu bu süreçte çalıştığı için aracı alt süreçte, olay döngüsünü kilitlemeden çalıştır
@@ -226,11 +230,26 @@ const ciOk = await runTool({ GSC_ACCESS_TOKEN: 'sahte-belirtec', GITHUB_ACTIONS:
 ok('CI seo-veri: hazır belirteçle çalışıyor (diğer yolların önüne geçer)', ciOk.code === 0 && seen.auth && existsSync(join(dir6, 'OZET.md')) && existsSync(join(dir6, 'url_inspection.csv')), ciOk.err);
 ok('CI seo-veri: belirteç çıktıda yok', !ciOk.out.includes('sahte-belirtec') && !ciOk.err.includes('sahte-belirtec'));
 ok('--quiet: sorgu ve URL ekrana basılmıyor', !ciOk.out.includes('serbest') && !ciOk.out.includes('/rehber/') && ciOk.out.includes('URL denetimi'));
+const leak6 = readdirSync(dir6).filter((f) => readFileSync(join(dir6, f), 'utf8').includes('sahte-belirtec'));
+ok('CI seo-veri: belirteç hiçbir çıktı dosyasında yok', leak6.length === 0, leak6.join(','));
 rmSync(dir6, { recursive: true, force: true });
-for (const bad of ['', 'satir\nsonu', 'bosluk var']) {
-  const rB = await runTool({ GSC_ACCESS_TOKEN: bad }, []);
-  ok(`GSC_ACCESS_TOKEN bozuk biçim reddediliyor ${JSON.stringify(bad)}`, rB.code === 1 && rB.err.includes('GSC_ACCESS_TOKEN') && (bad === '' || !rB.err.includes(bad)));
+for (const bad of ['', 'xq7\nzk9', 'xq7 zk9', 'xq7\tzk9', 'xq7\u00e7zk9']) {
+  const rB = await runTool({ GSC_ACCESS_TOKEN: bad }, ['--out', NOWRITE]);
+  ok(`GSC_ACCESS_TOKEN bozuk biçim reddediliyor ${JSON.stringify(bad)}`, rB.code === 1 && rB.err.includes('GSC_ACCESS_TOKEN') && !/xq7|zk9/.test(rB.err + rB.out));
 }
+for (const repo of ['voltageenerji/seo-veri-kopya', 'voltageenerji/seo-veri.yedek', 'voltageenerji/seo-veri ']) {
+  const rR = await runTool({ GSC_ACCESS_TOKEN: 'sahte-belirtec', GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: repo }, ['--out', NOWRITE]);
+  ok(`CI: yalnızca tam ad kabul ediliyor (${JSON.stringify(repo)} reddediliyor)`, rR.code === 1 && rR.err.includes('herkese açık'));
+}
+mode = 'forbidden';
+const r403t = await runTool({ GSC_ACCESS_TOKEN: 'sahte-belirtec' }, ['--out', NOWRITE]);
+ok('hazır belirteç 403: yol gösterici mesaj, belirteç yok', r403t.code === 1 && r403t.err.includes('Erişim reddedildi') && r403t.err.includes('GSC_ACCESS_TOKEN') && !(r403t.err + r403t.out).includes('sahte-belirtec'));
+mode = 'tokenEcho';
+const rEcho = await runTool({ GSC_ACCESS_TOKEN: 'sahte-belirtec' }, ['--out', NOWRITE]);
+ok('hazır belirteç: Google mesajı belirteci yinelese de basılmıyor', rEcho.code === 1 && !(rEcho.err + rEcho.out).includes('sahte-belirtec') && rEcho.err.includes('<belirteç>'));
+mode = 'ok';
+ok('olumsuz testler hiçbir dosya yazmadı (gsc-data/ korunuyor)', readdirSync(NOWRITE).length === 0, readdirSync(NOWRITE).join(','));
+rmSync(NOWRITE, { recursive: true, force: true });
 
 server.close();
 console.log(`\n${pass} passed, ${fail} failed`);
