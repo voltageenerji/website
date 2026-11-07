@@ -105,9 +105,13 @@ async function impersonatedToken(email) {
   const noLogin = 'gcloud oturumu yok veya gcloud bulunamadı. Önce: gcloud auth login --no-launch-browser ' +
     '(kurulum: docs/seo/GSC-API-KURULUM.md, "Anahtarsız yol").';
   let user = '';
+  // Claude bulut oturumlarında CLOUDSDK_AUTH_ACCESS_TOKEN vekil sunucu için yer tutucudur ve
+  // gcloud girişinin önüne geçer; burada giriş yapan kişinin kimliği istendiği için çıkarılır.
+  const env = { ...process.env };
+  delete env.CLOUDSDK_AUTH_ACCESS_TOKEN;
   try {
     // Belirteç yalnızca bellekte tutulur; stdout ekrana basılmaz
-    user = execFileSync(GCLOUD, ['auth', 'print-access-token'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60000 }).trim();
+    user = execFileSync(GCLOUD, ['auth', 'print-access-token'], { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60000 }).trim();
   } catch (e) { fail(noLogin); }
   if (!user) fail(noLogin);
   const r = await fetch(`${IAM}/v1/projects/-/serviceAccounts/${email}:generateAccessToken`, {

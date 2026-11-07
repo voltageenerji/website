@@ -71,6 +71,8 @@ URL denetimi bir URL'de hata verirse performans verisi yine de yazılır; o URL 
 voltan.com.tr kuruluşunda servis hesabı anahtarı oluşturmak kuruluş politikasıyla kapalı (`iam.disableServiceAccountKeyCreation`). Politika açık kalıyor; anahtar yerine şu yol kullanılıyor:
 
 - **Kimlik:** Sahip, Claude oturumunda bir kez Google'a giriş yapar. Claude `gcloud auth login --no-launch-browser` çalıştırır, sahip verilen bağlantıyı telefonda açar ve çıkan tek kullanımlık kodu sohbete yapıştırır. Kod PKCE ile o oturumdaki bekleyen girişe bağlıdır, birkaç dakikada geçersiz olur.
+  - **Hesap:** Girişte projenin bulunduğu **@voltan.com.tr** hesabı seçilmelidir. Kişisel gmail hesabının projeye erişimi yoktur.
+  - **Yer tutucu değişken:** Claude bulut oturumlarında `CLOUDSDK_AUTH_ACCESS_TOKEN` vekil sunucu için bir yer tutucudur ve gcloud girişinin önüne geçer. Elle çalıştırılan gcloud komutlarının başına `env -u CLOUDSDK_AUTH_ACCESS_TOKEN` eklenir. Araç bunu kendisi yapar.
 - **Belirteç:** Araç, sahibin kimliğiyle `gsc-okuyucu` adına 1 saatlik, salt okunur (`webmasters.readonly`) bir belirteç alır.
   ```bash
   GSC_IMPERSONATE=gsc-okuyucu@voltage-search-console.iam.gserviceaccount.com node tools/gsc-export.mjs --inspect

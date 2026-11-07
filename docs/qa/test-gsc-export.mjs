@@ -156,16 +156,17 @@ ok('CI atlama yolu yok (GSC_ALLOW_CI etkisiz)', rCi2.code === 1 && rCi2.err.incl
 // 4) Anahtarsız yol: GSC_IMPERSONATE + gcloud ile giriş yapmış kişi
 const bin = mkdtempSync(join(tmpdir(), 'gsc-gcloud-'));
 const fakeOk = join(bin, 'gcloud-girisli'), fakeNo = join(bin, 'gcloud-girissiz');
-writeFileSync(fakeOk, `#!/bin/sh\n[ "$1 $2" = "auth print-access-token" ] && echo ${USER_TOKEN} && exit 0\nexit 3\n`);
+// Yer tutucu CLOUDSDK_AUTH_ACCESS_TOKEN gcloud'a ulaşırsa sahte gcloud yanlış kimlik döndürür
+writeFileSync(fakeOk, `#!/bin/sh\n[ -n "$CLOUDSDK_AUTH_ACCESS_TOKEN" ] && echo yer-tutucu && exit 0\n[ "$1 $2" = "auth print-access-token" ] && echo ${USER_TOKEN} && exit 0\nexit 3\n`);
 writeFileSync(fakeNo, '#!/bin/sh\necho "ERROR: (gcloud.auth.print-access-token) You do not currently have an active account selected." >&2\nexit 1\n');
 chmodSync(fakeOk, 0o755); chmodSync(fakeNo, 0o755);
 const impEnv = (extra) => ({ GSC_IMPERSONATE: EMAIL, GSC_GCLOUD: fakeOk, GSC_IAM_BASE: BASE, ...extra });
 seen.auth = true;
 const dir4 = mkdtempSync(join(tmpdir(), 'gsc-test-'));
-const rImp = await runTool(impEnv({ GSC_SA_KEY_B64: Buffer.from('kullanilmamali').toString('base64') }), ['--out', dir4]);
+const rImp = await runTool(impEnv({ GSC_SA_KEY_B64: Buffer.from('kullanilmamali').toString('base64'), CLOUDSDK_AUTH_ACCESS_TOKEN: 'yer-tutucu' }), ['--out', dir4]);
 ok('anahtarsız: çıkış kodu 0', rImp.code === 0, rImp.err);
 ok('anahtarsız: doğru servis hesabı adresi', seen.impUrl === `/v1/projects/-/serviceAccounts/${EMAIL}:generateAccessToken`, seen.impUrl);
-ok('anahtarsız: kişi belirteciyle istek', seen.impAuth === true);
+ok('anahtarsız: kişi belirteciyle istek (yer tutucu CLOUDSDK_AUTH_ACCESS_TOKEN etkisiz)', seen.impAuth === true);
 ok('anahtarsız: yalnızca salt okunur kapsam, 1 saat', JSON.stringify(seen.impScope) === '["https://www.googleapis.com/auth/webmasters.readonly"]' && seen.impLifetime === '3600s');
 ok('anahtarsız: API çağrıları servis hesabı belirteciyle', seen.auth);
 ok('anahtarsız: dosyalar yazıldı', existsSync(join(dir4, 'OZET.md')) && existsSync(join(dir4, 'queries_28d.csv')));
