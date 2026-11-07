@@ -3,7 +3,7 @@
 // Gerçek Google'a bağlanmaz. Anahtar çalışma anında üretilir; dosyaya yazılmaz.
 import { createServer } from 'node:http';
 import { generateKeyPairSync, createVerify } from 'node:crypto';
-import { mkdtempSync, readFileSync, existsSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, existsSync, rmSync, writeFileSync, chmodSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +18,7 @@ const EMAIL = 'gsc-okuyucu@voltage-test.iam.gserviceaccount.com';
 const KEY_B64 = Buffer.from(JSON.stringify({ type: 'service_account', client_email: EMAIL, private_key: PEM })).toString('base64');
 const PEM_BODY = PEM.split('\n')[5]; // anahtarın ortasından bir satır: çıktıda asla görünmemeli
 
+const USER_TOKEN = 'kullanici-' + 'belirteci-1';   // gcloud'un vereceği sahte kişi belirteci
 let mode = 'ok';
 const seen = { jwtValid: false, scope: null, aud: null, pages: 0, inspected: 0, auth: true };
 const QUERIES = ['elektrik tedarikçi değiştirme', 'ptf', 'serbest tüketici limiti 2026', '=HYPERLINK("http://x")', 'sktt nedir', '\t+SUM(1)'];
@@ -35,6 +36,12 @@ const server = createServer((req, res) => {
       const claims = JSON.parse(Buffer.from(p, 'base64').toString());
       seen.scope = claims.scope; seen.aud = claims.aud; seen.iss = claims.iss;
       return send(200, { access_token: 'sahte-belirtec', expires_in: 3600 });
+    }
+    if (req.url.startsWith('/v1/projects/-/serviceAccounts/')) {   // anahtarsız yol (IAM Credentials)
+      seen.impUrl = req.url; seen.impAuth = req.headers.authorization === 'Bearer ' + USER_TOKEN;
+      const b = JSON.parse(body || '{}'); seen.impScope = b.scope; seen.impLifetime = b.lifetime;
+      if (mode === 'imp403') return send(403, { error: { message: 'Permission iam.serviceAccounts.getAccessToken denied' } });
+      return send(200, { accessToken: 'sahte-belirtec', expireTime: '2026-11-07T12:00:00Z' });
     }
     if (req.headers.authorization !== 'Bearer sahte-belirtec') seen.auth = false;
     if (mode === 'forbidden') return send(403, { error: { message: 'User does not have sufficient permission' } });
@@ -145,6 +152,43 @@ const rCi = await runTool({ GSC_SA_KEY_B64: KEY_B64, GITHUB_ACTIONS: 'true' }, [
 ok('GitHub Actions içinde çalışmayı reddediyor', rCi.code === 1 && rCi.err.includes('herkese açık'));
 const rCi2 = await runTool({ GSC_SA_KEY_B64: KEY_B64, GITHUB_ACTIONS: 'true', GSC_ALLOW_CI: '1' }, []);
 ok('CI atlama yolu yok (GSC_ALLOW_CI etkisiz)', rCi2.code === 1 && rCi2.err.includes('herkese açık'));
+
+// 4) Anahtarsız yol: GSC_IMPERSONATE + gcloud ile giriş yapmış kişi
+const bin = mkdtempSync(join(tmpdir(), 'gsc-gcloud-'));
+const fakeOk = join(bin, 'gcloud-girisli'), fakeNo = join(bin, 'gcloud-girissiz');
+writeFileSync(fakeOk, `#!/bin/sh\n[ "$1 $2" = "auth print-access-token" ] && echo ${USER_TOKEN} && exit 0\nexit 3\n`);
+writeFileSync(fakeNo, '#!/bin/sh\necho "ERROR: (gcloud.auth.print-access-token) You do not currently have an active account selected." >&2\nexit 1\n');
+chmodSync(fakeOk, 0o755); chmodSync(fakeNo, 0o755);
+const impEnv = (extra) => ({ GSC_IMPERSONATE: EMAIL, GSC_GCLOUD: fakeOk, GSC_IAM_BASE: BASE, ...extra });
+seen.auth = true;
+const dir4 = mkdtempSync(join(tmpdir(), 'gsc-test-'));
+const rImp = await runTool(impEnv({ GSC_SA_KEY_B64: Buffer.from('kullanilmamali').toString('base64') }), ['--out', dir4]);
+ok('anahtarsız: çıkış kodu 0', rImp.code === 0, rImp.err);
+ok('anahtarsız: doğru servis hesabı adresi', seen.impUrl === `/v1/projects/-/serviceAccounts/${EMAIL}:generateAccessToken`, seen.impUrl);
+ok('anahtarsız: kişi belirteciyle istek', seen.impAuth === true);
+ok('anahtarsız: yalnızca salt okunur kapsam, 1 saat', JSON.stringify(seen.impScope) === '["https://www.googleapis.com/auth/webmasters.readonly"]' && seen.impLifetime === '3600s');
+ok('anahtarsız: API çağrıları servis hesabı belirteciyle', seen.auth);
+ok('anahtarsız: dosyalar yazıldı', existsSync(join(dir4, 'OZET.md')) && existsSync(join(dir4, 'queries_28d.csv')));
+ok('anahtarsız: kişi belirteci çıktıda yok', !rImp.out.includes(USER_TOKEN) && !rImp.err.includes(USER_TOKEN));
+for (const f of ['totals.json', 'meta.json', 'OZET.md']) ok(`anahtarsız: kişi belirteci ${f} içinde yok`, !readFileSync(join(dir4, f), 'utf8').includes(USER_TOKEN));
+rmSync(dir4, { recursive: true, force: true });
+const rNoLogin = await runTool(impEnv({ GSC_GCLOUD: fakeNo }), []);
+ok('anahtarsız: gcloud girişi yoksa yol gösteriyor', rNoLogin.code === 1 && rNoLogin.err.includes('gcloud auth login'));
+const rNoBin = await runTool(impEnv({ GSC_GCLOUD: join(bin, 'yok') }), []);
+ok('anahtarsız: gcloud kurulu değilse çökmüyor', rNoBin.code === 1 && rNoBin.err.includes('gcloud auth login'));
+mode = 'imp403';
+const dir5 = mkdtempSync(join(tmpdir(), 'gsc-test-'));
+const rImp403 = await runTool(impEnv({}), ['--out', dir5]);
+ok('anahtarsız 403: rol eksikliği anlatılıyor', rImp403.code === 1 && rImp403.err.includes('Service Account Token Creator') && rImp403.err.includes(EMAIL));
+ok('anahtarsız 403: kişi belirteci mesajda yok', !rImp403.err.includes(USER_TOKEN));
+ok('anahtarsız 403: dosya yazılmadı', !existsSync(join(dir5, 'OZET.md')));
+rmSync(dir5, { recursive: true, force: true });
+mode = 'ok';
+const rBadEmail = await runTool(impEnv({ GSC_IMPERSONATE: 'gsc-okuyucu/../x' }), []);
+ok('anahtarsız: geçersiz e-posta reddediliyor', rBadEmail.code === 1 && rBadEmail.err.includes('servis hesabı e-postası'));
+const rImpCi = await runTool(impEnv({ GITHUB_ACTIONS: 'true' }), []);
+ok('anahtarsız: GitHub Actions içinde de reddediliyor', rImpCi.code === 1 && rImpCi.err.includes('herkese açık'));
+rmSync(bin, { recursive: true, force: true });
 
 server.close();
 console.log(`\n${pass} passed, ${fail} failed`);

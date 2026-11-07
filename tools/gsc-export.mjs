@@ -12,11 +12,18 @@
  *   GSC_SA_KEY_FILE  JSON anahtar dosyasının yolu (repo DIŞINDA olmalı)
  *   GSC_SITE         mülk (varsayılan: sc-domain:voltage.com.tr)
  *
+ * Anahtarsız yol (kuruluş politikası anahtar oluşturmayı kapattıysa):
+ *   GSC_IMPERSONATE  servis hesabının e-postası. Araç, oturumda `gcloud auth login` ile giriş
+ *                    yapmış kişinin kimliğiyle o hesap adına 1 saatlik salt okunur belirteç alır.
+ *                    Kişinin servis hesabında "Service Account Token Creator" rolü olmalı.
+ *                    Tanımlıysa anahtar değişkenlerinin önüne geçer.
+ *
  * Kurallar (CLAUDE.md 5 ve 6): anahtar hiçbir zaman ekrana veya dosyaya yazılmaz; çıktı
  * repoya girmez; repo herkese açık olduğu için GitHub Actions içinde çalışmayı reddeder.
  * Bağımlılık yok: Node 18+ (fetch, crypto).
  */
 import { createSign } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,6 +32,8 @@ const REPO = fileURLToPath(new URL('..', import.meta.url));
 
 const TOKEN_URL = process.env.GSC_TOKEN_URL || 'https://oauth2.googleapis.com/token';
 const API = process.env.GSC_API_BASE || 'https://searchconsole.googleapis.com';
+const IAM = process.env.GSC_IAM_BASE || 'https://iamcredentials.googleapis.com';
+const GCLOUD = process.env.GSC_GCLOUD || 'gcloud';
 const SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
 const SITE = process.env.GSC_SITE || 'sc-domain:voltage.com.tr';
 const ROW_LIMIT = Number(process.env.GSC_ROW_LIMIT) || 25000;
@@ -62,7 +71,7 @@ function loadKey() {
       raw = readFileSync(process.env.GSC_SA_KEY_FILE, 'utf8');
     }
   } catch (e) { fail('Anahtar okunamadı (' + e.code + ').'); }
-  if (!raw) fail('GSC_SA_KEY_B64 tanımlı değil. Kurulum: docs/seo/GSC-API-KURULUM.md');
+  if (!raw) fail('GSC_SA_KEY_B64 tanımlı değil (anahtarsız yol: GSC_IMPERSONATE). Kurulum: docs/seo/GSC-API-KURULUM.md');
   let k;
   try { k = JSON.parse(raw); } catch (e) { fail('Anahtar geçerli bir JSON değil (base64 doğru mu?).'); }
   if (!k.client_email || !k.private_key) fail('Anahtarda client_email veya private_key yok: servis hesabı JSON anahtarı mı?');
@@ -89,6 +98,31 @@ async function accessToken(key) {
       'Anahtar iptal edilmiş, saat kaymış veya proje silinmiş olabilir.');
   }
   return j.access_token;
+}
+
+/** Anahtarsız yol: gcloud ile giriş yapmış kişi, servis hesabı adına kısa ömürlü belirteç alır. */
+async function impersonatedToken(email) {
+  const noLogin = 'gcloud oturumu yok veya gcloud bulunamadı. Önce: gcloud auth login --no-launch-browser ' +
+    '(kurulum: docs/seo/GSC-API-KURULUM.md, "Anahtarsız yol").';
+  let user = '';
+  try {
+    // Belirteç yalnızca bellekte tutulur; stdout ekrana basılmaz
+    user = execFileSync(GCLOUD, ['auth', 'print-access-token'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60000 }).trim();
+  } catch (e) { fail(noLogin); }
+  if (!user) fail(noLogin);
+  const r = await fetch(`${IAM}/v1/projects/-/serviceAccounts/${email}:generateAccessToken`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ scope: [SCOPE], lifetime: '3600s' }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.accessToken) {
+    const gmsg = (j.error && j.error.message) || '';
+    fail(`Servis hesabı adına belirteç alınamadı (HTTP ${r.status}). ` +
+      (r.status === 403 ? `Giriş yapan hesabın ${email} üzerinde "Service Account Token Creator" rolü olmalı ve ` +
+        'projede IAM Service Account Credentials API açık olmalı. ' : '') + (gmsg ? `Google: ${gmsg}` : ''));
+  }
+  return j.accessToken;
 }
 
 async function api(token, method, path, body, { soft = false } = {}) {
@@ -171,9 +205,17 @@ function summary(w, t, tp, q, qPrev, pages, band) {
 }
 
 async function main() {
-  const key = loadKey();
-  process.env.__GSC_EMAIL = key.email;
-  const token = await accessToken(key);
+  let token;
+  const imp = (process.env.GSC_IMPERSONATE || '').trim();
+  if (imp) {
+    if (!/^[^\s/?#@]+@[^\s/?#@]+\.[A-Za-z]{2,}$/.test(imp)) fail('GSC_IMPERSONATE bir servis hesabı e-postası olmalı (ör. gsc-okuyucu@<proje>.iam.gserviceaccount.com).');
+    process.env.__GSC_EMAIL = imp;
+    token = await impersonatedToken(imp);
+  } else {
+    const key = loadKey();
+    process.env.__GSC_EMAIL = key.email;
+    token = await accessToken(key);
+  }
   const end = day(LAG_DAYS);
   const w = { cur: [day(LAG_DAYS + 27), end], prev: [day(LAG_DAYS + 55), day(LAG_DAYS + 28)], q90: [day(LAG_DAYS + 89), end] };
 

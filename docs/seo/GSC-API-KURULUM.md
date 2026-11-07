@@ -66,6 +66,22 @@ Veri 2–3 gün geriden gelir; araç dönem sonunu 3 gün geri alır. Tarih aral
 
 URL denetimi bir URL'de hata verirse performans verisi yine de yazılır; o URL `url_inspection.csv` içinde `ERROR` olarak görünür.
 
+## Anahtarsız yol (bugün kullanılan)
+
+voltan.com.tr kuruluşunda servis hesabı anahtarı oluşturmak kuruluş politikasıyla kapalı (`iam.disableServiceAccountKeyCreation`). Politika açık kalıyor; anahtar yerine şu yol kullanılıyor:
+
+- **Kimlik:** Sahip, Claude oturumunda bir kez Google'a giriş yapar. Claude `gcloud auth login --no-launch-browser` çalıştırır, sahip verilen bağlantıyı telefonda açar ve çıkan tek kullanımlık kodu sohbete yapıştırır. Kod PKCE ile o oturumdaki bekleyen girişe bağlıdır, birkaç dakikada geçersiz olur.
+- **Belirteç:** Araç, sahibin kimliğiyle `gsc-okuyucu` adına 1 saatlik, salt okunur (`webmasters.readonly`) bir belirteç alır.
+  ```bash
+  GSC_IMPERSONATE=gsc-okuyucu@voltage-search-console.iam.gserviceaccount.com node tools/gsc-export.mjs --inspect
+  ```
+- **Bir kerelik ön koşullar:** Bunlar 2026-11-07'de yapıldı.
+  - Projede **IAM Service Account Credentials API** açık.
+  - Sahibin hesabının `gsc-okuyucu` üzerinde **Service Account Token Creator** rolü var.
+  - `gsc-okuyucu`, Search Console'da Kısıtlı kullanıcı.
+- **İş bitince:** `gcloud auth revoke --all` ile oturumdaki Google erişimi silinir.
+- **Bedeli:** Her yeni oturumda giriş tekrarlanır. Tam otomatik kullanım için anahtar gerekir. O durumda kuruluş politikasının yalnızca bu proje için kapatılması gerekir; bu, sahibin açık kararıyla yapılır.
+
 ## Sık görülen hatalar
 
 | Mesaj | Çözüm |
@@ -75,6 +91,8 @@ URL denetimi bir URL'de hata verirse performans verisi yine de yazılır; o URL 
 | `Google erişim belirteci alınamadı` | Anahtar silinmiş olabilir; adım 2'den yeni anahtar |
 | `Repo herkese açık … CI` | Araç bilerek GitHub Actions içinde çalışmaz; Claude oturumunda çalıştırın |
 | `Çıktı klasörü repo içinde` | `gsc-data/` (varsayılan) veya repo dışı bir klasör kullanın |
+| `gcloud oturumu yok` | Anahtarsız yol: önce `gcloud auth login --no-launch-browser` |
+| `Servis hesabı adına belirteç alınamadı (HTTP 403)` | Anahtarsız yol ön koşulları: Token Creator rolü ve IAM Credentials API |
 | Anahtar oluştururken "Service account key creation is disabled" | Kuruluş politikası `iam.disableServiceAccountKeyCreation` açık (yeni Google Cloud kuruluşlarında varsayılan). IAM & Admin → Organization Policies → "Disable service account key creation" → bu proje için **Not enforced** (Organization Policy Administrator yetkisi gerekir). |
 
 ## Anahtarı iptal etmek
