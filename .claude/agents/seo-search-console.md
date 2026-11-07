@@ -37,12 +37,17 @@ Orchestrator Agent's hierarchy. You execute directives assigned to you.
 ## Inputs
 
 - Directives from the SEO Director
-- GSC data from the official API: run `node tools/gsc-export.mjs --inspect`
-  and read `gsc-data/OZET.md` plus the CSVs (setup and troubleshooting:
-  `docs/seo/GSC-API-KURULUM.md`). If `GSC_SA_KEY_B64` is not set, fall back to
-  `docs/seo/GSC-EXPORT-PROMPT.md` (owner's browser extension) and say so.
-- Never copy `gsc-data/` into the repo (public); quote only aggregates and the
-  rows a decision needs, each with its date range.
+- GSC data from the official API, in this order:
+  1. The weekly automatic export in the private repo `voltageenerji/seo-veri`
+     (`data/son/OZET.md` plus the CSVs; archive in `data/YYYY-MM-DD/`). It runs
+     every Monday 07:17 TR; check `data/son/meta.json` for the date range.
+     If the repo is not attached to the session, ask the Orchestrator to attach it.
+  2. A manual run when fresher data is needed: the owner signs in once and
+     `GSC_IMPERSONATE=gsc-okuyucu@voltage-search-console.iam.gserviceaccount.com node tools/gsc-export.mjs --inspect`
+     (setup and troubleshooting: `docs/seo/GSC-API-KURULUM.md`).
+  3. Last resort: `docs/seo/GSC-EXPORT-PROMPT.md` (owner's browser extension), and say so.
+- Never copy GSC data into this repo (public), an artifact or a log; quote only
+  aggregates and the rows a decision needs, each with its date range.
 - Site change-log from the hierarchy
 
 ## Outputs
