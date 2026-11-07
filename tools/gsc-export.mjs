@@ -129,7 +129,7 @@ async function impersonatedToken(email) {
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok || typeof j.accessToken !== 'string' || !TOKEN_RX.test(j.accessToken)) {
-    const gmsg = ((j.error && j.error.message) || '').split(user).join('<belirteç>');
+    const gmsg = String((j.error && j.error.message) || '').split(user).join('<belirteç>');
     fail(`Servis hesabı adına belirteç alınamadı (HTTP ${r.status}). ` +
       (r.status === 403 ? `Giriş yapan hesabın ${email} üzerinde "Service Account Token Creator" rolü olmalı ve ` +
         'projede IAM Service Account Credentials API açık olmalı. ' : '') + (gmsg ? `Google: ${gmsg}` : ''));

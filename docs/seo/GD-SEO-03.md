@@ -3,7 +3,7 @@
 **Tarih:** 07.11.2026
 **Domain:** voltage.com.tr
 **Hazırlayan:** SEO Director (Revenue). Uygulama: Webmaster (Technology). Onay: Hukuk & Uyum, QA.
-**Durum:** Analiz ve uygulamaya hazır değişiklik tanımı. Site dosyalarına dokunulmadı, commit yok. Webmaster, Hukuk onayından sonra uygular.
+**Durum:** Uygulandı 07.11.2026 (e5ae4f5); Hukuk ve QA onaylı. §3 listesinden farklar §11'de.
 
 Ek kaynaklar: `GD-SEO-02.md`, `CTR-OPTIMIZATION-MAP.md`, `GSC-8-20-WAR-ROOM.md`, `KEYWORD-OWNERSHIP-MAP.md`, `OPERASYON-DEFTERI.md` §3.08.
 

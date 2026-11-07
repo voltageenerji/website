@@ -208,8 +208,10 @@ mode = 'impNewline';
 const rNl = await runTool(impEnv({}), []);
 ok('anahtarsız: satır sonlu servis hesabı belirteci reddediliyor, basılmıyor', rNl.code === 1 && !rNl.err.includes('sahte') && !rNl.out.includes('sahte'));
 mode = 'ok';
-const rIamHost = await runTool(impEnv({ GSC_IAM_BASE: 'https://ornek.example' }), []);
-ok('anahtarsız: GSC_IAM_BASE yalnızca Google veya yerel test sunucusu', rIamHost.code === 1 && rIamHost.err.includes('GSC_IAM_BASE'));
+for (const host of ['https://ornek.example', 'https://iamcredentials.googleapis.com.ornek.example', 'http://127.0.0.1:1@ornek.example']) {
+  const rIamHost = await runTool(impEnv({ GSC_IAM_BASE: host }), []);
+  ok(`anahtarsız: GSC_IAM_BASE yalnızca Google veya yerel test sunucusu (${host})`, rIamHost.code === 1 && rIamHost.err.includes('GSC_IAM_BASE'));
+}
 rmSync(bin, { recursive: true, force: true });
 
 server.close();
