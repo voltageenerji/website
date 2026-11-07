@@ -344,3 +344,17 @@ Aracın kendi "önceki dönem"i (13.10–09.11) yayın öncesi günleri de içer
 6. 375 px ve masaüstü: yeni paragraf taşma yapmamalı.
 7. Değişen satırlarda kural 1 taraması: %, ₺, "en ucuz", "tasarruf", "garanti", "kesintisiz" geçmemeli. Denendi: 0.
 8. Sıra: QA kararı → Hukuk onayı → çalışma dalını push et → `main`'i ileri sar (`DEPLOY.md`). Ardından sahip O1–O3.
+
+---
+
+## 11. Uygulama notu (07.11.2026, Orchestrator)
+
+Uygulanan set, §3'teki listeden Hukuk ve Enerji Piyasası incelemesiyle şu noktalarda ayrıldı:
+
+- **SMF cümlesi:** "saatlik" ifadesi çıkarıldı. DGP uzlaştırma dönemi 01.01.2027'de 15 dakikaya iniyor (DUY m.91(2), RG 21.01.2025 sayı 32789; ikincil kaynaklardan, birincil metin Hukuk teyidinde). Aynı nedenle tablodaki SMF satırı, "saatlerde" → "dönemlerde" ve "geçmiş saatlik serisi" → "geçmiş serileri" düzeltildi. "PTF'yi kim belirler?" SSS'ine EPDK'nın asgari ve azami fiyat limitleri eklendi; rakam verilmedi.
+- **GÖP/GİP katılım iddiası:** ptf-nedir SSS'indeki "bugün GÖP ile GİP'in aktif katılımcısıdır" ifadesi kaldırıldı. Yerine yalnızca lisans bilgisi yazıldı. Sahip güncel katılımı teyit ederse geri eklenir. Aynı ifade beş sektör rehberinde ve ana sayfada duruyor (bkz. defter §3).
+- **Kontrol sayfaları artık yalnız bağlantı değil:**
+  - `/rehber/tedarikci-degistirme`: "Elektrik kesilir mi?" cevabı kural 1'e göre yeniden yazıldı.
+  - `/rehber/serbest-tuketici`: kaynaksız "mesken abonelerinin büyük bölümü", "katbekat" ve "fiilen tüm tüketici tabanı" ifadeleri değişti.
+  - İkisinin de tarihleri 07.11.2026'ya taşındı. §8'deki kontrol satırları artık saf kontrol değildir: bu sayfalardaki hareket, metin değişikliğinin etkisiyle karışır. Site geneli hareket için `/canli-ptf` ve `/rehber/osb-elektrik-tedariki` izlenir.
+- §10 madde 2 ("serbest-tuketici ve tedarikci-degistirme tarihleri değişmez") bu nedenle geçersizdir.
