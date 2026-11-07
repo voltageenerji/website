@@ -1,0 +1,28 @@
+# GEÇİCİ — e-posta DNS kayıtlarının (NS, MX, SPF, DMARC, DKIM) kontrolü. Secret kullanmaz;
+# yalnızca herkese açık DNS yanıtlarını yazdırır. İş bitince silinecek.
+name: DNS Check
+
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: ['.github/workflows/dns-check.yml']
+
+jobs:
+  dns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kayitlar
+        run: |
+          for d in voltage.com.tr voltan.com.tr voltan.com; do
+            echo "=================== $d"
+            echo "NS:    $(dig +short NS $d @1.1.1.1 | tr '\n' ' ')"
+            echo "SOA:   $(dig +short SOA $d @1.1.1.1)"
+            echo "MX:    $(dig +short MX $d @1.1.1.1 | sort -n | tr '\n' ' ')"
+            echo "TXT:"; dig +short TXT $d @1.1.1.1 | sed 's/^/       /'
+            echo "DMARC: $(dig +short TXT _dmarc.$d @1.1.1.1 | tr '\n' ' ')"
+            for s in google default selector1; do
+              r=$(dig +short TXT $s._domainkey.$d @1.1.1.1 | tr -d '\n')
+              echo "DKIM $s: ${r:0:90}$([ ${#r} -gt 90 ] && echo "… (${#r} karakter)")"
+            done
+            echo "DKIM google (8.8.8.8): $(dig +short TXT google._domainkey.$d @8.8.8.8 | wc -c) bayt"
+          done
