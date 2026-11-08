@@ -23,7 +23,7 @@ yapıştır-hazır künye blokları, tutarlılık kuralı ve takip tablosu.
 |---|---|
 | İşletme adı (marka) | `Voltage Enerji` |
 | Tüzel kişilik | `Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.` |
-| Adres | `Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34660 Kadıköy / İstanbul / Türkiye` |
+| Adres | `Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34718 Kadıköy / İstanbul / Türkiye` |
 | Web | `https://voltage.com.tr` |
 | E-posta | `info@voltage.com.tr` |
 | LinkedIn | `https://www.linkedin.com/company/voltage-enerji/` |
@@ -38,7 +38,7 @@ yapıştır-hazır künye blokları, tutarlılık kuralı ve takip tablosu.
 | Cadde/Sokak/Bina | `Acıbadem Mah. Elysium Elit Koşuyolu B-18` |
 | İlçe | `Kadıköy` |
 | İl | `İstanbul` |
-| Posta kodu | `34660` |
+| Posta kodu | `34718` |
 | Ülke | `Türkiye` (ISO: `TR`) |
 
 ### 0.2 BLOKER — telefon numarası
@@ -141,7 +141,7 @@ en güçlü şekilde besler; harita paketinde İstanbul sorgularında yer verir.
 "Müşteriler işletmenizin adresini ziyaret edebilir mi?" → Evet
 Adres → Acıbadem Mah. Elysium Elit Koşuyolu B-18
 İlçe/İl → Kadıköy, İstanbul
-Posta kodu → 34660
+Posta kodu → 34718
 Ülke → Türkiye
 "Ayrıca müşterilere onların konumunda hizmet veriyor musunuz?" → Evet
 Hizmet bölgesi → Türkiye
@@ -153,7 +153,7 @@ Hizmet bölgesi → Türkiye
 
 ```
 "Müşteriler işletmenizin adresini ziyaret edebilir mi?" → Hayır
-Adres (yalnızca doğrulama için, gizli) → Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34660 Kadıköy, İstanbul
+Adres (yalnızca doğrulama için, gizli) → Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34718 Kadıköy, İstanbul
 Hizmet bölgesi → Türkiye
 ```
 
@@ -381,7 +381,7 @@ Voltage Enerji (Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.)
 ### 3.2 Tek satır künye (imza / dipnot alanları)
 
 ```
-Voltage Enerji (Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.) · Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34660 Kadıköy / İstanbul / Türkiye · [SAHİP DOLDURACAK: kurumsal telefon] · https://voltage.com.tr · info@voltage.com.tr
+Voltage Enerji (Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.) · Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34718 Kadıköy / İstanbul / Türkiye · [SAHİP DOLDURACAK: kurumsal telefon] · https://voltage.com.tr · info@voltage.com.tr
 ```
 
 ### 3.3 Açıklama blokları
@@ -470,7 +470,7 @@ başlığa veya adres alanına **asla** girmez.
    alanına sığmayan metin **kısaltılmaz**; bir alt blok (UZUN → ORTA → KISA)
    seçilir.
 2. Adres yazımı hiçbir yerde değişmez: `Acıbadem Mah.` (`Mahallesi` değil),
-   `B-18` (`B18`, `B/18` değil), `34660` her zaman yazılır, `Kadıköy` ve
+   `B-18` (`B18`, `B/18` değil), `34718` her zaman yazılır, `Kadıköy` ve
    `İstanbul` Türkçe karakterle. ASCII zorunlu sistemlerde `Kadikoy / Istanbul`
    kabul edilir ve o satır takip tablosunda **not edilir**.
 3. Telefon her yerde tek formatta: `+90 216 XXX XX XX`. Farklı numara,
