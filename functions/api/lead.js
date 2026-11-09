@@ -308,6 +308,8 @@ export async function onRequestPost(context) {
   const meskenTalep = clean(body.tarife, 40) === 'mesken';
   if (meskenTalep) {
     body.sektor = 'mesken';
+    // Mesken formunda şirket adı sorulmaz: kayıtta ad soyad kullanılır
+    if (!clean(body.sirket)) body.sirket = `${clean(body.ad, 100)} ${clean(body.soyad, 100)}`.trim();
     body.odeme_tercihi = '';
   }
   for (const f of REQUIRED_FIELDS) {

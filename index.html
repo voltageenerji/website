@@ -2147,6 +2147,7 @@ async function fetchPtfLive(){
     const tarifeSel = document.getElementById('lead-tarife');
     const tukSel = document.getElementById('lead-tuketim');
     const sektorSel = document.getElementById('lead-sektor');
+    const sirketInp = document.getElementById('lead-sirket');
     const kwh = document.getElementById('lead-tuketim-kwh');
     const odeme = form.querySelector('fieldset.form-choices');
     const not = document.getElementById('lead-mesken-not');
@@ -2183,6 +2184,7 @@ async function fetchPtfLive(){
       mesken = m;
       bantKur(m ? meskenBant : isBant);
       sektorGrp.style.display = m ? 'none' : '';
+      if(sirketInp){ sirketInp.closest('.form-group').style.display = m ? 'none' : ''; sirketInp.required = !m; if(m) sirketInp.value = ''; }
       sektorSel.required = !m;
       if(m) sektorSel.value = '';
       odeme.style.display = m ? 'none' : '';

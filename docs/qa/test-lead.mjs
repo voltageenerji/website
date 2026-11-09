@@ -245,6 +245,13 @@ ok('multipart kvkk false → 400', (await mpGonder(alanlar({ kvkk: false }), [{ 
   ok('mesken sektörsüz → 200', r.status === 200, `-> ${r.status} ${JSON.stringify(r.j)}`);
   const l = leadKaydi(kv);
   ok('mesken: sektör mesken, ödeme tercihi boş, kWh 230', l && l.lead.sektor === 'mesken' && l.lead.odemeTercihi === '' && l.lead.tuketimKwh === 230, JSON.stringify(l && l.lead));
+  const r3 = await jsonGonder(alanlar({ tarife: 'mesken', sektor: '', sirket: '', tuketim: '300-500' }), { kv: sahteKv() });
+  ok('mesken şirketsiz → 200, şirket = ad soyad', r3.status === 200);
+  const kv3 = sahteKv();
+  await jsonGonder(alanlar({ tarife: 'mesken', sektor: '', sirket: '', tuketim: '300-500' }), { kv: kv3 });
+  ok('mesken şirket alanı ad soyad', leadKaydi(kv3)?.lead.sirket === 'QA Test');
+  const r4 = await jsonGonder(alanlar({ tarife: 'og-sanayi', sirket: '' }));
+  ok('mesken değilse şirket zorunlu → 400', r4.status === 400 && r4.j.field === 'sirket');
   const r2 = await jsonGonder(alanlar({ tarife: 'og-sanayi', sektor: '' }));
   ok('mesken değilse sektör zorunlu → 400', r2.status === 400 && r2.j.field === 'sektor');
 }
