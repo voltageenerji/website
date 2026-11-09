@@ -1584,6 +1584,21 @@ body.menu-open { overflow: hidden; }
           </div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label" for="lead-tarife" data-tr="Tarife / Abone Grubu" data-en="Tariff / Subscriber Group">Tarife / Abone Grubu</label>
+          <select class="form-select" id="lead-tarife" name="tarife" required>
+            <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
+            <option value="og-sanayi" data-tr="Sanayi · OG" data-en="Industry · MV">Sanayi · OG</option>
+            <option value="ag-sanayi" data-tr="Sanayi · AG" data-en="Industry · LV">Sanayi · AG</option>
+            <option value="og-ticarethane" data-tr="Ticarethane · OG" data-en="Commercial · MV">Ticarethane · OG</option>
+            <option value="ag-ticarethane" data-tr="Ticarethane · AG" data-en="Commercial · LV">Ticarethane · AG</option>
+            <option value="mesken" data-tr="Mesken" data-en="Residential">Mesken</option>
+            <option value="tarimsal" data-tr="Tarımsal Faaliyet" data-en="Agricultural">Tarımsal Faaliyet</option>
+            <option value="bilmiyorum" data-tr="Bilmiyorum" data-en="Not sure">Bilmiyorum</option>
+          </select>
+        </div>
+        <p class="form-hint" id="lead-mesken-not" style="display:none" data-tr="Mesken aboneliklerinde ödeme faturadan sonradır; son ödeme günü fatura tarihinden 10 gün sonradır. Sözleşme yapılırken iki aylık fatura tutarında güvence bedeli istenir ve iki taksitte ödenir; tedarik sona erdiğinde iade edilir." data-en="For residential subscriptions, payment is made after the invoice; the due date is 10 days after the invoice date. A security deposit equal to two months' bills is requested when the contract is signed and paid in two instalments; it is refunded when supply ends.">Mesken aboneliklerinde ödeme faturadan sonradır; son ödeme günü fatura tarihinden 10 gün sonradır. Sözleşme yapılırken iki aylık fatura tutarında güvence bedeli istenir ve iki taksitte ödenir; tedarik sona erdiğinde iade edilir.</p>
+
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="lead-tuketim" data-tr="Aylık Tüketim" data-en="Monthly Consumption">Aylık Tüketim</label>
@@ -1619,21 +1634,7 @@ body.menu-open { overflow: hidden; }
               <option value="diger" data-tr="Diğer" data-en="Other">Diğer</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="lead-tarife" data-tr="Tarife / Abone Grubu" data-en="Tariff / Subscriber Group">Tarife / Abone Grubu</label>
-            <select class="form-select" id="lead-tarife" name="tarife" required>
-              <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
-              <option value="og-sanayi" data-tr="Sanayi · OG" data-en="Industry · MV">Sanayi · OG</option>
-              <option value="ag-sanayi" data-tr="Sanayi · AG" data-en="Industry · LV">Sanayi · AG</option>
-              <option value="og-ticarethane" data-tr="Ticarethane · OG" data-en="Commercial · MV">Ticarethane · OG</option>
-              <option value="ag-ticarethane" data-tr="Ticarethane · AG" data-en="Commercial · LV">Ticarethane · AG</option>
-              <option value="mesken" data-tr="Mesken" data-en="Residential">Mesken</option>
-              <option value="tarimsal" data-tr="Tarımsal Faaliyet" data-en="Agricultural">Tarımsal Faaliyet</option>
-              <option value="bilmiyorum" data-tr="Bilmiyorum" data-en="Not sure">Bilmiyorum</option>
-            </select>
-          </div>
         </div>
-        <p class="form-hint" id="lead-mesken-not" style="display:none" data-tr="Mesken aboneliklerinde ödeme faturadan sonradır; son ödeme günü fatura tarihinden 10 gün sonradır. Sözleşme yapılırken iki aylık fatura tutarında güvence bedeli istenir ve iki taksitte ödenir; tedarik sona erdiğinde iade edilir." data-en="For residential subscriptions, payment is made after the invoice; the due date is 10 days after the invoice date. A security deposit equal to two months' bills is requested when the contract is signed and paid in two instalments; it is refunded when supply ends.">Mesken aboneliklerinde ödeme faturadan sonradır; son ödeme günü fatura tarihinden 10 gün sonradır. Sözleşme yapılırken iki aylık fatura tutarında güvence bedeli istenir ve iki taksitte ödenir; tedarik sona erdiğinde iade edilir.</p>
 
         <div class="form-group">
           <label class="form-label" for="lead-fatura" data-tr="Son faturanız (opsiyonel)" data-en="Latest invoice (optional)">Son faturanız (opsiyonel)</label>
@@ -2155,12 +2156,15 @@ async function fetchPtfLive(){
     const isBant = Array.from(tukSel.options).map(function(o){ return { v: o.value, tr: o.getAttribute('data-tr'), en: o.getAttribute('data-en') }; });
     const meskenBant = [
       { v: '', tr: 'Seçiniz', en: 'Select' },
-      { v: '0-150', tr: '150 kWh altı', en: 'Under 150 kWh' },
-      { v: '150-250', tr: '150 – 250 kWh', en: '150 – 250 kWh' },
-      { v: '250-400', tr: '250 – 400 kWh', en: '250 – 400 kWh' },
-      { v: '400-600', tr: '400 – 600 kWh', en: '400 – 600 kWh' },
-      { v: '600-1000', tr: '600 – 1.000 kWh', en: '600 – 1,000 kWh' },
-      { v: '1000+', tr: '1.000 kWh üstü', en: 'Over 1,000 kWh' }
+      { v: '0-300', tr: '300 kWh altı', en: 'Under 300 kWh' },
+      { v: '300-500', tr: '300 – 500 kWh', en: '300 – 500 kWh' },
+      { v: '500-750', tr: '500 – 750 kWh', en: '500 – 750 kWh' },
+      { v: '750-1000', tr: '750 – 1.000 kWh', en: '750 – 1,000 kWh' },
+      { v: '1000-1500', tr: '1.000 – 1.500 kWh', en: '1,000 – 1,500 kWh' },
+      { v: '1500-2000', tr: '1.500 – 2.000 kWh', en: '1,500 – 2,000 kWh' },
+      { v: '2000-3000', tr: '2.000 – 3.000 kWh', en: '2,000 – 3,000 kWh' },
+      { v: '3000-5000', tr: '3.000 – 5.000 kWh', en: '3,000 – 5,000 kWh' },
+      { v: '5000+', tr: '5.000 kWh üstü', en: 'Over 5,000 kWh' }
     ];
     let mesken = false;
     function bantKur(liste){
@@ -2185,8 +2189,8 @@ async function fetchPtfLive(){
       radyolar.forEach(function(r, i){ if(m) r.checked = false; if(i === 0) r.required = !m; });
       if(not) not.style.display = m ? '' : 'none';
       if(kwh){
-        kwh.setAttribute('data-tr-placeholder', m ? 'Örn. 250 kWh' : 'Örn. 42.500 kWh');
-        kwh.setAttribute('data-en-placeholder', m ? 'e.g. 250 kWh' : 'e.g. 42,500 kWh');
+        kwh.setAttribute('data-tr-placeholder', m ? 'Örn. 650 kWh' : 'Örn. 42.500 kWh');
+        kwh.setAttribute('data-en-placeholder', m ? 'e.g. 650 kWh' : 'e.g. 42,500 kWh');
         kwh.placeholder = document.documentElement.lang === 'en' ? kwh.getAttribute('data-en-placeholder') : kwh.getAttribute('data-tr-placeholder');
       }
     }
