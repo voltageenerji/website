@@ -618,7 +618,26 @@ section {
   min-height: 80px;
   line-height: 1.5;
 }
-.form-hint { display: block; margin-top: 4px; font-size: 12px; color: var(--muted, #6b7280); }
+.form-hint { display: block; margin-top: 4px; font-size: 12px; color: var(--ink-muted); }
+.form-choices { border: none; padding: 0; margin: 0 0 20px; min-width: 0; }
+.form-choices legend { padding: 0; }
+.form-choice {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px; margin-top: 8px;
+  border: 1px solid var(--line); cursor: pointer;
+  font-size: 13px; line-height: 1.55; color: var(--ink-soft);
+  transition: border-color 0.3s var(--ease);
+}
+.form-choice:hover { border-color: var(--ink-muted); }
+.form-choice input[type="radio"] {
+  appearance: none; -webkit-appearance: none;
+  width: 15px; height: 15px; flex: none; margin-top: 3px;
+  border: 1px solid var(--ink-muted); border-radius: 50%;
+  background: transparent; cursor: pointer;
+}
+.form-choice input[type="radio"]:checked { border: 4px solid var(--ink); }
+.form-choice:has(input:checked) { border-color: var(--ink); }
+.form-choice b { display: block; color: var(--ink); font-weight: 500; font-size: 14px; margin-bottom: 2px; }
 .form-select {
   appearance: none;
   -webkit-appearance: none;
@@ -1569,12 +1588,25 @@ body.menu-open { overflow: hidden; }
             <label class="form-label" for="lead-tuketim" data-tr="Aylık Tüketim" data-en="Monthly Consumption">Aylık Tüketim</label>
             <select class="form-select" id="lead-tuketim" name="tuketim" required>
               <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
-              <option value="0-100000" data-tr="100.000 kWh altı" data-en="Under 100,000 kWh">100.000 kWh altı</option>
-              <option value="100000-500000" data-tr="100.000 – 500.000 kWh" data-en="100,000 – 500,000 kWh">100.000 – 500.000 kWh</option>
+              <option value="0-10000" data-tr="10.000 kWh altı" data-en="Under 10,000 kWh">10.000 kWh altı</option>
+              <option value="10000-25000" data-tr="10.000 – 25.000 kWh" data-en="10,000 – 25,000 kWh">10.000 – 25.000 kWh</option>
+              <option value="25000-50000" data-tr="25.000 – 50.000 kWh" data-en="25,000 – 50,000 kWh">25.000 – 50.000 kWh</option>
+              <option value="50000-100000" data-tr="50.000 – 100.000 kWh" data-en="50,000 – 100,000 kWh">50.000 – 100.000 kWh</option>
+              <option value="100000-250000" data-tr="100.000 – 250.000 kWh" data-en="100,000 – 250,000 kWh">100.000 – 250.000 kWh</option>
+              <option value="250000-500000" data-tr="250.000 – 500.000 kWh" data-en="250,000 – 500,000 kWh">250.000 – 500.000 kWh</option>
               <option value="500000-1000000" data-tr="500.000 – 1.000.000 kWh" data-en="500,000 – 1,000,000 kWh">500.000 – 1.000.000 kWh</option>
-              <option value="1000000+" data-tr="1.000.000 kWh üstü" data-en="Over 1,000,000 kWh">1.000.000 kWh üstü</option>
+              <option value="1000000-2500000" data-tr="1.000.000 – 2.500.000 kWh" data-en="1,000,000 – 2,500,000 kWh">1.000.000 – 2.500.000 kWh</option>
+              <option value="2500000+" data-tr="2.500.000 kWh üstü" data-en="Over 2,500,000 kWh">2.500.000 kWh üstü</option>
             </select>
           </div>
+          <div class="form-group">
+            <label class="form-label" for="lead-tuketim-kwh" data-tr="Tam aylık tüketim (opsiyonel)" data-en="Exact monthly use (optional)">Tam aylık tüketim (opsiyonel)</label>
+            <input type="text" class="form-input" id="lead-tuketim-kwh" name="tuketim_kwh" inputmode="numeric" maxlength="14" data-tr-placeholder="Örn. 42.500 kWh" data-en-placeholder="e.g. 42,500 kWh" placeholder="Örn. 42.500 kWh">
+            <small class="form-hint" data-tr="Faturanızdaki aylık toplam tüketim" data-en="Total monthly consumption on your invoice">Faturanızdaki aylık toplam tüketim</small>
+          </div>
+        </div>
+
+        <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="lead-sektor" data-tr="Sektör" data-en="Industry">Sektör</label>
             <select class="form-select" id="lead-sektor" name="sektor" required>
@@ -1586,9 +1618,6 @@ body.menu-open { overflow: hidden; }
               <option value="diger" data-tr="Diğer" data-en="Other">Diğer</option>
             </select>
           </div>
-        </div>
-
-        <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="lead-tarife" data-tr="Tarife / Abone Grubu" data-en="Tariff / Subscriber Group">Tarife / Abone Grubu</label>
             <select class="form-select" id="lead-tarife" name="tarife" required>
@@ -1602,12 +1631,43 @@ body.menu-open { overflow: hidden; }
               <option value="bilmiyorum" data-tr="Bilmiyorum" data-en="Not sure">Bilmiyorum</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="lead-fatura" data-tr="Son faturanız (opsiyonel)" data-en="Latest invoice (optional)">Son faturanız (opsiyonel)</label>
-            <input type="file" class="form-input" id="lead-fatura" name="fatura" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic" multiple>
-            <small class="form-hint" data-tr="PDF ya da fotoğraf · en fazla 3 dosya, her biri 8 MB" data-en="PDF or photo · up to 3 files, 8 MB each">PDF ya da fotoğraf · en fazla 3 dosya, her biri 8 MB</small>
-          </div>
         </div>
+
+        <div class="form-group">
+          <label class="form-label" for="lead-fatura" data-tr="Son faturanız (opsiyonel)" data-en="Latest invoice (optional)">Son faturanız (opsiyonel)</label>
+          <input type="file" class="form-input" id="lead-fatura" name="fatura" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple>
+          <small class="form-hint" data-tr="PDF ya da fotoğraf · en fazla 3 dosya, her biri en fazla 8 MB, toplamı en fazla 10 MB. Fotoğraflar gönderilirken küçültülür. Fatura eklerseniz tüketiminizi ve tarifenizi faturadan biz okuruz." data-en="PDF or photo · up to 3 files, max 8 MB each and 10 MB in total. Photos are resized before upload. If you attach an invoice, we read your consumption and tariff from it.">PDF ya da fotoğraf · en fazla 3 dosya, her biri en fazla 8 MB, toplamı en fazla 10 MB. Fotoğraflar gönderilirken küçültülür. Fatura eklerseniz tüketiminizi ve tarifenizi faturadan biz okuruz.</small>
+          <small class="form-hint" data-tr="Faturanız teklifinizin hazırlanması için kullanılır; saklama ve silme koşulları KVKK Aydınlatma Metni'nde yer alır." data-en="Your invoice is used to prepare your proposal; retention and deletion terms are set out in the KVKK Privacy Notice.">Faturanız teklifinizin hazırlanması için kullanılır; saklama ve silme koşulları KVKK Aydınlatma Metni'nde yer alır.</small>
+        </div>
+
+        <fieldset class="form-choices">
+          <legend class="form-label" data-tr="Ödeme şekli tercihiniz" data-en="Preferred payment method">Ödeme şekli tercihiniz</legend>
+          <label class="form-choice" for="lead-odeme-onodemeli">
+            <input type="radio" id="lead-odeme-onodemeli" name="odeme_tercihi" value="onodemeli" required>
+            <span>
+              <b class="tr-only">Ön ödemeli</b><b class="en-only">Prepaid</b>
+              <span class="tr-only">Her ayın enerji bedelini o ay başlamadan önce ödersiniz. Ödeme şekli birim fiyatı etkiler; ön ödemeli fiyat teklifte ayrıca gösterilir. Ön ödemeli teklif her tüketim ve abone grubu için sunulmaz.</span>
+              <span class="en-only">You pay each month's energy charge before that month starts. The payment method affects the unit price; the prepaid price is shown separately in the proposal. Prepaid offers are not available for every consumption level or subscriber group.</span>
+            </span>
+          </label>
+          <label class="form-choice" for="lead-odeme-vadeli">
+            <input type="radio" id="lead-odeme-vadeli" name="odeme_tercihi" value="vadeli">
+            <span>
+              <b class="tr-only">Faturadan sonra öde</b><b class="en-only">Pay after invoice</b>
+              <span class="tr-only">Tükettiğiniz ayın faturası izleyen ayın başında kesilir; ödemeyi faturadaki son ödeme tarihine kadar yaparsınız. Ödeme süresi teklifte ve sözleşmede yer alır.</span>
+              <span class="en-only">The invoice for the month you used is issued at the start of the following month; you pay by the due date on the invoice. The payment term is stated in the proposal and the contract.</span>
+            </span>
+          </label>
+          <label class="form-choice" for="lead-odeme-ikisi">
+            <input type="radio" id="lead-odeme-ikisi" name="odeme_tercihi" value="ikisi">
+            <span>
+              <b class="tr-only">İkisini de görmek istiyorum</b><b class="en-only">Show me both</b>
+              <span class="tr-only">Sizin için uygun seçenekleri teklifte yan yana sunarız.</span>
+              <span class="en-only">We show the options available to you side by side in the proposal.</span>
+            </span>
+          </label>
+          <small class="form-hint" data-tr="Mesken aboneliklerinde ödeme faturadan sonradır. Sözleşme yapılırken güvence bedeli istenir; tutarı ve ödeme şekli sözleşmede yer alır." data-en="For residential subscriptions, payment is made after the invoice. A security deposit is requested when the contract is signed; its amount and payment terms are set out in the contract.">Mesken aboneliklerinde ödeme faturadan sonradır. Sözleşme yapılırken güvence bedeli istenir; tutarı ve ödeme şekli sözleşmede yer alır.</small>
+        </fieldset>
 
         <div class="form-group">
           <label class="form-label" for="lead-mesaj" data-tr="Notunuz (opsiyonel)" data-en="Your Note (optional)">Notunuz (opsiyonel)</label>
@@ -1623,8 +1683,8 @@ body.menu-open { overflow: hidden; }
         <label class="form-consent" for="lead-kvkk">
           <input type="checkbox" id="lead-kvkk" name="kvkk" required>
           <span>
-            <span class="tr-only"><a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni okudum; kişisel verilerimin teklif hazırlanması amacıyla işlenmesine onay veriyorum.</span>
-            <span class="en-only">I have read the <a href="/kvkk" target="_blank" rel="noopener">KVKK Privacy Notice</a> and consent to the processing of my personal data for the preparation of a proposal.</span>
+            <span class="tr-only"><a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni okudum ve anladım.</span>
+            <span class="en-only">I have read and understood the <a href="/kvkk" target="_blank" rel="noopener">KVKK Privacy Notice</a>.</span>
           </span>
         </label>
 
@@ -1789,7 +1849,7 @@ function setLanguage(lang) {
   });
   
   // Update textarea placeholders specifically
-  document.querySelectorAll('textarea[data-' + lang + '-placeholder]').forEach(el => {
+  document.querySelectorAll('input[data-' + lang + '-placeholder], textarea[data-' + lang + '-placeholder]').forEach(el => {
     el.setAttribute('placeholder', el.getAttribute('data-' + lang + '-placeholder'));
   });
   
@@ -2090,7 +2150,12 @@ async function fetchPtfLive(){
     okTitle: { tr: 'Talebiniz alındı.', en: 'Your request has been received.' },
     okText: { tr: '1 iş günü içinde dönüş yapacağız.', en: 'We will get back to you within 1 business day.' },
     errPre: { tr: 'Talebiniz gönderilemedi. Lütfen tekrar deneyin veya ', en: 'Your request could not be sent. Please try again or email ' },
-    errPost: { tr: ' adresine yazın.', en: '.' }
+    errPost: { tr: ' adresine yazın.', en: '.' },
+    rlPre: { tr: 'Kısa sürede çok sayıda talep gönderildi. Lütfen daha sonra tekrar deneyin veya ', en: 'Too many requests were sent in a short time. Please try again later or email ' },
+    filePre: { tr: 'Fatura dosyası kabul edilmedi. PDF, JPG, PNG, WEBP ya da HEIC yükleyin veya talebi faturasız gönderin. Sorularınız için ', en: 'The invoice file was not accepted. Please upload PDF, JPG, PNG, WEBP or HEIC, or send the request without an invoice. For questions, email ' },
+    filePost: { tr: ' adresine yazabilirsiniz.', en: '.' },
+    noFilePre: { tr: 'Talebiniz alındı, ancak faturanız yüklenemedi. Teklif, formdaki bilgilerle hazırlanacak; gerekirse sizinle iletişime geçeceğiz. Sorularınız için ', en: 'Your request was received, but your invoice could not be uploaded. We will prepare the proposal from the form details and contact you if needed. For questions, email ' },
+    noFilePost: { tr: ' adresine yazabilirsiniz.', en: '.' }
   };
   function esc(s){ return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
   function utmParams(){
@@ -2105,22 +2170,98 @@ async function fetchPtfLive(){
     return utm;
   }
   const FATURA_TURLER = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/heic'];
-  function faturalariOku(input){
+  const UZANTI_TUR = { pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heic' };
+  const DOSYA_EN_FAZLA = 8 * 1024 * 1024;
+  const TOPLAM_EN_FAZLA = 10 * 1024 * 1024;
+  // Tür boşsa (ör. Windows'ta HEIC) uzantıdan çıkarılır
+  function turBul(f){
+    const t = String(f.type || '').toLowerCase();
+    if(t === 'image/heif') return 'image/heic';
+    if(FATURA_TURLER.indexOf(t) >= 0) return t;
+    if(t === '' || t === 'application/octet-stream'){
+      const m = /\.([a-z0-9]+)$/i.exec(f.name || '');
+      return (m && UZANTI_TUR[m[1].toLowerCase()]) || '';
+    }
+    return '';
+  }
+  // JPEG/PNG/WEBP: tarayıcıda uzun kenar en fazla 2000 px, JPEG %85. Başarısızsa ya da
+  // küçülmüyorsa null döner ve özgün dosya gönderilir (HEIC/PDF'e dokunulmaz).
+  function resmiAc(f){
+    if(window.createImageBitmap) return createImageBitmap(f, { imageOrientation: 'from-image' }).catch(function(){ return createImageBitmap(f); });
+    return new Promise(function(ok, hata){
+      const r = new FileReader();
+      r.onload = function(){ const img = new Image(); img.onload = function(){ ok(img); }; img.onerror = hata; img.src = String(r.result); };
+      r.onerror = hata;
+      r.readAsDataURL(f);
+    });
+  }
+  async function kucult(f, tur){
+    if(['image/jpeg', 'image/png', 'image/webp'].indexOf(tur) < 0) return null;
+    try {
+      const img = await resmiAc(f);
+      const w = img.width || img.naturalWidth, h = img.height || img.naturalHeight;
+      if(!w || !h) return null;
+      const k = Math.min(1, 2000 / Math.max(w, h));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(w * k));
+      c.height = Math.max(1, Math.round(h * k));
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      if(img.close) img.close();
+      const b = await new Promise(function(ok){ c.toBlob(ok, 'image/jpeg', 0.85); });
+      return b && b.size > 0 && b.size < f.size ? b : null;
+    } catch(e) {
+      return null;
+    }
+  }
+  async function faturalariHazirla(input){
     const dosyalar = Array.from((input && input.files) || []);
     const t = L();
-    if(dosyalar.length > 3) return Promise.reject(new Error(t === 'en' ? 'Up to 3 invoice files.' : 'En fazla 3 fatura dosyası yükleyebilirsiniz.'));
+    if(dosyalar.length > 3) throw new Error(t === 'en' ? 'Up to 3 invoice files.' : 'En fazla 3 fatura dosyası yükleyebilirsiniz.');
+    const hazir = [];
     for(const f of dosyalar){
-      if(f.size > 8 * 1024 * 1024) return Promise.reject(new Error(t === 'en' ? 'Each file must be 8 MB or smaller.' : 'Her dosya en fazla 8 MB olabilir.'));
-      if(FATURA_TURLER.indexOf(f.type) < 0) return Promise.reject(new Error(t === 'en' ? 'Please upload PDF, JPG or PNG.' : 'Lütfen PDF, JPG ya da PNG yükleyin.'));
+      const tur = turBul(f);
+      if(!tur) throw new Error(t === 'en' ? 'Please upload PDF, JPG, PNG, WEBP or HEIC.' : 'Lütfen PDF, JPG, PNG, WEBP ya da HEIC yükleyin.');
+      if(!f.size) throw new Error(t === 'en' ? 'File could not be read.' : 'Dosya okunamadı.');
+      const ad = (f.name || 'fatura').slice(0, 120);
+      const kucuk = await kucult(f, tur);
+      if(kucuk) hazir.push({ blob: kucuk, ad: (ad.replace(/\.[^.]*$/, '') || 'fatura').slice(0, 115) + '.jpg' });
+      else hazir.push({ blob: f.type === tur ? f : new Blob([f], { type: tur }), ad: ad });
     }
-    return Promise.all(dosyalar.map(function(f){
-      return new Promise(function(ok, hata){
-        const r = new FileReader();
-        r.onload = function(){ ok({ ad: f.name.slice(0, 120), tur: f.type, veri: String(r.result).split(',')[1] || '' }); };
-        r.onerror = function(){ hata(new Error(t === 'en' ? 'File could not be read.' : 'Dosya okunamadı.')); };
-        r.readAsDataURL(f);
-      });
-    }));
+    let toplam = 0;
+    for(const h of hazir){
+      if(h.blob.size > DOSYA_EN_FAZLA) throw new Error(t === 'en' ? 'Each file must be 8 MB or smaller.' : 'Her dosya en fazla 8 MB olabilir.');
+      toplam += h.blob.size;
+    }
+    if(toplam > TOPLAM_EN_FAZLA) throw new Error(t === 'en' ? 'Files must total 10 MB or less.' : 'Dosyaların toplamı en fazla 10 MB olabilir.');
+    return hazir;
+  }
+  // Dosyalıysa multipart/form-data (payload = JSON metni, her dosya `fatura`); değilse JSON.
+  // Content-Type elle verilmez: tarayıcı multipart sınırını kendisi yazar.
+  async function gonder(payload, dosyalar){
+    let istek;
+    if(dosyalar.length){
+      const g = new FormData();
+      g.append('payload', JSON.stringify(payload));
+      dosyalar.forEach(function(d){ g.append('fatura', d.blob, d.ad); });
+      istek = { method: 'POST', body: g };
+    } else {
+      istek = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) };
+    }
+    const r = await fetch('/api/lead', istek);
+    const j = await r.json().catch(function(){ return null; });
+    return { status: r.status, j: j };
+  }
+  function mesajYaz(hedef, pre, post){
+    const t = L();
+    hedef.append(pre[t]);
+    const a = document.createElement('a');
+    a.href = 'mailto:info@voltage.com.tr';
+    a.textContent = 'info@voltage.com.tr';
+    hedef.append(a);
+    hedef.append(post[t]);
   }
   form.addEventListener('submit', async function(e){
     e.preventDefault();
@@ -2128,9 +2269,9 @@ async function fetchPtfLive(){
     if(btnLabel) btnLabel.textContent = TXT.busy[L()];
     if(status){ status.className = 'form-status'; status.textContent = ''; }
     const fd = new FormData(form);
-    // Fatura dosyaları: en fazla 3, her biri 8 MB; base64 olarak gönderilir (sunucu tür ve boyutu yeniden denetler)
+    // Fatura dosyaları: en fazla 3, her biri 8 MB, toplam 10 MB (sunucu sayı, tür, boyut ve imzayı yeniden denetler)
     let faturalar = [];
-    try { faturalar = await faturalariOku(form.querySelector('#lead-fatura')); }
+    try { faturalar = await faturalariHazirla(form.querySelector('#lead-fatura')); }
     catch(errF) {
       if(status){ status.className = 'form-status error'; status.textContent = errF.message; }
       if(btn) btn.disabled = false;
@@ -2146,39 +2287,60 @@ async function fetchPtfLive(){
       tuketim: fd.get('tuketim') || '',
       sektor: fd.get('sektor') || '',
       tarife: fd.get('tarife') || '',
-      faturalar: faturalar,
+      tuketim_kwh: fd.get('tuketim_kwh') || '',
+      odeme_tercihi: fd.get('odeme_tercihi') || '',
       mesaj: fd.get('mesaj') || '',
       kvkk: fd.get('kvkk') === 'on',
       website: fd.get('website') || '',
       lang: L(),
       utm: utmParams()
     };
+    let hataKodu = '';
     try {
-      const r = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const j = await r.json().catch(function(){ return null; });
-      if(!r.ok || !j || j.ok !== true) throw new Error('HTTP ' + r.status);
+      let sonuc;
+      let ekYuklenemedi = false;
+      try { sonuc = await gonder(payload, faturalar); }
+      catch(ag) { if(!faturalar.length) throw ag; sonuc = { status: 0, j: null }; }
+      // Dosyalı gönderim ağ ya da sunucu (5xx) hatasıyla düşerse bir kez dosyasız denenir
+      if(faturalar.length && (sonuc.status === 0 || sonuc.status >= 500)){
+        sonuc = await gonder(payload, []);
+        ekYuklenemedi = true;
+      }
+      if(sonuc.status !== 200 || !sonuc.j || sonuc.j.ok !== true){
+        hataKodu = (sonuc.j && sonuc.j.error) || '';
+        throw new Error('HTTP ' + sonuc.status);
+      }
       const t = L();
       form.innerHTML = '<div class="form-success">' +
         '<div class="form-success-tag" data-tr="' + esc(TXT.okTag.tr) + '" data-en="' + esc(TXT.okTag.en) + '">' + TXT.okTag[t] + '</div>' +
         '<div class="form-success-title" data-tr="' + esc(TXT.okTitle.tr) + '" data-en="' + esc(TXT.okTitle.en) + '">' + TXT.okTitle[t] + '</div>' +
         '<p class="form-success-text" data-tr="' + esc(TXT.okText.tr) + '" data-en="' + esc(TXT.okText.en) + '">' + TXT.okText[t] + '</p>' +
         '</div>';
+      if(ekYuklenemedi){
+        const p = document.createElement('p');
+        p.className = 'form-success-text';
+        p.style.marginTop = '12px';
+        ['tr', 'en'].forEach(function(dil){
+          const s = document.createElement('span');
+          s.className = dil + '-only';
+          s.append(TXT.noFilePre[dil]);
+          const a = document.createElement('a');
+          a.href = 'mailto:info@voltage.com.tr';
+          a.textContent = 'info@voltage.com.tr';
+          s.append(a);
+          s.append(TXT.noFilePost[dil]);
+          p.append(s);
+        });
+        form.querySelector('.form-success').append(p);
+      }
     } catch(err) {
       console.warn('Lead submit failed:', err.message);
       if(status){
         status.className = 'form-status error';
         status.textContent = '';
-        const t = L();
-        status.append(TXT.errPre[t]);
-        const a = document.createElement('a');
-        a.href = 'mailto:info@voltage.com.tr';
-        a.textContent = 'info@voltage.com.tr';
-        status.append(a);
-        status.append(TXT.errPost[t]);
+        if(hataKodu === 'rate_limited' || hataKodu === 'rate_limited_files') mesajYaz(status, TXT.rlPre, TXT.errPost);
+        else if(hataKodu === 'invalid_file' || hataKodu === 'file_too_large' || hataKodu === 'too_many_files') mesajYaz(status, TXT.filePre, TXT.filePost);
+        else mesajYaz(status, TXT.errPre, TXT.errPost);
       }
       if(btn) btn.disabled = false;
       if(btnLabel) btnLabel.textContent = TXT.btn[L()];

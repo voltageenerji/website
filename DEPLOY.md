@@ -121,7 +121,8 @@ URL'ye de POST edilir.
 
 ### Bağlı değilse davranış (bilinçli tasarım)
 
-- `LEADS` KV **ve** `LEAD_WEBHOOK_URL` ikisi de yoksa `/api/lead` **503** döner;
+- `LEADS` KV **zorunludur** (lead kaydı, fatura ekleri ve kötüye kullanım sayacı burada).
+  KV yoksa ya da okunamıyorsa `/api/lead` **503** döner (`LEAD_WEBHOOK_URL` tek başına yetmez, isteğe bağlı ek kopyadır);
   form ziyaretçiye dürüst bir hata + e-posta (mailto) alternatifi gösterir.
   **Veri çöpe giderken asla "talebiniz alındı" denmez.**
 - `EVENTS` KV yoksa `/api/event` sessizce 204 döner — analitik durur, site durmaz.
