@@ -1067,7 +1067,7 @@ body.menu-open { overflow: hidden; }
       <span class="lang-sep">/</span>
       <button class="lang-btn" data-lang="en">EN</button>
     </div>
-    <a href="#iletisim" class="nav-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
+    <a href="#teklif" class="nav-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
   </div>
   <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
     <span></span><span></span><span></span>
@@ -1080,7 +1080,7 @@ body.menu-open { overflow: hidden; }
   <a href="#yaklasim" data-tr="Yaklaşım" data-en="Approach">Yaklaşım</a>
   <a href="/rehber" data-tr="Rehber" data-en="Guides">Rehber</a>
   <a href="#iletisim" data-tr="İletişim" data-en="Contact">İletişim</a>
-  <a href="#iletisim" class="mobile-menu-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
+  <a href="#teklif" class="mobile-menu-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
 </div>
 
 <!-- HERO -->
@@ -1141,7 +1141,7 @@ body.menu-open { overflow: hidden; }
     </p>
     <div class="cover-imprint">ETS/3424-8/2074 · EST. 2011 · İSTANBUL</div>
     <div class="hero-actions">
-      <a href="#iletisim" class="btn-primary">
+      <a href="#teklif" class="btn-primary">
         <span data-tr="Teklif Talep Edin" data-en="Request a Proposal">Teklif Talep Edin</span>
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1552,6 +1552,7 @@ body.menu-open { overflow: hidden; }
         </div>
       </div>
       
+      <span id="teklif" class="form-capa" aria-hidden="true"></span>
       <form class="form reveal" id="leadForm" action="/api/lead" method="post">
         <h3 class="form-title" data-tr="Teklif Talebi" data-en="Request a Proposal">Teklif Talebi</h3>
         <p class="form-subtitle" data-tr="Tüm alanları doldurarak hızlı dönüş alın." data-en="Fill out all fields for a prompt response.">Tüm alanları doldurarak hızlı dönüş alın.</p>
@@ -1786,7 +1787,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     const target = document.querySelector(href);
     if (target) {
       e.preventDefault();
-      window.scrollTo({ top: target.offsetTop - 60, behavior: 'smooth' });
+      // Sayfadaki gerçek konum (offsetTop iç içe kapsayıcıda yanlış verir; mobilde teklif formu adres bloğunun altında)
+      window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
     }
   });
 });
