@@ -238,5 +238,16 @@ ok('multipart kvkk false → 400', (await mpGonder(alanlar({ kvkk: false }), [{ 
   ok('yabancı köken → 403', (await onRequestPost({ request, env: { LEADS: sahteKv() } })).status === 403);
 }
 
+// Mesken: sektör ve ödeme tercihi sorulmaz; sunucu sektörü 'mesken' yapar, tercihi boşaltır
+{
+  const kv = sahteKv();
+  const r = await jsonGonder(alanlar({ tarife: 'mesken', sektor: '', odeme_tercihi: 'onodemeli', tuketim: '150-250', tuketim_kwh: '230' }), { kv });
+  ok('mesken sektörsüz → 200', r.status === 200, `-> ${r.status} ${JSON.stringify(r.j)}`);
+  const l = leadKaydi(kv);
+  ok('mesken: sektör mesken, ödeme tercihi boş, kWh 230', l && l.lead.sektor === 'mesken' && l.lead.odemeTercihi === '' && l.lead.tuketimKwh === 230, JSON.stringify(l && l.lead));
+  const r2 = await jsonGonder(alanlar({ tarife: 'og-sanayi', sektor: '' }));
+  ok('mesken değilse sektör zorunlu → 400', r2.status === 400 && r2.j.field === 'sektor');
+}
+
 console.log(`\ntest-lead: ${pass} geçti, ${fail} kaldı`);
 if (fail) process.exit(1);

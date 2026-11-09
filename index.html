@@ -1632,6 +1632,7 @@ body.menu-open { overflow: hidden; }
             </select>
           </div>
         </div>
+        <p class="form-hint" id="lead-mesken-not" style="display:none" data-tr="Mesken aboneliklerinde ödeme faturadan sonradır; son ödeme günü fatura tarihinden 10 gün sonradır. Sözleşme yapılırken iki aylık fatura tutarında güvence bedeli istenir ve iki taksitte ödenir; tedarik sona erdiğinde iade edilir." data-en="For residential subscriptions, payment is made after the invoice; the due date is 10 days after the invoice date. A security deposit equal to two months' bills is requested when the contract is signed and paid in two instalments; it is refunded when supply ends.">Mesken aboneliklerinde ödeme faturadan sonradır; son ödeme günü fatura tarihinden 10 gün sonradır. Sözleşme yapılırken iki aylık fatura tutarında güvence bedeli istenir ve iki taksitte ödenir; tedarik sona erdiğinde iade edilir.</p>
 
         <div class="form-group">
           <label class="form-label" for="lead-fatura" data-tr="Son faturanız (opsiyonel)" data-en="Latest invoice (optional)">Son faturanız (opsiyonel)</label>
@@ -1666,7 +1667,6 @@ body.menu-open { overflow: hidden; }
               <span class="en-only">We show the options available to you side by side in the proposal.</span>
             </span>
           </label>
-          <small class="form-hint" data-tr="Mesken aboneliklerinde ödeme faturadan sonradır. Sözleşme yapılırken güvence bedeli istenir; tutarı ve ödeme şekli sözleşmede yer alır." data-en="For residential subscriptions, payment is made after the invoice. A security deposit is requested when the contract is signed; its amount and payment terms are set out in the contract.">Mesken aboneliklerinde ödeme faturadan sonradır. Sözleşme yapılırken güvence bedeli istenir; tutarı ve ödeme şekli sözleşmede yer alır.</small>
         </fieldset>
 
         <div class="form-group">
@@ -2139,6 +2139,58 @@ async function fetchPtfLive(){
 (function(){
   const form = document.getElementById('leadForm');
   if(!form) return;
+  // Mesken seçilince: tüketim bantları ev tüketimine göre, sektör ve ödeme tercihi gizli (mesken hep faturadan sonra öder)
+  (function(){
+    const tarifeSel = document.getElementById('lead-tarife');
+    const tukSel = document.getElementById('lead-tuketim');
+    const sektorSel = document.getElementById('lead-sektor');
+    const kwh = document.getElementById('lead-tuketim-kwh');
+    const odeme = form.querySelector('fieldset.form-choices');
+    const not = document.getElementById('lead-mesken-not');
+    if(!tarifeSel || !tukSel || !sektorSel || !odeme) return;
+    const sektorGrp = sektorSel.closest('.form-group');
+    const radyolar = odeme.querySelectorAll('input[type=radio]');
+    const isBant = Array.from(tukSel.options).map(function(o){ return { v: o.value, tr: o.getAttribute('data-tr'), en: o.getAttribute('data-en') }; });
+    const meskenBant = [
+      { v: '', tr: 'Seçiniz', en: 'Select' },
+      { v: '0-150', tr: '150 kWh altı', en: 'Under 150 kWh' },
+      { v: '150-250', tr: '150 – 250 kWh', en: '150 – 250 kWh' },
+      { v: '250-400', tr: '250 – 400 kWh', en: '250 – 400 kWh' },
+      { v: '400-600', tr: '400 – 600 kWh', en: '400 – 600 kWh' },
+      { v: '600-1000', tr: '600 – 1.000 kWh', en: '600 – 1,000 kWh' },
+      { v: '1000+', tr: '1.000 kWh üstü', en: 'Over 1,000 kWh' }
+    ];
+    let mesken = false;
+    function bantKur(liste){
+      const dil = document.documentElement.lang === 'en' ? 'en' : 'tr';
+      tukSel.innerHTML = '';
+      liste.forEach(function(b){
+        const o = document.createElement('option');
+        o.value = b.v; o.setAttribute('data-tr', b.tr); o.setAttribute('data-en', b.en);
+        o.textContent = dil === 'en' ? b.en : b.tr;
+        tukSel.appendChild(o);
+      });
+    }
+    function guncelle(){
+      const m = tarifeSel.value === 'mesken';
+      if(m === mesken) return;
+      mesken = m;
+      bantKur(m ? meskenBant : isBant);
+      sektorGrp.style.display = m ? 'none' : '';
+      sektorSel.required = !m;
+      if(m) sektorSel.value = '';
+      odeme.style.display = m ? 'none' : '';
+      radyolar.forEach(function(r, i){ if(m) r.checked = false; if(i === 0) r.required = !m; });
+      if(not) not.style.display = m ? '' : 'none';
+      if(kwh){
+        kwh.setAttribute('data-tr-placeholder', m ? 'Örn. 250 kWh' : 'Örn. 42.500 kWh');
+        kwh.setAttribute('data-en-placeholder', m ? 'e.g. 250 kWh' : 'e.g. 42,500 kWh');
+        kwh.placeholder = document.documentElement.lang === 'en' ? kwh.getAttribute('data-en-placeholder') : kwh.getAttribute('data-tr-placeholder');
+      }
+    }
+    tarifeSel.addEventListener('change', guncelle);
+    guncelle();
+  })();
   const btn = document.getElementById('leadSubmit');
   const btnLabel = btn ? btn.querySelector('span') : null;
   const status = document.getElementById('leadStatus');

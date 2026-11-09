@@ -304,6 +304,12 @@ export async function onRequestPost(context) {
   }
 
   // Server-side validation
+  // Mesken: sektör sorulmaz (formda gizli), ödeme tercihi yok (mesken hep faturadan sonra öder)
+  const meskenTalep = clean(body.tarife, 40) === 'mesken';
+  if (meskenTalep) {
+    body.sektor = 'mesken';
+    body.odeme_tercihi = '';
+  }
   for (const f of REQUIRED_FIELDS) {
     if (!clean(body[f])) return json({ ok: false, error: 'missing_field', field: f }, 400);
   }
