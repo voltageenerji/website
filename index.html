@@ -668,6 +668,91 @@ section {
 .form-submit:hover { background: var(--accent-dark); }
 .form-submit[disabled] { opacity: 0.55; cursor: wait; }
 
+/* Yeşil enerji seçeneği: kutucuk işaretlenince form yeşerir, köşelerde dal ve çiçekler açar */
+.form { position: relative; overflow: hidden; transition: background-color 0.9s var(--ease), border-color 0.9s var(--ease); }
+.form > * { position: relative; z-index: 1; }
+.form-green {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 14px; margin: 0 0 20px;
+  border: 1px solid var(--line); cursor: pointer;
+  font-size: 13px; line-height: 1.55; color: var(--ink-soft);
+  transition: border-color 0.4s var(--ease), background-color 0.6s var(--ease);
+}
+.form-green:hover { border-color: var(--green); }
+.form-green input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 15px; height: 15px; flex: none; margin-top: 3px;
+  border: 1px solid var(--ink-muted); border-radius: 0;
+  background: transparent; cursor: pointer;
+  display: inline-grid; place-content: center;
+  transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.form-green input[type="checkbox"]:checked { border-color: var(--green); background: var(--green); }
+.form-green input[type="checkbox"]:checked::before {
+  content: ''; width: 8px; height: 4.5px;
+  border-left: 1.5px solid #fff; border-bottom: 1.5px solid #fff;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.form-green b { display: block; color: var(--ink); font-weight: 500; font-size: 14px; margin-bottom: 2px; }
+.form-green-ikon { flex: none; margin-left: auto; width: 22px; height: 22px; color: var(--ink-muted); opacity: 0.55; transition: color 0.6s var(--ease), opacity 0.6s var(--ease), transform 0.9s var(--ease-out); }
+.form.yesil { background: #F2F7EB; border-color: #B7D1AE; }
+.form.yesil .form-green { border-color: var(--green); background: rgba(255, 255, 255, 0.6); }
+.form.yesil .form-green-ikon { color: var(--green); opacity: 1; transform: rotate(-14deg) scale(1.15); }
+.form.yesil .form-title { color: #1F4D33; }
+.form.yesil .form-input:focus, .form.yesil .form-select:focus, .form.yesil .form-textarea:focus { border-bottom-color: var(--green); }
+.form.yesil .form-input, .form.yesil .form-select, .form.yesil .form-textarea { border-bottom-color: #CBDCC3; }
+.form.yesil .form-choice { border-color: #CBDCC3; }
+.form.yesil .form-choice:has(input:checked) { border-color: var(--green); }
+.form.yesil .form-choice input[type="radio"]:checked { border-color: var(--green); }
+.form.yesil .form-consent input[type="checkbox"]:checked { border-color: var(--green); background: var(--green); }
+.form.yesil .form-submit { background: #25603B; }
+.form.yesil .form-submit:hover { background: #1B4A2D; }
+.form-title, .form-submit, .form-choice, .form-input, .form-select, .form-textarea { transition-duration: 0.6s; }
+.form-flora { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.flora { position: absolute; overflow: visible; }
+/* Yeşil tema: zemin ve süsleme (/gyesil/cicek.js) içeriğin arkasında yavaşça belirir. Tema: 1 zarif yaprak, 2 modern enerji, 3 doğal doku */
+.form-flora .flora-3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.form-flora .flora { display: none; }
+/* Tema 4 (çiçekli): tuval içeriğin üstünde durur ve form kenarından taşar */
+.form[data-yesil-tema="4"] { overflow: visible; }
+.form[data-yesil-tema="4"] > .flora-3d { position: absolute; z-index: 2; display: block; pointer-events: none; }
+.form::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0; transition: opacity 1.4s var(--ease);
+  background: linear-gradient(180deg, #F5F9EF 0%, #E8F0DE 100%);
+}
+.form.yesil::before { opacity: 1; transition-duration: 3.6s; }
+.form[data-yesil-tema="2"]::before { background: radial-gradient(130% 420px at 100% 0%, rgba(126, 184, 120, 0.28), rgba(126, 184, 120, 0) 62%), linear-gradient(180deg, #FCFDF9 0%, #F2F7EB 100%); }
+.form[data-yesil-tema="3"]::before { background: linear-gradient(135deg, #EFF3E5 0%, #E2EAD5 100%); }
+.form::after {
+  content: ''; display: none; position: absolute; left: -1px; top: -1px; bottom: -1px; width: 7px; z-index: 1; pointer-events: none;
+  background: #2F6B3C; transform: scaleY(0); transform-origin: top; transition: transform 1.2s var(--ease);
+}
+.form[data-yesil-tema="3"]::after { display: block; }
+.form[data-yesil-tema="3"].yesil::after { transform: scaleY(1); transition-duration: 3.6s; }
+/* Kutucuk değişince renkler yavaş döner; sonrasında (üzerine gelme, odak) normal hızına iner */
+.form.yesil-gecis, .form.yesil-gecis .form-title, .form.yesil-gecis .form-submit, .form.yesil-gecis .form-choice,
+.form.yesil-gecis .form-input, .form.yesil-gecis .form-select, .form.yesil-gecis .form-textarea,
+.form.yesil-gecis .form-green, .form.yesil-gecis .form-green-ikon { transition-duration: 3.2s; }
+.flora-ust { top: 0; right: 0; width: 280px; height: 112px; }
+.flora-alt { left: 0; bottom: 0; width: 44px; height: 300px; }
+.fl-d { fill: none; stroke: #4F8A58; stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 0.5s var(--ease); }
+.fl-y { fill: #7FB27C; }
+.fl-y.k { fill: #4F8A58; }
+.fl-c ellipse { fill: #FFFFFF; stroke: #E9B9C6; stroke-width: 0.8; }
+.fl-c.b ellipse { fill: #F8D9E0; stroke: #E3A6B6; }
+.fl-g { fill: var(--accent); }
+.fl-t { fill: #F2BFCB; }
+.fl-y, .fl-c, .fl-t { transform: scale(0); opacity: 0; transition: transform 0.35s var(--ease), opacity 0.3s var(--ease); }
+.form.yesil .fl-d { stroke-dashoffset: 0; transition: stroke-dashoffset var(--s, 1.3s) var(--ease) var(--d, 0s); }
+.form.yesil .fl-y, .form.yesil .fl-t { transform: scale(1); opacity: 1; transition: transform 0.7s var(--ease-out) var(--d, 0s), opacity 0.4s var(--ease) var(--d, 0s); }
+.form.yesil .fl-c { transform: scale(1) rotate(0deg); opacity: 1; transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d, 0s), opacity 0.4s var(--ease) var(--d, 0s); }
+.fl-c { transform: scale(0) rotate(-70deg); }
+@media (max-width: 640px) {
+  .flora-ust { width: 215px; height: 86px; }
+  .flora-alt { width: 26px; height: 177px; }
+}
+
 /* Form altyapısı — KVKK onayı, honeypot, gönderim durumları */
 .form-consent {
   display: flex; align-items: flex-start; gap: 12px;
@@ -1554,6 +1639,24 @@ body.menu-open { overflow: hidden; }
       
       <span id="teklif" class="form-capa" aria-hidden="true"></span>
       <form class="form reveal" id="leadForm" action="/api/lead" method="post">
+        <div class="form-flora" aria-hidden="true">
+<svg class="flora flora-ust" viewBox="0 0 280 112" focusable="false">
+<path class="fl-d" pathLength="1" style="--d:0.1s;--s:1.6s" d="M282 6C246 22 214 30 176 26C140 22 110 12 72 18C52 21 34 28 18 38"/>
+<path class="fl-d" pathLength="1" style="--d:0.7s;--s:1s" d="M236 21C246 40 254 58 250 82C248 92 244 100 238 106"/>
+<path class="fl-d" pathLength="1" style="--d:0.9s;--s:0.7s" d="M150 22C142 34 130 40 116 42"/>
+<g transform="translate(262 13) rotate(205) scale(1)"><path class="fl-y" style="--d:0.5s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(214 28) rotate(150) scale(0.95)"><path class="fl-y k" style="--d:0.7s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(190 27) rotate(215) scale(0.9)"><path class="fl-y" style="--d:0.85s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g>
+<g transform="translate(132 17) rotate(140) scale(0.9)"><path class="fl-y k" style="--d:1.05s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(96 15) rotate(205) scale(0.85)"><path class="fl-y" style="--d:1.2s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(56 22) rotate(150) scale(0.8)"><path class="fl-y k" style="--d:1.35s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g>
+<g transform="translate(247 46) rotate(20) scale(0.8)"><path class="fl-y" style="--d:1.15s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(252 70) rotate(150) scale(0.75)"><path class="fl-y k" style="--d:1.3s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(132 38) rotate(215) scale(0.7)"><path class="fl-y" style="--d:1.35s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g>
+<g transform="translate(238 104) scale(1.5)"><g class="fl-c " style="--d:1.75s"><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(0)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(72)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(144)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(216)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(288)"/><circle class="fl-g" r="3"/></g></g><g transform="translate(114 43) scale(1.25)"><g class="fl-c b" style="--d:1.6s"><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(0)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(72)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(144)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(216)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(288)"/><circle class="fl-g" r="3"/></g></g><g transform="translate(170 24) scale(1.05)"><g class="fl-c " style="--d:1.45s"><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(0)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(72)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(144)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(216)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(288)"/><circle class="fl-g" r="3"/></g></g><g transform="translate(18 38) scale(1.2)"><g class="fl-c b" style="--d:1.9s"><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(0)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(72)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(144)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(216)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(288)"/><circle class="fl-g" r="3"/></g></g>
+<g transform="translate(74 18) rotate(-20)"><path class="fl-t" style="--d:1.7s" d="M0 0C-3.2-3-3.2-8 0-11C3.2-8 3.2-3 0 0Z"/></g><g transform="translate(204 30) rotate(160)"><path class="fl-t" style="--d:1.55s" d="M0 0C-3.2-3-3.2-8 0-11C3.2-8 3.2-3 0 0Z"/></g>
+</svg>
+<svg class="flora flora-alt" viewBox="0 0 44 300" focusable="false">
+<path class="fl-d" pathLength="1" style="--d:0.2s;--s:1.9s" d="M20 302C30 270 10 246 20 214C30 184 12 160 22 128C30 104 16 84 22 58C24 46 24 36 22 26"/>
+<g transform="translate(24 276) rotate(-35) scale(0.8)"><path class="fl-y" style="--d:0.7s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(15 250) rotate(215) scale(0.8)"><path class="fl-y k" style="--d:0.85s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(23 206) rotate(-30) scale(0.85)"><path class="fl-y" style="--d:1.05s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g>
+<g transform="translate(18 172) rotate(210) scale(0.8)"><path class="fl-y k" style="--d:1.2s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(23 122) rotate(-35) scale(0.8)"><path class="fl-y" style="--d:1.4s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(19 90) rotate(215) scale(0.75)"><path class="fl-y k" style="--d:1.55s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g><g transform="translate(23 54) rotate(-40) scale(0.7)"><path class="fl-y" style="--d:1.7s" d="M0 0C4-6.5 13-7 18 0C13 6 4 6.5 0 0Z"/></g>
+<g transform="translate(22 22) scale(1.3)"><g class="fl-c " style="--d:2.05s"><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(0)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(72)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(144)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(216)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(288)"/><circle class="fl-g" r="3"/></g></g><g transform="translate(14 148) scale(0.95)"><g class="fl-c b" style="--d:1.75s"><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(0)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(72)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(144)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(216)"/><ellipse cy="-6.6" rx="4.2" ry="6.4" transform="rotate(288)"/><circle class="fl-g" r="3"/></g></g><g transform="translate(28 232) rotate(60)"><path class="fl-t" style="--d:1.5s" d="M0 0C-3.2-3-3.2-8 0-11C3.2-8 3.2-3 0 0Z"/></g>
+</svg>
+        </div>
         <h3 class="form-title" data-tr="Teklif Talebi" data-en="Request a Proposal">Teklif Talebi</h3>
         <p class="form-subtitle" data-tr="Tüm alanları doldurarak hızlı dönüş alın." data-en="Fill out all fields for a prompt response.">Tüm alanları doldurarak hızlı dönüş alın.</p>
 
@@ -1670,6 +1773,16 @@ body.menu-open { overflow: hidden; }
             </span>
           </label>
         </fieldset>
+
+        <label class="form-green" for="lead-yesil">
+          <input type="checkbox" id="lead-yesil" name="yesil">
+          <span>
+            <b class="tr-only">Yeşil enerji teklifi istiyorum</b><b class="en-only">I would like a green energy proposal</b>
+            <span class="tr-only">Teklifiniz, tüketiminizin yenilenebilir kaynaklardan karşılandığını belgeleyen yeşil enerji seçeneğiyle hazırlanır. Bu seçeneğin birim fiyatı standart teklife göre daha yüksektir.</span>
+            <span class="en-only">Your proposal is prepared with the green energy option, which documents that your consumption is met from renewable sources. The unit price of this option is higher than the standard proposal.</span>
+          </span>
+          <svg class="form-green-ikon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M4 20C4 10 10 4 20 4C20 14 14 20 4 20Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M4 20L14 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </label>
 
         <div class="form-group">
           <label class="form-label" for="lead-mesaj" data-tr="Notunuz (opsiyonel)" data-en="Your Note (optional)">Notunuz (opsiyonel)</label>
@@ -2141,6 +2254,46 @@ async function fetchPtfLive(){
 // mailto alternatifi gösterir.
 (function(){
   const form = document.getElementById('leadForm');
+
+  // Yeşil enerji kutucuğu: işaretliyken form yeşil görünüme geçer (yalnız görünüm; değer payload'da gider)
+  const yesilKutu = form.querySelector('#lead-yesil');
+  if(yesilKutu){
+    // Üç boyutlu süsleme formla ilk etkileşimde yüklenir; hazır değilse ya da WebGL yoksa SVG süsleme kalır
+    let sahne = null, istendi = false, gecisSayaci = 0;
+    // ÖNİZLEME: tema ?yesil=1|2|3 ile seçilir; sahip seçince tek tema kalır ve bu satır sadeleşir
+    const temaIstek = new URLSearchParams(location.search).get('yesil');
+    const tema = (temaIstek === '1' || temaIstek === '2' || temaIstek === '3') ? temaIstek : '4';
+    form.dataset.yesilTema = tema;
+    const hareketAz = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const sahneYukle = function(){
+      if(istendi || hareketAz) return;
+      istendi = true;
+      const s = document.createElement('script');
+      s.src = '/gyesil/cicek.js';
+      s.async = true;
+      s.onload = function(){
+        try { sahne = window.VoltageYesil ? window.VoltageYesil.kur(form, Number(tema)) : null; } catch(e){ sahne = null; }
+        if(sahne && yesilKutu.checked) sahne.ayarla(true);
+      };
+      document.head.appendChild(s);
+    };
+    ['pointerenter', 'focusin', 'touchstart'].forEach(function(olay){
+      form.addEventListener(olay, sahneYukle, { once: true, passive: true });
+    });
+    form.addEventListener('yesil3d-kayip', function(){ sahne = null; });
+    const yesilAyarla = function(){
+      const acik = yesilKutu.checked;
+      form.classList.toggle('yesil', acik);
+      if(sahne) sahne.ayarla(acik);
+    };
+    yesilKutu.addEventListener('change', function(){
+      form.classList.add('yesil-gecis');
+      clearTimeout(gecisSayaci);
+      gecisSayaci = setTimeout(function(){ form.classList.remove('yesil-gecis'); }, 3400);
+      yesilAyarla();
+    });
+    yesilAyarla();
+  }
   if(!form) return;
   // Mesken seçilince: tüketim bantları ev tüketimine göre, sektör ve ödeme tercihi gizli (mesken hep faturadan sonra öder)
   (function(){
@@ -2349,6 +2502,7 @@ async function fetchPtfLive(){
       tarife: fd.get('tarife') || '',
       tuketim_kwh: fd.get('tuketim_kwh') || '',
       odeme_tercihi: fd.get('odeme_tercihi') || '',
+      yesil: fd.get('yesil') === 'on',
       mesaj: fd.get('mesaj') || '',
       kvkk: fd.get('kvkk') === 'on',
       website: fd.get('website') || '',

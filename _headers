@@ -85,3 +85,7 @@
 # "immutable" GÜVENLİ DEĞİL: 1 saat + revalidate.
 /g404/*
   Cache-Control: public, max-age=3600, must-revalidate
+
+# Teklif formu yeşil enerji süslemesi: dosya adı hash'siz, 1 saat + revalidate.
+/gyesil/*
+  Cache-Control: public, max-age=3600, must-revalidate
