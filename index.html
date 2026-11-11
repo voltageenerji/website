@@ -2265,22 +2265,40 @@ async function fetchPtfLive(){
     const tema = (temaIstek === '1' || temaIstek === '2' || temaIstek === '3') ? temaIstek : '4';
     form.dataset.yesilTema = tema;
     const hareketAz = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // ÖNİZLEME: ?tani=1 ile kutucuğun altında süslemenin durumu yazılır (canlıya çıkmadan kaldırılır)
+    let taniSatiri = null;
+    const tani = function(metin){
+      if(new URLSearchParams(location.search).get('tani') !== '1') return;
+      if(!taniSatiri){
+        taniSatiri = document.createElement('p');
+        taniSatiri.style.cssText = 'font:12px/1.5 monospace;color:#7a2e2e;margin:8px 0;word-break:break-word';
+        yesilKutu.closest('label').after(taniSatiri);
+      }
+      taniSatiri.textContent += metin + ' · ';
+    };
+    tani('tema ' + tema + ', hareket azaltma ' + (hareketAz ? 'AÇIK' : 'kapalı') + ', ekran ' + window.innerWidth + 'x' + window.innerHeight + '@' + window.devicePixelRatio);
     const sahneYukle = function(){
-      if(istendi || hareketAz) return;
+      if(istendi) return;
       istendi = true;
+      tani('betik isteniyor');
       const s = document.createElement('script');
       s.src = '/gyesil/cicek.js';
       s.async = true;
+      s.onerror = function(){ tani('BETİK YÜKLENEMEDİ'); };
       s.onload = function(){
-        try { sahne = window.VoltageYesil ? window.VoltageYesil.kur(form, Number(tema)) : null; } catch(e){ sahne = null; }
-        if(sahne && yesilKutu.checked) sahne.ayarla(true);
+        try {
+          sahne = window.VoltageYesil ? window.VoltageYesil.kur(form, Number(tema), hareketAz) : null;
+          tani(sahne ? 'sahne kuruldu' : 'SAHNE KURULAMADI (WebGL yok)');
+        } catch(e){ sahne = null; tani('HATA: ' + (e && e.message)); }
+        try { if(sahne && yesilKutu.checked) sahne.ayarla(true); } catch(e){ tani('ÇİZİM HATASI: ' + (e && e.message)); }
       };
       document.head.appendChild(s);
     };
-    ['pointerenter', 'focusin', 'touchstart'].forEach(function(olay){
+    window.addEventListener('error', function(e){ if(/cicek\.js/.test(e.filename || '')) tani('HATA: ' + e.message); });
+    ['pointerenter', 'focusin', 'touchstart', 'change'].forEach(function(olay){
       form.addEventListener(olay, sahneYukle, { once: true, passive: true });
     });
-    form.addEventListener('yesil3d-kayip', function(){ sahne = null; });
+    form.addEventListener('yesil3d-kayip', function(){ sahne = null; tani('WEBGL BAĞLAMI KAYBOLDU'); });
     const yesilAyarla = function(){
       const acik = yesilKutu.checked;
       form.classList.toggle('yesil', acik);

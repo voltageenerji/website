@@ -23,10 +23,11 @@ interface Oge { guncelle(g: number, zaman: number): void }
 
 export interface Sahne { ayarla(acik: boolean): void; kapat(): void }
 
-export function kur(form: HTMLElement, tema: number): Sahne | null {
+// duragan: hareket azaltma tercihi açıkken canlandırma yapılmaz, son hâl tek karede çizilir
+export function kur(form: HTMLElement, tema: number, duragan = false): Sahne | null {
   // 4 · Çiçekli sarmaşık (cicek.ts): kutucuk hizasından iki kenara büyür, çiçek açar
   if (tema === 4) {
-    const c = cicekKur(form);
+    const c = cicekKur(form, duragan);
     if (!c) return null;
     return { ayarla: (acik: boolean): void => c.ayarla(acik, acik ? form.querySelector('#lead-yesil') : null), kapat: (): void => c.kapat() };
   }
@@ -262,7 +263,7 @@ export function kur(form: HTMLElement, tema: number): Sahne | null {
     for (const o of ogeler) o.guncelle(g, zaman);
     cizer.render(sahne, kamera);
     if (g <= 0 && hedef === 0) { tuval.style.visibility = 'hidden'; return; }
-    if (!gorunur) return;
+    if (!gorunur || duragan) return;
     raf = requestAnimationFrame(kare);
   }
   function calistir(): void {
@@ -287,6 +288,7 @@ export function kur(form: HTMLElement, tema: number): Sahne | null {
         boyutla();
         tuval.style.visibility = 'visible';
       }
+      if (duragan) g = hedef;
       if (W && H) calistir();
     },
     kapat(): void {

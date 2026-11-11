@@ -75,7 +75,7 @@ interface Dal { g: Group; egri: CatmullRomCurve3; boru: TubeGeometry; dilim: num
 
 export interface Sahne { ayarla(acik: boolean, kaynak?: Element | null): void; kapat(): void }
 
-export function kur(form: HTMLElement): Sahne | null {
+export function kur(form: HTMLElement, duragan = false): Sahne | null {
   const tuval = document.createElement('canvas');
   tuval.className = 'flora-3d';
   tuval.setAttribute('aria-hidden', 'true');
@@ -533,7 +533,7 @@ export function kur(form: HTMLElement): Sahne | null {
     const canli = guncelle(dt);
     cizer.render(sahne, kamera);
     if (g <= 0 && hedef === 0 && canli === 0) { tuval.style.visibility = 'hidden'; return; }
-    if (!gorunur) return;
+    if (!gorunur || duragan) return;
     raf = requestAnimationFrame(kare);
   }
   function calistir(): void {
@@ -564,7 +564,7 @@ export function kur(form: HTMLElement): Sahne | null {
         if (!tuval.isConnected) form.appendChild(tuval);
         boyutla();
         tuval.style.visibility = 'visible';
-        if (kaynak && W) {
+        if (kaynak && W && !duragan) {
           // Kutucuğun olduğu yerden taç yaprakları saçılır
           const f = form.getBoundingClientRect();
           const k = kaynak.getBoundingClientRect();
@@ -578,6 +578,7 @@ export function kur(form: HTMLElement): Sahne | null {
         }
         dokum = 3.5;
       }
+      if (duragan) g = hedef;
       calistir();
     },
     kapat(): void {
