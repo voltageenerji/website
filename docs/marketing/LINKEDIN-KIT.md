@@ -1,3 +1,5 @@
+> **11.11.2026:** YEK-G ile ilgili satırlar EPİAŞ YEK-G sistemine kayıt tamamlanana kadar hiçbir kanalda kullanılmaz; bkz. `docs/seo/GD-SEO-04.md`.
+
 # LINKEDIN KİTİ — Voltage Enerji Şirket Sayfası
 
 **Hedef sayfa:** https://www.linkedin.com/company/voltage-enerji/
