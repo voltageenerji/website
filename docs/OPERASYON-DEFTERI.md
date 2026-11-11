@@ -142,6 +142,12 @@ tekrarlayabilir; "kaynak canlı mı?" kontrolü her görünürlük testinin par�
   - Marka sorgularının bir kısmı `/kvkk` ve `/kullanim-kosullari` sayfalarına düşüyor.
 - Ham veri `gsc-data/` (git dışı). Analiz ve aksiyon planı: `docs/seo/GD-SEO-03.md`.
 
+## 3.09 İLK ZAMANLANMIŞ HAFTALIK ÇEKİM (2026-11-09, seo-veri)
+- Zamanlanmış iş çalıştı ve başarılı. GitHub kuyruğu yüzünden 07:17 yerine 15:55'te (TR) başladı; veri etkilenmez.
+- **Dönem 2026-10-10 – 2026-11-06** (önceki: 2026-09-12 – 2026-10-09): tıklama 62 (14), gösterim 2.297 (660), CTR %2,7 (%2,1), ort. pozisyon 7,0 (10,7), sorgu 109 (52). Önceki dönem Eylül çukurunu içerir (bkz. GD-SEO-03 §2.1).
+- **URL denetimi:** 21/21 dizinde. 07.11'de değişen üç rehber ve `/kurumsal` aynı gün tarandı; 21.11 ara kontrolü erken kapandı.
+- GD-SEO-03 değişikliklerinin etkisi bu pencerede ölçülemez (pencere 06.11'de bitiyor); ölçüm 10.12 okumasında.
+
 ## 3.1 OLAY KAYDI
 
 | Olay | Tarih | Durum |
