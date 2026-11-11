@@ -1,0 +1,21 @@
+name: gecici-canli
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-canli.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            c=$(curl -sS -o a.html -w "%{http_code}" "https://voltage.com.tr/rehber/yek-g-i-rec-farki?t=$RANDOM")
+            [ "$c" = "200" ] && grep -q 'aglomere demir cevherinde' a.html && break
+            sleep 30
+          done
+          echo "farki=$c duzeltme=$(grep -c 'aglomere demir cevherinde' a.html || true) h1=$(grep -c '<h1' a.html || true)"
+          for u in rehber/yek-g-nedir rehber/i-rec-nedir rehber sitemap.xml llms.txt; do
+            echo "$u=$(curl -sS -o o.txt -w '%{http_code}' "https://voltage.com.tr/$u?t=$RANDOM") yekg_farki_link=$(grep -c 'yek-g-i-rec-farki' o.txt || true)"
+          done
+          echo "taslak=$(curl -sS -o /dev/null -w '%{http_code}' https://voltage.com.tr/docs/seo/drafts/yek-g-nedir.html)"
