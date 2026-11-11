@@ -262,15 +262,21 @@ aylık ayın 1'i, 3 aylık Oca/Nis/Tem/Eki, 6 aylık Oca/Tem, yıllık 1 Ocak).
 Elle tetikleme: Actions → Lead Reports → Run workflow → dönem seç.
 
 
-## 5.6) Cloudflare Web Analytics (çerezsiz, opsiyonel)
+## 5.6) Cloudflare Web Analytics (çerezsiz) — ETKİN (2026-11-11)
 
-1. Dashboard → **Analytics & Logs → Web Analytics** → site ekle → token'ı kopyala.
-2. `index.html` içinde `</body>` hemen öncesindeki yorumlu beacon bloğunu bul
-   (`CF_WEB_ANALYTICS_TOKEN_BURAYA`), token'ı yapıştır, yorumdan çıkar.
-3. `_headers` CSP'si `https://static.cloudflareinsights.com`'u `script-src` ve
-   `connect-src`'te zaten içeriyor — ekstra CSP değişikliği gerekmez.
-4. Çerezsiz çalıştığı için Çerez Politikası metniyle uyumludur; çerezli bir
-   araca geçilirse `cerez-politikasi.html` önce güncellenmelidir.
+Otomatik kurulumla açıldı: Dashboard → **Workers & Pages → website → Metrics →
+Web Analytics → Enable**. Cloudflare ölçüm betiğini her dağıtımda sayfalara
+kendisi ekler; repoda belirteç (token) tutulmaz.
+
+- Raporlar: Dashboard → **Analytics & Logs → Web Analytics** (site adı
+  `website-dh5.pages.dev +2`; voltage.com.tr bunun içindedir).
+- `_headers` CSP'si `script-src`'te `https://static.cloudflareinsights.com`,
+  `connect-src`'te `https://cloudflareinsights.com` içerir; ikisi de gereklidir.
+- `index.html` sonundaki yorum içindeki eski elle-kurulum satırı
+  (`CF_WEB_ANALYTICS_TOKEN_BURAYA`) kullanılmıyor; yorumdan çıkarılmamalı
+  (çift sayım olur). Bir sonraki ana sayfa değişikliğinde kaldırılabilir.
+- Çerezsiz çalıştığı için Çerez Politikası metniyle uyumludur; çerezli bir
+  araca geçilirse `cerez-politikasi.html` önce güncellenmelidir.
 
 ---
 
