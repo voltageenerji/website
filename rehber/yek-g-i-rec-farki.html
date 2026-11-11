@@ -52,7 +52,7 @@ ul, ol { padding-left: 22px; margin-bottom: 16px; }
 li { margin-bottom: 8px; }
 strong { color: var(--ink); }
 .tbl { overflow-x: auto; margin: 20px 0; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: 14px; }
 th, td { border: 1px solid var(--line-strong); padding: 10px 12px; text-align: left; vertical-align: top; }
 th { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--paper-warm); color: var(--ink-muted); }
 .cta { margin: 36px 0; padding: 26px 24px; border: 1px solid var(--line-strong); background: var(--paper-warm); text-align: center; }
@@ -78,7 +78,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     <thead><tr><th>Başlık</th><th>YEK-G</th><th>I-REC(E)</th></tr></thead>
     <tbody>
       <tr><td>Kim yürütür?</td><td>Belgeyi piyasa işletmecisi EPİAŞ ihraç eder. Organize YEK-G piyasasını da EPİAŞ işletir.</td><td>Sertifikayı I-TRACK Foundation akredite eder. I-REC Code'un yöneticisi ve kayıt sisteminin işletmecisi Evident'tır. I-TRACK Foundation'ın yayımladığı listeye göre Türkiye'de I-REC(E) ihraççısı Foton'dur (11 Kasım 2026 itibarıyla).</td></tr>
-      <tr><td>Dayanağı</td><td>Elektrik Piyasasında Yenilenebilir Enerji Kaynak Garanti Belgesi Yönetmeliği (Resmî Gazete 14.11.2020, sayı 31304; yürürlük 01.06.2021). Uygulama ayrıntıları EPİAŞ'ın yayımladığı Usul ve Esaslardadır.</td><td>I-REC Code for Electricity. 11 Kasım 2026 itibarıyla yayımdaki sürüm 12 Haziran 2025 tarihli 1.13'tür.</td></tr>
+      <tr><td>Dayanağı</td><td>Elektrik Piyasasında Yenilenebilir Enerji Kaynak Garanti Belgesi Yönetmeliği (Resmî Gazete 14.11.2020, sayı 31304; yürürlük 01.06.2021). Uygulama ayrıntıları, işlenmiş metnini EPİAŞ'ın yayımladığı Usul ve Esaslardadır.</td><td>I-REC Code for Electricity. 11 Kasım 2026 itibarıyla yayımdaki sürüm 12 Haziran 2025 tarihli 1.13'tür.</td></tr>
       <tr><td>Kimler yer alır?</td><td>Sistem kullanıcıları üretim, tedarik, şarj ağı işletmeci ve toplayıcı lisansı sahibi tüzel kişilerdir. Lisanssız üreticiler sistem kullanıcısı olamaz.</td><td>Kayıt sahibi (registrant) üretim tesisinin kaydından sorumludur. Katılımcı (participant) kayıt sistemindeki hesapları yönetir. Son kullanıcı yararlanıcıdır (beneficiary).</td></tr>
       <tr><td>Kabulü</td><td>Türkiye'de yönetmelikle düzenlenir. Yurt dışındaki bir muhatabın kabul edip etmediğini o muhataba sorun.</td><td>Kabulü, raporlama yaptığınız programın veya müşterinizin kurallarına bağlıdır; muhatabınıza sorun.</td></tr>
       <tr><td>Birim</td><td>Her 1 MWh belgelendirilebilir üretim için bir belge ihraç edilir.</td><td>Ölçü birimi MWh'dir.</td></tr>
@@ -109,18 +109,18 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 
   <h2>Sertifika neyi değiştirmez?</h2>
   <p><strong>Fiziksel elektriği.</strong> Sertifika fiziksel teslimat değildir. Tesisiniz aynı şebekeden, aynı elektrikle beslenmeye devam eder. Sertifika, belirli bir miktar üretime ait belgenin sizin adınıza itfa edildiğini gösterir.</p>
-  <p><strong>Konum bazlı rakamı.</strong> Konum bazlı yöntem şebekenin ortalama emisyon yoğunluğunu yansıtır. Sertifika piyasa bazlı yöntemin aracıdır; konum bazlı rakamınıza girmez.</p>
+  <p><strong>Konum bazlı rakamı.</strong> Konum bazlı yöntem şebekenin ortalama emisyon yoğunluğunu yansıtır. Sertifika piyasa bazlı yöntemin aracıdır; kılavuzdaki tanımlara göre konum bazlı rakamınıza girmez.</p>
   <p><strong>Diğer emisyon kalemlerini.</strong> Sertifika karbon kredisi veya denkleştirme (offset) aracı değildir. Tek başına yeni bir santral kurulduğunu da kanıtlamaz.</p>
 
   <h2>SKDM hesabında sertifikalar</h2>
   <p>AB'nin Sınırda Karbon Düzenleme Mekanizması'nda (SKDM) dolaylı emisyonlar kural olarak varsayılan değerle hesaplanır. Fiilî değer ancak üretim tesisi ile elektrik kaynağı arasında doğrudan teknik bağlantı veya bir elektrik alım anlaşması varsa kullanılabilir. Bu kural Tüzük (AB) 2023/956'da yer alır ve bağlayıcıdır.</p>
   <p>Avrupa Komisyonu'nun 14 Ağustos 2026 tarihli kılavuz belgesi, menşe garantisi veya yeşil sertifika gibi piyasa bazlı araçlarla emisyon faktörü belirlenmesine izin verilmediğini belirtir. Kılavuz açıklayıcı bir belgedir, bağlayıcı değildir.</p>
-  <p>11 Kasım 2026 itibarıyla dolaylı emisyonlar çimento ve gübrede hesaba girer. Demir-çelik, alüminyum ve hidrojende yalnızca doğrudan emisyonlar dikkate alınır. Tüzük, kapsamın genişletilmesi olasılığının Komisyon tarafından değerlendirilmesini öngörür. SKDM beyanınız için Tüzük'ün ve uygulama kurallarının güncel metnini esas alın.</p>
+  <p>11 Kasım 2026 itibarıyla dolaylı emisyonlar çimento ve gübrede hesaba girer; Komisyon'un Soru ve Cevaplar belgesine göre aglomere demir cevherinde de öyledir. Demir-çelik (bazı ferro-alyajlar hariç), alüminyum ve hidrojende yalnızca doğrudan emisyonlar dikkate alınır. Tüzük'e göre Komisyon, kapsamın genişletilmesini ayrıca değerlendirecek. SKDM beyanınız için Tüzük'ün ve uygulama kurallarının güncel metnini esas alın.</p>
 
   <h2>Tedarikçiye sorulacak sorular</h2>
   <p>YEK-G'de tedarikçi, tüketici lehine yapacağı itfaya ilişkin hususları tüketiciyle yaptığı sözleşmede belirtmek zorundadır. Bu yüzden aşağıdaki soruları teklif aşamasında sorun ve yanıtları sözleşmeye yazdırın. Tedarikçinizi seçme hakkının koşulları <a href="/rehber/serbest-tuketici">serbest tüketici rehberindedir</a>.</p>
   <ol>
-    <li>YEK-G sistemine kayıtlı mısınız? I-REC için katılımcı hesabı sizin adınıza mı, itfayı başka bir katılımcı mı yapacak?</li>
+    <li>YEK-G sistemine kayıtlı mısınız? I-REC'te katılımcı hesabı size mi ait, yoksa itfayı başka bir katılımcı mı yapacak?</li>
     <li>Hangi tüketim dönemi ve kaç MWh için itfa yapılacak?</li>
     <li>İtfa ne zaman yapılacak, itfa belgesi veya itfa beyanı bana ne zaman ulaşacak?</li>
     <li>Belgede tüzel kişi unvanım nasıl yazılacak?</li>
