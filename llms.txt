@@ -35,6 +35,8 @@
 - [YEK-G ile I-REC Arasındaki Fark](https://voltage.com.tr/rehber/yek-g-i-rec-farki): YEK-G ile I-REC arasındaki fark: kim yürütür, dayanağı ne, nasıl itfa edilir, tüketici hangi belgeyi alır? Karşılaştırma tablosu ve tedarikçiye sorular.
 - [YEK-G Belgesi Nedir?](https://voltage.com.tr/rehber/yek-g-nedir): YEK-G belgesi nedir, ihraç, transfer ve itfa nasıl işler, 12 aylık geçerlilik ne demek, tüketici itfayı hangi belgeyle kanıtlar? Kaynaklı, tarihli rehber.
 - [I-REC Sertifikası Nedir?](https://voltage.com.tr/rehber/i-rec-nedir): I-REC sertifikası nedir, kuralları nerede yazar, roller neler, ihraçtan itfaya hangi adımlar var, itfa beyanında neye bakılır? Tarihli ve kaynaklı rehber.
+- [Elektrik Tüketiminin Kapsam 2 Emisyonu Nasıl Hesaplanır?](https://voltage.com.tr/rehber/kapsam-2-elektrik-emisyonu): Kapsam 2 elektrik emisyonu nasıl hesaplanır? Konum bazlı ve piyasa bazlı yöntem, emisyon faktörü sıralaması, kalite ölçütleri ve tedarikçiden istenen veri.
+- [SKDM'de Elektrik ve Yeşil Sertifikalar](https://voltage.com.tr/rehber/skdm-elektrik-sertifika): SKDM'de elektrik hangi mallarda hesaba girer, dolaylı emisyon nasıl hesaplanır, yeşil sertifika ve PPA için kurallar ne diyor? Kaynaklı, tarihli rehber.
 
 ## Araçlar
 

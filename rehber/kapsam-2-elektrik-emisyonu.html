@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kapsam 2 Emisyon: Elektrikte Piyasa ve Konum Bazlı Hesap</title>
+<meta name="description" content="Kapsam 2 elektrik emisyonu nasıl hesaplanır? Konum bazlı ve piyasa bazlı yöntem, emisyon faktörü sıralaması, kalite ölçütleri ve tedarikçiden istenen veri.">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link rel="canonical" href="https://voltage.com.tr/rehber/kapsam-2-elektrik-emisyonu">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" sizes="48x48 32x32 16x16" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://voltage.com.tr/rehber/kapsam-2-elektrik-emisyonu">
+<meta property="og:title" content="Kapsam 2 Emisyon: Elektrikte Piyasa ve Konum Bazlı Hesap">
+<meta property="og:description" content="Kapsam 2 elektrik emisyonu nasıl hesaplanır? Konum bazlı ve piyasa bazlı yöntem, emisyon faktörü sıralaması, kalite ölçütleri ve tedarikçiden istenen veri.">
+<meta property="og:image" content="https://voltage.com.tr/og/rehber.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Voltage Enerji paylaşım görseli: Enerji Rehberi">
+<meta property="og:site_name" content="Voltage Enerji">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://voltage.com.tr/og/rehber.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"Ana Sayfa","item":"https://voltage.com.tr/"},
+{"@type":"ListItem","position":2,"name":"Rehber","item":"https://voltage.com.tr/rehber"},
+{"@type":"ListItem","position":3,"name":"Elektrik tüketiminin Kapsam 2 emisyonu nasıl hesaplanır?"}]},
+{"@type":"Article","image":"https://voltage.com.tr/og/rehber.jpg","headline":"Elektrik tüketiminin Kapsam 2 emisyonu nasıl hesaplanır?","inLanguage":"tr-TR","datePublished":"2026-11-11","dateModified":"2026-11-11","author":{"@id":"https://voltage.com.tr/#organization"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/rehber/kapsam-2-elektrik-emisyonu"},
+{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Piyasa bazlı ve konum bazlı yöntem arasındaki fark nedir?","acceptedAnswer":{"@type":"Answer","text":"Konum bazlı yöntem, tüketimin gerçekleştiği şebekenin ortalama emisyon yoğunluğunu yansıtır. Piyasa bazlı yöntem, şirketin sözleşmeyle seçtiği elektriğin emisyonunu yansıtır. İki tanım da GHG Protocol Scope 2 Guidance'tadır (2015)."}},{"@type":"Question","name":"Sertifika alırsam konum bazlı Kapsam 2 sonucum değişir mi?","acceptedAnswer":{"@type":"Answer","text":"Hayır. Kılavuza göre konum bazlı yöntemdeki şebeke ortalaması faktörleri, sözleşmeye dayalı iddialar nedeniyle düzeltilmez. Sertifika, kılavuzdaki Kapsam 2 Kalite Ölçütlerini karşılıyorsa piyasa bazlı hesapta kullanılır."}},{"@type":"Question","name":"İki yöntemi de raporlamak zorunda mıyım?","acceptedAnswer":{"@type":"Answer","text":"Scope 2 Guidance (2015), tedarikçiye veya ürüne özgü verinin sözleşmeye dayalı araçlarla sunulduğu pazarlarda faaliyeti olan şirketlerin iki sonucu ayrı ayrı raporlamasını şart koşar. Kılavuz gönüllü bir standarttır; sizin için geçerli olup olmadığını raporunuzu hazırladığınız çerçeve belirler."}},{"@type":"Question","name":"Sertifikanın üretim dönemi için kılavuzda bir süre var mı?","acceptedAnswer":{"@type":"Answer","text":"2015 kılavuzu sayısal bir süre vermez; aracın, uygulandığı tüketim dönemine olabildiğince yakın bir zamanda ihraç ve itfa edilmesini ister. Sertifikanın tüketimle aynı saat için ihraç ve itfa edilmesi, Ekim 2025 tarihli istişare belgesindeki bir öneridir; 11 Kasım 2026 itibarıyla yürürlükte değildir."}}]}]}
+</script>
+<style>
+:root { --ink:#0A0E1A; --ink-soft:#1A2032; --ink-muted:#4A5264; --line:#E4E2DC; --line-strong:#D6D2C6; --paper:#F5F3EC; --paper-warm:#EDEAE0; --accent:#C9A961; --accent-dark:#A68A44; --accent-ink:#826829; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Archivo', -apple-system, sans-serif; background: var(--paper); color: var(--ink); font-size: 15.5px; line-height: 1.75; }
+.page { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+a { color: var(--accent-ink); text-underline-offset: 2px; }
+.crumbs { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 40px; }
+.crumbs a { color: var(--ink-muted); text-decoration: none; }
+.crumbs a:hover { color: var(--ink); }
+h1 { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: clamp(29px, 4.5vw, 41px); letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 10px; }
+.updated { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+h2 { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 23px; letter-spacing: -0.01em; line-height: 1.25; margin: 40px 0 14px; }
+h3 { font-size: 16px; font-weight: 600; margin: 24px 0 6px; }
+p, li { color: var(--ink-soft); margin-bottom: 14px; }
+ul, ol { padding-left: 22px; margin-bottom: 16px; }
+li { margin-bottom: 8px; }
+strong { color: var(--ink); }
+.tbl { overflow-x: auto; margin: 20px 0; }
+table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: 14px; }
+th, td { border: 1px solid var(--line-strong); padding: 10px 12px; text-align: left; vertical-align: top; }
+th { font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--paper-warm); color: var(--ink-muted); }
+.cta { margin: 36px 0; padding: 26px 24px; border: 1px solid var(--line-strong); background: var(--paper-warm); text-align: center; }
+.cta p { margin-bottom: 16px; }
+.btn-primary { display: inline-flex; align-items: center; gap: 12px; padding: 16px 28px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; letter-spacing: 0.02em; border: 1px solid var(--ink); border-radius: 0; text-decoration: none; transition: background 0.3s, border-color 0.3s; }
+.btn-primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.about { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-muted); }
+.about p { color: var(--ink-muted); margin-bottom: 8px; }
+footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › <a href="/rehber">Rehber</a> › Elektrik tüketiminin Kapsam 2 emisyonu nasıl hesaplanır?</nav>
+  <h1>Elektrik tüketiminin Kapsam 2 emisyonu nasıl hesaplanır?</h1>
+  <div class="updated">Yayın / son güncelleme: 11.11.2026</div>
+
+  <p><strong>Kapsam 2</strong>, şirketin satın aldığı veya edindiği ve tükettiği elektriğin, buharın, ısının veya soğutmanın üretiminden kaynaklanan dolaylı emisyonlardır. Envanterin elektrik satırında hesap, her işletmenin tüketim verisinin (MWh veya kWh) emisyon faktörüyle çarpılmasına dayanır. GHG Protocol Scope 2 Guidance (2015) bunun için iki yöntem tanımlar: konum bazlı (location-based; TSRS 2'deki terimle lokasyona-dayalı) ve piyasa bazlı (market-based).</p>
+  <p>Bu sayfadaki bilgiler 11.11.2026 tarihlidir. GHG Protocol gönüllü bir standarttır; yasal bağlayıcılığı yoktur ve raporlama çerçeveleri atıf yaptığı ölçüde uygulanır. Raporunuzu hangi çerçeveye göre hazırlıyorsanız o çerçevenin güncel metnine bakın.</p>
+
+  <h2>Kapsam 1, 2 ve 3 nedir?</h2>
+  <p>Tanımlar GHG Protocol'dendir. Kapsam 1, şirketin sahip olduğu veya kontrol ettiği faaliyetlerden kaynaklanan emisyonlardır. Kapsam 2, satın alınan veya edinilen enerjinin üretiminden kaynaklanan dolaylı emisyonlardır. Kapsam 3, Kapsam 2 dışında kalan ve değer zincirinde oluşan diğer dolaylı emisyonlardır.</p>
+
+  <h2>Temel formül</h2>
+  <p>Kılavuzdaki hesap üç adımdır:</p>
+  <ol>
+    <li>Her işletmenin tüketim verisi (MWh veya kWh), o tüketime ait emisyon faktörüyle çarpılır. Faktör, MWh veya kWh başına ton cinsinden ifade edilir.</li>
+    <li>Sera gazı toplamları, küresel ısınma potansiyeli (GWP) değerleriyle çarpılarak CO2 eşdeğerine (CO2e) çevrilir.</li>
+    <li>Sonuç ton CO2 eşdeğeri olarak ve her yöntem için ayrı raporlanır.</li>
+  </ol>
+  <p>İki yöntemi birbirinden ayıran, kullanılan emisyon faktörüdür. Bu sayfada emisyon faktörü rakamı vermiyoruz. Hangi faktörü kullanacağınızı raporlama çerçevenize göre ve raporunuzu doğrulayan kuruluşla birlikte belirleyin.</p>
+
+  <h2>Konum bazlı ve piyasa bazlı yöntem</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Başlık</th><th>Konum bazlı yöntem</th><th>Piyasa bazlı yöntem</th></tr></thead>
+    <tbody>
+      <tr><td>Neyi yansıtır?</td><td>Tüketimin gerçekleştiği şebekenin ortalama emisyon yoğunluğunu.</td><td>Şirketin sözleşmeyle seçtiği elektriğin emisyonunu.</td></tr>
+      <tr><td>Hangi emisyon faktörü kullanılır?</td><td>Önce bölgesel veya ülke altı şebeke ortalaması, o yoksa ulusal üretim ortalaması.</td><td>Veri kaynakları kesinlik sırasıyla şöyledir: enerji nitelik sertifikaları, elektrik sözleşmeleri, tedarikçiye özgü emisyon oranı, artık karışım ve son olarak şebeke ortalaması.</td></tr>
+      <tr><td>Sertifika neyi değiştirir?</td><td>Sonucu değiştirmez. Şebeke ortalaması faktörleri, sözleşmeye dayalı iddialar nedeniyle düzeltilmez.</td><td>Kalite ölçütlerini karşılayan sertifika, sıralamanın ilk basamağındaki veridir. Ölçütleri karşılamayan aracın yerine sıralamadaki başka bir veri kullanılır.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Piyasa bazlı sütundaki sıralama verinin kesinlik sıralamasıdır; bir tedarik yöntemi tercihi olarak okunmamalıdır. Kılavuz, sıralamadaki araçların kalite ölçütlerini kendiliğinden karşılamış sayılmadığını da not eder.</p>
+  <p>Türkiye'de karşılaşacağınız iki sertifika sistemini <a href="/rehber/yek-g-i-rec-farki">YEK-G ile I-REC arasındaki fark</a> rehberinde karşılaştırdık.</p>
+
+  <h2>İki yöntemi birlikte raporlamak kimler için şart?</h2>
+  <p>Scope 2 Guidance (2015), tedarikçiye veya ürüne özgü verinin sözleşmeye dayalı araçlarla sunulduğu pazarlarda faaliyeti olan şirketlerin Kapsam 2'yi iki yöntemle, konum bazlı ve piyasa bazlı olarak ayrı ayrı raporlamasını şart koşar. Kılavuz buna çift raporlama (dual reporting) der.</p>
+  <p>Tetikleyici, şirketin faaliyet gösterdiği herhangi bir pazarda sözleşmeye dayalı bilginin bulunmasıdır. Faaliyetlerinin tamamı böyle bir verinin bulunmadığı pazarlarda olan şirketler yalnızca konum bazlı sonucu raporlar.</p>
+  <p>Bu şart kılavuzun kendi kuralıdır. Sizin için geçerli olup olmadığını raporunuzu hazırladığınız çerçeve belirler.</p>
+
+  <h2>Kapsam 2 Kalite Ölçütleri: sertifikada neye bakılır?</h2>
+  <p>Piyasa bazlı hesapta kullanılan her sözleşmeye dayalı araç, kılavuzdaki Kapsam 2 Kalite Ölçütlerini (Scope 2 Quality Criteria) karşılamak zorundadır. Ölçütler sekiz tanedir; ilk beşi bütün araçlar için geçerlidir. Her ölçütün yanına elektrik alıcısının sorabileceği bir soru yazdık. Ölçütler kılavuzdandır, sorular bizim önerimizdir.</p>
+  <ol>
+    <li>Araç, üretilen elektriğin doğrudan emisyon oranı bilgisini taşımalıdır. <em>Sertifika hangi üretime ve hangi kaynak türüne ait?</em></li>
+    <li>Araç, bu iddiayı taşıyan tek araç olmalıdır. <em>Aynı üretim için başka bir sistemde sertifika ihraç edilmediği nasıl gösteriliyor?</em></li>
+    <li>Araç, raporlayan şirket adına izlenmeli ve itfa veya iptal edilmelidir. <em>İtfa benim unvanıma mı yapıldı, kaydını alabilir miyim?</em></li>
+    <li>Araç, uygulandığı tüketim dönemine olabildiğince yakın bir zamanda ihraç ve itfa edilmiş olmalıdır. 2015 kılavuzu burada ay veya yıl olarak bir süre vermez; zamanlamanın ilgili pazardaki mevcut standartlarla tutarlı olmasını ister. <em>Sertifikalar hangi üretim dönemine ait, itfa hangi tüketim dönemi için yapıldı?</em></li>
+    <li>Araç, şirketin elektrik tükettiği pazarla aynı pazardan temin edilmelidir. Kılavuza göre sertifika pazarlarını genellikle siyasi veya düzenleyici sınırlar belirler; yalnızca fiziksel şebeke bağlantısına bakılmaz. <em>Sertifikanın dayandığı üretim hangi ülkede yapıldı?</em></li>
+    <li>Tedarikçiye özgü emisyon faktörü, teslim edilen elektriğe göre ve tedarikçinin müşterileri adına temin edip itfa ettiği sertifikalar dâhil edilerek hesaplanmalıdır. <em>Tedarikçim bana bir emisyon oranı veriyorsa bunu nasıl hesapladı?</em></li>
+    <li>Üreticiden doğrudan alımda ve yerinde üretimde, emisyon iddiasını taşıyan bütün araçlar yalnızca raporlayan şirkete devredilmelidir. <em>Santralin sertifikaları başkasına devredildi mi?</em></li>
+    <li>Tüketicilerin hesabı için düzeltilmiş bir artık karışım mevcut olmalı, yoksa şirket bunun yokluğunu açıklamalıdır. <em>Bulunduğum pazar için yayımlanmış bir artık karışım verisi var mı?</em></li>
+  </ol>
+  <p>Elinizdeki sertifikanın bu ölçütleri karşılayıp karşılamadığını raporunuzu doğrulayan kuruluşla birlikte değerlendirin.</p>
+
+  <h2>Artık karışım (residual mix) nedir?</h2>
+  <p>Artık karışım, sözleşmeye dayalı araçlarla sahiplenilen üretim düşüldükten sonra geriye kalan üretimin emisyon profilidir. Kılavuz, şirketlerin bunu kendilerinin hesaplamamasını söyler.</p>
+  <p>Artık karışım verisi yoksa şebeke ortalaması kullanılabilir. Şirket bu durumu ve bunun tüketiciler arasında çifte sayıma yol açabileceğini envanterinde belirtmek zorundadır.</p>
+
+  <h2>Sertifika neyi değiştirmez?</h2>
+  <p><strong>Fiziksel elektrik akışını.</strong> Kılavuz, sertifikaların tanım gereği fiziksel elektrik akışından ayrı olduğunu ve şebekeye verilen elektriğin fiziksel olarak ayırt edilemediğini belirtir.</p>
+  <p><strong>Konum bazlı sonucu.</strong> Kılavuza göre konum bazlı yöntemdeki şebeke ortalaması faktörleri, sözleşmeye dayalı iddialar nedeniyle düzeltilmez; sertifika almak konum bazlı sonucu değiştirmez.</p>
+  <p><strong>Ek katkı sorusunu.</strong> Kılavuz, piyasa bazlı yöntemde kullanılan araçlar için "ek katkı" (additionality) koşulu aramaz. Kılavuza göre Kapsam 2 raporu bir kullanım raporudur ve ek katkı tartışmasından bağımsızdır.</p>
+
+  <h2>Kılavuzun revizyonu ne durumda?</h2>
+  <p>Kılavuzun revizyonu sürmektedir. Kamuoyu görüşü 20 Ekim 2025 ile 31 Ocak 2026 arasında alınmış, 11 Kasım 2026 itibarıyla revize edilmiş nihai metin yayımlanmamıştır; yürürlükteki belge 2015 kılavuzudur.</p>
+  <p>Ekim 2025 tarihli istişare belgesindeki öneriler arasında sertifikanın tüketimle aynı saat için ihraç ve itfa edilmesi ile teslim edilebilirliğin gösterilmesi yer alır. 11 Kasım 2026 itibarıyla bunlar öneridir, yürürlükte değildir. Bu sayfada nihai metin için tarih vermiyoruz.</p>
+
+  <h2>TSRS ne diyor?</h2>
+  <p>Türkiye Sürdürülebilirlik Raporlama Standartları (TSRS), KGK'nın 29 Aralık 2023 tarihli ve 32414 (Mükerrer) sayılı Resmî Gazete'de yayımlanan kararıyla belirlenmiştir. TSRS 2, işletmenin Kapsam 2 emisyonlarını lokasyona-dayalı (konum bazlı) olarak açıklamasını ve bu emisyonların anlaşılması için gerekli olan sözleşmeye dayalı araçlar hakkında bilgi vermesini ister.</p>
+  <p>Bu cümle TSRS 2'nin 29(a)(v), B30 ve B31 paragraflarına dayanır. TSRS'nin hangi şirketlere uygulandığını ve sonraki değişiklikleri bu sayfada ele almıyoruz. TSRS kapsamındaki şirketler KGK'nın güncel kararlarına bakmalıdır.</p>
+
+  <h2>Tedarikçinizden hangi veriyi isteyin?</h2>
+  <p>Bu liste uygulamaya dönük önerimizdir; mevzuattan veya kılavuzdan gelen bir kural olarak okunmamalıdır.</p>
+  <ul>
+    <li><strong>Dönem bazında tüketim.</strong> Her tesis ve her fatura dönemi için kWh veya MWh tüketimi. Dayanağınız faturalar ve sayaç verisidir.</li>
+    <li><strong>İtfa kaydı.</strong> Adınıza bir sertifika itfa edildi mi? Edildiyse itfa belgesini veya itfa beyanını isteyin. Unvanı, tüketim dönemini ve MWh miktarını kontrol edin.</li>
+    <li><strong>Sözleşme hükmü.</strong> İtfaya ilişkin koşullar sözleşmenizde yazıyor mu? Dönemi, miktarı ve kaynak türünü arayın.</li>
+  </ul>
+  <p>İtfa kayıtlarının içeriğini <a href="/rehber/yek-g-nedir">YEK-G belgesi nedir?</a> ve <a href="/rehber/i-rec-nedir">I-REC sertifikası nedir?</a> rehberlerinde anlattık. İhracat yapıyorsanız AB'nin sınırda karbon düzenlemesi ayrı bir çerçevedir ve kuralları farklıdır: <a href="/rehber/skdm-elektrik-sertifika">SKDM'de elektrik ve yeşil sertifikalar</a>.</p>
+
+  <h2>Sık sorulan sorular</h2>
+  <h3>Piyasa bazlı ve konum bazlı yöntem arasındaki fark nedir?</h3>
+  <p>Konum bazlı yöntem, tüketimin gerçekleştiği şebekenin ortalama emisyon yoğunluğunu yansıtır. Piyasa bazlı yöntem, şirketin sözleşmeyle seçtiği elektriğin emisyonunu yansıtır. İki tanım da GHG Protocol Scope 2 Guidance'tadır (2015).</p>
+  <h3>Sertifika alırsam konum bazlı Kapsam 2 sonucum değişir mi?</h3>
+  <p>Hayır. Kılavuza göre konum bazlı yöntemdeki şebeke ortalaması faktörleri, sözleşmeye dayalı iddialar nedeniyle düzeltilmez. Sertifika, kılavuzdaki Kapsam 2 Kalite Ölçütlerini karşılıyorsa piyasa bazlı hesapta kullanılır.</p>
+  <h3>İki yöntemi de raporlamak zorunda mıyım?</h3>
+  <p>Scope 2 Guidance (2015), tedarikçiye veya ürüne özgü verinin sözleşmeye dayalı araçlarla sunulduğu pazarlarda faaliyeti olan şirketlerin iki sonucu ayrı ayrı raporlamasını şart koşar. Kılavuz gönüllü bir standarttır; sizin için geçerli olup olmadığını raporunuzu hazırladığınız çerçeve belirler.</p>
+  <h3>Sertifikanın üretim dönemi için kılavuzda bir süre var mı?</h3>
+  <p>2015 kılavuzu sayısal bir süre vermez; aracın, uygulandığı tüketim dönemine olabildiğince yakın bir zamanda ihraç ve itfa edilmesini ister. Sertifikanın tüketimle aynı saat için ihraç ve itfa edilmesi, Ekim 2025 tarihli istişare belgesindeki bir öneridir; 11 Kasım 2026 itibarıyla yürürlükte değildir.</p>
+
+  <div class="cta">
+    <p>Tesisinizin elektrik tedariki için teklif almak isterseniz tüketim bilgilerinizle başvurabilirsiniz.</p>
+    <a class="btn-primary" href="/#iletisim">Teklif Talep Edin</a>
+  </div>
+
+  <div class="about">
+    <p><strong>Bu yazı hakkında:</strong> Yayın/güncelleme tarihi: 11.11.2026. Hazırlayan: EPDK tedarik lisansı ETS/3424-8/2074 sahibi Voltage Enerji ekibi (<a href="/kurumsal">kurumsal bilgiler</a>). Kaynaklar: GHG Protocol Scope 2 Guidance (2015), gönüllü standart; GHG Protocol Public Consultations sayfası (11.11.2026 itibarıyla) ve Scope 2 Public Consultation Document (Ekim 2025), açıklayıcı belgeler; KGK Kurul Kararı, "Türkiye Sürdürülebilirlik Raporlama Standartlarının (TSRS) Belirlenmesi" (karar tarihi 27.12.2023; Resmî Gazete 29.12.2023, sayı 32414 (Mükerrer)). Kaynaklara erişim tarihi: 11.11.2026. Düzenleyici bilgiler tarihlidir; standart veya mevzuat değiştiğinde sayfa güncellenir. Bu sayfa bilgilendirme amaçlıdır; hukuki, mali veya raporlama danışmanlığı yerine geçmez.</p>
+  </div>
+
+  <footer>© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · <a href="/">Ana sayfa</a> · <a href="/kurumsal">Kurumsal</a> · <a href="/rehber">Rehber</a> · <a href="/kvkk">KVKK</a> · <a href="/kullanim-kosullari">Kullanım Koşulları</a></footer>
+</div>
+</body>
+</html>
