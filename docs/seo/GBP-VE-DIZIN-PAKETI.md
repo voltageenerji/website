@@ -1,3 +1,5 @@
+> **11.11.2026:** YEK-G ile ilgili satırlar EPİAŞ YEK-G sistemine kayıt tamamlanana kadar hiçbir kanalda kullanılmaz; bkz. `docs/seo/GD-SEO-04.md`.
+
 # GBP VE DİZİN PAKETİ — Yürütme Talimatı
 
 **Hazırlayan:** seo-local (Seviye 4, SEO birimi)

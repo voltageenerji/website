@@ -28,10 +28,10 @@
 - [Tekstil Fabrikasında Elektrik Maliyeti](https://voltage.com.tr/rehber/tekstil-elektrik): İplik, dokuma ve boyahane hatlarında elektrik maliyeti nasıl yönetilir? Tekstil yük profiline göre sabit, endeksli ve hibrit tedarik modelleri.
 - [Demir-Çelik Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/demir-celik-elektrik): Ark ocağı, indüksiyon ve haddehane yüklerinde elektrik maliyeti nasıl yönetilir? PTF saatlik profiline dayalı tedarik modelleri ve süreç.
 - [Kimya Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/kimya-elektrik): Sürekli proses yükleri, dar dengeleme toleransı ve kesintisiz üretim: kimya ve petrokimya tesislerinde sabit, endeksli ve hibrit tedarik modelleri.
-- [Veri Merkezi Elektrik Tedariki](https://voltage.com.tr/rehber/veri-merkezi-elektrik): 7/24 düz yük çeken veri merkezlerinde elektrik tedariki: PTF endeksli ve sabit modeller, PUE bilinci ve YEK-G belgeli yeşil enerji tedariki.
+- [Veri Merkezi Elektrik Tedariki](https://voltage.com.tr/rehber/veri-merkezi-elektrik): 7/24 düz yük çeken veri merkezlerinde elektrik tedariki: PTF endeksli ve sabit modeller, PUE bilinci ve YEK-G belgesi hakkında bilmeniz gerekenler.
 - [Soğuk Zincir ve Depolarda Elektrik Maliyeti](https://voltage.com.tr/rehber/soguk-zincir-elektrik): Kompresör yükleri, gece öne-soğutma ve saat planlaması: soğuk zincir depoları ve lojistik tesisleri için elektrik tedarik modelleri ve süreç.
 - [Cam ve Seramik Tesislerinde Elektrik Tedariki](https://voltage.com.tr/rehber/cam-seramik-elektrik): Fırın sürekliliği ve kesinti toleransı olmayan yükler: cam ve seramik tesislerinde elektrik maliyeti, ısıl-elektrik ayrımı ve tedarik modelleri.
-- [Yenilenebilir Üreticiler için Portföy Hizmetleri](https://voltage.com.tr/rehber/yenilenebilir-ureticiler): GES-RES üreticileri için üretim portföy hizmetleri: tahmin ve dengesizlik yönetimi, YEK-G belgelendirme desteği, dengeden sorumlu taraf ilişkisi.
+- [Yenilenebilir Üreticiler için Portföy Hizmetleri](https://voltage.com.tr/rehber/yenilenebilir-ureticiler): GES-RES üreticileri için üretim portföy hizmetleri: tahmin ve dengesizlik yönetimi, dengeden sorumlu taraf ilişkisi ve YEK-G sisteminin işleyişi.
 
 ## Araçlar
 
