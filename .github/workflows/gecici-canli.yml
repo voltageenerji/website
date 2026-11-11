@@ -1,0 +1,26 @@
+name: gecici-canli
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-canli.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            curl -sS -o k.html -w "kurumsal=%{http_code}\n" "https://voltage.com.tr/kurumsal?t=$RANDOM"
+            n=$(grep -c 'YEK-G' k.html || true)
+            [ "$n" = "0" ] && break
+            sleep 30
+          done
+          echo "kurumsal_yekg=$n"
+          curl -sS -o v.html -w "veri=%{http_code}\n" "https://voltage.com.tr/rehber/veri-merkezi-elektrik?t=$RANDOM"
+          echo "veri_yeni=$(grep -c 'Yenilenebilir kaynak belgesi (YEK-G)' v.html || true) veri_eski=$(grep -c 'YEK-G belgeli' v.html || true)"
+          curl -sS -o u.html -w "uretici=%{http_code}\n" "https://voltage.com.tr/rehber/yenilenebilir-ureticiler?t=$RANDOM"
+          echo "uretici_yeni=$(grep -c 'sisteme kayıtlı üreticinin talebiyle' u.html || true) uretici_eski=$(grep -c 'belgelendirme desteği' u.html || true)"
+          curl -sS -o r.html -w "rehber=%{http_code}\n" "https://voltage.com.tr/rehber?t=$RANDOM"
+          echo "rehber_eski=$(grep -c 'YEK-G belgeli\|belgelendirme desteği' r.html || true)"
+          curl -sS -o l.txt -w "llms=%{http_code}\n" "https://voltage.com.tr/llms.txt?t=$RANDOM"
+          echo "llms_eski=$(grep -c 'YEK-G belgeli\|belgelendirme desteği' l.txt || true)"
