@@ -17,8 +17,8 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Voltage Enerji">
 <meta property="og:url" content="https://voltage.com.tr/">
-<meta property="og:title" content="Voltage Enerji — Türkiye'nin Endüstriyel Enerji Ortağı">
-<meta property="og:description" content="2011'den bu yana kurumsal ve endüstriyel müşterilere güvenilir elektrik tedariki; GÖP, GİP ve ikili anlaşmaların aktif katılımcısı. Serbest elektrik piyasasının ilk oyuncularından.">
+<meta property="og:title" content="Voltage Enerji (Voltan Elektrik A.Ş.) | Elektrik Tedarikçisi">
+<meta property="og:description" content="Voltan Elektrik A.Ş.'nin markası Voltage Enerji, EPDK lisansıyla 2011'den bu yana kurumsal ve endüstriyel tüketicilere elektrik tedarik eder.">
 <meta property="og:image" content="https://voltage.com.tr/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -29,8 +29,8 @@
 <!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://voltage.com.tr/">
-<meta name="twitter:title" content="Voltage Enerji — Türkiye'nin Endüstriyel Enerji Ortağı">
-<meta name="twitter:description" content="2011'den bu yana kurumsal ve endüstriyel elektrik tedariki. Serbest piyasanın ilk oyuncularından.">
+<meta name="twitter:title" content="Voltage Enerji (Voltan Elektrik A.Ş.) | Elektrik Tedarikçisi">
+<meta name="twitter:description" content="Voltan Elektrik A.Ş.'nin markası Voltage Enerji, EPDK lisansıyla 2011'den bu yana kurumsal ve endüstriyel tüketicilere elektrik tedarik eder.">
 <meta name="twitter:image" content="https://voltage.com.tr/og-image.jpg">
 
 <!-- Favicon — gerçek dosyalar (data-URI yerine): SVG + ICO (48/32/16) + PNG touch icon -->
@@ -510,6 +510,9 @@ section {
   gap: 100px;
   align-items: start;
 }
+/* Dar ekranda sütun içeriğin en geniş öğesine göre taşmasın (375 px'te 16 px yatay kayma vardı) */
+.contact-grid > * { min-width: 0; }
+.contact-detail-value { min-width: 0; overflow-wrap: anywhere; }
 
 .contact-info .section-title {
   margin-bottom: 40px;
@@ -966,7 +969,7 @@ section {
 .cl-v .mono { font-family: var(--mono); font-size: 12.5px; }
 .cl-bottom { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; border-top: 1px solid rgba(245,243,236,0.12); margin-top: 52px; padding-top: 18px; }
 .cl-copy { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: rgba(245,243,236,0.45); }
-.cl-legal { display: flex; gap: 20px; }
+.cl-legal { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .cl-legal a { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: rgba(245,243,236,0.6); }
 .cl-legal a:hover { color: var(--accent); }
 .cl-subwrap { display: inline-flex; align-items: flex-start; }
