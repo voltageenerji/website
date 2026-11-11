@@ -43,15 +43,14 @@ footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line);
   <p>voltage.com.tr, ziyaretçilerine <strong>hiçbir çerez (cookie) yerleştirmez</strong>. Reklam çerezi, takip çerezi, üçüncü taraf pazarlama aracı veya oturum çerezi kullanılmaz.</p>
 
   <h2>2. Cihazınızda Sakladığımız Bilgiler</h2>
-  <!-- TASLAK-REVİZYON (2026-08-04, webmaster): localStorage envanteri sitenin güncel
-       durumuyla eşitlendi — dil tercihine ek olarak canlı piyasa göstergesinin teknik
-       önbelleği (voltage-ptf-cache) eklendi. Hukuk incelemesinde doğrulanmalı. -->
-  <p>Tarayıcınızın <em>localStorage</em> alanında yalnızca iki bilgi, yalnızca sizin cihazınızda saklanır: dil tercihiniz (<code>voltage-lang</code>) ve canlı piyasa göstergesinin son EPİAŞ verisini tutan teknik önbellek (<code>voltage-ptf-cache</code>). Bu bilgiler bize iletilmez, sizi tanımlamaz ve tarayıcı verilerinizi temizlediğinizde silinir.</p>
+  <!-- 2026-11-11: localStorage envanteri kodla eşitlendi (altı anahtar; 404 oyunundaki
+       takma ad yalnızca skor gönderiminde iletilir). -->
+  <p>Tarayıcınızın <em>localStorage</em> alanında yalnızca şu bilgiler saklanır: dil tercihiniz (<code>voltage-lang</code>), canlı piyasa verisinin teknik önbelleği (<code>voltage-ptf-cache</code>, <code>voltage-ptf-cache-page</code>) ve 404 sayfasındaki oyunun ses tercihi, ilerlemesi ve takma adınız (<code>voltage-404-sound</code>, <code>voltage-404-progress</code>, <code>voltage-404-name</code>). Takma ad yalnızca skorunuzu gönderdiğinizde lider tablosu için bize iletilir; diğerleri iletilmez. Bu bilgiler tarayıcı verilerinizi temizlediğinizde silinir.</p>
 
   <h2>3. Analitik Ölçüm — Çerezsiz</h2>
   <!-- 2026-11-11: Cloudflare Web Analytics etkinleştirildi (Pages otomatik kurulum);
        cümle koşulludan etkin hâle çevrildi. Sayfada birinci taraf olay sayacı çağrısı yoktur. -->
-  <p>Sitemizdeki kullanım ölçümü çerezsizdir ve kimlik tespiti yapmaz. Ölçüm için Cloudflare Web Analytics kullanılır: çerez yerleştirmeden, cihaz parmak izi çıkarmadan ve ziyaretçileri bireysel olarak takip etmeden toplu sayfa görüntüleme istatistikleri üretir. Bunun dışında sayfalarımız hiçbir analitik veri iletmez.</p>
+  <p>Sitemizdeki kullanım ölçümü çerezsizdir ve kimlik tespiti yapmaz. Ölçüm için Cloudflare Web Analytics kullanılır: çerez yerleştirmeden, cihaz parmak izi çıkarmadan ve ziyaretçileri bireysel olarak takip etmeden toplu sayfa görüntüleme istatistikleri üretir. Ölçüm isteği, barındırma altyapımızı da sağlayan Cloudflare, Inc. (ABD) sunucularına gider; ziyaret edilen sayfa adresi, yönlendiren sayfa, tarayıcı türü, sayfa yükleme süresi ve IP adresinden türetilen ülke bilgisini içerir. Bunun dışında sayfalarımız hiçbir analitik veri iletmez.</p>
 
   <h2>4. Üçüncü Taraf İçerikler</h2>
   <p>Sayfalarımız Google Fonts üzerinden yazı tipi ve kendi Cloudflare altyapımız üzerinden anlık EPİAŞ PTF verisi yükler. Bu istekler çerez içermez; ilgili sağlayıcıların sunucuları, internetin çalışma şekli gereği IP adresinizi teknik olarak görebilir.</p>
