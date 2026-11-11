@@ -1,0 +1,22 @@
+name: gecici-canli
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-canli.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            c=$(curl -sS -o a.html -w "%{http_code}" "https://voltage.com.tr/rehber/skdm-elektrik-sertifika?t=$RANDOM")
+            [ "$c" = "200" ] && grep -q 'Sık karıştırılan noktalar' a.html && break
+            sleep 30
+          done
+          echo "skdm=$c duzeltme=$(grep -c 'Sık karıştırılan noktalar' a.html || true) eski=$(grep -c 'Yaygın yanlışlar' a.html || true)"
+          c=$(curl -sS -o k.html -w "%{http_code}" "https://voltage.com.tr/rehber/kapsam-2-elektrik-emisyonu?t=$RANDOM")
+          echo "kapsam2=$c duzeltme=$(grep -c 'Ek katkı koşulu aranmaz' k.html || true)"
+          for u in rehber sitemap.xml llms.txt rehber/yek-g-i-rec-farki; do
+            echo "$u=$(curl -sS -o o.txt -w '%{http_code}' "https://voltage.com.tr/$u?t=$RANDOM") skdm_link=$(grep -c 'skdm-elektrik-sertifika' o.txt || true) kapsam2_link=$(grep -c 'kapsam-2-elektrik-emisyonu' o.txt || true)"
+          done
