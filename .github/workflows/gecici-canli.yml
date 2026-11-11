@@ -1,0 +1,18 @@
+name: gecici-canli
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-canli.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sS -o p.html -w "http=%{http_code}\n" https://voltage.com.tr/
+          echo "og_title=$(grep -c 'property="og:title" content="Voltage Enerji (Voltan Elektrik A.Ş.) | Elektrik Tedarikçisi"' p.html)"
+          echo "tw_title=$(grep -c 'name="twitter:title" content="Voltage Enerji (Voltan Elektrik A.Ş.) | Elektrik Tedarikçisi"' p.html)"
+          echo "og_desc=$(grep -c 'property="og:description" content="Voltan Elektrik A.Ş.' p.html)"
+          echo "tw_desc=$(grep -c 'name="twitter:description" content="Voltan Elektrik A.Ş.' p.html)"
+          echo "eski_etiket=$(grep -c 'Endüstriyel Enerji Ortağı">' p.html)"
+          echo "footer_wrap=$(grep -c 'cl-legal { display: flex; flex-wrap: wrap' p.html)"
