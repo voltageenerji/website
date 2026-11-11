@@ -67,3 +67,11 @@ Sahibin sözü ("alacağız") şirketin henüz sistemde olmadığı anlamına ge
 2. YEK-G: EPİAŞ'a tedarikçi olarak kayıt mı, başka katılımcıdan temin mi? Hedef tarih?
 3. I-REC: kendi hesabımız mı, aracı üzerinden mi?
 4. Ürün: tedarik sözleşmesine bağlı itfa mı, ayrıca yalnız sertifika satışı da mı?
+
+## 7. Sahibin cevapları (2026-11-11)
+
+1. YEK-G: EPİAŞ sistemine **tedarikçi olarak kayıt** yapılacak (henüz kayıtlı değiliz).
+2. I-REC: **kendi katılımcı hesabımız** açılacak.
+3. Sertifika **yalnızca bizden elektrik alan müşteriye** verilecek; tek başına sertifika satışı yok.
+
+Sonuç: §1'deki mevcut "YEK-G belgeli tedarik" beyanları bugün için doğru değil. Ana sayfa dışındaki sayfalar eğitici dile çevrildi (Legal + QA kapısıyla); ana sayfa değişikliği sahibin önizleme onayını bekliyor. Kayıt tamamlandığında §5'teki "kayıt sonrası" cümlesi tarihle eklenir.
