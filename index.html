@@ -758,6 +758,16 @@ section {
   .about-signature-meta { text-align: left; }
 }
 
+/* Telefon (≤480 px): iletişim sütunu en geniş öğeye göre taşmasın; etiket üstte, değer altta
+   (yan yana dizilişte e-posta ve sicil satırı 375 px'te sığmıyordu). 481 px ve üstü değişmez. */
+@media (max-width: 480px) {
+  .contact-grid > * { min-width: 0; }
+  .contact-detail { grid-template-columns: 1fr; gap: 6px; }
+  .contact-detail-value { min-width: 0; overflow-wrap: anywhere; }
+  .form-row > *, .form-group { min-width: 0; }
+  .form-select { min-width: 0; max-width: 100%; }
+}
+
 /* ============ CINEMATIC HERO ENHANCEMENTS ============ */
 .hero-canvas {
   position: absolute;
