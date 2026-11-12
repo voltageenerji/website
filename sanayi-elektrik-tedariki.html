@@ -36,8 +36,7 @@
 {"@type":"Question","name":"Fabrikam serbest tüketici mi?","acceptedAnswer":{"@type":"Answer","text":"2026 yılı serbest tüketici limiti yıllık 500 kWh'tir (EPDK Kurul Kararı 14039, Resmî Gazete 23.12.2025, sayı 33116). Yıllık tüketimi bu limitin üzerinde olan abone, elektriğini dilediği lisanslı tedarikçiden alabilir. Eşiği aşıp aşmadığınızı son bir yıllık faturalarınızdaki toplam tüketime bakarak görebilirsiniz."}},
 {"@type":"Question","name":"Tedarikçi değiştirince kesinti olur mu?","acceptedAnswer":{"@type":"Answer","text":"Tedarikçi değiştirmek için elektriğin kesilmesi gerekmez. Geçiş ticari bir kayıt işlemidir; sayaç ve dağıtım sorumluluğu dağıtım şirketindedir ve tedarikçiye bağlanmamıştır. Şebeke arızası veya planlı bakım gibi nedenlerle yaşanabilecek kesintiler dağıtım şebekesiyle ilgilidir ve tedarikçi seçimine bağlı değildir."}},
 {"@type":"Question","name":"Teklif almak için ne gerekir?","acceptedAnswer":{"@type":"Answer","text":"Teklif formunda abone grubu, aylık tüketim, sektör, şirket adı ve iletişim bilgileri istenir. Son faturanızı eklemeniz isteğe bağlıdır; eklerseniz tüketiminizi ve tarifenizi faturadan biz okuruz. Model kurulurken son 12 aylık tüketim verisi kullanılır. Tipik geri dönüş süremiz bir iş günüdür."}},
-{"@type":"Question","name":"Sabit fiyat mı, PTF endeksli mi?","acceptedAnswer":{"@type":"Answer","text":"Hangi modelin uygun olduğu tesisin yük profiline ve risk tercihine bağlıdır. Sabit fiyat bütçe kesinliği isteyen, PTF endeksli model piyasayı izleyebilen, hibrit model dengeli profil arayan tesisler içindir. Seçenekler teklifte sunulur ve tüm formüller sözleşmede yazılıdır."}},
-{"@type":"Question","name":"OSB içindeki fabrika tedarikçisini seçebilir mi?","acceptedAnswer":{"@type":"Answer","text":"Evet. Serbest tüketici hakkı OSB katılımcıları için de geçerlidir; katılımcı, OSB tarifesinde kalmak yerine tedarikçisini seçebilir. Dağıtım hizmeti OSB üzerinden sağlanmaya devam eder: ikili anlaşmada enerji bedeli sözleşmedeki formülle belirlenir, dağıtım bedeli OSB'ye ödenir. OSB iç düzenlemeleri bildirim yükümlülüğü içerebilir."}}]}]}
+{"@type":"Question","name":"Sabit fiyat mı, PTF endeksli mi?","acceptedAnswer":{"@type":"Answer","text":"Hangi modelin uygun olduğu tesisin yük profiline ve risk tercihine bağlıdır. Sabit fiyat bütçe kesinliği isteyen, PTF endeksli model piyasayı izleyebilen, hibrit model dengeli profil arayan tesisler içindir. Seçenekler teklifte sunulur ve tüm formüller sözleşmede yazılıdır."}}]}]}
 </script>
 <style>
 :root { --ink:#0A0E1A; --ink-soft:#1A2032; --ink-muted:#4A5264; --line:#E4E2DC; --line-strong:#D6D2C6; --paper:#F5F3EC; --paper-warm:#EDEAE0; --accent:#C9A961; --accent-dark:#A68A44; --accent-ink:#826829; --mono:'IBM Plex Mono',Consolas,monospace; }
@@ -100,7 +99,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <h2>Sözleşme modelleri</h2>
   <p>İkili anlaşmada üç fiyat modeli kurguluyoruz:</p>
   <ul>
-    <li><strong>Sabit fiyat.</strong> Birim fiyat sözleşme süresi boyunca sabittir. Bütçe kesinliği isteyen tesislere uygundur; piyasa düşüşlerinden yararlanılamaz.</li>
+    <li><strong>Sabit fiyat.</strong> Enerji birim fiyatı, sözleşmede tanımlı istisnalar dışında sözleşme süresi boyunca sabittir. Bütçe kesinliği isteyen tesislere uygundur; piyasa düşüşlerinden yararlanılamaz.</li>
     <li><strong>PTF endeksli.</strong> Birim fiyat, <a href="/rehber/ptf-nedir">PTF</a>'ye sözleşmede yazılı bir formülle bağlanır. Ödenen fiyat piyasayla birlikte yükselir ve düşer. Piyasayı izleyebilen tesislere uygundur.</li>
     <li><strong>Hibrit.</strong> Tüketimin bir bölümü sabit, kalanı endeksli fiyatlanır; risk iki taraf arasında formülle paylaşılır. Dengeli profil arayan tesislere uygundur.</li>
   </ul>
@@ -134,7 +133,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <ol>
     <li><strong>Keşif.</strong> Son 12 aylık tüketim verisi alınır. Tesisin yük profili, OG/AG kullanımı ve saat dağılımı incelenir. Mevcut sözleşmenin süresi ve fesih koşulları kontrol edilir.</li>
     <li><strong>Modelleme.</strong> GÖP ve ikili anlaşma karışımı, risk dağılımı ve referans dönem PTF analiziyle tesise özgü fiyat senaryoları kurulur.</li>
-    <li><strong>Teklif.</strong> Sabit, endeksli veya hibrit seçenekler sunulur. Tüm formüller sözleşmede yazılıdır. Model mevcut tarifenizin gerisinde kalıyorsa bunu açıkça söyleriz.</li>
+    <li><strong>Teklif.</strong> Sabit, endeksli veya hibrit seçenekler sunulur. Tüm formüller sözleşmede yazılıdır. Geçmiş tüketim verinizle yaptığımız karşılaştırmada model mevcut tarifenizin gerisinde kalıyorsa bunu açıkça söyleriz.</li>
     <li><strong>Geçiş işlemleri.</strong> EPİAŞ kayıt işlemleri, tedarikçi değişimi başvurusu ve dengeleme eşleştirmesi tarafımızca yürütülür.</li>
     <li><strong>Devreye alma.</strong> Tedarik ilk saatten itibaren başlar. İlk ay faturalama ve kullanım raporuyla modelin gerçekleşmesi kontrol edilir.</li>
   </ol>
@@ -143,9 +142,9 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <h2>Teklifleri karşılaştırırken sorulacak sorular</h2>
   <p>Bu sorular hangi tedarikçiden teklif alırsanız alın geçerlidir. Bize de sorun.</p>
   <ul>
-    <li><strong>Birim fiyat neye dayanıyor?</strong> Fiyat sabit mi, PTF'ye mi endeksli? Endeksliyse çarpan, katsayı ve tüm bileşenler yazılı mı?</li>
-    <li><strong>Fiyata neler dâhil, neler hariç?</strong> Dağıtım bedeli ve vergiler teklifte nasıl gösteriliyor?</li>
-    <li><strong>Dengesizlik sorumluluğu kimde?</strong> Sözleşmede açıkça yazıyor mu?</li>
+    <li><strong>Birim fiyat neye dayanıyor?</strong> Fiyat sabit mi, PTF'ye mi endeksli? Endeksliyse hangi dönemin PTF'si esas alınıyor (saatlik mi, aylık ortalama mı)? Çarpan, katsayı ve tüm bileşenler yazılı mı?</li>
+    <li><strong>Fiyata neler dâhil, neler hariç?</strong> YEKDEM maliyeti, dağıtım bedeli ve vergiler teklifte nasıl gösteriliyor?</li>
+    <li><strong>Dengesizlik maliyeti kimde?</strong> Fiyata dâhil mi, ayrıca mı yansıtılıyor? Sözleşmede açıkça yazıyor mu?</li>
     <li><strong>Teminat ve ödeme koşulları ne?</strong> Teminat isteniyor mu, hangi biçimde? Ödeme süresi kaç gün?</li>
     <li><strong>Tüketim tolerans bandı var mı?</strong> Öngörülen miktarın altında ya da üstünde kalırsanız ne olur?</li>
     <li><strong>Süre ve fesih nasıl?</strong> Süre bitiminde ne oluyor, erken fesihte yükümlülük ne?</li>
@@ -187,8 +186,6 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <p>Teklif formunda abone grubu, aylık tüketim, sektör, şirket adı ve iletişim bilgileri istenir. Son faturanızı eklemeniz isteğe bağlıdır; eklerseniz tüketiminizi ve tarifenizi faturadan biz okuruz. Model kurulurken son 12 aylık tüketim verisi kullanılır. Tipik geri dönüş süremiz bir iş günüdür.</p>
   <h3>Sabit fiyat mı, PTF endeksli mi?</h3>
   <p>Hangi modelin uygun olduğu tesisin yük profiline ve risk tercihine bağlıdır. Sabit fiyat bütçe kesinliği isteyen, PTF endeksli model piyasayı izleyebilen, hibrit model dengeli profil arayan tesisler içindir. Seçenekler teklifte sunulur ve tüm formüller sözleşmede yazılıdır.</p>
-  <h3>OSB içindeki fabrika tedarikçisini seçebilir mi?</h3>
-  <p>Evet. Serbest tüketici hakkı OSB katılımcıları için de geçerlidir; katılımcı, OSB tarifesinde kalmak yerine tedarikçisini seçebilir. Dağıtım hizmeti OSB üzerinden sağlanmaya devam eder: ikili anlaşmada enerji bedeli sözleşmedeki formülle belirlenir, dağıtım bedeli OSB'ye ödenir. OSB iç düzenlemeleri bildirim yükümlülüğü içerebilir.</p>
 
   <div class="cta">
     <p>Tesisiniz için hangi tedarik modelinin uygun olduğunu verilerle konuşalım.</p>
