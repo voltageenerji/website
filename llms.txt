@@ -22,7 +22,7 @@
 
 - [Serbest Tüketici Nedir?](https://voltage.com.tr/rehber/serbest-tuketici): Serbest tüketici nedir, 2026 limiti neden 500 kWh? EPDK kararına dayalı güncel rehber: kimler tedarikçisini seçebilir, süreç nasıl işler.
 - [Elektrik Tedarikçisi Nasıl Değiştirilir?](https://voltage.com.tr/rehber/tedarikci-degistirme): Elektrik tedarikçisi değiştirme adım adım: sayaç değişir mi, elektrik kesilir mi, ne kadar sürer? EPDK mevzuatına dayalı dürüst süreç rehberi.
-- [Elektrik Tedarikçisi Nasıl Seçilir ve Doğrulanır?](https://voltage.com.tr/rehber/elektrik-tedarikcisi-nasil-secilir): Elektrik tedarikçisi nasıl seçilir? Lisans nasıl kontrol edilir, teklifler nasıl karşılaştırılır, 100.000 kWh eşiği neyi değiştirir? Kaynaklı, tarihli rehber.
+- [Elektrik Tedarikçisi Nasıl Seçilir ve Doğrulanır?](https://voltage.com.tr/rehber/elektrik-tedarikcisi-nasil-secilir): Elektrik tedarikçisi nasıl seçilir? Lisans nasıl kontrol edilir, teklifler nasıl karşılaştırılır, 100.000 kWh eşiği neyi değiştirir? Kaynaklı rehber.
 - [OSB Elektrik Tedariki](https://voltage.com.tr/rehber/osb-elektrik-tedariki): OSB katılımcısı tedarikçisini seçebilir mi? OSB tarifesi ile ikili anlaşmanın karşılaştırması, süreç ve dikkat edilecek sözleşme başlıkları.
 - [PTF Nedir?](https://voltage.com.tr/rehber/ptf-nedir): PTF (Piyasa Takas Fiyatı) nedir, Gün Öncesi Piyasası'nda nasıl oluşur, neden değişir? EPİAŞ verisine dayalı açıklama ve canlı saatlik fiyat.
 - [Son Kaynak Tedarik Tarifesi (SKTT)](https://voltage.com.tr/rehber/sktt): SKTT nedir? 2026 limitleri mesken 4.000 kWh, diğer abone grupları 15.000 kWh (EPDK Kurul Kararı 13912, RG 31.10.2025). Ne zaman uygulanır, nasıl çıkılır.
