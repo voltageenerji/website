@@ -254,7 +254,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   justify-content: center;
   color: var(--ink);
 }
-.nav-logo-mark svg, .nav-logo-mark img { width: 100%; height: 100%; display: block; }
+.nav-logo-mark svg { width: 100%; height: 100%; }
+/* Logo görsel dosyası olarak da sunulur (görsel aramada markayla eşleşsin diye). Görsel yüklenene kadar,
+   betik kapalıyken ve zorunlu renk (yüksek karşıtlık) kipinde satır içi çizim görünür; ikisi aynı şekildir. */
+.nav-logo-mark img { display: none; width: 100%; height: 100%; -webkit-user-select: none; user-select: none; }
+.nav-logo-mark.gorsel-hazir img { display: block; }
+.nav-logo-mark.gorsel-hazir svg { display: none; }
+@media (forced-colors: active) {
+  .nav-logo-mark.gorsel-hazir img { display: none; }
+  .nav-logo-mark.gorsel-hazir svg { display: block; }
+}
 
 .nav-logo-text {
   display: flex;
@@ -1131,7 +1140,12 @@ body.menu-open { overflow: hidden; }
 <nav class="nav" id="nav">
   <a href="#" class="nav-logo">
     <div class="nav-logo-mark">
-      <img src="/voltage-enerji-logo.svg" alt="Voltage Enerji logosu" width="30" height="30" decoding="async">
+      <img src="/voltage-enerji-logo.svg" alt="Voltage Enerji logosu" width="30" height="30" decoding="async" draggable="false" onload="this.parentNode.classList.add('gorsel-hazir')">
+      <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1" opacity="0.25"/>
+        <path d="M11 10 L18 26 L25 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="18" cy="18" r="1.4" fill="currentColor"/>
+      </svg>
     </div>
     <span class="nav-logo-text">
       <span class="nav-logo-name">Voltage</span>
