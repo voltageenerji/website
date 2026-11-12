@@ -787,6 +787,12 @@ section {
 .form-success-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--green); margin-bottom: 16px; }
 .form-success-title { font-family: var(--serif); font-weight: 400; font-size: 26px; line-height: 1.2; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 12px; }
 .form-success-text { font-size: 14px; line-height: 1.65; color: var(--ink-soft); max-width: 400px; }
+/* Bağlantıyla (#leadForm, #teklif, #iletisim) gelinen hedef ve form mesajları sabit menünün altında kalmasın:
+   menü yüksekliği (kaydırılmış hâli) + 16 px. Yalnız kaydırma konumunu etkiler, görünüm değişmez. */
+:root { --nav-h: 75px; }
+@media (max-width: 640px) { :root { --nav-h: 64px; } }
+#iletisim, #teklif, #leadForm { scroll-margin-top: calc(var(--nav-h) + 16px); }
+.form-success, .form-status { scroll-margin-top: calc(var(--nav-h) + 16px); scroll-margin-bottom: 16px; }
 
 /* ============ ANIMATIONS ============ */
 @keyframes fadeUp {
