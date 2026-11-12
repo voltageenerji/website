@@ -7,11 +7,12 @@
        yorum bazı katı ayrıştırıcılarda "processing error" tetikliyordu (GSC 2026-08). -->
   <url>
     <loc>https://voltage.com.tr/</loc>
-    <lastmod>2026-08-10</lastmod>
+    <lastmod>2026-11-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image><image:loc>https://voltage.com.tr/logo.png</image:loc></image:image>
     <image:image><image:loc>https://voltage.com.tr/og-image.jpg</image:loc></image:image>
+    <image:image><image:loc>https://voltage.com.tr/voltage-enerji-logo.svg</image:loc></image:image>
   </url>
   <url>
     <loc>https://voltage.com.tr/kvkk</loc>
