@@ -8,10 +8,10 @@
   <url>
     <loc>https://voltage.com.tr/</loc>
     <lastmod>2026-08-10</lastmod>
-    <image:image><image:loc>https://voltage.com.tr/logo.png</image:loc></image:image>
-    <image:image><image:loc>https://voltage.com.tr/og-image.jpg</image:loc></image:image>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image><image:loc>https://voltage.com.tr/logo.png</image:loc></image:image>
+    <image:image><image:loc>https://voltage.com.tr/og-image.jpg</image:loc></image:image>
   </url>
   <url>
     <loc>https://voltage.com.tr/kvkk</loc>
@@ -112,10 +112,10 @@
   <url>
     <loc>https://voltage.com.tr/kurumsal</loc>
     <lastmod>2026-11-12</lastmod>
-    <image:image><image:loc>https://voltage.com.tr/logo.png</image:loc></image:image>
-    <image:image><image:loc>https://voltage.com.tr/og/kurumsal.jpg</image:loc></image:image>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
+    <image:image><image:loc>https://voltage.com.tr/logo.png</image:loc></image:image>
+    <image:image><image:loc>https://voltage.com.tr/og/kurumsal.jpg</image:loc></image:image>
   </url>
   <url>
     <loc>https://voltage.com.tr/elektrik-faturasi-hesaplama</loc>
