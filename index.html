@@ -1023,6 +1023,7 @@ section {
 .service-item { padding: 30px 0; border-bottom: 1px solid var(--line-soft); display: grid; grid-template-columns: 64px 1fr 2fr 44px; gap: 40px; align-items: center; transition: background 0.3s var(--ease); }
 .service-item:hover { background: var(--warm-fill); }
 .service-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--accent-text); }
+.service-name a { color: inherit; text-decoration: none; } .service-name a:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .service-name { font-family: var(--serif); font-weight: 400; font-size: clamp(21px, 2.1vw, 27px); line-height: 1.15; letter-spacing: -0.01em; color: var(--ink); }
 .service-desc { font-size: 14px; line-height: 1.6; color: var(--ink-soft); max-width: 480px; }
 .service-arrow { justify-self: end; color: var(--ink-muted); transition: color 0.3s var(--ease), transform 0.3s var(--ease-out); }
@@ -1397,7 +1398,7 @@ body.menu-open { overflow: hidden; }
     <div class="fin-table reveal"><div class="ft-inner">
       <div class="ft-row head"><span data-tr="MODEL" data-en="MODEL">MODEL</span><span data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span class="hi-col" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span></div>
       <div class="ft-row"><span class="ft-k" data-tr="Fiyat nasıl belirlenir" data-en="How the price is set">Fiyat nasıl belirlenir</span><span data-tr="Dönem boyu sabit birim fiyat" data-en="Fixed unit price for the term">Dönem boyu sabit birim fiyat</span><span data-tr="PTF'ye endeksli formül" data-en="Formula indexed to the MCP">PTF'ye endeksli formül</span><span data-tr="Sabit taban + endeksli dilim" data-en="Fixed base + indexed tranche">Sabit taban + endeksli dilim</span></div>
-      <div class="ft-row"><span class="ft-k" data-tr="Piyasa riski kimde" data-en="Who carries market risk">Piyasa riski kimde</span><span data-tr="Voltage'da" data-en="With Voltage">Voltage'da</span><span data-tr="Paylaşımlı; formül sözleşmede" data-en="Shared; formula in the contract">Paylaşımlı; formül sözleşmede</span><span data-tr="Dilim bazında paylaşımlı" data-en="Shared per tranche">Dilim bazında paylaşımlı</span></div>
+      <div class="ft-row"><span class="ft-k" data-tr="Piyasa riski kimde" data-en="Who carries market risk">Piyasa riski kimde</span><span data-tr="Voltage'da" data-en="With Voltage">Voltage'da</span><span data-tr="Tüketicide; istenirse sabitlenir" data-en="Consumer; fixable on request">Tüketicide; istenirse sabitlenir</span><span data-tr="Dilim bazında paylaşımlı" data-en="Shared per tranche">Dilim bazında paylaşımlı</span></div>
       <div class="ft-row last"><span class="ft-k" data-tr="Kime uygun" data-en="Who it suits">Kime uygun</span><span data-tr="Bütçe kesinliği isteyene" data-en="Those who want budget certainty">Bütçe kesinliği isteyene</span><span data-tr="Piyasayı izleyebilene" data-en="Those who can track the market">Piyasayı izleyebilene</span><span data-tr="Dengeli profil arayana" data-en="Those seeking a balanced profile">Dengeli profil arayana</span></div>
     </div></div>
     <p class="ft-note" data-tr="Dipnot: tasarruf yüzdesi ve tutar taahhüdü verilmez; her formül sözleşme metninde yazılıdır." data-en="Note: no savings percentage or amount is promised; every formula is written into the contract.">Dipnot: tasarruf yüzdesi ve tutar taahhüdü verilmez; her formül sözleşme metninde yazılıdır.</p>
@@ -1514,7 +1515,7 @@ body.menu-open { overflow: hidden; }
     <div class="services-list">
       <div class="service-item">
         <div class="service-num">01</div>
-        <div class="service-name" data-tr="Endüstriyel Tedarik" data-en="Industrial Supply">Endüstriyel Tedarik</div>
+        <div class="service-name"><a href="/sanayi-elektrik-tedariki" data-tr="Endüstriyel Tedarik" data-en="Industrial Supply">Endüstriyel Tedarik</a></div>
         <div class="service-desc" data-tr="Yüksek tüketimli tesisler için ikili anlaşma bazlı sabit fiyat veya endeksli model ile uzun vadeli elektrik tedariki." data-en="Long-term electricity supply for high-consumption facilities via bilateral agreements, with fixed-price or indexed pricing models.">Yüksek tüketimli tesisler için ikili anlaşma bazlı sabit fiyat veya endeksli model ile uzun vadeli elektrik tedariki.</div>
         <div class="service-arrow">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 16 L16 6 M8 6 L16 6 L16 14" stroke="currentColor" stroke-width="1.2"/></svg>
