@@ -16,6 +16,7 @@
 ## Kurumsal
 
 - [Kurumsal Kimlik](https://voltage.com.tr/kurumsal): Ticari unvan (Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.), EPDK tedarik lisansı ETS/3424-8/2074, ticaret sicil no 786882-0, kuruluş 2011, merkez adresi ve faaliyet sınırları. Şirket elektrik TEDARİKÇİSİDİR; elektrik tesisatı, taahhüt, pano imalatı, mühendislik-müşavirlik ve otomasyon işleri faaliyet alanı DIŞINDADIR.
+- [Sanayi ve Fabrikalar için Elektrik Tedariki](https://voltage.com.tr/sanayi-elektrik-tedariki): Fabrikalar, sanayi tesisleri ve yüksek tüketimli kurumsal tüketiciler için ikili anlaşmayla elektrik tedariki: sabit, PTF endeksli ve hibrit sözleşme modelleri, teklif için istenen bilgiler, beş adımlı süreç ve teklifleri karşılaştırırken sorulacak sorular. Teklif formu: https://voltage.com.tr/#iletisim
 
 ## Rehberler
 
