@@ -30,7 +30,7 @@
 {"@type":"BreadcrumbList","itemListElement":[
 {"@type":"ListItem","position":1,"name":"Ana Sayfa","item":"https://voltage.com.tr/"},
 {"@type":"ListItem","position":2,"name":"Kurumsal"}]},
-{"@type":"AboutPage","image":"https://voltage.com.tr/og/kurumsal.jpg","name":"Kurumsal Kimlik: Voltage Enerji","url":"https://voltage.com.tr/kurumsal","description":"Voltage Enerji'nin ticari unvanı, EPDK tedarik lisansı, ticaret sicil numarası, kuruluş yılı ve merkez adresi.","inLanguage":"tr-TR","datePublished":"2026-08-23","dateModified":"2026-11-11","publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntity":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/kurumsal"},
+{"@type":"AboutPage","image":"https://voltage.com.tr/og/kurumsal.jpg","primaryImageOfPage":{"@type":"ImageObject","url":"https://voltage.com.tr/logo.png","width":512,"height":512,"caption":"Voltage Enerji logosu"},"name":"Kurumsal Kimlik: Voltage Enerji","url":"https://voltage.com.tr/kurumsal","description":"Voltage Enerji'nin ticari unvanı, EPDK tedarik lisansı, ticaret sicil numarası, kuruluş yılı ve merkez adresi.","inLanguage":"tr-TR","datePublished":"2026-08-23","dateModified":"2026-11-12","publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntity":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/kurumsal"},
 {"@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"Voltage Enerji kimdir?","acceptedAnswer":{"@type":"Answer","text":"Voltage Enerji, Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.'nin ticari markasıdır. Şirket, EPDK'dan aldığı ETS/3424-8/2074 numaralı tedarik lisansıyla 2011'den bu yana Türkiye serbest elektrik piyasasında faaliyet gösterir ve kurumsal ile endüstriyel tüketicilere elektrik tedarik eder."}},
 {"@type":"Question","name":"Voltage Enerji elektrik taahhüt veya tesisat işi yapıyor mu?","acceptedAnswer":{"@type":"Answer","text":"Hayır. Voltage Enerji bir elektrik tedarik şirketidir; elektriği toptan piyasadan temin edip serbest tüketicilere sözleşmeyle satar. Elektrik tesisatı, taahhüt, pano imalatı, mühendislik-müşavirlik ve otomasyon işleri faaliyet alanımız dışındadır. Türkiye'de benzer adı taşıyan başka şirketler bulunmaktadır; tüzel kişiliğimiz Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş., EPDK lisans numaramız ETS/3424-8/2074, TÜRKPATENT marka tescil numaramız 2011/70573'tür."}},
@@ -55,6 +55,9 @@ strong { color: var(--ink); }
 .reg { font-size: 0.55em; vertical-align: super; margin-left: 0.12em; opacity: 0.75; font-weight: 400; }
 ul { margin: 0 0 16px 20px; color: var(--ink-soft); }
 li { margin-bottom: 7px; }
+.marka-gorsel { display: flex; align-items: center; gap: 20px; margin: 26px 0 8px; }
+.marka-gorsel img { width: 120px; height: 120px; border-radius: 6px; flex: none; }
+.marka-gorsel figcaption { font-size: 13.5px; color: var(--ink-soft, inherit); line-height: 1.55; }
 .id-card { margin: 30px 0 34px; border: 1px solid var(--line-strong); background: var(--paper-warm); }
 .id-card table { width: 100%; border-collapse: collapse; }
 .id-card th { text-align: left; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); font-weight: 500; padding: 14px 18px; white-space: nowrap; vertical-align: top; width: 38%; border-bottom: 1px solid var(--line); }
@@ -86,10 +89,15 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 <div class="page">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › Kurumsal</nav>
   <h1>Kurumsal Kimlik</h1>
-  <div class="updated">Yayın / son güncelleme: 11.11.2026</div>
+  <div class="updated">Yayın / son güncelleme: 12.11.2026</div>
 
   <p><strong>Voltage Enerji<span class="reg" aria-hidden="true">®</span></strong>, Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.'nin ticari markasıdır. Şirket, Enerji Piyasası Düzenleme Kurumu'ndan (EPDK) aldığı <strong>ETS/3424-8/2074</strong> numaralı tedarik lisansıyla 2011'den bu yana Türkiye serbest elektrik piyasasında faaliyet göstermektedir.</p>
   <p>İşimiz tek cümleyle şudur: elektriği organize toptan piyasadan ve ikili anlaşmalarla temin edip, serbest tüketici niteliğindeki kurumsal ve endüstriyel müşterilere sözleşme ile satmak. Fiyatlandırma sözleşme bazlıdır ve her formül sözleşme metninde yazılıdır; bu sitede tasarruf yüzdesi veya tutar taahhüdü yayınlanmaz.</p>
+
+  <figure class="marka-gorsel">
+    <img src="/logo.png" alt="Voltage Enerji logosu" width="512" height="512">
+    <figcaption><strong>Voltage Enerji logosu.</strong> Marka, Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. adına TÜRKPATENT nezdinde tescillidir. Elektrik malzemesi ya da kondansatör satan benzer adlı firmalarla bir bağımız yoktur.</figcaption>
+  </figure>
 
   <h2>Kurumsal bilgiler</h2>
   <div class="id-card">
