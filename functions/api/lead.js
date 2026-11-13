@@ -139,6 +139,18 @@ async function sinirDenetle(request, kv, dosyali, nowMs = Date.now()) {
 
 const MAX_LEN = 1000;
 
+/**
+ * Talebin geldiği sayfa (`kaynak`, isteğe bağlı): site içi yol ya da CTA etiketi ([a-z0-9/-], en fazla 120),
+ * dış sitenin alan adı ([a-z0-9.-], en fazla 80) ya da "dogrudan". Başka her şey sessizce atılır ('' saklanır);
+ * talep reddedilmez. İstemci (index.html kaynakBul) aynı kuralı uygular.
+ */
+function kaynakTemiz(v) {
+  if (typeof v !== 'string') return '';
+  if (v.length <= 120 && /^[a-z0-9/-]+$/.test(v)) return v;
+  if (v.length <= 80 && /^[a-z0-9.-]+$/.test(v)) return v;
+  return '';
+}
+
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -196,6 +208,7 @@ function buildLeadEmail(lead, kvKey) {
     ['Not', lead.mesaj || '—'],
     ['Dil', lead.lang === 'en' ? 'İngilizce' : 'Türkçe'],
     ['Kaynak/UTM', utmStr],
+    ['Gelinen sayfa', lead.kaynak || '—'],
     ['Tarih', istanbulDate(lead.receivedAt)],
   ];
 
@@ -366,6 +379,8 @@ export async function onRequestPost(context) {
     utm,
     receivedAt: new Date().toISOString(),
     source: 'voltage.com.tr/teklif-formu',
+    // Yeni alan (geriye uyumlu ek): talebin geldiği sayfa ya da dış site; geçersiz/eksikse ''
+    kaynak: kaynakTemiz(body.kaynak),
   };
 
   let stored = false;

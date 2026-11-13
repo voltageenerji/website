@@ -1950,6 +1950,52 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
+// Bağlantıyla forma gelişte (#leadForm, #teklif, #iletisim) tarayıcı açılışta hedefe atlar; sonra yazı tipleri,
+// belirme animasyonları ve canlı PTF bandı yukarıdaki içeriğin yüksekliğini değiştirir, hedef kayar. Yerleşim
+// oturana kadar hedef anında (yumuşak kaydırma yok) yeniden hizalanır; kullanıcı kaydırır, dokunur ya da tuşa
+// basarsa hemen bırakılır. #teklif formun çapasıdır (masaüstünde çapa ikinci sütunda kalır): hedef formun kendisi.
+// Geri/ileri ve yenilemede tarayıcının hatırladığı konuma dokunulmaz. Menü tıklamaları yukarıdaki işleyicide kalır.
+(function(){
+  const h = location.hash;
+  if (h !== '#leadForm' && h !== '#teklif' && h !== '#iletisim') return;
+  try {
+    const gz = performance.getEntriesByType('navigation')[0];
+    if (gz && (gz.type === 'back_forward' || gz.type === 'reload')) return;
+  } catch(e) {}
+  const hedef = document.getElementById(h === '#iletisim' ? 'iletisim' : 'leadForm');
+  if (!hedef) return;
+  const kok = document.documentElement;
+  const olaylar = ['wheel', 'touchstart', 'keydown', 'pointerdown', 'mousedown'];
+  let bitti = false;
+  let ro = null;
+  function birak(){
+    if (bitti) return;
+    bitti = true;
+    olaylar.forEach(function(o){ window.removeEventListener(o, birak, true); });
+    if (ro) ro.disconnect();
+  }
+  function hizala(){
+    if (bitti) return;
+    const pay = parseFloat(getComputedStyle(hedef).scrollMarginTop) || 0;
+    const fark = hedef.getBoundingClientRect().top - pay;
+    if (Math.abs(fark) <= 1) return;
+    // html'deki scroll-behavior: smooth bu düzeltmede devre dışı: hedef anında yerine oturur
+    const once = kok.style.scrollBehavior;
+    kok.style.scrollBehavior = 'auto';
+    window.scrollTo(window.scrollX, window.scrollY + fark);
+    kok.style.scrollBehavior = once;
+  }
+  olaylar.forEach(function(o){ window.addEventListener(o, birak, { capture: true, passive: true }); });
+  requestAnimationFrame(hizala);
+  function yuklendi(){ hizala(); setTimeout(hizala, 400); }
+  if (document.readyState === 'complete') yuklendi();
+  else window.addEventListener('load', yuklendi, { once: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(hizala).catch(function(){});
+  // Canlı bant ya da geç gelen içerik yüksekliği değiştirirse (ör. yavaş veri) ilk 8 saniye boyunca da hizalanır
+  if (window.ResizeObserver) { ro = new ResizeObserver(function(){ hizala(); }); ro.observe(document.body); }
+  setTimeout(birak, 8000);
+})();
+
 // ============ LANGUAGE SWITCHER ============
 const META_CONTENT = {
   tr: {
@@ -2400,6 +2446,35 @@ async function fetchPtfLive(){
     } catch(e) {}
     return utm;
   }
+  // Talebin geldiği sayfa: kendi CTA'larımızın ?kaynak= değeri, yoksa site içi önceki sayfanın yolu, yoksa dış
+  // sitenin yalnız alan adı, yoksa "dogrudan". Çerez ya da depolama kullanılmaz; sunucu aynı kuralla yeniden denetler.
+  function kaynakBul(){
+    const YOL = /^[a-z0-9\/-]{1,120}$/;
+    try {
+      const q = String(new URLSearchParams(location.search).get('kaynak') || '').toLowerCase();
+      if(YOL.test(q)) return q;
+    } catch(e) {}
+    try {
+      if(document.referrer){
+        const r = new URL(document.referrer);
+        const host = r.hostname.toLowerCase();
+        if(host === 'voltage.com.tr' || host === 'www.voltage.com.tr' || host === location.hostname){
+          const yol = r.pathname.toLowerCase().replace(/\.html$/, '');
+          if(YOL.test(yol)) return yol;
+        }
+        if(/^[a-z0-9.-]{1,80}$/.test(host)) return host;
+      }
+    } catch(e) {}
+    return 'dogrudan';
+  }
+  // Başarı ya da hata mesajı: görünür alana getirilir (hareket azaltmada yumuşak kaydırma yok) ve odak mesaja geçer
+  function mesajaGit(el){
+    if(!el) return;
+    el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch(e) { el.focus(); }
+    const azHareket = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ block: 'nearest', behavior: azHareket ? 'auto' : 'smooth' });
+  }
   const FATURA_TURLER = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/heic'];
   const UZANTI_TUR = { pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heic' };
   const DOSYA_EN_FAZLA = 8 * 1024 * 1024;
@@ -2504,7 +2579,7 @@ async function fetchPtfLive(){
     let faturalar = [];
     try { faturalar = await faturalariHazirla(form.querySelector('#lead-fatura')); }
     catch(errF) {
-      if(status){ status.className = 'form-status error'; status.textContent = errF.message; }
+      if(status){ status.className = 'form-status error'; status.textContent = errF.message; mesajaGit(status); }
       if(btn) btn.disabled = false;
       if(btnLabel) btnLabel.textContent = TXT.btn[L()];
       return;
@@ -2525,7 +2600,8 @@ async function fetchPtfLive(){
       kvkk: fd.get('kvkk') === 'on',
       website: fd.get('website') || '',
       lang: L(),
-      utm: utmParams()
+      utm: utmParams(),
+      kaynak: kaynakBul()
     };
     let hataKodu = '';
     try {
@@ -2543,7 +2619,8 @@ async function fetchPtfLive(){
         throw new Error('HTTP ' + sonuc.status);
       }
       const t = L();
-      form.innerHTML = '<div class="form-success">' +
+      // Başarı kutusu role="status" (kibar duyuru) ve DOM'da kalır; odak ve kaydırma aşağıda mesajaGit ile
+      form.innerHTML = '<div class="form-success" role="status">' +
         '<div class="form-success-tag" data-tr="' + esc(TXT.okTag.tr) + '" data-en="' + esc(TXT.okTag.en) + '">' + TXT.okTag[t] + '</div>' +
         '<div class="form-success-title" data-tr="' + esc(TXT.okTitle.tr) + '" data-en="' + esc(TXT.okTitle.en) + '">' + TXT.okTitle[t] + '</div>' +
         '<p class="form-success-text" data-tr="' + esc(TXT.okText.tr) + '" data-en="' + esc(TXT.okText.en) + '">' + TXT.okText[t] + '</p>' +
@@ -2565,6 +2642,7 @@ async function fetchPtfLive(){
         });
         form.querySelector('.form-success').append(p);
       }
+      mesajaGit(form.querySelector('.form-success'));
     } catch(err) {
       console.warn('Lead submit failed:', err.message);
       if(status){
@@ -2573,6 +2651,7 @@ async function fetchPtfLive(){
         if(hataKodu === 'rate_limited' || hataKodu === 'rate_limited_files') mesajYaz(status, TXT.rlPre, TXT.errPost);
         else if(hataKodu === 'invalid_file' || hataKodu === 'file_too_large' || hataKodu === 'too_many_files') mesajYaz(status, TXT.filePre, TXT.filePost);
         else mesajYaz(status, TXT.errPre, TXT.errPost);
+        mesajaGit(status);
       }
       if(btn) btn.disabled = false;
       if(btnLabel) btnLabel.textContent = TXT.btn[L()];

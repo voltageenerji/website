@@ -3,7 +3,8 @@
  *   node docs/qa/test-lead.mjs
  * Kapsam: JSON ve multipart gövde, fatura sayı/boyut/imza denetimi, uzantıdan tür,
  * 180 gün fatura TTL'i, IP sayacı (saatte 5, dosyalı 2; kapalı çöker), kayıt
- * hatasında sahipsiz eklerin silinmesi, kWh ayrıştırma (QA B2), Voltan OS anahtar biçimi.
+ * hatasında sahipsiz eklerin silinmesi, kWh ayrıştırma (QA B2), Voltan OS anahtar biçimi,
+ * `kaynak` (gelinen sayfa) izin listesi ve uzunluk sınırları, bildirim e-postasındaki satırı.
  */
 import { onRequestPost } from '../../functions/api/lead.js';
 
@@ -254,6 +255,65 @@ ok('multipart kvkk false → 400', (await mpGonder(alanlar({ kvkk: false }), [{ 
   ok('mesken değilse şirket zorunlu → 400', r4.status === 400 && r4.j.field === 'sirket');
   const r2 = await jsonGonder(alanlar({ tarife: 'og-sanayi', sektor: '' }));
   ok('mesken değilse sektör zorunlu → 400', r2.status === 400 && r2.j.field === 'sektor');
+}
+
+// ---------------------------------------------------------------------------
+// kaynak: talebin geldiği sayfa (isteğe bağlı; geçersizse sessizce '' — talep reddedilmez)
+// ---------------------------------------------------------------------------
+{
+  const KAYNAK = [
+    ['/rehber/tedarikci-degistirme', '/rehber/tedarikci-degistirme', 'site içi yol'],
+    ['rehber-sktt', 'rehber-sktt', 'CTA etiketi'],
+    ['elektrik-faturasi-hesaplama-sonuc', 'elektrik-faturasi-hesaplama-sonuc', 'hesaplama CTA etiketi'],
+    ['www.google.com', 'www.google.com', 'dış alan adı'],
+    ['chatgpt.com', 'chatgpt.com', 'dış alan adı (tek nokta)'],
+    ['dogrudan', 'dogrudan', 'doğrudan giriş'],
+    ['/' + 'a'.repeat(119), '/' + 'a'.repeat(119), 'yol tam 120'],
+    ['/' + 'a'.repeat(120), '', 'yol 121 → atılır'],
+    ['a'.repeat(76) + '.com', 'a'.repeat(76) + '.com', 'alan adı tam 80'],
+    ['a'.repeat(77) + '.com', '', 'alan adı 81 (nokta var, yol değil) → atılır'],
+    ['/rehber/sktt?utm_source=x', '', 'sorgu dizgesi → atılır'],
+    ['/Rehber/SKTT', '', 'büyük harf → atılır'],
+    ['<script>alert(1)</script>', '', 'işaretleme → atılır'],
+    ['/rehber/sktt\nBcc: x@y', '', 'satır sonu → atılır'],
+    ['https://www.google.com/', '', 'tam URL → atılır'],
+    ['/rehber/ışık', '', 'ASCII dışı → atılır'],
+    ['', '', 'boş dizgi'],
+    [42, '', 'sayı → atılır'],
+    [{ a: 1 }, '', 'nesne → atılır'],
+    [['/x'], '', 'dizi → atılır'],
+  ];
+  for (const [girdi, beklenen, ad] of KAYNAK) {
+    const r = await jsonGonder(alanlar({ kaynak: girdi }));
+    const l = leadKaydi(r.kv);
+    ok(`kaynak ${ad} → ${JSON.stringify(beklenen).slice(0, 40)}`, r.status === 200 && l && l.lead.kaynak === beklenen, `-> ${r.status} ${l && JSON.stringify(l.lead.kaynak)}`);
+  }
+  const yok = { ...alanlar() }; delete yok.kaynak;
+  const r = await jsonGonder(yok);
+  const l = leadKaydi(r.kv);
+  ok('kaynak alanı yok → 200, kaynak ""', r.status === 200 && l && l.lead.kaynak === '');
+  ok('kaynak eklendi, eski alanlar korunur (source, utm)', l && l.lead.source === 'voltage.com.tr/teklif-formu' && typeof l.lead.utm === 'object');
+  const m = await mpGonder(alanlar({ kaynak: '/sanayi-elektrik-tedariki' }), [{ ad: 'a.pdf', tur: 'application/pdf', bayt: PDF }]);
+  ok('multipart payload içinden kaynak okunur', m.status === 200 && leadKaydi(m.kv)?.lead.kaynak === '/sanayi-elektrik-tedariki');
+}
+{
+  // Bildirim e-postasında "Gelinen sayfa" satırı (Resend isteği taklit edilir; ağ yok)
+  const gercekFetch = globalThis.fetch;
+  const gonderilen = [];
+  globalThis.fetch = async (url, init) => { gonderilen.push({ url: String(url), body: JSON.parse(init.body) }); return new Response('{}', { status: 200 }); };
+  try {
+    const env = { LEADS: sahteKv(), RESEND_API_KEY: 'test-placeholder', LEAD_NOTIFY_TO: 'qa@example.invalid', MAIL_FROM: 'qa@example.invalid' };
+    await jsonGonder(alanlar({ kaynak: 'rehber-sktt' }), { env });
+    const e = gonderilen.find((g) => g.url.includes('resend'));
+    ok('e-posta metninde Gelinen sayfa: rehber-sktt', e && e.body.text.includes('Gelinen sayfa: rehber-sktt'), e && e.body.text);
+    ok('e-posta HTML tablosunda Gelinen sayfa', e && e.body.html.includes('Gelinen sayfa') && e.body.html.includes('rehber-sktt'));
+    gonderilen.length = 0;
+    await jsonGonder(alanlar({ kaynak: '<b>x</b>' }), { env: { ...env, LEADS: sahteKv() } });
+    const e2 = gonderilen.find((g) => g.url.includes('resend'));
+    ok('geçersiz kaynak e-postada — olarak görünür', e2 && e2.body.text.includes('Gelinen sayfa: —') && !e2.body.html.includes('<b>x</b>'));
+  } finally {
+    globalThis.fetch = gercekFetch;
+  }
 }
 
 console.log(`\ntest-lead: ${pass} geçti, ${fail} kaldı`);
