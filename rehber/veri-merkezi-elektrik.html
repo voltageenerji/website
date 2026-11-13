@@ -26,12 +26,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://voltage.com.tr/#organization","name":"Voltage Enerji","legalName":"Voltan Elektrik Toptan Satış İthalat ve İhracat Anonim Şirketi","url":"https://voltage.com.tr/","logo":"https://voltage.com.tr/logo.png","sameAs":["https://www.linkedin.com/company/voltage-enerji/","https://www.facebook.com/voltageenerji/"]},
 {"@type":"BreadcrumbList","itemListElement":[
 {"@type":"ListItem","position":1,"name":"Ana Sayfa","item":"https://voltage.com.tr/"},
 {"@type":"ListItem","position":2,"name":"Rehber","item":"https://voltage.com.tr/rehber"},
 {"@type":"ListItem","position":3,"name":"Veri Merkezleri ve Telekom Tesislerinde Elektrik Tedariki"}]},
-{"@type":"Article","image":"https://voltage.com.tr/og/rehber-veri-merkezi-elektrik.jpg","headline":"Veri Merkezleri ve Telekom Tesislerinde Elektrik Tedariki","inLanguage":"tr-TR","datePublished":"2026-08-05","dateModified":"2026-11-11","author":{"@id":"https://voltage.com.tr/#organization"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/rehber/veri-merkezi-elektrik"},
+{"@type":"Article","image":"https://voltage.com.tr/og/rehber-veri-merkezi-elektrik.jpg","headline":"Veri Merkezleri ve Telekom Tesislerinde Elektrik Tedariki","inLanguage":"tr-TR","datePublished":"2026-08-05","dateModified":"2026-11-13","author":{"@id":"https://voltage.com.tr/#organization","name":"Voltage Enerji"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/rehber/veri-merkezi-elektrik"},
 {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Tedarikçi değişimi kesinti veya SLA riski doğurur mu?","acceptedAnswer":{"@type":"Answer","text":"Hayır. Değişim fiziksel değil ticari bir kayıt işlemidir: enerji aynı şebekeden, aynı bağlantı ve aynı sayaç üzerinden akmaya devam eder. UPS, jeneratör ve çift besleme mimariniz tedarikçiden bağımsızdır ve geçişten etkilenmez."}},{"@type":"Question","name":"YEK-G belgesi neyi kanıtlar, neyi kanıtlamaz?","acceptedAnswer":{"@type":"Answer","text":"YEK-G belgesi, belirtilen miktar ve dönem için elektriğin yenilenebilir kaynaktan üretildiğini belgeler. Her belge 1 MWh üretime karşılık gelir ve tedarikçi tarafından tüketici adına itfa edilir. Belge, şebekeden fiziksel olarak teslim edilen elektriği değiştirmez; tesisiniz aynı şebekeden beslenmeye devam eder. YEK-G, EPİAŞ'ın işlettiği gönüllü bir sistemdir."}},{"@type":"Question","name":"Jeneratör testleri ve UPS şarj yükleri modeli bozar mı?","acceptedAnswer":{"@type":"Answer","text":"Hayır; periyodik jeneratör testleri ve UPS şarj çevrimleri toplam profil içinde küçük ve planlı yüklerdir. Keşif adımında test takvimi tüketim planına işlenir ve miktar toleransları buna göre kurulur."}}]}]}
 </script>
 <style>
@@ -64,7 +64,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 <div class="page">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › <a href="/rehber">Rehber</a> › Veri Merkezi &amp; Telekom</nav>
   <h1>Veri Merkezleri ve Telekom Tesislerinde Elektrik Tedariki</h1>
-  <div class="updated">Yayın / son güncelleme: 11.11.2026</div>
+  <div class="updated">Yayın / son güncelleme: 13.11.2026</div>
 
   <p><strong>Veri merkezi, elektrik piyasasının gözünden bakıldığında sanayinin en okunaklı yüküdür:</strong> sunucu salonları yılın her saati çalışır, soğutma bu yükü gölge gibi izler ve sonuç, günün hiçbir saatinde sıfıra inmeyen, mevsimsel dalgalanması sınırlı, <strong>7/24 düz (flat) bir profildir</strong>. Elektrik aynı zamanda veri merkezinin en büyük işletme maliyeti kalemlerindendir; sunucu başına değil, çekilen her kilovatsaat başına ödenir. Bu iki gerçek birleşince tedarik sözleşmesi, veri merkezi işletmecisi için kira kadar stratejik bir kaleme dönüşür.</p>
   <p>Bu sayfa, veri merkezi ve telekom altyapısı işleten ekiplerin enerji ve finans sorumluları için yazıldı: yük gerçeğinden başlayıp enerjinin kaynağı sorusuna ve sözleşme modeline giden sıra ile.</p>
@@ -74,7 +74,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <p>İkinci değer öngörülebilirliktir: BT yükü kısa vadede neredeyse sabittir, soğutma yükü ise dış hava sıcaklığıyla mevsimsel olarak salınır ama modellenebilir. Plan-gerçekleşme sapması küçük kalan bir tesiste dengesizlik riski küçülür; bu, fiyatlamaya yansıyan bir disiplindir. Saatlik verisiyle modellenen düz profilli bir teklif, profil hiç sorulmadan verilen tek fiyatlı tekliften çok daha isabetli kurulur.</p>
 
   <h2>UPS, jeneratör ve tedarikçi değişimi: fiziksel-ticari ayrımı</h2>
-  <p>Veri merkezi dünyasında "elektrik" kelimesi refleks olarak yedekliliği çağrıştırır: UPS grupları, jeneratörler, çift besleme. Burada net olmak gerekir: <strong>kesintisizlik fiziksel bir konudur ve dağıtım şebekesi ile tesisin kendi altyapısının işidir; tedarikçi değişimi ise tamamen ticari bir işlemdir.</strong> Tedarikçiniz değiştiğinde sayaç, bağlantı, besleme hattı ve yedeklilik mimariniz olduğu gibi kalır; değişen yalnızca enerjinin faturalandığı taraftır. Geçiş işleminin kendisinden kaynaklanan, SLA'nızı ilgilendiren hiçbir fiziksel olay yaşanmaz.</p>
+  <p>Veri merkezi dünyasında "elektrik" kelimesi refleks olarak yedekliliği çağrıştırır: UPS grupları, jeneratörler, çift besleme. Burada net olmak gerekir: <strong>kesintisizlik fiziksel bir konudur ve dağıtım şebekesi ile tesisin kendi altyapısının işidir; tedarikçi değişimi ise tamamen ticari bir işlemdir.</strong> Tedarikçiniz değiştiğinde sayaç, bağlantı, besleme hattı ve yedeklilik mimariniz olduğu gibi kalır; değişen yalnızca enerjinin faturalandığı taraftır. Geçiş sayaç, bağlantı ve besleme hattında değişiklik gerektirmez.</p>
   <p>Buna karşılık PUE bilinci tedarik masasına doğrudan taşınır: soğutma ve altyapı yükü, faturanın BT yükünün üzerine binen kısmıdır. Keşif adımında BT yükü ile altyapı yükünün saatlik ayrışması incelenir; soğutma optimizasyonu yapan bir tesisin profildeki iyileşmesi, bir sonraki modelleme döneminde fiyata yansır.</p>
 
   <h2>Yenilenebilir kaynak belgesi (YEK-G): müşterinizin sorduğu soru</h2>
@@ -93,7 +93,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <div class="cta"><a class="btn-primary" href="/?kaynak=rehber-veri-merkezi-elektrik#leadForm">Teklif Talep Edin</a></div>
 
   <h2>Süreç ve serbest tüketici hakkı</h2>
-  <p><a href="/rehber/tedarikci-degistirme">Tedarikçi değiştirme rehberimizde</a> anlattığımız beş adım burada da aynıdır: keşif (saatlik yük verisi, BT/altyapı ayrışması, büyüme planı), modelleme (GÖP + ikili karışım, referans dönem PTF analizi), teklif (formüller sözleşme metninde), onboard (EPİAŞ işlemleri tarafımızca) ve devreye alma (ilk saatte canlı tedarik, ilk ay kullanım raporu). Kapasite artışları — yeni salon, yeni hat — sözleşme döneminde miktar toleranslarıyla yönetilir; büyüyen tesis modeli yeniden kurdurur, cezaya yürümez.</p>
+  <p><a href="/rehber/tedarikci-degistirme">Tedarikçi değiştirme rehberimizde</a> anlattığımız beş adım burada da aynıdır: keşif (saatlik yük verisi, BT/altyapı ayrışması, büyüme planı), modelleme (GÖP + ikili karışım, referans dönem PTF analizi), teklif (formüller sözleşme metninde), onboard (EPİAŞ işlemleri tarafımızca) ve devreye alma (ilk saatte canlı tedarik, ilk ay kullanım raporu). Kapasite artışları — yeni salon, yeni hat — sözleşme döneminde miktar toleranslarıyla yönetilir; büyüyen tesis modeli yeniden kurdurur; tolerans dışı sapmanın sonucu sözleşmede yazılıdır.</p>
   <p>2026 serbest tüketici limiti yıllık 500 kWh olduğundan (EPDK Kurul Kararı 14039, Resmî Gazete 23.12.2025) en küçük uç (edge) sahadan hiperölçekli kampüse kadar her tesis <a href="/rehber/serbest-tuketici">serbest tüketici</a> kapsamındadır; tedarikçisini seçme hakkı ölçek koşuluna takılmaz.</p>
 
   <h2>Neden Voltage Enerji?</h2>
@@ -110,7 +110,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <div class="cta"><a class="btn-primary" href="/?kaynak=rehber-veri-merkezi-elektrik#leadForm">Teklif Talep Edin</a></div>
 
   <div class="about">
-    <p><strong>Bu yazı hakkında:</strong> Yayın/güncelleme tarihi: 11.11.2026. Kaynaklar: EPDK Kurul Kararı 14039 (Resmî Gazete 23.12.2025, sayı 33116); EPİAŞ Gün Öncesi Piyasası işleyişi (Şeffaflık Platformu); Elektrik Piyasasında Yenilenebilir Enerji Kaynak Garanti Belgesi Yönetmeliği (Resmî Gazete 14.11.2020, sayı 31304); YEK-G Sistemi ve Organize YEK-G Piyasası İşletim Usul ve Esasları (EPİAŞ, işlenmiş metin 23.02.2026). Yük karakterlerine ilişkin tespitler genel mühendislik bilgisi ve 2011'den bu yana yürütülen tedarik operasyonu deneyimidir; tesise özgü değerlendirme saatlik tüketim verisiyle yapılır.</p>
+    <p><strong>Bu yazı hakkında:</strong> Yayın/güncelleme tarihi: 13.11.2026. Kaynaklar: EPDK Kurul Kararı 14039 (Resmî Gazete 23.12.2025, sayı 33116); EPİAŞ Gün Öncesi Piyasası işleyişi (Şeffaflık Platformu); Elektrik Piyasasında Yenilenebilir Enerji Kaynak Garanti Belgesi Yönetmeliği (Resmî Gazete 14.11.2020, sayı 31304); YEK-G Sistemi ve Organize YEK-G Piyasası İşletim Usul ve Esasları (EPİAŞ, işlenmiş metin 23.02.2026). Yük karakterlerine ilişkin tespitler genel mühendislik bilgisi ve 2011'den bu yana yürütülen tedarik operasyonu deneyimidir; tesise özgü değerlendirme saatlik tüketim verisiyle yapılır.</p>
   </div>
 
   <footer>© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · <a href="/">Ana sayfa</a> · <a href="/kurumsal">Kurumsal</a> · <a href="/rehber">Rehber</a> · <a href="/kvkk">KVKK</a> · <a href="/kullanim-kosullari">Kullanım Koşulları</a></footer>

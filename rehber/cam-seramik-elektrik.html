@@ -26,12 +26,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://voltage.com.tr/#organization","name":"Voltage Enerji","legalName":"Voltan Elektrik Toptan Satış İthalat ve İhracat Anonim Şirketi","url":"https://voltage.com.tr/","logo":"https://voltage.com.tr/logo.png","sameAs":["https://www.linkedin.com/company/voltage-enerji/","https://www.facebook.com/voltageenerji/"]},
 {"@type":"BreadcrumbList","itemListElement":[
 {"@type":"ListItem","position":1,"name":"Ana Sayfa","item":"https://voltage.com.tr/"},
 {"@type":"ListItem","position":2,"name":"Rehber","item":"https://voltage.com.tr/rehber"},
 {"@type":"ListItem","position":3,"name":"Cam ve Seramik Tesislerinde Elektrik Tedariki"}]},
-{"@type":"Article","image":"https://voltage.com.tr/og/rehber-cam-seramik-elektrik.jpg","headline":"Cam ve Seramik Tesislerinde Elektrik Tedariki","inLanguage":"tr-TR","datePublished":"2026-08-05","dateModified":"2026-08-05","author":{"@id":"https://voltage.com.tr/#organization"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/rehber/cam-seramik-elektrik"},
+{"@type":"Article","image":"https://voltage.com.tr/og/rehber-cam-seramik-elektrik.jpg","headline":"Cam ve Seramik Tesislerinde Elektrik Tedariki","inLanguage":"tr-TR","datePublished":"2026-08-05","dateModified":"2026-11-13","author":{"@id":"https://voltage.com.tr/#organization","name":"Voltage Enerji"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"mainEntityOfPage":"https://voltage.com.tr/rehber/cam-seramik-elektrik"},
 {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Elektrikli boosting kullanan fırında yük modele nasıl girer?","acceptedAnswer":{"@type":"Answer","text":"Boosting, fırının cam kalitesi ve çekiş hedefine göre işletilen sürekli-ayarlı bir elektrik yüküdür; saatlik veride baz profilin üzerinde ayrı bir katman olarak görünür ve modellemede kendi karakteriyle ele alınır. İşletme rejimini tedarikçi değil tesis belirler; model rejime uyar."}},{"@type":"Question","name":"Doğal gaz ve rejeneratif sistem yatırımları bu sözleşmeyi etkiler mi?","acceptedAnswer":{"@type":"Answer","text":"Sözleşmenin kapsamını değil, elektrik profilinizi etkileyebilir: ısıl verim yatırımları fan ve yardımcı yüklerin çalışma düzenini değiştirebilir. Böyle bir yatırım sonrası profil değişimi bir sonraki modelleme döneminde fiyata yansıtılır; gaz tarafının kendisi elektrik sözleşmesinin dışındadır."}},{"@type":"Question","name":"Soğuk tamir döneminde tüketim düşünce cezalı duruma düşer miyiz?","acceptedAnswer":{"@type":"Answer","text":"Hayır — planlı olduğu sürece. Kampanya takvimi ve soğuk tamir dönemi keşif adımında yıllık tüketim planına işlenir ve miktar toleransları buna göre kurulur. Sorun yaratan şey tüketim düşüşünün kendisi değil, sözleşmeye hiç işlenmemiş olmasıdır."}}]}]}
 </script>
 <style>
@@ -64,7 +64,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 <div class="page">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › <a href="/rehber">Rehber</a> › Cam &amp; Seramik</nav>
   <h1>Cam ve Seramik Tesislerinde Elektrik Tedariki</h1>
-  <div class="updated">Yayın / son güncelleme: 05.08.2026</div>
+  <div class="updated">Yayın / son güncelleme: 13.11.2026</div>
 
   <p><strong>Cam ve seramikte enerji, prosesin kendisidir:</strong> cam ergitme fırını bir kez ateşlendiğinde kampanya ömrü boyunca — yıllarca — soğutulmadan çalışır, çünkü içindeki ergimiş cam katılaşırsa fırın hasar görür. Seramikte tünel fırınlar benzer bir süreklilikle döner. Bu sektörde "üretimi durdurup bekleyelim" diye bir seçenek yoktur; enerji sorusu bu yüzden her zaman iki katmanlıdır: süreklilik nasıl korunur ve maliyet hangi katmanda yönetilir?</p>
   <p>Bu sayfa, cam ve seramik işletmesinin enerji ve mali işler sorumlusu için yazıldı — ve dürüst bir ayrımla başlar: bu sektörün enerji faturasının büyük katmanı ısıldır, bu sayfanın konusu ise elektrik katmanıdır.</p>
@@ -95,7 +95,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 
   <h2>Süreç: fırın hiç durmadan geçiş</h2>
   <p><a href="/rehber/tedarikci-degistirme">Tedarikçi değiştirme rehberimizde</a> anlattığımız beş adım burada da aynıdır: keşif (saatlik yük verisi, OG kullanımı, ısıl-elektrik ayrışması, kampanya ve soğuk tamir takvimi), modelleme (GÖP + ikili karışım, referans dönem PTF analizi), teklif (sabit/endeksli/hibrit, formüller sözleşmede), onboard (EPİAŞ işlemleri tarafımızca) ve devreye alma (ilk saatte canlı tedarik, ilk ay kullanım raporu). Geçiş işleminin kendisinden kaynaklanan bir üretim kesintisi olmaz; sayaç ve bağlantı değişmez.</p>
-  <p>OSB bünyesindeki cam ve seramik tesisleri için karşılaştırmaya <a href="/rehber/osb-elektrik-tedariki">OSB tarifesi</a> de dâhil edilir; 2026 serbest tüketici limiti yıllık 500 kWh olduğundan (EPDK Kurul Kararı 14039, Resmî Gazete 23.12.2025) tedarikçi seçme hakkı her ölçekteki tesis için açıktır.</p>
+  <p>OSB bünyesindeki cam ve seramik tesisleri için karşılaştırmaya <a href="/rehber/osb-elektrik-tedariki">OSB tarifesi</a> de dâhil edilir. 2026 serbest tüketici limiti yıllık 500 kWh'tir (EPDK Kurul Kararı 14039, Resmî Gazete 23.12.2025); yıllık tüketimi 500 kWh'i aşan her kullanım yeri serbest tüketici niteliğindedir.</p>
 
   <h2>Neden Voltage Enerji?</h2>
   <p>Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (Voltage Enerji), ETS/3424-8/2074 numaralı EPDK tedarik lisansıyla 19 Eylül 2011'den bu yana serbest piyasada faaliyet göstermektedir; bugün GÖP ile GİP'in aktif katılımcısıdır. Cam ve seramik, ana sayfamızda sahiplendiğimiz sektörlerdendir; kesintisiz proses işleten yüksek tüketimli üreticiler ana müşteri segmentimizdir. Isıl katman ile elektrik katmanını keşifte açıkça ayırırız; teklifimiz yalnızca elektrik tarafını kapsar ve modelin mevcut tarifenizin gerisinde kaldığı durumda bunu açıkça söyleriz.</p>
@@ -111,7 +111,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <div class="cta"><a class="btn-primary" href="/?kaynak=rehber-cam-seramik-elektrik#leadForm">Teklif Talep Edin</a></div>
 
   <div class="about">
-    <p><strong>Bu yazı hakkında:</strong> Yayın/güncelleme tarihi: 05.08.2026. Kaynaklar: EPDK Kurul Kararı 14039 (Resmî Gazete 23.12.2025, sayı 33116); EPİAŞ Gün Öncesi Piyasası işleyişi (Şeffaflık Platformu). Yük karakterlerine ilişkin tespitler genel mühendislik bilgisi ve 2011'den bu yana yürütülen tedarik operasyonu deneyimidir; tesise özgü değerlendirme saatlik tüketim verisiyle yapılır.</p>
+    <p><strong>Bu yazı hakkında:</strong> Yayın/güncelleme tarihi: 13.11.2026. Kaynaklar: EPDK Kurul Kararı 14039 (Resmî Gazete 23.12.2025, sayı 33116); EPİAŞ Gün Öncesi Piyasası işleyişi (Şeffaflık Platformu). Yük karakterlerine ilişkin tespitler genel mühendislik bilgisi ve 2011'den bu yana yürütülen tedarik operasyonu deneyimidir; tesise özgü değerlendirme saatlik tüketim verisiyle yapılır.</p>
   </div>
 
   <footer>© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · <a href="/">Ana sayfa</a> · <a href="/kurumsal">Kurumsal</a> · <a href="/rehber">Rehber</a> · <a href="/kvkk">KVKK</a> · <a href="/kullanim-kosullari">Kullanım Koşulları</a></footer>
