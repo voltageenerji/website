@@ -31,6 +31,7 @@ export const CFG = {
   // Görüntü
   dprCap: 2,
   dprCapMobile: 1.5,
+  maxPixelsMobile: 1_600_000, // dokunmatikte çizim tamponu üst sınırı (tablet belleği)
   fov: 62,
   fovBoost: 70,
 } as const;

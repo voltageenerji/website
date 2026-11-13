@@ -184,6 +184,7 @@ body.g-on { overflow: hidden; height: 100vh; }
 #gLbName:focus { border-color: rgba(126, 203, 255, 0.55); }
 #gLbForm .g-cta { padding: 12px 18px; white-space: nowrap; }
 .lb-msg { margin-top: 10px; font-size: 12.5px; color: var(--amber); text-align: center; }
+.lb-hint { margin-top: 8px; font-size: 11.5px; line-height: 1.5; color: var(--dim); }
 
 /* ---- Toast + yumurta ---- */
 #gToast {
@@ -222,17 +223,39 @@ body.g-on #gFallback { display: none; }
 #gFallback footer { margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 12px; color: var(--dim); line-height: 1.9; }
 #gFallback footer a { color: var(--dim); }
 #gFallback footer a:hover { color: var(--cyan); }
+/* Hareket azaltma / bağlam kaybı: açık rızayla başlatma düğmesi */
+.f-start { margin-top: 30px; }
+.f-start .f-note { margin-top: 12px; font-size: 13px; line-height: 1.6; }
+
+/* ---- Teşhis satırı (?tani=1) — yalnız ekranda, hiçbir yere gönderilmez ---- */
+#gDiag { max-width: 720px; margin: -48px auto 40px; padding: 0 24px; font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 11px; line-height: 1.6; color: var(--dim); overflow-wrap: anywhere; }
+body.g-on #gDiag {
+  position: fixed; left: 8px; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 9; margin: 0;
+  max-width: min(94vw, 560px); padding: 6px 8px; background: rgba(2, 4, 10, 0.78); pointer-events: none;
+}
+
+/* ---- Dokunmatik: kaydırma/çift dokunma yakınlaştırma/uzun basma menüsü oyunu bölmesin ---- */
+@media (pointer: coarse) {
+  #gStage { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  #gStage .g-card { touch-action: pan-y; }
+  #gLbName { -webkit-user-select: text; user-select: text; }
+}
 </style>
 </head>
 <body>
 
 <!-- Statik yedek: JS kapalıysa, WebGL yoksa ya da kullanıcı hareket azaltmayı
-     seçtiyse görünen içerik budur. Oyun başarıyla açılırsa gizlenir. -->
+     seçtiyse görünen içerik budur. Oyun başarıyla açılırsa gizlenir.
+     Hareket azaltmada oyun yalnız "Oyunu başlat" düğmesine dokunulunca açılır. -->
 <main id="gFallback">
   <div class="f-404">404</div>
   <div class="f-sub">Sayfa Bulunamadı</div>
   <p>Yazdığınız adres hatalı olabilir ya da sayfa taşınmış olabilir. Elektrik gibi: talep ettiğiniz saatte arz yoksa, sistem sizi en yakın kaynağa yönlendirir.</p>
   <p lang="en" style="font-size:13px;margin-top:10px;">EN — The page you requested was not found. The links below will take you where you need to go.</p>
+  <div id="gStartBox" class="f-start" hidden>
+    <button class="g-cta" id="gStartBtn" type="button"></button>
+    <p id="gStartNote" class="f-note"></p>
+  </div>
   <nav class="f-links" aria-label="Öne çıkan sayfalar">
     <a class="f-link" href="/"><span><span class="t">Ana Sayfa</span> <span class="d">— EPDK lisanslı elektrik tedarikçisi</span></span><span class="go">→</span></a>
     <a class="f-link" href="/rehber"><span><span class="t">Enerji Rehberi</span> <span class="d">— serbest tüketici, tedarikçi değiştirme, PTF</span></span><span class="go">→</span></a>
@@ -241,6 +264,7 @@ body.g-on #gFallback { display: none; }
   </nav>
   <footer>© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · <a href="/">Ana sayfa</a> · <a href="/kvkk">KVKK</a> · <a href="/cerez-politikasi">Çerez Politikası</a> · <a href="/kullanim-kosullari">Kullanım Koşulları</a></footer>
 </main>
+<p id="gDiag" role="status" hidden></p>
 
 <!-- Oyun sahnesi -->
 <div id="gStage">
@@ -304,9 +328,10 @@ body.g-on #gFallback { display: none; }
         <ol id="gLbList"></ol>
         <div id="gLbEmpty" class="lb-empty" hidden></div>
         <form id="gLbForm" hidden>
-          <input id="gLbName" type="text" maxlength="24" minlength="2" autocomplete="nickname" spellcheck="false" required>
+          <input id="gLbName" type="text" maxlength="24" minlength="2" autocomplete="nickname" spellcheck="false" aria-describedby="gLbHint" required>
           <button class="g-cta" id="gLbSubmit" type="submit"></button>
         </form>
+        <p id="gLbHint" class="lb-hint" hidden></p>
         <div id="gLbMsg" class="lb-msg" role="alert" hidden></div>
       </div>
       <div class="g-actions">

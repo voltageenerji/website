@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { CFG } from './config';
-import { Engine } from './engine';
+import { Engine, type EngineInfo } from './engine';
 import { Sky } from './sky';
 import { World } from './world';
 import { Player } from './player';
@@ -69,16 +69,19 @@ export class Game {
   private lastRun = { mwh: 0, dist: 0 };
   private lbSubmitting = false;
 
-  constructor(canvas: HTMLCanvasElement) {
+  private halted = false;
+
+  /** onFatal: WebGL bağlamı kaybolursa / çizim kalıcı çökerse çağrılır (main.ts statik yedeğe döner). */
+  constructor(canvas: HTMLCanvasElement, onFatal: (reason: string) => void = () => {}) {
     const isTouch = window.matchMedia('(pointer: coarse)').matches;
-    this.engine = new Engine(canvas, isTouch);
+    this.engine = new Engine(canvas, isTouch, (reason) => { this.halt(); onFatal(reason); });
     this.sky = new Sky(this.engine.scene);
     this.world = new World(this.engine.scene);
     this.player = new Player(this.engine.scene);
     this.obstacles = new Obstacles(this.engine.scene);
     this.collectibles = new Collectibles(this.engine.scene);
 
-    this.engine.bloom.strength = this.sky.preset.bloom * 0.45;
+    this.engine.setBloomStrength(this.sky.preset.bloom * 0.45);
     this.engine.setExposure(this.sky.preset.exposure * 0.85);
 
     this.hud = new Hud(isTouch, {
@@ -150,7 +153,7 @@ export class Game {
         const e = this.powerT * this.powerT * (3 - 2 * this.powerT); // smoothstep
         this.world.power = 0.18 + 0.82 * e;
         this.hud.setGridPct(0.18 + 0.82 * e);
-        this.engine.bloom.strength = p.bloom * (0.45 + 0.55 * e);
+        this.engine.setBloomStrength(p.bloom * (0.45 + 0.55 * e));
         this.engine.setExposure(p.exposure * (0.85 + 0.15 * e));
         dz = (2.2 + CFG.baseSpeed * e) * dt;
         if (this.powerT >= 1) {
@@ -441,6 +444,18 @@ export class Game {
     this.hud.setStats(0, 0, 100);
     this.hud.setEnergy(0, false);
     this.state = 'run';
+  }
+
+  /** Motor durdu: girişleri ve sesi kapat — statik yedeğin arkasında ses/oyun sürmesin. */
+  private halt(): void {
+    if (this.halted) return;
+    this.halted = true;
+    this.input.disabled = true;
+    this.audio.suspend();
+  }
+
+  get engineInfo(): EngineInfo {
+    return this.engine.info;
   }
 
   /** QA kancaları — üretimde zararsız, teşhis için okunur. */

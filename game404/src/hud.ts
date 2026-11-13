@@ -84,6 +84,8 @@ export class Hud {
     el('gLbTitle').textContent = t('lbTitle');
     const nameInput = el<HTMLInputElement>('gLbName');
     nameInput.placeholder = t('lbName');
+    nameInput.setAttribute('aria-label', t('lbName'));
+    el('gLbHint').textContent = t('lbHint');
     el('gLbSubmit').textContent = t('lbSubmit');
     el<HTMLFormElement>('gLbForm').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -102,6 +104,7 @@ export class Hud {
 
   lbFormShow(show: boolean): void {
     el('gLbForm').hidden = !show;
+    el('gLbHint').hidden = !show;
   }
 
   lbBusy(on: boolean): void {

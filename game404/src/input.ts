@@ -16,6 +16,8 @@ export class Input {
   mouseX = 0; // -1..1 — kamera bakış sapması
   mouseY = 0;
   readonly isTouch: boolean;
+  /** true → tüm girişler yok sayılır (motor durduğunda). */
+  disabled = false;
   private boostKey = false;
   private touchId: number | null = null;
   private touchStartX = 0;
@@ -29,7 +31,7 @@ export class Input {
     this.isTouch = window.matchMedia('(pointer: coarse)').matches;
 
     window.addEventListener('keydown', (e) => {
-      if (e.repeat) return;
+      if (e.repeat || this.disabled) return;
       // Odak bir buton/bağlantı/metin alanındaysa (skor paneli, lider tablosu
       // isim girişi) tarayıcı davranışı bozulmasın: SPACE isimde boşluk yazsın,
       // Enter formu göndersin — oyun girişi karışmasın.
@@ -53,7 +55,7 @@ export class Input {
     // Dokunmatik: UI butonlarına gelen dokunuşlara karışma (closest ile ayıklanır).
     window.addEventListener('touchstart', (e) => {
       const target = e.target as HTMLElement;
-      if (target.closest('button, a, input, .g-card')) return;
+      if (this.disabled || target.closest('button, a, input, .g-card')) return;
       this.h.onAnyGesture();
       if (this.touchId !== null) return;
       const tch = e.changedTouches[0];
@@ -70,7 +72,7 @@ export class Input {
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
-      if (this.touchId === null || this.swiped) return;
+      if (this.touchId === null || this.swiped || this.disabled) return;
       for (const tch of Array.from(e.changedTouches)) {
         if (tch.identifier !== this.touchId) continue;
         const dx = tch.clientX - this.touchStartX;
@@ -88,6 +90,7 @@ export class Input {
       for (const tch of Array.from(e.changedTouches)) {
         if (tch.identifier !== this.touchId) continue;
         window.clearTimeout(this.holdTimer);
+        if (this.disabled) { this.touchId = null; continue; }
         const quick = performance.now() - this.touchStartT < HOLD_BOOST_MS;
         if (this.holdBoosting) { this.holdBoosting = false; this.h.onBoost(false); }
         else if (!this.swiped && quick) this.h.onJump();
@@ -100,7 +103,7 @@ export class Input {
     // Masaüstünde tıkla-zıpla (canvas üstünde)
     window.addEventListener('mousedown', (e) => {
       const target = e.target as HTMLElement;
-      if (target.closest('button, a, input, .g-card')) return;
+      if (this.disabled || target.closest('button, a, input, .g-card')) return;
       this.h.onAnyGesture();
       if (!this.isTouch) this.h.onJump();
     });
