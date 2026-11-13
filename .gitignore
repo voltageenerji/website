@@ -37,3 +37,6 @@ gsc-data/
 gsc-key*.json
 # Google Cloud anahtarının varsayılan adı: <proje-id>-<12 hex>.json
 *-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].json
+
+# Ajanların geçici git çalışma kopyaları (asla commit etme)
+.claude/worktrees/
