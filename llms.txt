@@ -8,7 +8,8 @@
 - Merkez: Acıbadem Mah. Elysium Elit Koşuyolu B-18, 34718 Kadıköy, İstanbul, Türkiye
 - EPDK Tedarik Lisansı: ETS/3424-8/2074 — veriliş 19 Eylül 2011 (Kurul Kararı 3424-8)
 - TÜRKPATENT marka tescili: "voltage enerji", 2011/70573 (tescil 23.11.2012), sahibi Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.
-- EPİAŞ üyesi; GÖP, GİP ve dengeleme piyasasında aktif katılımcı
+- EPİAŞ piyasa katılımcısı; GÖP ve GİP'te aktif katılımcı
+- Benzer adı taşıyan elektrik malzemesi ve kondansatör firmalarıyla bağı yoktur.
 - İletişim: info@voltage.com.tr
 - LinkedIn: https://www.linkedin.com/company/voltage-enerji/
 - Facebook: https://www.facebook.com/voltageenerji/
@@ -20,6 +21,7 @@
 
 ## Rehberler
 
+- [Enerji Rehberi](https://voltage.com.tr/rehber): Tüm rehberlerin dizini: serbest tüketici, tedarikçi değiştirme ve seçimi, SKTT, PTF, fatura, YEK-G, I-REC, Kapsam 2, SKDM ve sektörel elektrik tedariki rehberleri.
 - [Serbest Tüketici Nedir?](https://voltage.com.tr/rehber/serbest-tuketici): Serbest tüketici nedir, 2026 limiti neden 500 kWh? EPDK kararına dayalı güncel rehber: kimler tedarikçisini seçebilir, süreç nasıl işler.
 - [Elektrik Tedarikçisi Nasıl Değiştirilir?](https://voltage.com.tr/rehber/tedarikci-degistirme): Elektrik tedarikçisi değiştirme adım adım: sayaç değişir mi, elektrik kesilir mi, ne kadar sürer? EPDK mevzuatına dayalı dürüst süreç rehberi.
 - [Elektrik Tedarikçisi Nasıl Seçilir ve Doğrulanır?](https://voltage.com.tr/rehber/elektrik-tedarikcisi-nasil-secilir): Elektrik tedarikçisi nasıl seçilir? Lisans nasıl kontrol edilir, teklifler nasıl karşılaştırılır, 100.000 kWh eşiği neyi değiştirir? Kaynaklı rehber.
