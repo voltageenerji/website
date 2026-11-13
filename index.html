@@ -2472,8 +2472,8 @@ async function fetchPtfLive(){
     if(!el) return;
     el.setAttribute('tabindex', '-1');
     try { el.focus({ preventScroll: true }); } catch(e) { el.focus(); }
-    const azHareket = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    el.scrollIntoView({ block: 'nearest', behavior: azHareket ? 'auto' : 'smooth' });
+    // Anında kaydırma: bu sayfada yumuşak kaydırma sabit menünün payını kaçırıp mesajı menünün altında bırakıyordu (QA D1)
+    el.scrollIntoView({ block: 'nearest', behavior: 'auto' });
   }
   const FATURA_TURLER = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/heic'];
   const UZANTI_TUR = { pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heic' };
