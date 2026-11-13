@@ -1,0 +1,22 @@
+name: gecici-canli
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-canli.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            c=$(curl -sS -o a.html -w "%{http_code}" "https://voltage.com.tr/rehber/15-dakikalik-uzlastirma?t=$RANDOM")
+            [ "$c" = "200" ] && break
+            sleep 30
+          done
+          echo "rehber15=$c h1=$(grep -c '<h1' a.html || true) sorumluluk=$(grep -c 'denge sorumluluğu bizdedir' a.html || true)"
+          echo "eski_rehber=$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' https://voltage.com.tr/rehber/yenilenebilir-ureticiler)"
+          curl -sS -o s.html "https://voltage.com.tr/sanayi-elektrik-tedariki?t=$RANDOM"; echo "sanayi_2027=$(grep -c "2027'den itibaren dengesizlik" s.html || true) ucretsiz=$(grep -c 'Teklif ücretsizdir' s.html || true)"
+          curl -sS -o k.html "https://voltage.com.tr/kurumsal?t=$RANDOM"; echo "kurumsal_ges=$(grep -c 'GES ve RES üreticilerine' k.html || true)"
+          curl -sS -o i.html "https://voltage.com.tr/?t=$RANDOM"; echo "imza=$(grep -c 'Emirhan Tan' i.html || true)"
+          curl -sS -o m.xml "https://voltage.com.tr/sitemap.xml?t=$RANDOM"; echo "sitemap_url=$(grep -c '<loc>' m.xml) eski=$(grep -c yenilenebilir-ureticiler m.xml || true)"
