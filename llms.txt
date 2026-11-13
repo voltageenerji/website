@@ -21,12 +21,13 @@
 
 ## Rehberler
 
-- [Enerji Rehberi](https://voltage.com.tr/rehber): Tüm rehberlerin dizini: serbest tüketici, tedarikçi değiştirme ve seçimi, SKTT, PTF, fatura, YEK-G, I-REC, Kapsam 2, SKDM ve sektörel elektrik tedariki rehberleri.
+- [Enerji Rehberi](https://voltage.com.tr/rehber): Tüm rehberlerin dizini: serbest tüketici, tedarikçi değiştirme ve seçimi, SKTT, PTF, 15 dakikalık uzlaştırma, fatura, YEK-G, I-REC, Kapsam 2, SKDM ve sektörel elektrik tedariki rehberleri.
 - [Serbest Tüketici Nedir?](https://voltage.com.tr/rehber/serbest-tuketici): Serbest tüketici nedir, 2026 limiti neden 500 kWh? EPDK kararına dayalı güncel rehber: kimler tedarikçisini seçebilir, süreç nasıl işler.
 - [Elektrik Tedarikçisi Nasıl Değiştirilir?](https://voltage.com.tr/rehber/tedarikci-degistirme): Elektrik tedarikçisi değiştirme adım adım: sayaç değişir mi, elektrik kesilir mi, ne kadar sürer? EPDK mevzuatına dayalı dürüst süreç rehberi.
 - [Elektrik Tedarikçisi Nasıl Seçilir ve Doğrulanır?](https://voltage.com.tr/rehber/elektrik-tedarikcisi-nasil-secilir): Elektrik tedarikçisi nasıl seçilir? Lisans nasıl kontrol edilir, teklifler nasıl karşılaştırılır, 100.000 kWh eşiği neyi değiştirir? Kaynaklı rehber.
 - [OSB Elektrik Tedariki](https://voltage.com.tr/rehber/osb-elektrik-tedariki): OSB katılımcısı tedarikçisini seçebilir mi? OSB tarifesi ile ikili anlaşmanın karşılaştırması, süreç ve dikkat edilecek sözleşme başlıkları.
 - [PTF Nedir?](https://voltage.com.tr/rehber/ptf-nedir): PTF (Piyasa Takas Fiyatı) nedir, Gün Öncesi Piyasası'nda nasıl oluşur, neden değişir? EPİAŞ verisine dayalı açıklama ve canlı saatlik fiyat.
+- [15 Dakikalık Uzlaştırma: Tüketici İçin Ne Değişir?](https://voltage.com.tr/rehber/15-dakikalik-uzlastirma): Dengeleme güç piyasasında uzlaştırma dönemi 15 dakika olarak uygulanacak (1 Ocak 2027'den önce başlatılmaz; DUY m.91, Geçici Madde 40, RG 21.01.2025 sayı 32789). Genel uzlaştırma dönemi, dengesizlik miktarı ve PTF saatlik kalır; tüketiciye ayrıca başvuru veya bildirim yükümlülüğü yoktur (12.11.2026 itibarıyla). Sayaç, dengesizlik fiyatı ve tedarikçiye sorulacak sorular.
 - [Son Kaynak Tedarik Tarifesi (SKTT)](https://voltage.com.tr/rehber/sktt): SKTT nedir? 2026 limitleri mesken 4.000 kWh, diğer abone grupları 15.000 kWh (EPDK Kurul Kararı 13912, RG 31.10.2025). Ne zaman uygulanır, nasıl çıkılır.
 - [Elektrik Faturası Neden Yüksek Geldi?](https://voltage.com.tr/rehber/elektrik-faturasi-neden-yuksek): Yüksek faturanın tüketimden mi fiyattan mı kaynaklandığını ayırt etmek için kontrol listesi ve itiraz yolları.
 - [Tekstil Fabrikasında Elektrik Maliyeti](https://voltage.com.tr/rehber/tekstil-elektrik): İplik, dokuma ve boyahane hatlarında elektrik maliyeti nasıl yönetilir? Tekstil yük profiline göre sabit, endeksli ve hibrit tedarik modelleri.
