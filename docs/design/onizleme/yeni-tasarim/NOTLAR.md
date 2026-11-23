@@ -115,3 +115,10 @@ Bağlantılar: kaldırılan hedef yok. Rayın `/canli-ptf` bağlantısı yerine 
 - iOS Safari ve Firefox. Denetimlerin tamamı Chromium iledir.
 - Telefon kapak görseli 579×724 pikseldir; 3× ekranda yaklaşık 3 kat büyütülür ve yumuşak görünür. Daha yüksek çözünürlüklü dikey kırpım gerekir.
 - Sıkıştırılmış (Brotli) HTML ile LCP; yerel sunucu sıkıştırmaz.
+
+## Yapım dosyaları ve sonuçlar (23.11)
+
+- `yapi/` — sayfa `yapi/kur.py` ile üretilir: baş bölümü, form ve betikler canlı `index.html`'den okunur; gövde `yapi/govde.html`, stil `yapi/stil.css`. Değişiklik bu iki dosyada yapılır, sonra `python3 yapi/kur.py`. `karsilastir.py` önce/sonra karşılaştırmasını, `test2.mjs` davranış testlerini (yerel sunucu: `python3 -m http.server 8765`), `perf.mjs` laboratuvar ölçümünü, `kontrast2.mjs` karşıtlık denetimini üretir. Betiklerdeki mutlak yollar oturuma özeldir; yeni oturumda düzeltilir.
+- `sonuclar/` — son koşunun çıktıları: `test-sonucu.txt` (177/177), `once-sonra.txt`, `performans.txt`, `karsitlik.txt` (5.462 metin kutusu, eşik altı 0).
+- Kapak kartındaki "Güncel Piyasa Verisi" etiketi başlık değil paragraftır (`<p id="ptfBaslik">`); başlık ağacında piyasa için tek H2 kalır ("Güncel Elektrik Piyasası Verileri").
+- Önizleme bağlantısı üretilirken sunulan kopyada iki fark olur: `robots` değeri `noindex, nofollow` ve `PTF_PROXY` aynı kökenli geçici aktarıcıya (`/onizleme-ptf`) bakar. Bu klasördeki `index.html` üretim değerlerini taşır.

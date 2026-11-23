@@ -1,0 +1,474 @@
+<body>
+<a class="skip" href="#icerik" data-tr="İçeriğe atla" data-en="Skip to content">İçeriğe atla</a>
+
+<!-- ÜST BANT -->
+<header class="site-header on-dark" id="nav">
+  <div class="wrap header-in">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-mark">
+        <img src="/voltage-enerji-logo.svg" alt="Voltage Enerji logosu" width="30" height="30" decoding="async" draggable="false" onload="this.parentNode.classList.add('gorsel-hazir')">
+        <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1" opacity="0.25"/>
+          <path d="M11 10 L18 26 L25 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="18" cy="18" r="1.4" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">
+        <span class="nav-logo-name">Voltage</span>
+        <span class="nav-logo-sub" data-tr="ENERJİ" data-en="ENERGY">ENERJİ</span>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Ana menü">
+      <a href="#hakkimizda" data-tr="Hakkımızda" data-en="About">Hakkımızda</a>
+      <a href="#hizmetler" data-tr="Hizmetler" data-en="Services">Hizmetler</a>
+      <a href="#yaklasim" data-tr="Yaklaşım" data-en="Approach">Yaklaşım</a>
+      <a href="/rehber" data-tr="Rehber" data-en="Guides">Rehber</a>
+      <a href="/canli-ptf" data-tr="Canlı PTF" data-en="Live MCP">Canlı PTF</a>
+      <a href="#iletisim" data-tr="İletişim" data-en="Contact">İletişim</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" class="lang-btn active" data-lang="tr" aria-pressed="true">TR</button>
+        <span class="lang-sep" aria-hidden="true">/</span>
+        <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <a href="#teklif" class="btn nav-cta" data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</a>
+    </div>
+    <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <a href="#hakkimizda" data-tr="Hakkımızda" data-en="About">Hakkımızda</a>
+  <a href="#hizmetler" data-tr="Hizmetler" data-en="Services">Hizmetler</a>
+  <a href="#yaklasim" data-tr="Yaklaşım" data-en="Approach">Yaklaşım</a>
+  <a href="/rehber" data-tr="Rehber" data-en="Guides">Rehber</a>
+  <a href="/canli-ptf" data-tr="Canlı PTF" data-en="Live MCP">Canlı PTF</a>
+  <a href="#iletisim" data-tr="İletişim" data-en="Contact">İletişim</a>
+  <div class="lang-toggle" role="group" aria-label="Language">
+    <button type="button" class="lang-btn active" data-lang="tr" aria-pressed="true">TR</button>
+    <span class="lang-sep" aria-hidden="true">/</span>
+    <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</div>
+
+<main id="icerik" tabindex="-1">
+
+<!-- KAPAK -->
+<section class="hero on-dark" id="kapak" aria-labelledby="kapakBaslik">
+  <div class="hero-media" aria-hidden="true">
+    <!-- yedek: fotoğraf yüklenemezse görünen çizim silüet -->
+    <svg class="hero-placeholder" viewBox="0 0 1440 700">
+      <path d="M0 520C90 500 150 462 230 470c80 8 120-40 200-32 90 8 130 54 220 42 90-12 140-60 230-48 80 10 130 54 210 44 90-12 140-58 220-46 60 8 100 32 130 40V700H0Z" fill="#343C74"/>
+      <path d="M0 628h1440v72H0zM586 630v-84c0-9 15-14 35-14s35 5 35 14v84zM666 630v-94c0-9 15-14 35-14s35 5 35 14v94zM748 450h130v180H748zM892 630l8-444h24l8 444zM958 450h208v180H958zM1238 540h202v90h-202z" fill="#0B1126"/>
+    </svg>
+    <picture class="hero-photo">
+      <source media="(max-width: 700px)" srcset="img/kapak-mobil-579.webp" width="579" height="724">
+      <img srcset="img/kapak-800.webp 800w, img/kapak-1200.webp 1200w, img/kapak-1600.webp 1600w, img/kapak-2172.webp 2172w" sizes="(min-width: 2100px) 100vw, 2100px" src="img/kapak-1600.webp" alt="" width="2172" height="724" fetchpriority="high" decoding="async" onerror="this.closest('.hero-media').classList.add('yedek')">
+    </picture>
+  </div>
+  <div class="hero-overlay" aria-hidden="true"></div>
+
+  <div class="wrap hero-in">
+    <div class="hero-copy">
+      <div class="hero-text">
+        <h1 id="kapakBaslik"><span class="h1-ust" data-tr="Sanayi ve Ticarethaneler için Elektrik Tedariki" data-en="Electricity Supply for Industry and Businesses">Sanayi ve Ticarethaneler için Elektrik Tedariki</span> <span class="h1-ana" data-tr="Sanayinin enerjisini piyasayla buluşturuyoruz." data-en="We connect industry's energy with the market.">Sanayinin enerjisini piyasayla buluşturuyoruz.</span></h1>
+        <p class="hero-sub" data-tr="Voltan Elektrik A.Ş. çatısı altında, GÖP, GİP ve ikili anlaşmalar üzerinden sanayi ve ticarethanelere sözleşmeye dayalı elektrik tedariki sağlıyoruz." data-en="Under Voltan Elektrik A.Ş., we provide contract-based electricity supply to industrial and commercial consumers via the Day-Ahead Market (DAM), Intra-Day Market (IDM), and bilateral agreements.">Voltan Elektrik A.Ş. çatısı altında, GÖP, GİP ve ikili anlaşmalar üzerinden sanayi ve ticarethanelere sözleşmeye dayalı elektrik tedariki sağlıyoruz.</p>
+      </div>
+      <div class="hero-actions">
+        <a href="#teklif" class="btn btn-primary"><span data-tr="Teklif Al" data-en="Get a Quote">Teklif Al</span>
+          <svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h13M11.5 5l5 5-5 5"/></svg>
+        </a>
+        <a href="#hizmetler" class="btn btn-ghost" data-tr="Hizmetlerimizi İncele" data-en="Explore Our Services">Hizmetlerimizi İncele</a>
+      </div>
+    </div>
+
+    <!-- Güncel saatin PTF değeri: değer ve damga betikle dolar (kfPtf, kfStamp); veri yoksa "—" kalır -->
+    <aside class="ptf-card" id="ptfKart" data-state="waiting" aria-labelledby="ptfBaslik">
+      <p class="ptf-title" id="ptfBaslik" data-tr="Güncel Piyasa Verisi" data-en="Current Market Data">Güncel Piyasa Verisi</p>
+      <p class="kf-stamp waiting" id="kfStamp">EPİAŞ VERİSİ BEKLENİYOR</p>
+      <div class="ptf-fig">
+        <p class="ptf-label"><span data-tr="PTF" data-en="MCP">PTF</span> (₺/MWh)</p>
+        <p class="ptf-value" id="kfPtf">—</p>
+      </div>
+      <div class="ptf-chart">
+        <svg viewBox="0 0 360 96" preserveAspectRatio="none" aria-hidden="true">
+          <path class="ptf-area" id="heroArea" d=""/>
+          <path class="ptf-line" id="heroLine" d=""/>
+          <circle class="ptf-now" id="heroDot" r="4" style="display:none"/>
+          <path class="ptf-axis" fill="none" d="M0 94h360M0.5 88v6M90 90v4M180 90v4M270 90v4M359.5 88v6"/>
+        </svg>
+        <p class="ptf-empty" data-tr="Saatlik veri bekleniyor" data-en="Awaiting hourly data">Saatlik veri bekleniyor</p>
+      </div>
+      <div class="ptf-ticks" aria-hidden="true"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+      <a class="ptf-link" href="/canli-ptf"><span data-tr="Piyasa verilerini detaylı incele" data-en="View detailed market data">Piyasa verilerini detaylı incele</span>
+        <svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h13M11.5 5l5 5-5 5"/></svg>
+      </a>
+    </aside>
+  </div>
+</section>
+
+<!-- KURUMSAL BİLGİ SATIRI -->
+<div class="trust">
+  <ul class="wrap">
+    <li><strong data-tr="2011'den bu yana" data-en="Since 2011">2011'den bu yana</strong><span data-tr="EPDK lisanslı tedarikçi" data-en="EPDK-licensed supplier">EPDK lisanslı tedarikçi</span></li>
+    <li><strong data-tr="EPDK Lisansı" data-en="EPDK License">EPDK Lisansı</strong><span class="mono">ETS/3424-8/2074</span></li>
+    <li><strong data-tr="Piyasa katılımcısı" data-en="Market participant">Piyasa katılımcısı</strong><span data-tr="GÖP ve GİP" data-en="DAM and IDM">GÖP ve GİP</span></li>
+    <li><strong data-tr="Türkiye'nin tamamı" data-en="All of Türkiye">Türkiye'nin tamamı</strong><span data-tr="Sanayi ve ticarethane" data-en="Industrial and commercial">Sanayi ve ticarethane</span></li>
+  </ul>
+</div>
+
+<!-- HİZMETLER -->
+<section class="services sec sec-white" id="hizmetler">
+  <div class="wrap split">
+    <div>
+      <h2 class="sec-h"><span class="tr-only">Hizmetlerimiz</span><span class="en-only">Our Services</span></h2>
+      <p class="sec-intro" data-tr="Spot piyasa alımlarından uzun vadeli ikili anlaşmalara, portföy yönetiminden yenilenebilir tedariğe kadar kurumsal enerji ihtiyaçlarınızın tamamını tek çatı altında karşılıyoruz." data-en="From spot market purchases to long-term bilateral agreements, from portfolio management to renewable supply — we meet the full scope of your corporate energy needs under a single roof.">Spot piyasa alımlarından uzun vadeli ikili anlaşmalara, portföy yönetiminden yenilenebilir tedariğe kadar kurumsal enerji ihtiyaçlarınızın tamamını tek çatı altında karşılıyoruz.</p>
+    </div>
+    <ul class="svc-list">
+      <li>
+        <h3><a class="more" href="/sanayi-elektrik-tedariki"><span data-tr="Endüstriyel Tedarik" data-en="Industrial Supply">Endüstriyel Tedarik</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h13M11.5 5l5 5-5 5"/></svg></a></h3>
+        <p data-tr="Yüksek tüketimli tesisler için ikili anlaşma bazlı sabit fiyat veya endeksli model ile uzun vadeli elektrik tedariki." data-en="Long-term electricity supply for high-consumption facilities via bilateral agreements, with fixed-price or indexed pricing models.">Yüksek tüketimli tesisler için ikili anlaşma bazlı sabit fiyat veya endeksli model ile uzun vadeli elektrik tedariki.</p>
+      </li>
+      <li>
+        <h3 data-tr="GÖP &amp; GİP Operasyonu" data-en="Day-Ahead &amp; Intra-Day Operations">GÖP &amp; GİP Operasyonu</h3>
+        <p data-tr="EPİAŞ piyasasında aktif katılım; Gün Öncesi ve Gün İçi piyasalarında disiplinli pozisyon yönetimi ve dengeleme." data-en="Active participation on EPIAS with disciplined position management and balancing across Day-Ahead and Intra-Day markets.">EPİAŞ piyasasında aktif katılım; Gün Öncesi ve Gün İçi piyasalarında disiplinli pozisyon yönetimi ve dengeleme.</p>
+      </li>
+      <li>
+        <h3 data-tr="Portföy Yönetimi" data-en="Portfolio Management">Portföy Yönetimi</h3>
+        <p data-tr="Fiyat risklerine karşı hedging stratejileri, tüketim profili analizi ve müşteriye özel enerji bütçeleme." data-en="Hedging strategies against price risk, consumption profile analysis, and customized energy budgeting for each client.">Fiyat risklerine karşı hedging stratejileri, tüketim profili analizi ve müşteriye özel enerji bütçeleme.</p>
+      </li>
+      <li>
+        <h3 data-tr="Yenilenebilir Enerji Tedariki" data-en="Renewable Energy Supply">Yenilenebilir Enerji Tedariki</h3>
+        <p data-tr="YEK-G belgeli yeşil enerji tedariği ile kurumsal sürdürülebilirlik hedeflerinizi doğrulanabilir şekilde karşılayın." data-en="YEK-G certified green energy supply, enabling verifiable fulfillment of your corporate sustainability targets.">YEK-G belgeli yeşil enerji tedariği ile kurumsal sürdürülebilirlik hedeflerinizi doğrulanabilir şekilde karşılayın.</p>
+      </li>
+      <li>
+        <h3 data-tr="Enerji Danışmanlığı" data-en="Energy Advisory">Enerji Danışmanlığı</h3>
+        <p data-tr="Fatura analizi, sözleşme yapılandırması ve piyasa geçişleri için uçtan uca stratejik danışmanlık." data-en="End-to-end strategic advisory for invoice analysis, contract structuring, and supplier transitions.">Fatura analizi, sözleşme yapılandırması ve piyasa geçişleri için uçtan uca stratejik danışmanlık.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- SEKTÖRLER -->
+<section class="sectors sec sec-dark on-dark">
+  <div class="wrap">
+    <h2 class="sec-h"><span class="tr-only">Hizmet Verdiğimiz Sektörler</span><span class="en-only">Sectors We Serve</span></h2>
+    <p class="sec-intro">
+      <span class="tr-only">Yüksek tüketimli, süreklilik isteyen tesislerle çalışıyoruz.</span>
+      <span class="en-only">We work with high-consumption facilities where continuity is critical.</span>
+    </p>
+    <ul class="sector-list">
+      <li><h3><a href="/rehber/demir-celik-elektrik" data-tr="Demir-Çelik &amp; Döküm" data-en="Steel &amp; Foundry">Demir-Çelik &amp; Döküm</a></h3><p data-tr="Ark ocaklı tesisler, haddehaneler, dökümhaneler." data-en="Arc-furnace plants, rolling mills, foundries.">Ark ocaklı tesisler, haddehaneler, dökümhaneler.</p></li>
+      <li><h3><a href="/rehber/kimya-elektrik" data-tr="Kimya &amp; Petrokimya" data-en="Chemicals &amp; Petrochem">Kimya &amp; Petrokimya</a></h3><p data-tr="Proses sürekliliği kritik, dengeleme toleransı dar tesisler." data-en="Process-continuity-critical plants with narrow balancing tolerance.">Proses sürekliliği kritik, dengeleme toleransı dar tesisler.</p></li>
+      <li><h3><a href="/rehber/osb-elektrik-tedariki" data-tr="OSB &amp; Endüstri Bölgeleri" data-en="Organized Industrial Zones">OSB &amp; Endüstri Bölgeleri</a></h3><p data-tr="OSB bünyesindeki yüksek tüketimli üreticiler." data-en="High-consumption manufacturers inside organized industrial zones.">OSB bünyesindeki yüksek tüketimli üreticiler.</p></li>
+      <li><h3><a href="/rehber/soguk-zincir-elektrik" data-tr="Lojistik &amp; Soğuk Zincir" data-en="Logistics &amp; Cold Chain">Lojistik &amp; Soğuk Zincir</a></h3><p data-tr="Soğuk hava depoları, otomatik antrepolar." data-en="Cold storage and automated warehouses.">Soğuk hava depoları, otomatik antrepolar.</p></li>
+      <li><h3><a href="/rehber/cam-seramik-elektrik" data-tr="Cam &amp; Seramik" data-en="Glass &amp; Ceramics">Cam &amp; Seramik</a></h3><p data-tr="Fırın sürekliliği, rejeneratif sistemler." data-en="Furnace continuity, regenerative systems.">Fırın sürekliliği, rejeneratif sistemler.</p></li>
+      <li><h3><a href="/rehber/veri-merkezi-elektrik" data-tr="Veri Merkezleri &amp; Telekom" data-en="Data Centers &amp; Telecom">Veri Merkezleri &amp; Telekom</a></h3><p data-tr="Kesintiye toleranssız, yüksek güvenilirlik isteyen tesisler." data-en="Outage-intolerant, high-reliability facilities.">Kesintiye toleranssız, yüksek güvenilirlik isteyen tesisler.</p></li>
+      <li><h3><a href="/rehber/tekstil-elektrik" data-tr="Tekstil &amp; Kompozit" data-en="Textile &amp; Composites">Tekstil &amp; Kompozit</a></h3><p data-tr="İplik, dokuma, boyahane hatları." data-en="Spinning, weaving and dyehouse lines.">İplik, dokuma, boyahane hatları.</p></li>
+    </ul>
+    <p class="sector-all"><a class="more" href="/rehber"><span data-tr="Tüm sektör rehberleri" data-en="All sector guides">Tüm sektör rehberleri</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h13M11.5 5l5 5-5 5"/></svg></a></p>
+  </div>
+</section>
+
+<!-- PİYASA VERİLERİ: grafik, günün özeti, saatlik tablo. Sayılar yalnız betikle, EPİAŞ verisinden yazılır; HTML'de sayı yoktur. -->
+<section class="market sec sec-paper" id="canli-piyasa">
+  <div class="wrap">
+    <h2 class="sec-h"><span class="tr-only">Güncel Elektrik Piyasası Verileri</span><span class="en-only">Current Electricity Market Data</span></h2>
+    <p class="sec-intro">
+      <span class="tr-only">Gün öncesi piyasasında oluşan saatlik PTF değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.</span>
+      <span class="en-only">Hourly day-ahead market clearing prices (MCP). Source: EPİAŞ Transparency Platform.</span>
+    </p>
+    <noscript><p class="lm-noscript">Grafik ve saatlik tablo bu sayfada tarayıcı betiğiyle dolar. Güncel saatlik değerler <a href="/canli-ptf">Canlı PTF sayfasında</a> yer alır.</p></noscript>
+    <div class="lm-veri">
+      <div>
+        <div class="lm-chart-head2">
+          <h3 class="label lm-ct" data-tr="Gün Öncesi PTF · 24 Saat · ₺/MWh" data-en="Day-Ahead MCP · 24 Hours · ₺/MWh">Gün Öncesi PTF · 24 Saat · ₺/MWh</h3>
+          <span class="lm-mode waiting" id="lmMode">—</span>
+        </div>
+        <svg class="lm-chart-svg" viewBox="0 0 800 260" preserveAspectRatio="none" aria-hidden="true">
+          <line x1="0" x2="800" y1="65" y2="65"/><line x1="0" x2="800" y1="130" y2="130"/><line x1="0" x2="800" y1="195" y2="195"/>
+          <path id="lmArea" d=""/>
+          <path id="lmLine" d=""/>
+          <circle id="lmDot" r="5" style="display:none"/>
+        </svg>
+        <div class="ptf-ticks lm-ticks" aria-hidden="true"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+        <div class="lm-ledger">
+          <h3 class="label lm-ledger-title" data-tr="Bugünün Cetveli" data-en="Today's Ledger">Bugünün Cetveli</h3>
+          <dl>
+            <div class="lg-row"><dt class="label lg-k" data-tr="Gün Ortalaması" data-en="Day Average">Gün Ortalaması</dt><dd class="lg-v" id="lgAvg">—</dd></div>
+            <div class="lg-row"><dt class="label lg-k" id="lgMoK">Aylık Ortalama</dt><dd class="lg-v" id="lgMo">—</dd></div>
+            <div class="lg-row"><dt class="label lg-k" data-tr="En Düşük Saat" data-en="Lowest Hour">En Düşük Saat</dt><dd class="lg-v" id="lgMinH">—</dd></div>
+            <div class="lg-row"><dt class="label lg-k" data-tr="En Yüksek Saat" data-en="Highest Hour">En Yüksek Saat</dt><dd class="lg-v" id="lgMaxH">—</dd></div>
+            <div class="lg-row"><dt class="label lg-k" data-tr="Durum" data-en="Status">Durum</dt><dd class="lg-v" id="lgUpd">—</dd></div>
+          </dl>
+        </div>
+        <p class="lm-link"><a class="more" href="/canli-ptf"><span data-tr="Piyasa verilerini detaylı incele" data-en="View detailed market data">Piyasa verilerini detaylı incele</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h13M11.5 5l5 5-5 5"/></svg></a></p>
+      </div>
+      <table class="saat-tablo" id="saatTablo">
+        <caption class="label" data-tr="Saatlik PTF · ₺/MWh" data-en="Hourly MCP · ₺/MWh">Saatlik PTF · ₺/MWh</caption>
+        <thead><tr><th scope="col" class="label" data-tr="Saat" data-en="Hour">Saat</th><th scope="col" class="label" data-tr="PTF" data-en="MCP">PTF</th></tr></thead>
+        <tbody>
+@@SAATLER@@
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SÜREÇ -->
+<section class="process sec sec-white">
+  <div class="wrap">
+    <h2 class="sec-h"><span class="tr-only">Elektrik Tedarik Süreci</span><span class="en-only">Electricity Supply Process</span></h2>
+    <p class="sec-intro">
+      <span class="tr-only">Teklif'ten ilk faturaya, beş adım.</span>
+      <span class="en-only">From proposal to first invoice, five steps.</span>
+    </p>
+    <ol class="steps">
+      <li><h3 data-tr="Keşif" data-en="Discovery">Keşif</h3><p data-tr="Tesisin yük profili, OG/AG kullanımı ve saat dağılımı incelenir." data-en="Load profile, MV/LV usage and hourly distribution are analyzed.">Tesisin yük profili, OG/AG kullanımı ve saat dağılımı incelenir.</p></li>
+      <li><h3 data-tr="Modelleme" data-en="Modeling">Modelleme</h3><p data-tr="GÖP + ikili karışım modeli, risk dağılımı, referans dönem PTF analizi." data-en="DAM + bilateral blend model, risk allocation, reference-period MCP analysis.">GÖP + ikili karışım modeli, risk dağılımı, referans dönem PTF analizi.</p></li>
+      <li><h3 data-tr="Teklif" data-en="Proposal">Teklif</h3><p data-tr="Sabit, endeksli veya hibrit seçenekler. Tüm formüller sözleşmede." data-en="Fixed, indexed or hybrid options. Every formula in the contract.">Sabit, endeksli veya hibrit seçenekler. Tüm formüller sözleşmede.</p></li>
+      <li><h3>Onboard</h3><p data-tr="EPİAŞ profil transferi, tedarikçi değişimi başvurusu, dengeleme eşleştirmesi." data-en="EPIAS profile transfer, supplier switch filing, balancing unit assignment.">EPİAŞ profil transferi, tedarikçi değişimi başvurusu, dengeleme eşleştirmesi.</p></li>
+      <li><h3 data-tr="Devreye Alma" data-en="Go-live">Devreye Alma</h3><p data-tr="İlk saatte canlı tedarik; ilk ay faturalama ve kullanım raporu." data-en="Live supply from hour one; first-month invoicing and consumption report.">İlk saatte canlı tedarik; ilk ay faturalama ve kullanım raporu.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- MODELLER -->
+<section class="calc-section sec sec-paper">
+  <div class="wrap">
+    <h2 class="sec-h"><span class="tr-only">Elektrik Tedarik Sözleşmesi Modelleri</span><span class="en-only">Electricity Supply Contract Models</span></h2>
+    <p class="sec-intro">
+      <span class="tr-only">Fiyat nasıl belirlenir, risk kimde, kime uygun — tüm formüller sözleşmede.</span>
+      <span class="en-only">How the price is set, who carries the risk, who it suits — every formula in the contract.</span>
+    </p>
+    <div class="fin-table">
+      <table>
+        <thead>
+          <tr><th scope="col" data-tr="MODEL" data-en="MODEL">MODEL</th><th scope="col" data-tr="SABİT" data-en="FIXED">SABİT</th><th scope="col" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</th><th scope="col" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" data-tr="Fiyat nasıl belirlenir" data-en="How the price is set">Fiyat nasıl belirlenir</th>
+            <td><span class="ft-m" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Dönem boyu sabit birim fiyat" data-en="Fixed unit price for the term">Dönem boyu sabit birim fiyat</span></td>
+            <td><span class="ft-m" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="PTF'ye endeksli formül" data-en="Formula indexed to the MCP">PTF'ye endeksli formül</span></td>
+            <td><span class="ft-m" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Sabit taban + endeksli dilim" data-en="Fixed base + indexed tranche">Sabit taban + endeksli dilim</span></td>
+          </tr>
+          <tr>
+            <th scope="row" data-tr="Piyasa riski kimde" data-en="Who carries market risk">Piyasa riski kimde</th>
+            <td><span class="ft-m" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Voltage'da" data-en="With Voltage">Voltage'da</span></td>
+            <td><span class="ft-m" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="Tüketicide; istenirse sabitlenir" data-en="Consumer; fixable on request">Tüketicide; istenirse sabitlenir</span></td>
+            <td><span class="ft-m" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Dilim bazında paylaşımlı" data-en="Shared per tranche">Dilim bazında paylaşımlı</span></td>
+          </tr>
+          <tr>
+            <th scope="row" data-tr="Kime uygun" data-en="Who it suits">Kime uygun</th>
+            <td><span class="ft-m" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Bütçe kesinliği isteyene" data-en="Those who want budget certainty">Bütçe kesinliği isteyene</span></td>
+            <td><span class="ft-m" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="Piyasayı izleyebilene" data-en="Those who can track the market">Piyasayı izleyebilene</span></td>
+            <td><span class="ft-m" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Dengeli profil arayana" data-en="Those seeking a balanced profile">Dengeli profil arayana</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ft-note" data-tr="Dipnot: tasarruf yüzdesi ve tutar taahhüdü verilmez; her formül sözleşme metninde yazılıdır." data-en="Note: no savings percentage or amount is promised; every formula is written into the contract.">Dipnot: tasarruf yüzdesi ve tutar taahhüdü verilmez; her formül sözleşme metninde yazılıdır.</p>
+  </div>
+</section>
+
+<!-- EPDK LİSANSI -->
+<section class="licence sec sec-white">
+  <div class="wrap split">
+    <h2 class="sec-h"><span class="tr-only">EPDK Tedarik Lisansı</span><span class="en-only">EPDK Supply License</span></h2>
+    <div>
+    <dl class="facts">
+      <div><dt class="label" data-tr="Lisans No" data-en="License No">Lisans No</dt><dd class="mono">ETS/3424-8/2074</dd></div>
+      <div><dt class="label" data-tr="Lisans Sahibi" data-en="Licensee">Lisans Sahibi</dt><dd data-tr="Voltan Elektrik Toptan Satış İth. ve İhr. A.Ş." data-en="Voltan Elektrik Toptan Satış İth. ve İhr. A.Ş.">Voltan Elektrik Toptan Satış İth. ve İhr. A.Ş.</dd></div>
+      <div><dt class="label" data-tr="Veriliş" data-en="Issued">Veriliş</dt><dd data-tr="19 Eylül 2011 · Kurul Kararı 3424-8" data-en="19 September 2011 · Board Decision 3424-8">19 Eylül 2011 · Kurul Kararı 3424-8</dd></div>
+      <div><dt class="label" data-tr="Geçerlilik" data-en="Validity">Geçerlilik</dt><dd data-tr="2031 · süre uzatımı EPDK onayına tabi" data-en="2031 · extension subject to EPDK approval">2031 · süre uzatımı EPDK onayına tabi</dd></div>
+      <div><dt class="label" data-tr="Düzenleyen" data-en="Issued by">Düzenleyen</dt><dd data-tr="Enerji Piyasası Düzenleme Kurumu" data-en="Energy Market Regulatory Authority (EPDK)">Enerji Piyasası Düzenleme Kurumu</dd></div>
+    </dl>
+    <ul class="marks">
+      <li data-tr="YEK-G SERTİFİKALI SATICI" data-en="YEK-G CERTIFIED SELLER">YEK-G SERTİFİKALI SATICI</li>
+      <li data-tr="EPİAŞ PİYASA KATILIMCISI" data-en="EPIAS MARKET PARTICIPANT">EPİAŞ PİYASA KATILIMCISI</li>
+      <li data-tr="İTO ÜYESİ" data-en="ITO MEMBER">İTO ÜYESİ</li>
+      <li data-tr="KVKK AYDINLATMA METNİ" data-en="KVKK PRIVACY NOTICE">KVKK AYDINLATMA METNİ</li>
+    </ul>
+    </div>
+  </div>
+</section>
+
+<!-- HAKKIMIZDA -->
+<section class="about sec sec-paper" id="hakkimizda">
+  <div class="wrap about-grid">
+    <div>
+      <h2 class="sec-h"><span class="tr-only">Voltage Enerji Hakkında</span><span class="en-only">About Voltage Enerji</span></h2>
+      <p class="about-claim">
+        <span class="tr-only">Bir firma kadar köklü, bir ortak kadar yakın.</span>
+        <span class="en-only">As established as a firm, as close as a partner.</span>
+      </p>
+      <p class="about-lead">
+        <span class="tr-only">Voltage, tedarikçi olmanın ötesine geçer. Müşterilerimizin enerji stratejilerinin bir parçası olarak sabit fiyatlı sözleşmede fiyat riskini biz taşırız; endeksli modelde risk tüketicidedir ve istenirse fiyat sabitlenir. Her sözleşmenin tam olarak yazıldığı gibi işlemesini sağlarız.</span>
+        <span class="en-only">Voltage is more than a supplier. As part of our clients' energy strategies, we carry the price risk under fixed-price contracts; under the indexed model the risk sits with the consumer and the price can be fixed on request. We ensure every contract performs exactly as written.</span>
+      </p>
+      <p class="about-body">
+        <span class="tr-only">Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş., <strong>2011 yılından bu yana</strong> Türkiye elektrik piyasasında aktif tedarikçi konumundadır. EPİAŞ üzerinden yürüttüğümüz Gün Öncesi ve Gün İçi piyasası operasyonlarımızın yanı sıra, yüksek tüketimli endüstriyel müşterilerimiz ile doğrudan ikili anlaşmalar üzerinden çalışıyoruz.</span>
+        <span class="en-only">Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. has been an active supplier in the Turkish electricity market <strong>since 2011</strong>. Alongside our Day-Ahead and Intra-Day market operations on EPIAS, we serve high-consumption industrial clients through direct bilateral agreements.</span>
+      </p>
+      <p class="about-body">
+        <span class="tr-only">İş modelimizin merkezinde tek bir prensip var: <strong>Sözleşme ne diyorsa, o olur.</strong> Fiyatlandırmalarımız şeffaf, risk aktarımımız net, raporlamamız açık. Müşterilerimiz enerji kalemlerinin nasıl hesaplandığını sözleşmeden okur.</span>
+        <span class="en-only">A single principle sits at the heart of our business model: <strong>the contract is the contract.</strong> Our pricing is transparent, our risk allocation is explicit, our reporting is open. Our clients can read how every energy line-item is calculated in the contract.</span>
+      </p>
+      <div class="about-signature">
+        <div class="about-signature-text">
+          <span class="tr-only">— Emirhan Tan, Yönetim Kurulu Başkanı</span>
+          <span class="en-only">— Emirhan Tan, Chairman of the Board</span>
+        </div>
+        <div class="about-signature-meta">Voltan Elektrik A.Ş.<br>İstanbul, 2011</div>
+      </div>
+    </div>
+    <dl class="about-facts">
+      <div class="ldg-row"><dt class="label" data-tr="Kuruluş" data-en="Founded">Kuruluş</dt><dd class="ldg-v" data-tr="2011" data-en="2011">2011</dd></div>
+      <div class="ldg-row"><dt class="label" data-tr="EPDK Lisansı" data-en="EPDK License">EPDK Lisansı</dt><dd class="ldg-v mono">ETS/3424-8/2074</dd></div>
+      <div class="ldg-row"><dt class="label" data-tr="Ticaret Sicil" data-en="Trade Registry">Ticaret Sicil</dt><dd class="ldg-v mono">786882-0 · İstanbul</dd></div>
+      <div class="ldg-row"><dt class="label" data-tr="Sözleşme Modelleri" data-en="Contract Models">Sözleşme Modelleri</dt><dd class="ldg-v" data-tr="Sabit · Endeksli · Hibrit" data-en="Fixed · Indexed · Hybrid">Sabit · Endeksli · Hibrit</dd></div>
+      <div class="ldg-row"><dt class="label" data-tr="Müşteri Segmenti" data-en="Client Segment">Müşteri Segmenti</dt><dd class="ldg-v" data-tr="OSB + endüstriyel tesisler" data-en="OIZ + industrial facilities">OSB + endüstriyel tesisler</dd></div>
+      <div class="ldg-row"><dt class="label" data-tr="Piyasalar" data-en="Markets">Piyasalar</dt><dd class="ldg-v" data-tr="GÖP · GİP · İkili Anlaşmalar" data-en="DAM · IDM · Bilateral Agreements">GÖP · GİP · İkili Anlaşmalar</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- NEDEN VOLTAGE -->
+<section class="approach sec sec-white" id="yaklasim">
+  <div class="wrap">
+    <h2 class="sec-h"><span class="tr-only">Neden Voltage?</span><span class="en-only">Why Voltage?</span></h2>
+    <p class="sec-intro">
+      <span class="tr-only">Enerji tedariği, fiyat kadar güvenilirliğin de satın alındığı bir ilişkidir. Üç temel prensip.</span>
+      <span class="en-only">Energy supply is a relationship where reliability is purchased alongside price. Three principles.</span>
+    </p>
+    <div class="principles">
+      <article>
+        <h3 data-tr="Sözleşme Disiplini" data-en="Contract Discipline">Sözleşme Disiplini</h3>
+        <p class="app-x" data-tr="Sabit fiyatlı sözleşmede fiyat riskini biz taşırız; endeksli sözleşmede fiyat formülü sözleşmede yazılıdır. Taahhüt ettiğimiz fiyatta, taahhüt ettiğimiz miktarda, taahhüt ettiğimiz sürede. 2011'den bu yana bu disiplinle çalışıyoruz." data-en="Under a fixed-price contract we carry the price risk; under an indexed contract the price formula is written into the contract. At the price committed, in the volume committed, for the duration committed. We have worked with this discipline since 2011.">Sabit fiyatlı sözleşmede fiyat riskini biz taşırız; endeksli sözleşmede fiyat formülü sözleşmede yazılıdır. Taahhüt ettiğimiz fiyatta, taahhüt ettiğimiz miktarda, taahhüt ettiğimiz sürede. 2011'den bu yana bu disiplinle çalışıyoruz.</p>
+        <p class="app-tag" data-tr="— Taahhüt üzerine kurulu" data-en="— Built on commitment">— Taahhüt üzerine kurulu</p>
+      </article>
+      <article>
+        <h3 data-tr="Elektrik Piyasalarında Uzmanlık" data-en="Expertise in Electricity Markets">Elektrik Piyasalarında Uzmanlık</h3>
+        <p class="app-x" data-tr="EPİAŞ'ta Gün Öncesi ve Gün İçi piyasalarının aktif katılımcısıyız; fiyatlamamızı bu piyasaların şeffaf verisine dayandırırız." data-en="We are an active participant in EPİAŞ's Day-Ahead and Intraday markets, and we base our pricing on their transparent data.">EPİAŞ'ta Gün Öncesi ve Gün İçi piyasalarının aktif katılımcısıyız; fiyatlamamızı bu piyasaların şeffaf verisine dayandırırız.</p>
+        <p class="app-tag" data-tr="— Derinlik üzerine kurulu" data-en="— Built on depth">— Derinlik üzerine kurulu</p>
+      </article>
+      <article>
+        <h3 data-tr="Şeffaf Yapı" data-en="Transparent Structure">Şeffaf Yapı</h3>
+        <p class="app-x" data-tr="Fiyatlandırmamızın her bileşeni açık: enerji maliyeti, dengeleme, piyasa ücretleri ayrı ayrı raporlanır. Güvence bedeli ve teminat mektubu yapılarıyla ticari güveni de sağlıyoruz." data-en="Every component of our pricing is disclosed: energy cost, balancing, and market fees are reported separately. We also use security deposits and letters of guarantee to build commercial trust.">Fiyatlandırmamızın her bileşeni açık: enerji maliyeti, dengeleme, piyasa ücretleri ayrı ayrı raporlanır. Güvence bedeli ve teminat mektubu yapılarıyla ticari güveni de sağlıyoruz.</p>
+        <p class="app-tag" data-tr="— Açıklık üzerine kurulu" data-en="— Built on clarity">— Açıklık üzerine kurulu</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ŞİRKET SÖZÜ -->
+<section class="quotec sec-dark on-dark">
+  <div class="wrap">
+    <p class="callout-t">
+      <span class="tr-only">Enerji bir emtia değil; işinizin nabzıdır. Fiyat dalgasında da, arz sıkışıklığında da sözleşmede yazdığımız koşullarla yanınızdayız.</span>
+      <span class="en-only">Energy is not a commodity; it is the pulse of your business. Through price swings and supply shocks alike, we stand by you on the terms written in our contract.</span>
+    </p>
+  </div>
+</section>
+
+<!-- İLETİŞİM VE TEKLİF FORMU -->
+<section class="contact sec sec-paper" id="iletisim">
+  <div class="wrap contact-grid">
+    <div class="contact-info">
+      <h2 class="sec-h"><span class="tr-only">İletişim</span><span class="en-only">Contact</span></h2>
+      <p class="sec-intro">
+        <span class="tr-only">Tedariğin bir sonraki adımını birlikte planlayalım.</span>
+        <span class="en-only">Let's plan the next step of your supply, together.</span>
+      </p>
+      <p class="contact-info-text" data-tr="Tüketim profilinizi ve ihtiyaçlarınızı paylaşın, size özel bir fiyatlandırma ve sözleşme yapısı hazırlayalım. Tipik geri dönüş süremiz bir iş günüdür." data-en="Share your consumption profile and requirements, and we will prepare a tailored pricing and contract structure. Our typical response time is one business day.">Tüketim profilinizi ve ihtiyaçlarınızı paylaşın, size özel bir fiyatlandırma ve sözleşme yapısı hazırlayalım. Tipik geri dönüş süremiz bir iş günüdür.</p>
+      <div class="contact-details">
+        <div class="contact-detail">
+          <div class="label" data-tr="E-posta" data-en="Email">E-posta</div>
+          <div class="contact-detail-value"><a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a></div>
+        </div>
+        <div class="contact-detail">
+          <div class="label" data-tr="Merkez" data-en="Headquarters">Merkez</div>
+          <div class="contact-detail-value">
+            <span class="tr-only">Acıbadem Mah. Elysium Elit<br>Koşuyolu B-18<br>34718 Kadıköy · İstanbul</span>
+            <span class="en-only">Acıbadem Mah. Elysium Elit<br>Koşuyolu B-18<br>34718 Kadıköy · Istanbul · Türkiye</span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="label" data-tr="Tüzel Kişilik" data-en="Legal Entity">Tüzel Kişilik</div>
+          <div class="contact-detail-value">Voltan Elektrik Toptan Satış<br>İthalat ve İhracat A.Ş.</div>
+        </div>
+        <div class="contact-detail">
+          <div class="label" data-tr="Ticaret Sicil" data-en="Trade Registry">Ticaret Sicil</div>
+          <div class="contact-detail-value mono">786882-0 · İstanbul</div>
+        </div>
+        <div class="contact-detail">
+          <div class="label" data-tr="EPDK Lisansı" data-en="EPDK License">EPDK Lisansı</div>
+          <div class="contact-detail-value mono">ETS/3424-8/2074</div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form">
+      <span id="teklif" class="form-capa" aria-hidden="true"></span>
+@@BLOK:form@@
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- KAPANIŞ -->
+<footer class="footer on-dark">
+  <div class="wrap">
+    <div class="cl-head">
+      <div class="cl-brand">
+        <div class="cl-mark-svg">
+          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1" opacity="0.25"></circle>
+            <path d="M14 13 L24 35 L34 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+            <circle cx="24" cy="24" r="1.8" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="cl-name"><span class="cl-word">Voltage</span> <span class="cl-subwrap"><span class="cl-sub" data-tr="ENERJİ" data-en="ENERGY">ENERJİ</span><span class="cl-reg" aria-hidden="true">®</span></span></div>
+      </div>
+      <nav class="cl-nav" aria-label="Footer">
+        <a href="#hakkimizda" data-tr="Hakkımızda" data-en="About">Hakkımızda</a>
+        <a href="#hizmetler" data-tr="Hizmetler" data-en="Services">Hizmetler</a>
+        <a href="#yaklasim" data-tr="Yaklaşım" data-en="Approach">Yaklaşım</a>
+        <a href="/rehber" data-tr="Rehber" data-en="Guides">Rehber</a>
+        <a href="#iletisim" data-tr="İletişim" data-en="Contact">İletişim</a>
+      </nav>
+    </div>
+    <div class="cl-grid">
+      <div>
+        <div class="label cl-k" data-tr="Şirket" data-en="Company">Şirket</div>
+        <div class="cl-v">Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.<br><span data-tr="EPDK Tedarik Lisansı" data-en="EPDK Supply License">EPDK Tedarik Lisansı</span> <span class="mono">ETS/3424-8/2074</span></div>
+      </div>
+      <div>
+        <div class="label cl-k" data-tr="Merkez" data-en="Office">Merkez</div>
+        <div class="cl-v">Acıbadem Mah. Elysium Elit Koşuyolu B-18<br><span data-tr="34718 Kadıköy · İstanbul · Türkiye" data-en="34718 Kadıköy · Istanbul · Türkiye">34718 Kadıköy · İstanbul · Türkiye</span></div>
+      </div>
+      <div>
+        <div class="label cl-k" data-tr="İletişim" data-en="Contact">İletişim</div>
+        <div class="cl-v"><a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a><br><span>voltage.com.tr</span></div>
+      </div>
+      <div>
+        <div class="label cl-k" data-tr="Kayıt" data-en="Registry">Kayıt</div>
+        <div class="cl-v"><span data-tr="Ticaret Sicil" data-en="Trade Registry">Ticaret Sicil</span> <span class="mono">786882-0 · İstanbul</span><br><span data-tr="Est. 2011 · EPİAŞ Üyesi" data-en="Est. 2011 · EPIAS Member">Est. 2011 · EPİAŞ Üyesi</span></div>
+      </div>
+    </div>
+    <div class="cl-bottom">
+      <span class="cl-copy" data-tr="© 2026 VOLTAN ELEKTRİK TOPTAN SATIŞ İTHALAT VE İHRACAT A.Ş." data-en="© 2026 VOLTAN ELEKTRİK TOPTAN SATIŞ İTHALAT VE İHRACAT A.Ş. ALL RIGHTS RESERVED.">© 2026 VOLTAN ELEKTRİK TOPTAN SATIŞ İTHALAT VE İHRACAT A.Ş.</span>
+      <div class="cl-legal">
+        <a href="/kurumsal" data-tr="Kurumsal" data-en="Company">Kurumsal</a>
+        <a href="/kvkk" data-tr="KVKK" data-en="Privacy">KVKK</a>
+        <a href="/cerez-politikasi" data-tr="Çerez Politikası" data-en="Cookie Policy">Çerez Politikası</a>
+        <a href="/kullanim-kosullari" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a>
+      </div>
+      <span class="cl-markline">VOLTAGE ENERJİ<span class="cl-reg" aria-hidden="true">®</span></span>
+    </div>
+  </div>
+</footer>

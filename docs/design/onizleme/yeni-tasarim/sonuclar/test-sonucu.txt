@@ -1,0 +1,190 @@
+HAZIRLIK SAYFASI — DAVRANIŞ TESTLERİ (2. tur)
+Sayfa: http://127.0.0.1:8765/docs/design/onizleme/yeni-tasarim/index.html
+
+GEÇTİ  A1 konsol hatası yok (1440, canlı veri)
+GEÇTİ  A2 tek <h1>; içinde üst satır (.h1-ust) ve slogan (.h1-ana); ayrı üst başlık öğesi yok
+GEÇTİ  A3 H1 görünümü: üst satır küçük büyük harfli sans, slogan serif
+GEÇTİ  A4 başlık sırası: atlanan düzey yok (H1 → H2 → H3)
+       başlık sayısı: H1 1, H2 9, H3 23
+GEÇTİ  A5 <main> var; içerik içinde, footer dışında; atlama bağlantısı #icerik
+GEÇTİ  A6 betiklerin ve gelen bağlantıların kullandığı id değerleri duruyor; yinelenen id yok
+GEÇTİ  A7 logo işareti görsel olarak yüklendi; marka yazısı kapakta ve altta sans (Archivo)
+GEÇTİ  A8 kapak fotoğrafı yüklendi (WebP), yedek kapalı
+GEÇTİ  A9 yollar kökten başlıyor (kapak görselleri dışında göreli yol yok)
+GEÇTİ  A10 süs öğeleri yok: bölüm numarası, folyo, hizmet numarası, tek hat şeması, halkalar, EXHIBIT A, S1–S5, A/B/C, felsefe etiketi, ray, belirme
+GEÇTİ  A11 ok simgesi yalnız gerçek bağlantı ve düğmelerde
+GEÇTİ  A12 PTF kartı düz panel: bulanıklık ve gölge yok, zemin opak
+GEÇTİ  A13 gölge kullanan öğe yok (form odak halkası dışında)
+GEÇTİ  A14 monospace yalnız piyasa verisi, saat damgası ve teknik kimliklerde (lisans no, sicil no)
+       monospace kullanan öğeler: İZİNLİ #kfStamp İZİNLİ .ptf-ticks İZİNLİ .mono İZİNLİ #lmMode İZİNLİ .ptf-ticks.lm-ticks İZİNLİ #lgAvg İZİNLİ #lgMo İZİNLİ #lgMinH İZİNLİ #lgMaxH İZİNLİ #lgUpd İZİNLİ #saatTablo İZİNLİ .ldg-v.mono İZİNLİ .contact-detail-value.mono
+GEÇTİ  A15 serif yalnız üç yerde: kapak sloganı, Hakkında cümlesi ve imza, şirket sözü
+       serif kullanan öğeler: h1-ana tr-only
+GEÇTİ  A16 yerleşim kayması yok (CLS, 1440, canlı veri gelirken)
+GEÇTİ  A16 yerleşim kayması yok (CLS, 375, canlı veri gelirken)
+GEÇTİ  B1 açılış Türkçe; tüm çiftler TR metninde; çocuklu çeviri çifti yok
+GEÇTİ  B1 TR H2 metinleri talimattaki gibi
+GEÇTİ  B2 EN: html lang, tüm çiftler EN metninde, tr-only gizli
+GEÇTİ  B2 EN H2 metinleri talimattaki gibi
+GEÇTİ  B3 EN: title / description / og:title / og:locale değişti
+GEÇTİ  B4 EN: canlı damga, kip, aylık etiket, yer tutucu İngilizce
+GEÇTİ  B5 EN: aria-pressed ve etkin sınıf (üst bant ve menü panelindeki düğmeler birlikte)
+GEÇTİ  B6 EN H1: iki parça
+GEÇTİ  B7 TR’ye dönüş: tüm çiftler TR, başlık ve tanım TR, en-only gizli
+GEÇTİ  B8 ?lang=en ile açılış İngilizce
+GEÇTİ  C1 1280px menü → #hakkimizda: hedef üst bandın hemen altında
+GEÇTİ  C1 1280px menü → #hizmetler: hedef üst bandın hemen altında
+GEÇTİ  C1 1280px menü → #yaklasim: hedef üst bandın hemen altında
+GEÇTİ  C1 1280px menü → #iletisim: hedef üst bandın hemen altında
+GEÇTİ  C1 1280px üst banttaki “Teklif Al” → #teklif: hedef üst bandın hemen altında
+GEÇTİ  C2 1280px kapak “Teklif Al” → form başlığı görünür
+GEÇTİ  C3 1280px kapak “Hizmetlerimizi İncele” → #hizmetler; üst bant “scrolled”
+GEÇTİ  C1 375px menü → #hakkimizda: hedef üst bandın hemen altında
+GEÇTİ  C1 375px menü → #hizmetler: hedef üst bandın hemen altında
+GEÇTİ  C1 375px menü → #yaklasim: hedef üst bandın hemen altında
+GEÇTİ  C1 375px menü → #iletisim: hedef üst bandın hemen altında
+GEÇTİ  C1 375px üst banttaki “Teklif Al” → #teklif: hedef üst bandın hemen altında
+GEÇTİ  C2 375px kapak “Teklif Al” → form başlığı görünür
+GEÇTİ  C3 375px kapak “Hizmetlerimizi İncele” → #hizmetler; üst bant “scrolled”
+GEÇTİ  D1 375px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
+GEÇTİ  D2 375px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
+GEÇTİ  D3 375px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D4 375px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
+       375×667: kapak yüksekliği 767 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
+GEÇTİ  D5 menü kapalı açılır
+GEÇTİ  D6 düğme menüyü açar: 6 bağlantı ≥44 px, dil düğmeleri panelde ≥44×44, gövde kilidi
+GEÇTİ  D7 paneldeki dil düğmesi dili değiştirir, panel açık kalır
+GEÇTİ  D8 Escape menüyü kapatır
+GEÇTİ  D9 düğmeye ikinci dokunuş kapatır
+GEÇTİ  D1 390px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
+GEÇTİ  D2 390px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
+GEÇTİ  D3 390px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D4 390px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
+       390×844: kapak yüksekliği 767 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
+GEÇTİ  D1 320px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
+GEÇTİ  D2 320px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
+GEÇTİ  D3 320px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D4 320px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
+       320×568: kapak yüksekliği 767 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
+GEÇTİ  D1 430px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
+GEÇTİ  D2 430px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
+GEÇTİ  D3 430px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D4 430px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
+       430×932: kapak yüksekliği 702 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 398 px
+GEÇTİ  D10 ilk Tab atlama bağlantısını gösterir; Enter odağı <main>’e taşır
+GEÇTİ  D11 klavye odağı her öğede görünür (70 Tab adımı: üst bant, kapak, bağlantılar, form alanları)
+GEÇTİ  E1 CANLI kapak kartı: değer sayı, damga “SAAT ss:00 · EPİAŞ”, durum live
+GEÇTİ  E1 CANLI kapak kartı: gün eğrisi çizildi (24 nokta), o saatin noktası görünür
+GEÇTİ  E1 kapak kartında yalnız: başlık, damga, PTF değeri, gün eğrisi, bağlantı (başka sayı yok)
+GEÇTİ  E1 CANLI bölüm: büyük grafik çizildi, özet dolu (gün ort., ay ort., en düşük, en yüksek, durum)
+GEÇTİ  E1 CANLI saatlik tablo: gerçek <table>, 24 satır (00:00–23:00), 24 değer sayı, o saatin satırı işaretli
+GEÇTİ  E1 tablo değerleri proxy yanıtındaki saatlik fiyatlarla birebir aynı; kapak değeri = o saatin tablo değeri
+GEÇTİ  E1 bölüm kapaktaki “şu anki saat” rakamını manşet yapmıyor: KPI bandı ve ray yok; kapak değeri bölümde yalnız tablo satırında
+GEÇTİ  E1 önbellek anahtarı “voltage-ptf-cache” yazıldı; yalnız /ptf/today ve /ptf/stats çağrıldı
+GEÇTİ  E2 ÖNBELLEK: damga “SON SENKRON ss:dd”, durum cached, değer önbellekteki sayı
+GEÇTİ  E2 ÖNBELLEK: grafik ve tablo bugünün önbelleğinden; “şu an” noktası ve satır işareti yok; kip SON SENKRON
+GEÇTİ  E2b DÜNKÜ ÖNBELLEK: değer + “SON SENKRON gg.aa ss:dd”; grafik boş; tablo 24 × “—” (dünün saatleri bugüne yazılmaz)
+GEÇTİ  E3 VERİ YOK: değer “—”, damga “EPİAŞ VERİSİ BEKLENİYOR”, durum waiting
+GEÇTİ  E3 VERİ YOK: grafikler boş, nokta yok, “Saatlik veri bekleniyor”; özet “—”; tablo 24 × “—”; kip VERİ BEKLENİYOR
+GEÇTİ  E3 VERİ YOK: bölümde ve kartta saat etiketleri dışında rakam yok (0 ya da yer tutucu sayı yok)
+GEÇTİ  E3 VERİ YOK: yalnız proxy isteği düştü, başka konsol hatası yok
+GEÇTİ  E3 VERİ YOK (EN): “AWAITING EPIAS DATA”, değer “—”
+GEÇTİ  E3 ?ptfoff test kancası: istek atılmaz, dürüst bekleme
+GEÇTİ  E4 kapak kartı ve piyasa bölümü üç durumda aynı yükseklikte (kayma yok)
+GEÇTİ  E5 EKSİK SAAT: şu anki saat yoksa kapak değeri “—” (0 değil), durum live
+GEÇTİ  E5 EKSİK SAAT: tabloda eksik saatler “—”, öbürleri sayı; çizgi boşlukta kopuyor
+GEÇTİ  E5 EKSİK SAAT: hiçbir yerde 0,00 yok
+GEÇTİ  E6 1440px kart, kapak ve piyasa bölümü yüksekliği veri durumundan bağımsız (canlı = önbellek = bekleme); kart içeriği sığıyor
+GEÇTİ  E6 768px kart, kapak ve piyasa bölümü yüksekliği veri durumundan bağımsız (canlı = önbellek = bekleme); kart içeriği sığıyor
+GEÇTİ  E6 375px kart, kapak ve piyasa bölümü yüksekliği veri durumundan bağımsız (canlı = önbellek = bekleme); kart içeriği sığıyor
+GEÇTİ  E6 320px kart, kapak ve piyasa bölümü yüksekliği veri durumundan bağımsız (canlı = önbellek = bekleme); kart içeriği sığıyor
+GEÇTİ  E7 BETİK KAPALI: bölümde düz cümle ve /canli-ptf bağlantısı; boş grafik, özet ya da tablo görünmez
+GEÇTİ  E8 BETİK KAPALI: betik açıkken görünen bütün Türkçe metin (piyasa sayıları dışında) betiksiz de görünür
+GEÇTİ  E8 BETİK KAPALI: kapak kartı dürüst bekleme metniyle durur (“—”, “EPİAŞ VERİSİ BEKLENİYOR”); gizli bölüm yok
+       betik kapalı görünür satır: 229; betik açık (piyasa göstergeleri hariç): 228
+GEÇTİ  F1 1280px boş gönderim engellenir (istek yok, odak ilk zorunlu alanda)
+GEÇTİ  F2 1280px geçerli gönderim: tek JSON isteği, tüm alanlar gövdede
+GEÇTİ  F2 1280px kaynak “dogrudan”, UTM yakalandı
+GEÇTİ  F2 1280px başarı mesajı görünür, üst bandın altında ve odakta
+GEÇTİ  F2 1280px başarı mesajı dil değişince çevrilir
+GEÇTİ  G1 1280px /?kaynak=rehber-sktt#leadForm: form başlığı sabit bandın altında görünür
+GEÇTİ  F3 1280px ?kaynak=rehber-sktt gövdede “rehber-sktt”
+GEÇTİ  F4 1280px 500: hata mesajı görünür, odakta, görüş alanında; düğme yeniden etkin; girilenler duruyor
+GEÇTİ  F4 1280px 429: hız sınırı mesajı
+GEÇTİ  F1 375px boş gönderim engellenir (istek yok, odak ilk zorunlu alanda)
+GEÇTİ  F2 375px geçerli gönderim: tek JSON isteği, tüm alanlar gövdede
+GEÇTİ  F2 375px kaynak “dogrudan”, UTM yakalandı
+GEÇTİ  F2 375px başarı mesajı görünür, üst bandın altında ve odakta
+GEÇTİ  F2 375px başarı mesajı dil değişince çevrilir
+GEÇTİ  G1 375px /?kaynak=rehber-sktt#leadForm: form başlığı sabit bandın altında görünür
+GEÇTİ  F3 375px ?kaynak=rehber-sktt gövdede “rehber-sktt”
+GEÇTİ  F4 375px 500: hata mesajı görünür, odakta, görüş alanında; düğme yeniden etkin; girilenler duruyor
+GEÇTİ  F4 375px 429: hız sınırı mesajı
+GEÇTİ  F5 yeşil kutucuk: form “yesil” sınıfı, yeşil düğme ve kenar, zemin yeşerir, yaprak dalı çizilir
+GEÇTİ  F5 yeşil seçim gövdede yesil:true
+GEÇTİ  F5 kutucuk kaldırılınca form eski görünüme döner
+GEÇTİ  F6 geçersiz tür (.txt): “Lütfen PDF, JPG, PNG, WEBP ya da HEIC yükleyin.”, istek yok, mesaj odakta
+GEÇTİ  F6 dört dosya: “En fazla 3 fatura dosyası yükleyebilirsiniz.”, istek yok
+GEÇTİ  F6 8 MB üstü dosya: “Her dosya en fazla 8 MB olabilir.”, istek yok
+GEÇTİ  F6 toplam 10 MB üstü: “Dosyaların toplamı en fazla 10 MB olabilir.”, istek yok
+GEÇTİ  F6 geçerli PDF: multipart gönderim, payload JSON + fatura dosyası
+GEÇTİ  F6 dosyalı gönderim 5xx: bir kez dosyasız denenir, “faturanız yüklenemedi” notu
+GEÇTİ  F7 ödeme seçenekleri: ön ödemeli, faturadan sonra, ikisi; etiketler görünür
+GEÇTİ  F7 mesken: şirket, sektör, ödeme gizlenir; not görünür; ev bantları gelir
+GEÇTİ  F7 mesken gönderimi: tarife mesken, bant 500-750, şirket ve ödeme boş
+GEÇTİ  F7 tuzak alan ekran dışında, sekme sırasında değil
+GEÇTİ  F7 her form alanının görünür etiketi var
+GEÇTİ  F7 KVKK onayı olmadan gönderilmez
+GEÇTİ  F7 KVKK bağlantısı /kvkk, yeni sekme
+GEÇTİ  F8 EN gönderim: lang en, İngilizce başarı metni
+GEÇTİ  G2 1280px /#teklif: hedef bandın 16 px altında
+GEÇTİ  G2 1280px /#iletisim: hedef bandın 16 px altında
+GEÇTİ  G3 1280px /#hakkimizda: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 1280px /#yaklasim: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 1280px /#hizmetler: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G2 375px /#teklif: hedef bandın 16 px altında
+GEÇTİ  G2 375px /#iletisim: hedef bandın 16 px altında
+GEÇTİ  G3 375px /#hakkimizda: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 375px /#yaklasim: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 375px /#hizmetler: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  H1 hareket azaltma: yumuşak kaydırma kapalı, çalışan animasyon yok, gizli içerik yok
+GEÇTİ  H2 kaydırınca belirme kaldırıldı: açılışta gizli ya da kaydırılmış öğe yok, IntersectionObserver yok
+GEÇTİ  H3 fotoğraf yüklenemezse çizim silüet devreye girer
+GEÇTİ  H4 logo görseli yüklenemezse satır içi çizim görünür
+GEÇTİ  H5 375px @2x kapak görseli: kapak-mobil-579.webp
+GEÇTİ  H5 700px @1x kapak görseli: kapak-mobil-579.webp
+GEÇTİ  H5 768px @1x kapak görseli: kapak-2172.webp
+GEÇTİ  H5 1440px @1x kapak görseli: kapak-2172.webp
+GEÇTİ  H5 1440px @2x kapak görseli: kapak-2172.webp
+GEÇTİ  I1 320px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 320px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 360px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 360px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 375px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 375px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 390px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 390px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 414px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 414px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 430px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 430px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 768px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 768px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 1024px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 1024px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 1280px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 1280px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 1440px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 1440px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I2 320px TR seçim kutularında en uzun seçenek sığıyor (iş ve mesken bantları)
+GEÇTİ  I2 320px EN seçim kutularında en uzun seçenek sığıyor (iş ve mesken bantları)
+GEÇTİ  I2 375px TR seçim kutularında en uzun seçenek sığıyor (iş ve mesken bantları)
+GEÇTİ  I2 375px EN seçim kutularında en uzun seçenek sığıyor (iş ve mesken bantları)
+GEÇTİ  I3 320px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi; menü paneli dahil)
+GEÇTİ  I3 375px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi; menü paneli dahil)
+GEÇTİ  I3 430px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi; menü paneli dahil)
+GEÇTİ  I4 1280px form iletişim bilgilerinin yanında, aynı hizada; #teklif çapası formun üstünde
+GEÇTİ  I4 1440px form iletişim bilgilerinin yanında, aynı hizada; #teklif çapası formun üstünde
+GEÇTİ  I4 1040px form iletişim bilgilerinin yanında, aynı hizada; #teklif çapası formun üstünde
+GEÇTİ  I5 320px saatlik tablo ve model tablosu ekrana sığıyor (yatay kaydırma yok); model tablosunda her değerin başında model adı
+
+TOPLAM: 177 geçti, 0 kaldı

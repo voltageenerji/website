@@ -1,0 +1,337 @@
+ÖNCE/SONRA KARŞILAŞTIRMASI
+önce : /home/user/website/index.html (166810 bayt)
+sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 bayt)
+
+== 1. BAŞ BÖLÜMÜ ==
+  <!DOCTYPE> … yazı tipi bağlantısı bayt bayt aynı: True (6391 bayt)
+  title                  aynı: True  (önce 1, sonra 1 öğe)
+  meta description       aynı: True  (önce 1, sonra 1 öğe)
+  canonical              aynı: True  (önce 1, sonra 1 öğe)
+  hreflang (alternate)   aynı: True  (önce 0, sonra 0 öğe)
+  robots                 aynı: True  (önce 1, sonra 1 öğe)
+  og:*                   aynı: True  (önce 11, sonra 11 öğe)
+  twitter:*              aynı: True  (önce 5, sonra 5 öğe)
+  favicon                aynı: True  (önce 3, sonra 3 öğe)
+  JSON-LD blokları       aynı: True  (önce 1, sonra 1 öğe)
+  robots değeri: ['index, follow, max-snippet:-1, max-image-preview:large']
+  teklif formu (<form>…</form>) bayt bayt aynı: True (31482 bayt)
+
+== 2. BAŞLIK AĞACI (TR) ==
+  ÖNCE: 14 başlık (H1 1, H2 8, H3 5)
+    H1 Türkiye'nin endüstriyel enerji ortağı, Voltage.
+      H2 Canlı Piyasa
+      H2 Çalıştığımız Tesis Sınıfları
+      H2 Teklif'ten ilk faturaya, beş adım.
+      H2 Üç Sözleşme Modeli
+        H3 EPDK Tedarik Lisansı
+      H2 Bir firma kadar köklü, bir ortak kadar yakın.
+      H2 Uçtan uca enerji çözüm portföyü.
+      H2 Neden Voltage?
+        H3 Sözleşme Disiplini
+        H3 Piyasa Zekâsı
+        H3 Şeffaf Yapı
+      H2 İletişim
+        H3 Teklif Talebi
+  SONRA: 33 başlık (H1 1, H2 9, H3 23)
+    H1 Sanayi ve Ticarethaneler için Elektrik Tedariki Sanayinin enerjisini piyasayla buluşturuyoruz.
+      H2 Hizmetlerimiz
+        H3 Endüstriyel Tedarik
+        H3 GÖP & GİP Operasyonu
+        H3 Portföy Yönetimi
+        H3 Yenilenebilir Enerji Tedariki
+        H3 Enerji Danışmanlığı
+      H2 Hizmet Verdiğimiz Sektörler
+        H3 Demir-Çelik & Döküm
+        H3 Kimya & Petrokimya
+        H3 OSB & Endüstri Bölgeleri
+        H3 Lojistik & Soğuk Zincir
+        H3 Cam & Seramik
+        H3 Veri Merkezleri & Telekom
+        H3 Tekstil & Kompozit
+      H2 Güncel Elektrik Piyasası Verileri
+        H3 Gün Öncesi PTF · 24 Saat · ₺/MWh
+        H3 Bugünün Cetveli
+      H2 Elektrik Tedarik Süreci
+        H3 Keşif
+        H3 Modelleme
+        H3 Teklif
+        H3 Onboard
+        H3 Devreye Alma
+      H2 Elektrik Tedarik Sözleşmesi Modelleri
+      H2 EPDK Tedarik Lisansı
+      H2 Voltage Enerji Hakkında
+      H2 Neden Voltage?
+        H3 Sözleşme Disiplini
+        H3 Elektrik Piyasalarında Uzmanlık
+        H3 Şeffaf Yapı
+      H2 İletişim
+        H3 Teklif Talebi
+  SONRA (EN):
+    H1 Electricity Supply for Industry and Businesses We connect industry's energy with the market.
+      H2 Our Services
+        H3 Industrial Supply
+        H3 Day-Ahead & Intra-Day Operations
+        H3 Portfolio Management
+        H3 Renewable Energy Supply
+        H3 Energy Advisory
+      H2 Sectors We Serve
+        H3 Steel & Foundry
+        H3 Chemicals & Petrochem
+        H3 Organized Industrial Zones
+        H3 Logistics & Cold Chain
+        H3 Glass & Ceramics
+        H3 Data Centers & Telecom
+        H3 Textile & Composites
+      H2 Current Electricity Market Data
+        H3 Day-Ahead MCP · 24 Hours · ₺/MWh
+        H3 Today's Ledger
+      H2 Electricity Supply Process
+        H3 Discovery
+        H3 Modeling
+        H3 Proposal
+        H3 Onboard
+        H3 Go-live
+      H2 Electricity Supply Contract Models
+      H2 EPDK Supply License
+      H2 About Voltage Enerji
+      H2 Why Voltage?
+        H3 Contract Discipline
+        H3 Expertise in Electricity Markets
+        H3 Transparent Structure
+      H2 Contact
+        H3 Request a Proposal
+
+== 3. İÇ BAĞLANTILAR VE ÇAPA METİNLERİ (TR) ==
+  önce 36 bağlantı (21 farklı hedef), sonra 40 bağlantı (22 farklı hedef)
+  KALDIRILAN (hedef, çapa metni): 3
+    - #hizmetler                             "Hizmetlerimiz"
+    - #teklif                                "Teklif Talep Edin"
+    - /canli-ptf                             "[Canlı PTF sayfasını aç]"
+  EKLENEN: 5
+    + #hizmetler                             "Hizmetlerimizi İncele"
+    + #icerik                                "İçeriğe atla"
+    + /canli-ptf                             "Canlı PTF"
+    + /canli-ptf                             "Piyasa verilerini detaylı incele"
+    + /rehber                                "Tüm sektör rehberleri"
+  hedef başına adet (önce → sonra):
+    #                                      1 → 1
+    #hakkimizda                            3 → 3
+    #hizmetler                             4 → 4
+    #icerik                                0 → 1  *
+    #iletisim                              3 → 3
+    #teklif                                3 → 2  *
+    #yaklasim                              3 → 3
+    /canli-ptf                             1 → 4  *
+    /cerez-politikasi                      1 → 1
+    /kullanim-kosullari                    1 → 1
+    /kurumsal                              1 → 1
+    /kvkk                                  2 → 2
+    /rehber                                3 → 4  *
+    /rehber/cam-seramik-elektrik           1 → 1
+    /rehber/demir-celik-elektrik           1 → 1
+    /rehber/kimya-elektrik                 1 → 1
+    /rehber/osb-elektrik-tedariki          1 → 1
+    /rehber/soguk-zincir-elektrik          1 → 1
+    /rehber/tekstil-elektrik               1 → 1
+    /rehber/veri-merkezi-elektrik          1 → 1
+    /sanayi-elektrik-tedariki              1 → 1
+    mailto:info@voltage.com.tr             2 → 2
+  EN çapa metinleri — kaldırılan: [('#hizmetler', 'Our Services'), ('#teklif', 'Request a Proposal'), ('/canli-ptf', '[Canlı PTF sayfasını aç]')]
+  EN çapa metinleri — eklenen: [('#hizmetler', 'Explore Our Services'), ('#icerik', 'Skip to content'), ('/canli-ptf', 'Live MCP'), ('/canli-ptf', 'View detailed market data'), ('/rehber', 'All sector guides')]
+
+== 4. GÖRÜNÜR METİN (TR) — metin birimi düzeyinde ==
+  birim sayısı: önce 294 (farklı 235), sonra 329 (farklı 243) · kelime sayısı: önce 1123, sonra 1147
+  KALDIRILAN: 44 (süs ve numara işaretleri: · 01 / 09 02 03 ◆ 04 S1 ▸ S2 S3 S4 S5 05 06 07 01 08 A B C 09)
+    - KAPAK
+    - Kurumsal Enerji Tedariki
+    - Türkiye'nin endüstriyel enerji ortağı, Voltage.
+    - Voltan Elektrik A.Ş. çatısı altında, GÖP, GİP ve ikili anlaşmalar üzerinden yüksek tüketimli kurumsal ve endüstriyel müşterilere sözleşmeye dayalı elektrik tedariki sağlıyoruz.
+    - ETS/3424-8/2074 · EST. 2011 · İSTANBUL
+    - Teklif Talep Edin
+    - Gün Öncesi PTF — Canlı
+    - ₺/MWh
+    - Piyasa Deneyimi
+    - 15 yıl · Est. 2011
+    - Canlı Piyasa
+    - EPİAŞ piyasasını anlık okuyoruz.
+    - Şu Anki Saat · Gün Öncesi PTF
+    - Bugünün En Düşüğü
+    - Bugünün En Yükseği
+    - KAYNAK: EPİAŞ ŞEFFAFLIK PLATFORMU · SAATLİK PTF
+    - Çalıştığımız Tesis Sınıfları
+    - Üç Sözleşme Modeli
+    - EXHIBIT A
+    - Uçtan uca enerji çözüm portföyü.
+    - TEK HAT ŞEMASI — ŞEMATİK · ÖLÇEKSİZ
+    - Piyasa Zekâsı
+    - VOLTAGE FELSEFESİ · EST. 2011
+  EKLENEN: 52 (saat etiketleri vb.: 25)
+    + İçeriğe atla
+    + Canlı PTF
+    + Sanayi ve Ticarethaneler için Elektrik Tedariki
+    + Sanayinin enerjisini piyasayla buluşturuyoruz.
+    + Voltan Elektrik A.Ş. çatısı altında, GÖP, GİP ve ikili anlaşmalar üzerinden sanayi ve ticarethanelere sözleşmeye dayalı elektrik tedariki sağlıyoruz.
+    + Hizmetlerimizi İncele
+    + Güncel Piyasa Verisi
+    + PTF
+    + (₺/MWh)
+    + Saatlik veri bekleniyor
+    + Piyasa verilerini detaylı incele
+    + 2011'den bu yana
+    + EPDK lisanslı tedarikçi
+    + Piyasa katılımcısı
+    + GÖP ve GİP
+    + Türkiye'nin tamamı
+    + Sanayi ve ticarethane
+    + Hizmet Verdiğimiz Sektörler
+    + Tüm sektör rehberleri
+    + Güncel Elektrik Piyasası Verileri
+    + Gün öncesi piyasasında oluşan saatlik PTF değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.
+    + Saatlik PTF · ₺/MWh
+    + Saat
+    + Elektrik Tedarik Süreci
+    + Elektrik Tedarik Sözleşmesi Modelleri
+    + Voltage Enerji Hakkında
+    + Elektrik Piyasalarında Uzmanlık
+
+== 4. GÖRÜNÜR METİN (EN) — metin birimi düzeyinde ==
+  birim sayısı: önce 294 (farklı 233), sonra 329 (farklı 242) · kelime sayısı: önce 1344, sonra 1368
+  KALDIRILAN: 43 (süs ve numara işaretleri: · 01 / 09 02 03 ◆ 04 S1 ▸ S2 S3 S4 S5 05 06 07 01 08 A B C 09)
+    - KAPAK
+    - Corporate Energy Supply
+    - Türkiye's industrial energy partner, Voltage.
+    - Under Voltan Elektrik A.Ş., we provide contract-based electricity supply to high-consumption corporate and industrial customers via the Day-Ahead Market (DAM), Intra-Day Market (IDM), and bilateral agreements.
+    - ETS/3424-8/2074 · EST. 2011 · İSTANBUL
+    - Day-Ahead MCP — Live
+    - ₺/MWh
+    - Market Experience
+    - 15 yrs · Est. 2011
+    - Live Market
+    - We read the EPIAS market in real time.
+    - Current Hour · Day-Ahead MCP
+    - Today's Low
+    - Today's High
+    - SOURCE: EPIAS TRANSPARENCY PLATFORM · HOURLY MCP
+    - Facility Classes We Serve
+    - Three Contract Models
+    - EXHIBIT A
+    - End-to-end energy solutions portfolio.
+    - SINGLE-LINE DIAGRAM — SCHEMATIC · NOT TO SCALE
+    - Market Intelligence
+    - THE VOLTAGE PHILOSOPHY · EST. 2011
+  EKLENEN: 52 (saat etiketleri vb.: 25)
+    + Skip to content
+    + Live MCP
+    + Electricity Supply for Industry and Businesses
+    + We connect industry's energy with the market.
+    + Under Voltan Elektrik A.Ş., we provide contract-based electricity supply to industrial and commercial consumers via the Day-Ahead Market (DAM), Intra-Day Market (IDM), and bilateral agreements.
+    + Explore Our Services
+    + Current Market Data
+    + MCP
+    + (₺/MWh)
+    + Awaiting hourly data
+    + View detailed market data
+    + Since 2011
+    + EPDK-licensed supplier
+    + Market participant
+    + DAM and IDM
+    + All of Türkiye
+    + Industrial and commercial
+    + Sectors We Serve
+    + All sector guides
+    + Current Electricity Market Data
+    + Hourly day-ahead market clearing prices (MCP). Source: EPİAŞ Transparency Platform.
+    + Hourly MCP · ₺/MWh
+    + Hour
+    + Electricity Supply Process
+    + Electricity Supply Contract Models
+    + About Voltage Enerji
+    + Expertise in Electricity Markets
+
+== 5. data-tr / data-en ÇİFTLERİ ==
+  önce 164, sonra 170 · kaldırılan 14 · eklenen 20
+    - 15 yıl · Est. 2011 | 15 yrs · Est. 2011
+    - Bugünün En Düşüğü | Today's Low
+    - Bugünün En Yükseği | Today's High
+    - Gün Öncesi PTF — Canlı | Day-Ahead MCP — Live
+    - Hizmetlerimiz | Our Services
+    - KAYNAK: EPİAŞ ŞEFFAFLIK PLATFORMU · SAATLİK PTF | SOURCE: EPIAS TRANSPARENCY PLATFORM · HOURLY MCP
+    - Kurumsal Enerji Tedariki | Corporate Energy Supply
+    - Piyasa Deneyimi | Market Experience
+    - Piyasa Zekâsı | Market Intelligence
+    - TEK HAT ŞEMASI — ŞEMATİK · ÖLÇEKSİZ | SINGLE-LINE DIAGRAM — SCHEMATIC · NOT TO SCALE
+    - Teklif Talep Edin | Request a Proposal
+    - VOLTAGE FELSEFESİ · EST. 2011 | THE VOLTAGE PHILOSOPHY · EST. 2011
+    - Voltan Elektrik A.Ş. çatısı altında, GÖP, GİP ve ikili anlaşmalar üzerinden yüksek tüketimli kurumsal ve endüstriyel müşterilere sözleşmeye dayalı elektrik tedariki sağlıyoruz. | Under Voltan Elektrik A.Ş., we provide contract-based electricity supply to high-consumption corporate and industrial customers via the Day-Ahead Market (DAM), Intra-Day Market (IDM), and bilateral agreements.
+    - Şu Anki Saat · Gün Öncesi PTF | Current Hour · Day-Ahead MCP
+    + 2011'den bu yana | Since 2011
+    + Canlı PTF | Live MCP
+    + EPDK lisanslı tedarikçi | EPDK-licensed supplier
+    + Elektrik Piyasalarında Uzmanlık | Expertise in Electricity Markets
+    + GÖP ve GİP | DAM and IDM
+    + Güncel Piyasa Verisi | Current Market Data
+    + Hizmetlerimizi İncele | Explore Our Services
+    + PTF | MCP
+    + Piyasa katılımcısı | Market participant
+    + Piyasa verilerini detaylı incele | View detailed market data
+    + Saat | Hour
+    + Saatlik PTF · ₺/MWh | Hourly MCP · ₺/MWh
+    + Saatlik veri bekleniyor | Awaiting hourly data
+    + Sanayi ve Ticarethaneler için Elektrik Tedariki | Electricity Supply for Industry and Businesses
+    + Sanayi ve ticarethane | Industrial and commercial
+    + Sanayinin enerjisini piyasayla buluşturuyoruz. | We connect industry's energy with the market.
+    + Tüm sektör rehberleri | All sector guides
+    + Türkiye'nin tamamı | All of Türkiye
+    + Voltan Elektrik A.Ş. çatısı altında, GÖP, GİP ve ikili anlaşmalar üzerinden sanayi ve ticarethanelere sözleşmeye dayalı elektrik tedariki sağlıyoruz. | Under Voltan Elektrik A.Ş., we provide contract-based electricity supply to industrial and commercial consumers via the Day-Ahead Market (DAM), Intra-Day Market (IDM), and bilateral agreements.
+    + İçeriğe atla | Skip to content
+
+== 6. id DEĞERLERİ ==
+  önce 54, sonra 51
+  kaldırılan: ['flow', 'kpiMax', 'kpiMin', 'kpiNow', 'kpiStamp', 'lmFill', 'mcpRail', 'mcpTrack', 'rhNum', 'rhSec', 'tline']
+  eklenen   : ['heroArea', 'heroDot', 'heroLine', 'icerik', 'kapakBaslik', 'ptfBaslik', 'ptfKart', 'saatTablo']
+  gelen bağlantıların kullandığı çapalar duruyor: True  ['leadForm', 'teklif', 'iletisim', 'hakkimizda', 'yaklasim', 'hizmetler', 'kapak', 'canli-piyasa']
+  sayfadaki betiğin aradığı ama sayfada OLMAYAN id: ['kpiMax', 'kpiMin', 'kpiNow', 'kpiStamp']
+
+== 7. KİMLİK VE LİSANS BİLGİLERİ (kaynakta geçme sayısı: önce → sonra) ==
+  ETS/3424-8/2074                                         6 → 5
+  786882-0                                                3 → 3
+  Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.    3 → 3
+  info@voltage.com.tr                                     8 → 8
+  Acıbadem Mah. Elysium Elit                              3 → 3
+  34718 Kadıköy                                           5 → 5
+  19 Eylül 2011 · Kurul Kararı 3424-8                     2 → 2
+  YEK-G SERTİFİKALI SATICI                                2 → 2
+  İTO ÜYESİ                                               2 → 2
+  Emirhan Tan, Yönetim Kurulu Başkanı                     1 → 1
+
+== 8. BETİK ==
+  satır içi betik: önce 38484 bayt, sonra 36259 bayt
+  satır içi stil : önce 43652 bayt, sonra 37044 bayt
+  betik satır farkı: -89 +20
+  çıkarılan bloklar (sayfada öğesi kalmayanlar): SMIL temizliği, kaydırınca belirme (IntersectionObserver), saatlik ray, folyo, tek hat şeması
+  eklenen satırlar:
+    +    if (href === '#' || href === '#icerik') return; // atlama bağlantısı: odağı tarayıcı taşır
+    +  if (['#leadForm', '#teklif', '#iletisim', '#hakkimizda', '#yaklasim', '#hizmetler', '#canli-piyasa'].indexOf(h) < 0) return;
+    +  const hedef = document.getElementById(h === '#leadForm' || h === '#teklif' ? 'leadForm' : h.slice(1));
+    +    btn.setAttribute('aria-pressed', btn.dataset.lang === lang ? 'true' : 'false');
+    +// 2) Canlı veri denetleyicisi — kapak PTF kartı (değer, damga, gün grafiği) + cetvel + grafik + saatlik tablo.
+    +  const ptfKart = $('ptfKart'), heroLine = $('heroLine'), heroArea = $('heroArea'), heroDot = $('heroDot');
+    +  const saatHucre = document.querySelectorAll('#saatTablo tbody td');
+    +  /* Aynı çizim iki hedefe gider: bölümdeki büyük grafik ve kapak kartındaki gün grafiği */
+    +    drawOne(prices, lmLine, lmArea, lmDot, 800, 260, 24, 24);
+    +    drawOne(prices, heroLine, heroArea, heroDot, 360, 94, 10, 10);
+    +    if(ptfKart) ptfKart.classList.toggle('cizildi', !!(heroLine && heroLine.getAttribute('d')));
+    +  }
+    +  function drawOne(prices, lmLine, lmArea, lmDot, W, H, padTop, padBottom){
+    +    if(ptfKart) ptfKart.setAttribute('data-state', state.mode === 'live' ? 'live' : (state.mode === 'stale' ? 'cached' : 'waiting'));
+    +    /* Saatlik tablo: yalnız gerçek saatler yazılır; eksik saat ve veri yokken "—" kalır (0 yazılmaz) */
+    +    const simdiH = Math.min(23, istanbulHourHome());
+    +    for(let i = 0; i < saatHucre.length; i++){
+    +      saatHucre[i].textContent = (state.prices && Number.isFinite(state.prices[i])) ? fmt(state.prices[i]) : DASH;
+    +      saatHucre[i].parentNode.classList.toggle('simdi', state.mode === 'live' && i === simdiH);
+    +    }
+  çıkarılan satırlar içinde veri/önbellek/form mantığına dokunan: 0
+  form betiği (// 6) Teklif formu … init) bayt bayt aynı: True
+
+== 9. BETİKSİZ GÖRÜNÜM İÇİN EK METİN (<noscript>) ==
+  Grafik ve saatlik tablo bu sayfada tarayıcı betiğiyle dolar. Güncel saatlik değerler Canlı PTF sayfasında yer alır.

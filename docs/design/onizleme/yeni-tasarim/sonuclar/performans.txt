@@ -1,0 +1,49 @@
+LABORATUVAR ÖLÇÜMÜ — önceki hazırlık (f467ddc) ile revize sayfa
+Chromium (Playwright) + CDP; yerel statik sunucu, sıkıştırma YOK (üretimde Cloudflare sıkıştırır; gzip boyutu ayrıca verildi).
+Telefon: 375×667 @2x, işlemci 4× yavaş, ağ 1,6 Mbit/sn ↓ · 750 kbit/sn ↑ · 150 ms. Masaüstü: 1440×900, kısıtlama yok.
+Google Fonts istekleri iki sayfada da kapalı; PTF yanıtı yerel taklit. Her değer 5 ölçümün ortancası. Gerçek kullanıcı ölçümü değildir.
+
+TELEFON (375×667, 4× işlemci, yavaş 4G)
+  ölçü                               önceki        revize
+  LCP (ms)                          1376          440
+  LCP öğesi                         SPAN.kf-stamp P.hero-sub
+  LCP, beş ölçüm (ms)               1380/528/1364/1376/1380440/440/420/444/428
+  FCP (ms)                          464           408
+  CLS (ortanca)                     0.0000        0.0036
+  CLS (beş ölçümün en büyüğü)       0.0000        0.0036
+  DOMContentLoaded (ms)             1301          1220
+  load (ms)                         1303          1220
+  toplam aktarım, yerel (bayt)      227322        203365
+  DOM öğe sayısı                    1128          885
+  sayfa yüksekliği (px)             15572         14520
+  etkileşim: menü aç → kare (ms)    13.0          12.2
+  etkileşim: dil değiştir → kare (ms)81.4          68.3
+  etkileşim: tarife seç → kare (ms) 24.8          29.7
+
+MASAÜSTÜ (1440×900)
+  ölçü                               önceki        revize
+  LCP (ms)                          84.0          76.0
+  LCP öğesi                         IMG. kapak-2172.webpIMG. kapak-2172.webp
+  LCP, beş ölçüm (ms)               120/84/84/84/10476/76/68/80/76
+  FCP (ms)                          84.0          76.0
+  CLS (ortanca)                     0.0000        0.0000
+  CLS (beş ölçümün en büyüğü)       0.0000        0.0000
+  DOMContentLoaded (ms)             76.8          60.3
+  load (ms)                         77.0          60.4
+  toplam aktarım, yerel (bayt)      294043        270086
+  DOM öğe sayısı                    1128          885
+  sayfa yüksekliği (px)             10034         9615
+  etkileşim: dil değiştir → kare (ms)30.7          17.1
+  etkileşim: tarife seç → kare (ms) 26.5          7.4
+
+HTML
+  ölçü                               önceki        revize
+  HTML (bayt)                       176975        153018
+  HTML gzip -9 (bayt)               47550         42023
+  satır içi stil (bayt)             47282         36833
+  satır içi betik (bayt)            39296         36292
+
+Notlar
+  - Etkileşim süresi: olayın tetiklenmesinden sonraki ikinci animasyon karesine kadar; 60 Hz ekranda en az ~17–33 ms çıkar.
+  - Toplam aktarım yalnız yerel sunucudan gelenleri sayar (HTML + kapak görseli + logo); yazı tipleri dahil değildir.
+  - Telefon LCP değeri sıkıştırmasız HTML ile ölçüldü; üretimde HTML sıkıştırılmış gelir, değer bundan düşük olur. Ölçülmedi.
