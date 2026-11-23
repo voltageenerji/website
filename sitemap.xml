@@ -7,7 +7,7 @@
        yorum bazı katı ayrıştırıcılarda "processing error" tetikliyordu (GSC 2026-08). -->
   <url>
     <loc>https://voltage.com.tr/</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image><image:loc>https://voltage.com.tr/logo.png</image:loc></image:image>
@@ -76,7 +76,7 @@
   </url>
   <url>
     <loc>https://voltage.com.tr/rehber/15-dakikalik-uzlastirma</loc>
-    <lastmod>2026-11-13</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -94,7 +94,7 @@
   </url>
   <url>
     <loc>https://voltage.com.tr/rehber/kimya-elektrik</loc>
-    <lastmod>2026-11-13</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -126,7 +126,7 @@
   </url>
   <url>
     <loc>https://voltage.com.tr/sanayi-elektrik-tedariki</loc>
-    <lastmod>2026-11-13</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
