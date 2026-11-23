@@ -1,0 +1,19 @@
+name: gecici-canli
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-canli.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          B=https://0a64e3f5.website-dh5.pages.dev
+          for p in onizleme-yeni-tasarim/ onizleme-yeni-tasarim/img/kapak-800.webp onizleme-yeni-tasarim/img/kapak-1200.webp onizleme-yeni-tasarim/img/kapak-1600.webp onizleme-yeni-tasarim/img/kapak-2172.webp onizleme-yeni-tasarim/img/kapak-mobil-579.webp; do
+            echo "$p $(curl -sS -o /dev/null -w '%{http_code} %{content_type} %{size_download}' "$B/$p")"
+          done
+          curl -sS -D h.txt -o p.html "$B/onizleme-yeni-tasarim/"
+          echo "robots_header=$(grep -ci '^x-robots-tag: *noindex' h.txt || true) robots_meta=$(grep -c 'noindex, nofollow' p.html || true) h1=$(grep -c 'kapakBaslik' p.html || true)"
+          curl -sS -D c.txt -o /dev/null -H "Origin: $B" "https://epias-proxy.emirhantan-ku.workers.dev/ptf/today"
+          echo "proxy_status=$(head -1 c.txt | tr -d '\r') cors=$(grep -i '^access-control-allow-origin' c.txt | tr -d '\r' | cut -c1-90)"
