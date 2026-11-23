@@ -2,49 +2,75 @@
 
 **Durum:** yayında değil. `index.html` bu klasörde bekler; yayın 10 Aralık SEO ölçümünden sonra, sahibin tam sayfa onayı ve QA (yeni cümleler için Hukuk) kararıyla yapılır. `/docs/*` sitede sunulmaz.
 
+Bu sürüm 23.11 revizyon talimatının sonucudur: sade kurumsal dil, daha açık kapak fotoğrafı, tekrarsız piyasa verisi, telefon için ayrı kapak düzeni.
+
 ## Dosyalar
 
-- `index.html` — ana sayfanın tamamı, tek dosya (stil ve betik satır içi). Kök `/index.html` yerine konduğunda düzenleme istemez.
-- `img/kapak-800.webp`, `kapak-1200.webp`, `kapak-1600.webp`, `kapak-2172.webp` (3:1) ve `kapak-mobil-579.webp` (4:5, 700 px ve altı) — kapak fotoğrafı.
+- `index.html` — ana sayfanın tamamı, tek dosya (stil ve betik satır içi).
+- `img/kapak-800.webp`, `kapak-1200.webp`, `kapak-1600.webp`, `kapak-2172.webp` (3:1) ve `kapak-mobil-579.webp` (4:5, 700 px ve altı).
 
 ## Canlı sayfadan aynen alınanlar
 
-Baş bölümü (yazı tipi bağlantısına kadar bayt bayt aynı), teklif formu (bayt bayt aynı), betikler (aşağıdaki dört ek dışında aynı), bölüm metinlerinin tamamı (TR/EN).
+- Baş bölümü: yazı tipi bağlantısına kadar bayt bayt aynı (title, description, canonical, robots, OG, Twitter, JSON-LD).
+- Teklif formu: `<form>…</form>` bayt bayt aynı. Form betiği de bayt bayt aynı.
+- Bölüm metinleri, beş hizmet, yedi sektör ve rehber bağlantıları, lisans bilgileri, dört rozet, Hakkında metni ve imza, üç ilke, şirket sözü, iletişim bilgileri, alt bilgi.
+- Canlı veri mantığı: proxy çağrıları (`/ptf/today`, `/ptf/stats`), önbellek anahtarı (`voltage-ptf-cache`), dürüstlük merdiveni.
 
-Betikteki ekler: (1) atlama bağlantısı yumuşak kaydırma işleyicisinin dışında, (2) dil düğmelerinde `aria-pressed`, (3) canlı veri denetleyicisi kapak kartını da besler (`ptfKart`, `heroLine`, `heroArea`, `heroDot`; çizim `drawOne` ile iki grafiğe gider), (4) kartın `data-state` değeri. Veri mantığı, önbellek anahtarı (`voltage-ptf-cache`) ve dürüstlük merdiveni değişmedi.
+## Betikte yapılanlar
+
+Çıkarılanlar (sayfada öğesi kalmadı): SMIL temizliği, kaydırınca belirme, saatlik ray, folyo, tek hat şeması.
+
+Eklenenler:
+1. Atlama bağlantısı yumuşak kaydırma işleyicisinin dışında.
+2. Dil düğmelerinde `aria-pressed`.
+3. Bağlantıyla gelişte yeniden hizalama `#hakkimizda`, `#yaklasim`, `#hizmetler` ve `#canli-piyasa` için de çalışır (bölüm boşlukları daraldığı için geç yüklenen yazı tipi başlığı sabit bandın altına itebiliyordu).
+4. Canlı veri denetleyicisi kapak kartını (`ptfKart`, `heroLine`, `heroArea`, `heroDot`) ve saatlik tabloyu (`#saatTablo`) da doldurur. Tabloda eksik saat "—" kalır.
+
+Betik `kpiNow`, `kpiMin`, `kpiMax`, `kpiStamp` öğelerini hâlâ arar; bulamayınca atlar (korumalı). Veri mantığına dokunmamak için bu satırlar bırakıldı.
 
 ## Canlı sayfadan farklar
 
-- Kapak: yeni üst başlık, H1, alt metin ve düğmeler (sahip onayı 23.11). Eski kapak şeridi (lisans no, "Piyasa Deneyimi", künye satırı) yerine PTF kartı ve güven şeridi.
-- Bölüm sırası: Kapak, Hizmetler, Tesis Sınıfları, Canlı Piyasa, Süreç, Modeller, lisans kartı, Hakkımızda, Yaklaşım, alıntı, İletişim. Folyo numaraları buna göre.
-- Hizmetler tek bölümdür (beş hizmet); önizlemedeki üçlü satır ayrıca yoktur. Açıklamalar telefonda da görünür.
-- Tesis sınıfları: önizlemedeki koyu karolar, canlı sayfadaki başlık, yedi ad ve açıklamayla. Sekizinci karo "Tüm sektör rehberleri".
-- Saatlik PTF rayı kapaktan Canlı Piyasa bölümünün üst kenarına taşındı (1040 px ve üstü, veri yoksa gizli).
-- Menüye "Canlı PTF" eklendi. Menü 1039 px ve altında açılır panele döner.
-- Modeller tablosu gerçek `<table>`; 759 px ve altında satır satır karta döner.
-- Form masaüstünde iletişim bilgilerinin yanında; `#teklif` çapası formun hemen üstünde. Form belirme animasyonu beklemez.
-- Büyük grafiğin saat etiketleri HTML satırıdır (SVG yazısı dar ekranda eziliyordu).
-- `<main id="icerik">`, atlama bağlantısı, tek H1, lisans kartı başlığı H2.
+- **Kapak:** H1 iki parçadır: üst satır (`.h1-ust`, arama niyeti) ve slogan (`.h1-ana`). Ayrı üst başlık öğesi yoktur. PTF kartı düz, opak paneldir. Koyu örtü yalnız metnin arkasındadır; durak yerleri metin sütununun kenarından hesaplanır.
+- **Marka yazısı:** işaret aynı; "Voltage Enerji" yazısı üst bantta ve altta Archivo, büyük harf.
+- **Kaldırılan süsler:** bölüm numaraları, folyo, hizmet numaraları, tek hat şeması, halkalar, "EXHIBIT A", "S1–S5", "A/B/C", "VOLTAGE FELSEFESİ · EST. 2011", işlevsiz oklar, kart gölgeleri, belirme animasyonları.
+- **Yazı tipi kullanımı:** serif yalnız kapak sloganı, Hakkında cümlesi, imza ve şirket sözünde. Monospace yalnız piyasa verisi, saat damgası, lisans ve sicil numarasında.
+- **Bölüm sırası:** Kapak, bilgi satırı, Hizmetler, Sektörler, Piyasa Verileri, Süreç, Modeller, EPDK Lisansı, Hakkında, Neden Voltage, şirket sözü, İletişim.
+- **Piyasa verisi:** kapak kartı yalnız o saatin değerini gösterir. Bölümde 24 saatlik grafik, günün özeti ve 24 satırlık saatlik tablo vardır. Üç rakamlı bant ve kayan ray kaldırıldı. Betik kapalıyken bölüm bir cümle ve `/canli-ptf` bağlantısı gösterir.
+- **Süreç:** gerçek `<ol>`; numaralar liste sırasıdır.
+- **Lisans:** tanım listesi; rozetler düz metin satırı.
+- **Telefon:** üst bantta "Teklif Al" ve menü düğmesi; dil seçimi menü panelinde. Kapak sırası: H1, alt metin, Teklif Al, ikinci düğme, küçük PTF kartı (grafiksiz). Alt boşluk yok.
+- **Menü:** "Canlı PTF" eklendi. 1039 px ve altında panel.
+- **Form:** masaüstünde iletişim bilgilerinin yanında; `#teklif` çapası formun hemen üstünde.
 
-## Kapak fotoğrafı
+## Değişen ve kaldırılan metinler (canlıya göre)
 
-`<picture class="hero-photo">` içinde; yollar göreli (`img/…`). Yüklenemezse `<img onerror>` `.hero-media` öğesine `yedek` sınıfını ekler ve çizim silüet görünür. `sizes` değeri kapağın gerçek çizim genişliğine göredir (masaüstünde kapak yüksekliği × 3 ≈ 2100 px); `100vw` yazılırsa 1440 px ekranda 1600'lük dosya seçilir ve fotoğraf yumuşar.
+Başlıklar (talimatla):
 
-## Yayın adımları
+| Canlı | Hazırlık |
+|---|---|
+| Türkiye'nin endüstriyel enerji ortağı, Voltage. | Sanayi ve Ticarethaneler için Elektrik Tedariki + Sanayinin enerjisini piyasayla buluşturuyoruz. |
+| Uçtan uca enerji çözüm portföyü. | Hizmetlerimiz |
+| Çalıştığımız Tesis Sınıfları | Hizmet Verdiğimiz Sektörler |
+| Canlı Piyasa | Güncel Elektrik Piyasası Verileri |
+| EPİAŞ piyasasını anlık okuyoruz. | Gün öncesi piyasasında oluşan saatlik PTF değerleri. Kaynak: EPİAŞ Şeffaflık Platformu. |
+| Teklif'ten ilk faturaya, beş adım. (H2) | Elektrik Tedarik Süreci (H2); eski cümle alt satır olarak duruyor |
+| Üç Sözleşme Modeli | Elektrik Tedarik Sözleşmesi Modelleri |
+| Bir firma kadar köklü, bir ortak kadar yakın. (H2) | Voltage Enerji Hakkında (H2); eski cümle alt satır olarak duruyor |
+| Piyasa Zekâsı | Elektrik Piyasalarında Uzmanlık |
 
-1. Sahibin tam sayfa onayı; QA kararı; yeni cümleler için Hukuk ve Uyum (aşağıdaki liste).
-2. Canlı `index.html` o güne kadar değiştiyse metin eşitliği yeniden denetlenir ve fark buraya işlenir.
-3. Beş `.webp` dosyası kökteki `/img/` klasörüne kopyalanır; sayfadaki altı `img/kapak-…` yolu `/img/kapak-…` yapılır.
-4. Bu `index.html` kök `index.html` yerine konur (kanca sahip onayı sorar).
-5. `_headers`: `/img/*` için önbellek kuralı (ör. `/og/*` ile aynı). CSP `img-src 'self'` yeterlidir.
-6. `sitemap.xml` ana sayfa `<lastmod>`; `.claude/rules/homepage.md` içindeki kanonik tasarım tarihi; `docs/OPERASYON-DEFTERI.md` ve `CHANGELOG.md` kaydı.
-7. Yayından sonra: kapak kartı ve Canlı Piyasa (yalnız "—" ise önce proxy), `/?kaynak=deneme#leadForm` ile bir deneme talebi, 375 ve 1280 px görünüm.
+Eski kapak metinleri (kaldırıldı): Kurumsal Enerji Tedariki; kapak paragrafının eski hâli; ETS/3424-8/2074 · EST. 2011 · İSTANBUL; Teklif Talep Edin; Hizmetlerimiz (düğme); Gün Öncesi PTF — Canlı; Piyasa Deneyimi; 15 yıl · Est. 2011.
+
+Etiketler (kaldırıldı): KAPAK · 01 / 09 ve bölüm numaraları; S1–S5; A, B, C; EXHIBIT A; TEK HAT ŞEMASI — ŞEMATİK · ÖLÇEKSİZ; VOLTAGE FELSEFESİ · EST. 2011; ◆ ve ▸ işaretleri.
+
+Tekrarı önlemek için kaldırılan piyasa etiketleri: Şu Anki Saat · Gün Öncesi PTF; Bugünün En Düşüğü; Bugünün En Yükseği; KAYNAK: EPİAŞ ŞEFFAFLIK PLATFORMU · SAATLİK PTF. En düşük ve en yüksek saat özet listesinde, kaynak giriş cümlesinde duruyor.
+
+Bağlantılar: kaldırılan hedef yok. Rayın `/canli-ptf` bağlantısı yerine aynı hedefe iki metin bağlantısı var.
 
 ## Hukuk ve İngilizce denetimi bekleyen yeni metinler
 
 | TR | EN |
 |---|---|
-| Elektrik Tedariki ve Enerji Ticareti | Electricity Supply and Energy Trading |
+| Sanayi ve Ticarethaneler için Elektrik Tedariki | Electricity Supply for Industry and Businesses |
 | Sanayinin enerjisini piyasayla buluşturuyoruz. | We connect industry's energy with the market. |
 | … sanayi ve ticarethanelere sözleşmeye dayalı elektrik tedariki sağlıyoruz. | … to industrial and commercial consumers … |
 | Teklif Al / Hizmetlerimizi İncele | Get a Quote / Explore Our Services |
@@ -54,13 +80,38 @@ Betikteki ekler: (1) atlama bağlantısı yumuşak kaydırma işleyicisinin dı�
 | 2011'den bu yana · EPDK lisanslı tedarikçi | Since 2011 · EPDK-licensed supplier |
 | Piyasa katılımcısı · GÖP ve GİP | Market participant · DAM and IDM |
 | Türkiye'nin tamamı · Sanayi ve ticarethane | All of Türkiye · Industrial and commercial |
-| Canlı PTF (menü) | Live MCP |
+| Hizmetlerimiz | Our Services |
+| Hizmet Verdiğimiz Sektörler | Sectors We Serve |
 | Tüm sektör rehberleri | All sector guides |
+| Güncel Elektrik Piyasası Verileri | Current Electricity Market Data |
+| Gün öncesi piyasasında oluşan saatlik PTF değerleri. Kaynak: EPİAŞ Şeffaflık Platformu. | Hourly day-ahead market clearing prices (MCP). Source: EPİAŞ Transparency Platform. |
+| Saatlik PTF · ₺/MWh · Saat · PTF | Hourly MCP · ₺/MWh · Hour · MCP |
+| Elektrik Tedarik Süreci | Electricity Supply Process |
+| Elektrik Tedarik Sözleşmesi Modelleri | Electricity Supply Contract Models |
+| Voltage Enerji Hakkında | About Voltage Enerji |
+| Elektrik Piyasalarında Uzmanlık | Expertise in Electricity Markets |
+| Canlı PTF (menü) | Live MCP |
 | İçeriğe atla | Skip to content |
+| Betik kapalıyken: "Grafik ve saatlik tablo bu sayfada tarayıcı betiğiyle dolar. Güncel saatlik değerler Canlı PTF sayfasında yer alır." | yalnız Türkçe (dil değişimi betik ister) |
 
-## Bilinen eksikler
+## Kapak fotoğrafı
 
-- Dosya 177 KB (canlı 167 KB; gzip 47 KB / 43 KB). 77 KB'ı aynen alınan baş bölümü, form (yaprak çizimi dahil) ve betiktir.
-- Temiz adresler ve `_redirects` yalnız `wrangler pages dev` ile denenebilir; denetimler `python3 -m http.server` ile yapıldı.
-- Lighthouse ölçümü yapılmadı.
-- Gerçek telefonda (iOS Safari) denenmedi; denetimler Chromium iledir.
+`<picture class="hero-photo">` içinde; yollar göreli (`img/…`). Yüklenemezse `<img onerror>` `.hero-media` öğesine `yedek` sınıfını ekler ve çizim silüet görünür. `sizes` değeri kapağın gerçek çizim genişliğine göredir (kapak yüksekliği × 3 ≈ 2100 px); `100vw` yazılırsa 1440 px ekranda 1600'lük dosya seçilir ve fotoğraf yumuşar.
+
+## Yayın adımları
+
+1. Sahibin tam sayfa onayı; QA kararı; yukarıdaki yeni metinler için Hukuk ve Uyum.
+2. Canlı `index.html` o güne kadar değiştiyse önce/sonra karşılaştırması yeniden çalıştırılır ve fark buraya işlenir.
+3. Beş `.webp` dosyası kökteki `/img/` klasörüne kopyalanır; sayfadaki altı `img/kapak-…` yolu `/img/kapak-…` yapılır.
+4. Bu `index.html` kök `index.html` yerine konur (kanca sahip onayı sorar).
+5. `_headers`: `/img/*` için önbellek kuralı (ör. `/og/*` ile aynı). CSP `img-src 'self'` yeterlidir.
+6. `sitemap.xml` ana sayfa `<lastmod>`; `.claude/rules/homepage.md` içindeki kanonik tasarım tarihi; `docs/OPERASYON-DEFTERI.md` ve `CHANGELOG.md` kaydı.
+7. Yayından sonra: kapak kartı, saatlik tablo (yalnız "—" ise önce proxy), `/?kaynak=deneme#leadForm` ile bir deneme talebi, 375 ve 1280 px görünüm, Search Console'da H1 ve başlık değişikliğinin izlenmesi.
+
+## Doğrulanamayanlar
+
+- Temiz adresler ve `_redirects` (`wrangler pages dev` bu ortamda yok); denetimler `python3 -m http.server` ile yapıldı.
+- Lighthouse puanı. Ölçümler Chromium + CDP ile laboratuvarda alındı; gerçek kullanıcı verisi değildir.
+- iOS Safari ve Firefox. Denetimlerin tamamı Chromium iledir.
+- Telefon kapak görseli 579×724 pikseldir; 3× ekranda yaklaşık 3 kat büyütülür ve yumuşak görünür. Daha yüksek çözünürlüklü dikey kırpım gerekir.
+- Sıkıştırılmış (Brotli) HTML ile LCP; yerel sunucu sıkıştırmaz.
