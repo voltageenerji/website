@@ -199,7 +199,7 @@ a:hover > .arrow{transform:translateX(3px)}
 .lang-btn{min-width:34px;min-height:34px;padding:6px;color:var(--on-dark-muted);transition:color .2s}
 .lang-btn.active{color:var(--white);font-weight:600;text-decoration:underline;text-decoration-color:var(--cta);text-decoration-thickness:2px;text-underline-offset:5px}
 .lang-btn:hover{color:var(--white)}
-.lang-sep{color:rgba(255,255,255,.4)}
+.lang-sep{color:rgba(255,255,255,.62)}
 
 .mobile-menu-btn{display:none}
 .mobile-menu{display:none}
@@ -291,7 +291,8 @@ h1.cover-title{margin-top:26px;font-family:var(--serif);font-weight:500;font-siz
 .sec-title2 em,.lead em{font-style:italic;color:var(--em)}
 .lead{font-family:var(--serif);font-size:clamp(18px,1.7vw,21px);line-height:1.5;max-width:720px;margin-bottom:clamp(32px,4vw,52px);text-wrap:pretty}
 .on-dark .lead{color:var(--on-dark)}
-.art-rings{position:absolute;z-index:-1;width:620px;height:620px;opacity:.45;pointer-events:none}
+/* koyu bantlardaki halka süsü: yalnız CSS */
+.sectors::before,.exhibit::before,.quotec::before{content:'';position:absolute;z-index:-1;width:620px;height:620px;border-radius:50%;pointer-events:none;background:repeating-radial-gradient(circle,transparent 0 35px,rgba(154,166,204,.2) 35px 36px);-webkit-mask-image:radial-gradient(circle,#000 10%,transparent 70%);mask-image:radial-gradient(circle,#000 10%,transparent 70%)}
 
 /* ============ HİZMETLER ============ */
 .services-header{display:grid;grid-template-columns:1.15fr 1fr;gap:20px clamp(32px,5vw,80px);align-items:start;margin-bottom:clamp(36px,4vw,56px)}
@@ -318,7 +319,7 @@ h1.cover-title{margin-top:26px;font-family:var(--serif);font-weight:500;font-siz
 .service-item:not(:has(a)) .service-arrow{visibility:hidden}
 
 /* ============ TESİS SINIFLARI ============ */
-.sectors .art-rings{left:-140px;top:50%;transform:translateY(-50%)}
+.sectors::before{left:-140px;top:50%;transform:translateY(-50%)}
 .sectors-head{display:grid;grid-template-columns:1fr 1fr;gap:16px clamp(32px,5vw,80px);align-items:end;margin-bottom:clamp(32px,4vw,48px)}
 .sectors-head .sec-no-head,.sectors-head .lead{margin-bottom:0}
 .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
@@ -354,6 +355,7 @@ h1.cover-title{margin-top:26px;font-family:var(--serif);font-weight:500;font-siz
 .kpi-stamp{color:var(--green-bright)}
 .kpi-stamp.stale{color:var(--cta)}
 .kpi-stamp.waiting{color:var(--on-dark-muted)}
+.kpi-band:has(.kpi-stamp.waiting) .kpi-num{font-weight:400;color:rgba(255,255,255,.62)}
 .lm-grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;margin-top:20px;align-items:stretch}
 .lm-chartbox,.lm-ledger{min-width:0;padding:24px 26px;background:var(--white);border:1px solid var(--line);border-radius:10px}
 .lm-chart-head2{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px 16px;margin-bottom:16px}
@@ -361,7 +363,9 @@ h1.cover-title{margin-top:26px;font-family:var(--serif);font-weight:500;font-siz
 .lm-mode{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--green)}
 .lm-mode.stale{color:var(--accent-text)}
 .lm-mode.waiting{color:var(--ink-muted)}
-.lm-chart-svg{width:100%;height:260px}
+.lm-chart-svg{width:100%;height:260px;overflow:visible}
+.lm-chart-svg text{display:none}
+.lm-ticks{margin-top:-16px;color:var(--ink-muted)}
 #lmLine{stroke:var(--night);vector-effect:non-scaling-stroke}
 #lmDot{fill:var(--cta);stroke:var(--night);stroke-width:1.5}
 #lmFill stop{stop-color:var(--cta)}
@@ -394,7 +398,7 @@ h1.cover-title{margin-top:26px;font-family:var(--serif);font-weight:500;font-siz
 .ft-note{font-size:14px;color:var(--ink-muted);margin-top:16px;max-width:760px}
 
 /* ============ EXHIBIT A — lisans ============ */
-.exhibit .art-rings{right:-160px;top:50%;transform:translateY(-50%)}
+.exhibit::before{right:-160px;top:50%;transform:translateY(-50%)}
 .exhibit-wrap{max-width:calc(840px + 2 * var(--pad))}
 .exhibit-card{background:var(--paper);color:var(--ink);border-radius:10px;padding:10px;box-shadow:0 30px 70px -30px rgba(2,5,14,.9)}
 .exhibit-card-in{border:1px solid var(--line-strong);border-radius:6px;padding:40px 44px 34px}
@@ -437,7 +441,7 @@ h1.cover-title{margin-top:26px;font-family:var(--serif);font-weight:500;font-siz
 /* ============ ALINTI BANDI ============ */
 .quotec{padding-block:clamp(56px,6.5vw,96px)}
 .quotec .container{max-width:calc(980px + 2 * var(--pad))}
-.quotec .art-rings{left:50%;top:50%;transform:translate(-50%,-50%);opacity:.3}
+.quotec::before{left:50%;top:50%;transform:translate(-50%,-50%);opacity:.6}
 .callout{display:flex;gap:18px;align-items:baseline}
 .callout-d{color:var(--cta);font-size:14px;flex:none}
 .callout-t{font-family:var(--serif);font-style:italic;font-size:clamp(21px,2.5vw,30px);line-height:1.42;text-wrap:pretty}
@@ -572,6 +576,8 @@ p.form-hint{margin:-8px 0 20px}
 /* ============ BELİRME ============ */
 @media (scripting:enabled){.reveal{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}}
 .reveal.in{opacity:1;transform:none}
+/* Teklif formu belirme beklemez: bağlantıyla gelen ziyaretçi formu hemen görür */
+.form.reveal{opacity:1;transform:none;transition:background-color .9s var(--ease),border-color .9s var(--ease)}
 
 /* ============ DUYARLI ============ */
 @media (min-width:1200px){.nav-folio{display:flex}}
@@ -633,7 +639,7 @@ h1.cover-title{font-size:clamp(36px,6.2vw,56px)}
 /* Modeller: tablo satır satır karta döner; her değerin başında model adı durur */
 .fin-table{background:none;border:0;border-radius:0;overflow:visible}
 .fin-table table,.fin-table tbody,.fin-table tr,.fin-table th,.fin-table td{display:block}
-.fin-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.fin-table thead{display:none}
 .fin-table tbody tr{margin-bottom:14px;background:var(--white);border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
 .fin-table tbody th{padding:13px 18px;background:var(--night);color:var(--white);border:0}
 .fin-table tbody td{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:13px 18px;border-left:0 !important;border-bottom:1px solid var(--line) !important;font-size:15.5px}
@@ -671,7 +677,7 @@ h1.cover-title{margin-top:20px}
 .trust-t{font-size:15.5px}
 .trust-s{font-size:13.5px}
 .trust-s.mono{font-size:12.5px}
-.art-rings{opacity:.24}
+.sectors::before,.exhibit::before,.quotec::before{opacity:.5}
 .tiles{grid-template-columns:1fr;gap:10px}
 .tile{display:grid;grid-template-columns:30px 1fr;gap:2px 14px;padding:16px}
 .tile .ico{width:28px;height:28px;margin:2px 0 0;grid-row:span 2}
@@ -762,7 +768,7 @@ h1.cover-title{margin-top:20px}
       <path d="M0 520C90 500 150 462 230 470c80 8 120-40 200-32 90 8 130 54 220 42 90-12 140-60 230-48 80 10 130 54 210 44 90-12 140-58 220-46 60 8 100 32 130 40V700H0Z" fill="#343C74"/>
       <path d="M0 572c120-24 220-12 330-32 120-22 210 26 330 12 130-16 220 22 340 6 130-18 250 14 440-12V700H0Z" fill="#1E2650"/>
       <path d="M0 628h1440v72H0zM60 600h130v30H60zM300 604h170v26H300zM586 630v-84c0-9 15-14 35-14s35 5 35 14v84zM666 630v-94c0-9 15-14 35-14s35 5 35 14v94zM748 450h130v180H748zM836 450l4-128h18l4 128zM892 630l8-444h24l8 444zM958 450h208v180H958zM1166 486l274-90v26l-274 90zM1238 540h202v90h-202z" fill="#0B1126"/>
-      <g fill="#FFCB78"><circle cx="621" cy="528" r="3"/><circle cx="701" cy="518" r="3"/><circle cx="770" cy="474" r="3"/><circle cx="812" cy="474" r="3"/><circle cx="854" cy="474" r="3"/><circle cx="790" cy="524" r="3"/><circle cx="834" cy="524" r="3"/><circle cx="770" cy="574" r="3"/><circle cx="854" cy="574" r="3"/><circle cx="912" cy="458" r="3"/><circle cx="912" cy="548" r="3"/><circle cx="984" cy="474" r="3"/><circle cx="1036" cy="474" r="3"/><circle cx="1088" cy="474" r="3"/><circle cx="1140" cy="474" r="3"/><circle cx="1010" cy="524" r="3"/><circle cx="1114" cy="524" r="3"/><circle cx="984" cy="574" r="3"/><circle cx="1062" cy="574" r="3"/><circle cx="1140" cy="574" r="3"/><circle cx="1250" cy="462" r="3"/><circle cx="1340" cy="432" r="3"/><circle cx="1264" cy="562" r="3"/><circle cx="1342" cy="562" r="3"/><circle cx="1420" cy="562" r="3"/><circle cx="96" cy="596" r="3"/><circle cx="322" cy="600" r="3"/><circle cx="446" cy="600" r="3"/></g>
+      <g fill="#FFCB78"><circle cx="621" cy="528" r="3"/><circle cx="701" cy="518" r="3"/><circle cx="770" cy="474" r="3"/><circle cx="854" cy="474" r="3"/><circle cx="812" cy="524" r="3"/><circle cx="770" cy="574" r="3"/><circle cx="854" cy="574" r="3"/><circle cx="912" cy="458" r="3"/><circle cx="984" cy="474" r="3"/><circle cx="1088" cy="474" r="3"/><circle cx="1036" cy="524" r="3"/><circle cx="1140" cy="574" r="3"/><circle cx="1264" cy="562" r="3"/><circle cx="1420" cy="562" r="3"/></g>
       <g fill="#FF6A5A"><circle cx="901" cy="184" r="3"/><circle cx="923" cy="184" r="3"/><circle cx="890" cy="368" r="3"/><circle cx="934" cy="368" r="3"/><circle cx="849" cy="320" r="3"/></g>
     </svg>
     <picture class="hero-photo">
@@ -926,7 +932,6 @@ h1.cover-title{margin-top:20px}
 
 <!-- TESİS SINIFLARI -->
 <section class="sectors sec sec-dark on-dark" data-folio="03" data-folio-tr="TESİS SINIFLARI" data-folio-en="FACILITY CLASSES">
-  <svg class="art-rings" viewBox="0 0 620 620" fill="none" aria-hidden="true"><g stroke="#9AA6CC" stroke-width="1"><circle cx="310" cy="310" r="60" opacity="0.5"/><circle cx="310" cy="310" r="96" opacity="0.42"/><circle cx="310" cy="310" r="132" opacity="0.34"/><circle cx="310" cy="310" r="168" opacity="0.27"/><circle cx="310" cy="310" r="204" opacity="0.2"/><circle cx="310" cy="310" r="240" opacity="0.14"/><circle cx="310" cy="310" r="276" opacity="0.09"/><circle cx="310" cy="310" r="308" opacity="0.05"/></g></svg>
   <div class="container">
     <div class="sectors-head">
       <div class="sec-no-head">
@@ -1030,6 +1035,7 @@ h1.cover-title{margin-top:20px}
             <text x="4" y="252">00:00</text><text x="196" y="252">06:00</text><text x="396" y="252">12:00</text><text x="596" y="252">18:00</text><text x="768" y="252">24:00</text>
           </g>
         </svg>
+        <div class="ptf-ticks lm-ticks" aria-hidden="true"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
       </div>
       <div class="lm-ledger reveal">
         <div class="lm-ledger-title" data-tr="Bugünün Cetveli" data-en="Today's Ledger">Bugünün Cetveli</div>
@@ -1083,21 +1089,21 @@ h1.cover-title{margin-top:20px}
         <tbody>
           <tr>
             <th scope="row" data-tr="Fiyat nasıl belirlenir" data-en="How the price is set">Fiyat nasıl belirlenir</th>
-            <td><span class="ft-m" aria-hidden="true" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Dönem boyu sabit birim fiyat" data-en="Fixed unit price for the term">Dönem boyu sabit birim fiyat</span></td>
-            <td><span class="ft-m" aria-hidden="true" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="PTF'ye endeksli formül" data-en="Formula indexed to the MCP">PTF'ye endeksli formül</span></td>
-            <td><span class="ft-m" aria-hidden="true" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Sabit taban + endeksli dilim" data-en="Fixed base + indexed tranche">Sabit taban + endeksli dilim</span></td>
+            <td><span class="ft-m" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Dönem boyu sabit birim fiyat" data-en="Fixed unit price for the term">Dönem boyu sabit birim fiyat</span></td>
+            <td><span class="ft-m" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="PTF'ye endeksli formül" data-en="Formula indexed to the MCP">PTF'ye endeksli formül</span></td>
+            <td><span class="ft-m" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Sabit taban + endeksli dilim" data-en="Fixed base + indexed tranche">Sabit taban + endeksli dilim</span></td>
           </tr>
           <tr>
             <th scope="row" data-tr="Piyasa riski kimde" data-en="Who carries market risk">Piyasa riski kimde</th>
-            <td><span class="ft-m" aria-hidden="true" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Voltage'da" data-en="With Voltage">Voltage'da</span></td>
-            <td><span class="ft-m" aria-hidden="true" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="Tüketicide; istenirse sabitlenir" data-en="Consumer; fixable on request">Tüketicide; istenirse sabitlenir</span></td>
-            <td><span class="ft-m" aria-hidden="true" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Dilim bazında paylaşımlı" data-en="Shared per tranche">Dilim bazında paylaşımlı</span></td>
+            <td><span class="ft-m" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Voltage'da" data-en="With Voltage">Voltage'da</span></td>
+            <td><span class="ft-m" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="Tüketicide; istenirse sabitlenir" data-en="Consumer; fixable on request">Tüketicide; istenirse sabitlenir</span></td>
+            <td><span class="ft-m" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Dilim bazında paylaşımlı" data-en="Shared per tranche">Dilim bazında paylaşımlı</span></td>
           </tr>
           <tr>
             <th scope="row" data-tr="Kime uygun" data-en="Who it suits">Kime uygun</th>
-            <td><span class="ft-m" aria-hidden="true" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Bütçe kesinliği isteyene" data-en="Those who want budget certainty">Bütçe kesinliği isteyene</span></td>
-            <td><span class="ft-m" aria-hidden="true" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="Piyasayı izleyebilene" data-en="Those who can track the market">Piyasayı izleyebilene</span></td>
-            <td><span class="ft-m" aria-hidden="true" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Dengeli profil arayana" data-en="Those seeking a balanced profile">Dengeli profil arayana</span></td>
+            <td><span class="ft-m" data-tr="SABİT" data-en="FIXED">SABİT</span><span data-tr="Bütçe kesinliği isteyene" data-en="Those who want budget certainty">Bütçe kesinliği isteyene</span></td>
+            <td><span class="ft-m" data-tr="ENDEKSLİ" data-en="INDEXED">ENDEKSLİ</span><span data-tr="Piyasayı izleyebilene" data-en="Those who can track the market">Piyasayı izleyebilene</span></td>
+            <td><span class="ft-m" data-tr="HİBRİT" data-en="HYBRID">HİBRİT</span><span data-tr="Dengeli profil arayana" data-en="Those seeking a balanced profile">Dengeli profil arayana</span></td>
           </tr>
         </tbody>
       </table>
@@ -1108,7 +1114,6 @@ h1.cover-title{margin-top:20px}
 
 <!-- EXHIBIT A — EPDK lisansı -->
 <section class="exhibit sec sec-dark on-dark">
-  <svg class="art-rings" viewBox="0 0 620 620" fill="none" aria-hidden="true"><g stroke="#9AA6CC" stroke-width="1"><circle cx="310" cy="310" r="96" opacity="0.42"/><circle cx="310" cy="310" r="168" opacity="0.27"/><circle cx="310" cy="310" r="240" opacity="0.14"/><circle cx="310" cy="310" r="308" opacity="0.06"/></g></svg>
   <div class="container exhibit-wrap reveal">
     <div class="exhibit-card"><div class="exhibit-card-in">
       <div class="exhibit-tag">EXHIBIT A</div>
@@ -1214,7 +1219,6 @@ h1.cover-title{margin-top:20px}
 
 <!-- ALINTI BANDI -->
 <section class="quotec sec-dark on-dark">
-  <svg class="art-rings" viewBox="0 0 620 620" fill="none" aria-hidden="true"><g stroke="#9AA6CC" stroke-width="1"><circle cx="310" cy="310" r="132" opacity="0.34"/><circle cx="310" cy="310" r="204" opacity="0.2"/><circle cx="310" cy="310" r="276" opacity="0.09"/></g></svg>
   <div class="container reveal">
     <div class="callout">
       <span class="callout-d">◆</span>
