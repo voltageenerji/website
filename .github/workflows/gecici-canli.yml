@@ -1,0 +1,21 @@
+name: gecici-canli
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-canli.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            curl -sS -o a.html "https://voltage.com.tr/?t=$RANDOM"
+            grep -q 'e-posta ya da telefonla' a.html && break
+            sleep 30
+          done
+          echo "ana_mesaj=$(grep -c 'e-posta ya da telefonla' a.html || true) uretici_satiri=$(grep -c 'Renewable Producers' a.html || true)"
+          for u in sanayi-elektrik-tedariki rehber/15-dakikalik-uzlastirma rehber/kimya-elektrik rehber/demir-celik-elektrik; do
+            curl -sS -o o.html "https://voltage.com.tr/$u?t=$RANDOM"
+            echo "$u biz_tasiriz=$(grep -c 'biz taşırız' o.html || true) eski2027=$(grep -c "2027'den itibaren dengesizlik" o.html || true) paylasim=$(grep -c 'riskinin paylaşımı' o.html || true)"
+          done
