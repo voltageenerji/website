@@ -1,4 +1,4 @@
-// Karşıtlık denetimi (2. tur): sayfadaki HER metin kutusu, metin gizlenmiş ekran görüntüsündeki gerçek piksellere
+// Karşıtlık denetimi (3. tur): sayfadaki HER metin kutusu, metin gizlenmiş ekran görüntüsündeki gerçek piksellere
 // karşı ölçülür; en kötü piksel raporlanır. Eşik: normal metin 4,5:1; büyük metin (≥24 px ya da ≥18,66 px kalın) 3:1.
 import { chromium, SAYFA, CIKTI, hazirla } from './ortak.mjs';
 import { writeFileSync } from 'fs';
@@ -36,6 +36,12 @@ for (const [w, h, dil, durum] of [...EK, [1920, 1000, 'tr', 'canli'], [1440, 900
     const p = await ctx.newPage();
     await p.goto(SAYFA + '?lang=' + dil, { waitUntil: 'networkidle' });
     await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(500);
+    // tembel yüklenen sektör görselleri ekran görüntüsünden önce insin
+    await p.evaluate(async () => { for (let y = 0; y < document.documentElement.scrollHeight; y += 500) { scrollTo(0, y); await new Promise(r => setTimeout(r, 40)); } scrollTo(0, 0); });
+    await p.waitForLoadState('networkidle'); await p.waitForTimeout(200);
+    // açılır alanların içi de ölçülsün: telefonda kapalı başlayan alanlar açılır
+    await p.evaluate(() => document.querySelectorAll('details.acilir').forEach(d => { d.open = true; }));
+    await p.waitForTimeout(250); // hareket azaltma kipinde her değişim 0,01 ms'lik geçişle bir kare sonra oturur; ölçüm ondan sonra
     if (menu) await p.click('#mobileMenuBtn');
     const kutular = await p.evaluate((menu) => {
       const out = [];
@@ -80,11 +86,11 @@ for (const [w, h, dil, durum] of [...EK, [1920, 1000, 'tr', 'canli'], [1440, 900
 enDusuk.sort((a, c) => a[0] - c[0]);
 const kapakOzet = {};
 for (const [o, ad, sinif, yazi, boy, buyuk] of kapak) { const anahtar = ad + ' · ' + sinif; if (!(anahtar in kapakOzet) || o < kapakOzet[anahtar][0]) kapakOzet[anahtar] = [o, yazi, boy, buyuk]; }
-const cikti = ['KARŞITLIK DENETİMİ (2. tur) — her metin kutusunun altındaki gerçek piksellere karşı, en kötü piksel', 'Eşik: normal metin 4,5:1; büyük metin (≥24 px ya da ≥18,66 px kalın) 3:1', '',
+const cikti = ['KARŞITLIK DENETİMİ (3. tur, 24.11 revizyonu) — her metin kutusunun altındaki gerçek piksellere karşı, en kötü piksel', 'Eşik: normal metin 4,5:1; büyük metin (≥24 px ya da ≥18,66 px kalın) 3:1', '',
   `Toplam metin kutusu: ${toplam}; eşik altında kalan: ${kotu}`, 'En düşük sekiz: ', ...enDusuk.slice(0, 8).map(e => '  ' + e[0].toFixed(2) + ':1  ' + e[1]), '', 'GÖRÜNÜM BAŞINA:', ...satir.filter(s => !s.startsWith('DÜŞÜK')).map(s => '  ' + s), '',
   'EŞİK ALTI:', ...(satir.filter(s => s.startsWith('DÜŞÜK')).length ? satir.filter(s => s.startsWith('DÜŞÜK')).map(s => '  ' + s) : ['  yok']), '',
   'KAPAK VE ÜST BANT (fotoğraf üstü) — öğe başına en kötü piksel:', ...Object.entries(kapakOzet).sort().map(([k, v]) => `  ${v[0].toFixed(2).padStart(6)}:1  ${v[3] ? '(büyük) ' : ''}${k}  "${v[1]}" ${v[2]}px`)];
-if (!YK) writeFileSync(`${CIKTI}/r2/karsitlik.txt`, cikti.join('\n') + '\n');
+if (!YK) writeFileSync(`${CIKTI}/r3/karsitlik.txt`, cikti.join('\n') + '\n');
 else console.log(Object.entries(kapakOzet).filter(([k]) => /h1-ana|hero-sub|h1-ust|· A$|lang-btn$|nav-logo-sub|btn-ghost/.test(k)).sort().map(([k, v]) => `${v[0].toFixed(2).padStart(6)}  ${k}`).join('\n'));
 console.log(`\nToplam metin kutusu: ${toplam}; eşik altında kalan: ${kotu}`);
 console.log('En düşük beş: ' + enDusuk.slice(0, 5).map(e => e[0].toFixed(2) + ' ' + e[1]).join(' | '));

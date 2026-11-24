@@ -1,5 +1,5 @@
-// Hazırlık sayfası davranış testleri — 2. tur. Gerçek veri gönderilmez: /api/lead ve epias-proxy yanıtları taklit edilir.
-import { chromium, SAYFA, CIKTI, ornekVeri } from './ortak.mjs';
+// Hazırlık sayfası davranış testleri — 3. tur (24.11 revizyonu). Gerçek veri gönderilmez: /api/lead ve epias-proxy yanıtları taklit edilir.
+import { chromium, SAYFA, CIKTI, ornekVeri, ONCEKI, sektorYedegi, eksikGorseller } from './ortak.mjs';
 import { writeFileSync } from 'fs';
 
 const sonuc = [];
@@ -11,10 +11,12 @@ function ok(ad, kosul, ayrinti = '') {
 }
 function not(m) { sonuc.push('       ' + m); }
 const b = await chromium.launch();
+{ const e = eksikGorseller(); if (e.length) not(`UYARI: ${e.length}/21 sektör görseli dosyası img/ klasöründe yok; bu koşuda yerlerine aynı ölçüde düz renkli TEST görseli döndürüldü (dosya yazılmadı): ${e.join(', ')}`); else not('sektör görselleri: 21/21 dosya img/ klasöründe; testler gerçek dosyalarla koştu'); }
 
 async function baglam({ w = 1280, h = 800, ptf = 'canli', eksik = [], azalt = false, js = true, dsf = 1 } = {}) {
   const ctx = await b.newContext({ viewport: { width: w, height: h }, reducedMotion: azalt ? 'reduce' : 'no-preference', javaScriptEnabled: js, deviceScaleFactor: dsf });
   const durum = { ptf, eksik, lead: null, gonderiler: [], konsol: [], istekler: [] };
+  await sektorYedegi(ctx);
   await ctx.route('https://epias-proxy.emirhantan-ku.workers.dev/**', async (route) => {
     const u = route.request().url();
     durum.istekler.push(u);
@@ -71,18 +73,19 @@ const clsKur = (p) => p.addInitScript(() => { window.__cls = 0; new PerformanceO
       atlama, h2: document.querySelectorAll('h2').length, h3: document.querySelectorAll('h3').length,
       main: document.querySelectorAll('main').length, mainIcinde: !!document.querySelector('main #kapak') && !!document.querySelector('main #leadForm') && !document.querySelector('main footer'),
       atla: document.querySelector('a.skip') && document.querySelector('a.skip').getAttribute('href'),
-      idler: ['kapak', 'hizmetler', 'canli-piyasa', 'hakkimizda', 'yaklasim', 'iletisim', 'teklif', 'leadForm', 'nav', 'mobileMenu', 'mobileMenuBtn', 'kfPtf', 'kfStamp', 'lgAvg', 'lgMoK', 'lgMo', 'lgMinH', 'lgMaxH', 'lgUpd', 'lmLine', 'lmArea', 'lmDot', 'lmMode', 'saatTablo', 'leadSubmit', 'leadStatus', 'lead-yesil', 'lead-kvkk', 'lead-fatura', 'lead-mesken-not'].filter(i => !document.getElementById(i)),
+      idler: ['kapak', 'hizmetler', 'canli-piyasa', 'hakkimizda', 'yaklasim', 'iletisim', 'teklif', 'leadForm', 'nav', 'mobileMenu', 'mobileMenuBtn', 'kfPtf', 'kfStamp', 'lgAvg', 'lgMoK', 'lgMo', 'lgMinH', 'lgMaxH', 'lgUpd', 'lmLine', 'lmArea', 'lmDot', 'lmMode', 'saatTablo', 'leadSubmit', 'leadStatus', 'lead-yesil', 'lead-kvkk', 'lead-fatura', 'lead-mesken-not', 'saatBaslik', 'leadFaturaKutu', 'leadFaturaDurum'].filter(i => !document.getElementById(i)),
       cift: [...document.querySelectorAll('[id]')].map(e => e.id).filter((v, i, a) => a.indexOf(v) !== i),
       logo: document.querySelector('.nav-logo-mark').classList.contains('gorsel-hazir'), logoImg: getComputedStyle(document.querySelector('.nav-logo-mark img')).display,
       marka: [getComputedStyle(document.querySelector('.nav-logo-name')).fontFamily, getComputedStyle(document.querySelector('.cl-word')).fontFamily].join(' | '),
       foto: (() => { const i = document.querySelector('.hero-photo img'); return [i.complete, i.naturalWidth, i.currentSrc.split('/').pop(), document.querySelector('.hero-media').className]; })(),
-      kok: [...document.querySelectorAll('[src],[href],[action]')].map(e => e.getAttribute('src') || e.getAttribute('href') || e.getAttribute('action')).filter(u => !/^(\/|#|https:\/\/|mailto:|img\/kapak)/.test(u)),
+      kok: [...document.querySelectorAll('[src],[href],[action]')].map(e => e.getAttribute('src') || e.getAttribute('href') || e.getAttribute('action')).filter(u => !/^(\/|#|https:\/\/|mailto:|img\/kapak|img\/sektor-)/.test(u)),
       sus: ['.sec-no', '.nav-folio', '.service-num', '.tline-svg', '.art-rings', '.exhibit-tag', '.step-s', '.app-l', '.callout-src', '.callout-d', '.mcp-rail', '.kpi-band', '.reveal:not(form)'].filter(s => document.querySelector(s)),
       yazi: ['EXHIBIT A', 'VOLTAGE FELSEFESİ', 'TEK HAT ŞEMASI', 'KAPAK ·', '01 / 09'].filter(t => document.body.innerText.includes(t)),
       okSuz: [...document.querySelectorAll('svg.arrow')].filter(s => !s.closest('a, button')).length,
       kart: (() => { const c = getComputedStyle(document.getElementById('ptfKart')); return [c.backdropFilter, c.boxShadow, c.backgroundColor].join(' | '); })(),
       mono: [...new Set(mono.map(e => { const k = e.closest('.kf-stamp, .ptf-ticks, .lm-mode, .lg-v, .saat-tablo, .mono'); return k ? 'İZİNLİ ' + (k.id ? '#' + k.id : '.' + String(k.className).split(' ').join('.')) : 'DIŞ ' + e.tagName + '.' + e.className; }))],
       serif: [...new Set(serif.map(e => e.className || e.tagName))],
+      claim: document.querySelectorAll('.about-claim, .quotec').length,
       golge: [...document.querySelectorAll('main *, footer *')].filter(e => { const s = getComputedStyle(e).boxShadow; return s !== 'none' && !e.closest('form') && !e.closest('.saat-tablo'); }).map(e => e.className).slice(0, 5),
     };
   });
@@ -94,7 +97,7 @@ const clsKur = (p) => p.addInitScript(() => { window.__cls = 0; new PerformanceO
   ok('A6 betiklerin ve gelen bağlantıların kullandığı id değerleri duruyor; yinelenen id yok', y.idler.length === 0 && y.cift.length === 0, y.idler.concat(y.cift).join(','));
   ok('A7 logo işareti görsel olarak yüklendi; marka yazısı kapakta ve altta sans (Archivo)', y.logo && y.logoImg === 'block' && !/Newsreader/.test(y.marka) && /Archivo/.test(y.marka), y.marka);
   ok('A8 kapak fotoğrafı yüklendi (WebP), yedek kapalı', y.foto[0] && y.foto[1] > 0 && /\.webp$/.test(y.foto[2]) && !/yedek/.test(y.foto[3]), JSON.stringify(y.foto));
-  ok('A9 yollar kökten başlıyor (kapak görselleri dışında göreli yol yok)', y.kok.length === 0, y.kok.join(','));
+  ok('A9 yollar kökten başlıyor (kapak ve sektör görselleri dışında göreli yol yok)', y.kok.length === 0, y.kok.join(','));
   ok('A10 süs öğeleri yok: bölüm numarası, folyo, hizmet numarası, tek hat şeması, halkalar, EXHIBIT A, S1–S5, A/B/C, felsefe etiketi, ray, belirme', y.sus.length === 0 && y.yazi.length === 0, y.sus.concat(y.yazi).join(','));
   ok('A11 ok simgesi yalnız gerçek bağlantı ve düğmelerde', y.okSuz === 0, String(y.okSuz));
   ok('A12 PTF kartı düz panel: bulanıklık ve gölge yok, zemin opak', /^none/.test(y.kart) && / \| none \| rgb\(11, 18, 38\)$/.test(y.kart), y.kart);
@@ -102,11 +105,11 @@ const clsKur = (p) => p.addInitScript(() => { window.__cls = 0; new PerformanceO
   const monoDisi = y.mono.filter(m => m.startsWith('DIŞ'));
   ok('A14 monospace yalnız piyasa verisi, saat damgası ve teknik kimliklerde (lisans no, sicil no)', monoDisi.length === 0, monoDisi.join(' , '));
   not('monospace kullanan öğeler: ' + y.mono.join(' '));
-  ok('A15 serif yalnız üç yerde: kapak sloganı, Hakkında cümlesi ve imza, şirket sözü', y.serif.every(s => /h1-ana|about-claim|tr-only|about-signature-text|callout-t/.test(s)) && y.serif.length <= 5, y.serif.join(','));
+  ok('A15 serif yalnız üç yerde: kapak sloganı, imza, şirket cümlesi (slogan satırı kaldırıldı)', y.serif.every(s => /h1-ana|tr-only|about-signature-text|callout-t/.test(s)) && y.serif.length <= 4 && y.claim === 0, y.serif.join(',') + ' claim/quotec ' + y.claim);
   not('serif kullanan öğeler: ' + y.serif.join(' '));
   await ctx.close();
-  for (const w of [1440, 375]) {
-    const k = await baglam({ w, h: w === 375 ? 667 : 900 });
+  for (const w of [1440, 390, 375]) {
+    const k = await baglam({ w, h: w === 375 ? 667 : (w === 390 ? 844 : 900) });
     await clsKur(k.p);
     await ac(k.p, '', 1500);
     const cls = await k.p.evaluate(() => window.__cls);
@@ -135,34 +138,44 @@ const clsKur = (p) => p.addInitScript(() => { window.__cls = 0; new PerformanceO
       damga: document.getElementById('kfStamp').textContent, mod: document.getElementById('lmMode').textContent,
       aylik: document.getElementById('lgMoK').textContent, yer: document.getElementById('lead-mesaj').placeholder,
       basili: [...document.querySelectorAll('.lang-btn')].map(x => x.dataset.lang + ':' + x.getAttribute('aria-pressed') + ':' + x.classList.contains('active')).join(' '),
+      h3: [...document.querySelectorAll('main h3')].filter(h => !h.closest('[hidden]')).map(h => [...h.querySelectorAll('span')].filter(x => getComputedStyle(x).display !== 'none').map(x => x.textContent).join('') || h.textContent.trim()),
+      alt: [...document.querySelectorAll('.sektor-foto img')].map(i => i.alt), altUyum: [...document.querySelectorAll('img[data-alt-tr]')].every(i => i.alt === i.getAttribute('data-alt-' + dil)),
       kayit: localStorage.getItem('voltage-lang'), h1: document.querySelector('h1').textContent.replace(/\s+/g, ' ').trim(),
       h2: [...document.querySelectorAll('main h2')].map(h => [...h.querySelectorAll('span')].filter(x => getComputedStyle(x).display !== 'none').map(x => x.textContent).join('') || h.textContent.trim()).join(' | '),
     };
   });
   let d = await oku();
   ok('B1 açılış Türkçe; tüm çiftler TR metninde; çocuklu çeviri çifti yok', d.dil === 'tr' && d.uyumsuz.length === 0 && d.enGor === 0 && d.trGor === d.trTop, JSON.stringify(d.uyumsuz.slice(0, 3)));
-  ok('B1 TR H2 metinleri talimattaki gibi', d.h2 === 'Hizmetlerimiz | Hizmet Verdiğimiz Sektörler | Güncel Elektrik Piyasası Verileri | Elektrik Tedarik Süreci | Elektrik Tedarik Sözleşmesi Modelleri | EPDK Tedarik Lisansı | Voltage Enerji Hakkında | Neden Voltage? | İletişim', d.h2);
+  ok('B1 TR H2 metinleri talimattaki gibi', d.h2 === 'Hizmetlerimiz | Hizmet Verdiğimiz Sektörler | Güncel Elektrik Piyasası Verileri | Elektrik Tedarik Süreci | Elektrik Tedarik Sözleşmesi Modelleri | Voltage Enerji Hakkında | Neden Voltage? | İletişim', d.h2);
+  const H3TR = ['Endüstriyel Tedarik', 'GÖP & GİP Operasyonu', 'Portföy Yönetimi', 'Yenilenebilir Enerji Tedariki', 'Enerji Danışmanlığı', 'Demir-Çelik & Döküm', 'Kimya & Petrokimya', 'OSB & Endüstri Bölgeleri', 'Lojistik & Soğuk Zincir', 'Cam & Seramik', 'Veri Merkezleri & Telekom', 'Tekstil & Kompozit', 'Gün Öncesi PTF · 24 Saat · ₺/MWh', 'Günlük Piyasa Özeti', 'Saatlik PTF · ₺/MWh', 'Keşif', 'Modelleme', 'Teklif', 'Tedarikçi Değişimi', 'Devreye Alma', 'Şirket Bilgileri', 'EPDK Tedarik Lisansı', 'Sözleşme Disiplini', 'Elektrik Piyasalarında Uzmanlık', 'Şeffaf Yapı', 'Teklif Talebi', 'İletişim ve Sicil Bilgileri'];
+  ok('B1 TR H3 metinleri: beş hizmet, yedi sektör, piyasa ara başlıkları (“Günlük Piyasa Özeti”), beş adım (“Tedarikçi Değişimi”), şirket bilgileri, EPDK lisansı (H3), üç ilke, form, iletişim bilgileri', JSON.stringify(d.h3) === JSON.stringify(H3TR) && !d.h3.includes('Onboard') && !d.h3.includes('Bugünün Cetveli'), JSON.stringify(d.h3.filter(x => !H3TR.includes(x)).concat(H3TR.filter(x => !d.h3.includes(x)))));
+  const ALTTR = ['Çelik fabrikasında elektrik ark ocağından erimiş çelik dökümü', 'Alacakaranlıkta bir petrokimya tesisinin damıtma kuleleri ve boru hatları', 'Organize sanayi bölgesindeki fabrika binalarının havadan görünümü', 'Yüksek raflı soğuk hava deposunun içi', 'Cam üretim hattında kızgın cam', 'Veri merkezinde sunucu kabinleri arasındaki koridor', 'Dokuma fabrikasında sıra sıra dokuma tezgâhları'];
+  const ALTEN = ['Molten steel being poured at an electric arc furnace steel plant', 'Distillation columns and pipe racks of a petrochemical plant at dusk', 'Aerial view of factory buildings in an organised industrial zone', 'Interior of a high-bay cold storage warehouse', 'Glowing glass on a glass production line', 'Aisle between server racks in a data centre', 'Rows of looms in a weaving mill'];
+  ok('B1 TR: yedi sektör görselinin alt metni Türkçe', JSON.stringify(d.alt) === JSON.stringify(ALTTR) && d.altUyum, JSON.stringify(d.alt));
   await p.click('.nav-right .lang-btn[data-lang="en"]');
   d = await oku();
+  const H3EN = ['Industrial Supply', 'Day-Ahead & Intra-Day Operations', 'Portfolio Management', 'Renewable Energy Supply', 'Energy Advisory', 'Steel & Foundry', 'Chemicals & Petrochem', 'Organized Industrial Zones', 'Logistics & Cold Chain', 'Glass & Ceramics', 'Data Centers & Telecom', 'Textile & Composites', 'Day-Ahead MCP · 24 Hours · ₺/MWh', 'Daily Market Summary', 'Hourly MCP · ₺/MWh', 'Discovery', 'Modeling', 'Proposal', 'Supplier Switch', 'Go-live', 'Company Details', 'EPDK Supply License', 'Contract Discipline', 'Expertise in Electricity Markets', 'Transparent Structure', 'Request a Proposal', 'Contact and Registry Details'];
+  ok('B2 EN H3 metinleri (“Daily Market Summary”, “Supplier Switch”, “Company Details”, “Contact and Registry Details” dahil)', JSON.stringify(d.h3) === JSON.stringify(H3EN), JSON.stringify(d.h3.filter(x => !H3EN.includes(x)).concat(H3EN.filter(x => !d.h3.includes(x)))));
+  ok('B2 EN: yedi sektör görselinin alt metni İngilizce (dil düğmesi alt metnini de değiştirir)', JSON.stringify(d.alt) === JSON.stringify(ALTEN) && d.altUyum, JSON.stringify(d.alt));
   ok('B2 EN: html lang, tüm çiftler EN metninde, tr-only gizli', d.dil === 'en' && d.uyumsuz.length === 0 && d.trGor === 0 && d.enGor === d.enTop, JSON.stringify(d.uyumsuz.slice(0, 3)));
-  ok('B2 EN H2 metinleri talimattaki gibi', d.h2 === 'Our Services | Sectors We Serve | Current Electricity Market Data | Electricity Supply Process | Electricity Supply Contract Models | EPDK Supply License | About Voltage Enerji | Why Voltage? | Contact', d.h2);
+  ok('B2 EN H2 metinleri talimattaki gibi', d.h2 === 'Our Services | Sectors We Serve | Current Electricity Market Data | Electricity Supply Process | Electricity Supply Contract Models | About Voltage Enerji | Why Voltage? | Contact', d.h2);
   ok('B3 EN: title / description / og:title / og:locale değişti', /Electricity Supplier$/.test(d.baslik) && /^Voltage Enerji, the brand/.test(d.tanim) && d.ogt === d.baslik && d.ogl === 'en_US', d.baslik);
   ok('B4 EN: canlı damga, kip, aylık etiket, yer tutucu İngilizce', /^HOUR \d\d:00/.test(d.damga) && d.mod === 'LIVE' && /^MONTHLY AVG/.test(d.aylik) && /^Current contract/.test(d.yer), JSON.stringify([d.damga, d.mod, d.aylik]));
   ok('B5 EN: aria-pressed ve etkin sınıf (üst bant ve menü panelindeki düğmeler birlikte)', d.basili === 'tr:false:false en:true:true tr:false:false en:true:true' && d.kayit === 'en', d.basili);
   ok('B6 EN H1: iki parça', d.h1 === "Electricity Supply for Industry and Businesses We connect industry's energy with the market.", d.h1);
   await p.click('.nav-right .lang-btn[data-lang="tr"]');
   d = await oku();
-  ok('B7 TR’ye dönüş: tüm çiftler TR, başlık ve tanım TR, en-only gizli', d.dil === 'tr' && d.uyumsuz.length === 0 && d.enGor === 0 && /Elektrik Tedarikçisi$/.test(d.baslik) && d.ogl === 'tr_TR' && /^SAAT /.test(d.damga), JSON.stringify(d.uyumsuz.slice(0, 3)));
+  ok('B7 TR’ye dönüş: tüm çiftler TR, başlık ve tanım TR, en-only gizli, alt metinleri yeniden Türkçe', d.dil === 'tr' && d.uyumsuz.length === 0 && d.enGor === 0 && /Elektrik Tedarikçisi$/.test(d.baslik) && d.ogl === 'tr_TR' && /^SAAT /.test(d.damga) && JSON.stringify(d.alt) === JSON.stringify(ALTTR), JSON.stringify(d.uyumsuz.slice(0, 3)));
   await ctx.close();
   const k = await baglam({ w: 1280 });
   await ac(k.p, '?lang=en');
-  ok('B8 ?lang=en ile açılış İngilizce', await k.p.evaluate(() => document.documentElement.lang === 'en' && document.querySelector('.h1-ana').textContent.startsWith('We connect')));
+  ok('B8 ?lang=en ile açılış İngilizce (alt metinleri ve dosya seçici dahil)', await k.p.evaluate(() => document.documentElement.lang === 'en' && document.querySelector('.h1-ana').textContent.startsWith('We connect') && document.querySelector('.sektor-foto img').alt.startsWith('Molten steel') && document.querySelector('.dosya-dugme').textContent === 'Choose Files' && document.getElementById('leadFaturaDurum').textContent === 'No file chosen'));
   await k.ctx.close();
 }
 
 // ───────────────────────── C. menü bağlantıları, yumuşak kaydırma ─────────────────────────
-for (const w of [1280, 375]) {
-  const { ctx, p } = await baglam({ w, h: w === 375 ? 667 : 800 });
+for (const w of [1440, 1280, 390, 375]) {
+  const { ctx, p } = await baglam({ w, h: w === 375 ? 667 : (w === 390 ? 844 : (w === 1440 ? 900 : 800)) });
   await ac(p);
   const mobil = w < 1040;
   for (const hedef of ['hakkimizda', 'hizmetler', 'yaklasim', 'iletisim', 'teklif']) {
@@ -174,6 +187,7 @@ for (const w of [1280, 375]) {
     await kaydirmaBitsin(p);
     const r = await p.evaluate((id) => { const e = document.getElementById(id); const n = document.getElementById('nav').getBoundingClientRect(); return { ust: Math.round(e.getBoundingClientRect().top), nav: Math.round(n.bottom), menu: document.getElementById('mobileMenu').hidden }; }, hedef);
     ok(`C1 ${w}px ${hedef === 'teklif' ? 'üst banttaki “Teklif Al”' : 'menü'} → #${hedef}: hedef üst bandın hemen altında`, r.ust >= r.nav && r.ust <= r.nav + 40 && r.menu, JSON.stringify(r));
+    if (hedef === 'teklif') { const f = await p.evaluate(() => { const t = document.querySelector('.form-title').getBoundingClientRect(), a = document.getElementById('lead-ad').getBoundingClientRect(), n = document.getElementById('nav').getBoundingClientRect(); return { baslik: Math.round(t.top), alan: Math.round(a.bottom), nav: Math.round(n.bottom), vh: innerHeight }; }); ok(`C1 ${w}px “Teklif Al” inişi: form başlığı ve ilk alan ilk ekranda, bandın altında (arada başka içerik yok)`, f.baslik >= f.nav && f.baslik <= f.nav + 90 && f.alan <= f.vh, JSON.stringify(f)); not(`${w}px “Teklif Al” → form üst kenarı ${r.ust} px, üst bant alt kenarı ${r.nav} px, form başlığı ${f.baslik} px, ilk alanın alt kenarı ${f.alan} px (ekran ${f.vh} px)`); }
   }
   await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(250);
   await p.click('.hero-actions a[href="#teklif"]'); await kaydirmaBitsin(p);
@@ -209,7 +223,7 @@ for (const [w, h] of [[375, 667], [390, 844], [320, 568], [430, 932]]) {
     ok('D5 menü kapalı açılır', m.gizli && m.gor === 'none' && m.acik === 'false');
     await p.click('#mobileMenuBtn'); m = await dm();
     ok('D6 düğme menüyü açar: 6 bağlantı ≥44 px, dil düğmeleri panelde ≥44×44, gövde kilidi', !m.gizli && m.gor === 'flex' && m.acik === 'true' && m.govde && m.bag.length === 6 && m.bag.every(x => x >= 44) && m.dil.length === 2 && m.dil.every(s => s.split('x').every(v => +v >= 44)), JSON.stringify(m));
-    await p.screenshot({ path: `${CIKTI}/r2/durum/mobil-menu-375.png` });
+    await p.screenshot({ path: `${CIKTI}/r3/durum/mobil-menu-375.png` });
     await p.click('#mobileMenu .lang-btn[data-lang="en"]');
     const en = await p.evaluate(() => [document.documentElement.lang, document.querySelector('#mobileMenu a').textContent, document.getElementById('mobileMenu').hidden, document.querySelector('.nav-right .nav-cta').textContent]);
     ok('D7 paneldeki dil düğmesi dili değiştirir, panel açık kalır', en[0] === 'en' && en[1] === 'About' && en[2] === false && en[3] === 'Get a Quote', en.join());
@@ -272,15 +286,17 @@ const kartYuk = {}, bolumYuk = {};
   ok('E1 CANLI kapak kartı: gün eğrisi çizildi (24 nokta), o saatin noktası görünür', d.cizgi.split(/[ML]/).length - 1 === 24 && d.alan.endsWith('Z') && d.nokta === '' && d.bos === 'none');
   ok('E1 kapak kartında yalnız: başlık, damga, PTF değeri, gün eğrisi, bağlantı (başka sayı yok)', d.kartMetin.replace(/\b\d\d:00\b/g, '').replace(d.deger, '').match(/\d/g) === null && !/%/.test(d.kartMetin), d.kartMetin);
   ok('E1 CANLI bölüm: büyük grafik çizildi, özet dolu (gün ort., ay ort., en düşük, en yüksek, durum)', d.lm.length > 50 && /₺\/MWh$/.test(d.cetvel[0]) && /₺\/MWh$/.test(d.cetvel[1]) && /^\d\d:00 · /.test(d.cetvel[2]) && /^\d\d:00 · /.test(d.cetvel[3]) && /^SAAT/.test(d.cetvel[4]) && d.mod === 'CANLI', JSON.stringify(d.cetvel));
+  const tablolar = await p.evaluate(() => [...document.querySelectorAll('#saatTablo table')].map(t => ({ satir: t.tBodies[0].rows.length, ilk: t.tBodies[0].rows[0].cells[0].textContent, bas: [...t.tHead.rows[0].cells].map(c => c.textContent + ':' + c.scope).join(','), ad: (document.getElementById(t.getAttribute('aria-labelledby')) || {}).textContent, ust: Math.round(t.getBoundingClientRect().top), sol: Math.round(t.getBoundingClientRect().left) })));
+  ok('E1 saatlik tablo dört kısa gerçek tablo: 6’şar satır (00, 06, 12, 18’den başlar), sütun başlıkları “Saat / PTF” (scope=col), adları “Saatlik PTF · ₺/MWh”; geniş ekranda yan yana', tablolar.length === 4 && tablolar.every(t => t.satir === 6 && t.bas === 'Saat:col,PTF:col' && t.ad === 'Saatlik PTF · ₺/MWh') && tablolar.map(t => t.ilk).join() === '00:00,06:00,12:00,18:00' && new Set(tablolar.map(t => t.ust)).size === 1 && new Set(tablolar.map(t => t.sol)).size === 4, JSON.stringify(tablolar));
   ok('E1 CANLI saatlik tablo: gerçek <table>, 24 satır (00:00–23:00), 24 değer sayı, o saatin satırı işaretli', d.satir === 24 && d.saat.startsWith('00:00,01:00') && d.saat.endsWith('22:00,23:00') && d.hucre.every(v => SAYI.test(v)) && d.simdi === simdi, JSON.stringify([d.satir, d.simdi, simdi, d.hucre.slice(0, 3)]));
   const ornek = ornekVeri();
   const bekle = ornek.items.map(i => i.price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
   ok('E1 tablo değerleri proxy yanıtındaki saatlik fiyatlarla birebir aynı; kapak değeri = o saatin tablo değeri', JSON.stringify(d.hucre) === JSON.stringify(bekle) && d.deger === d.hucre[+simdi.slice(0, 2)], d.hucre.slice(0, 2) + ' / ' + bekle.slice(0, 2));
   ok('E1 bölüm kapaktaki “şu anki saat” rakamını manşet yapmıyor: KPI bandı ve ray yok; kapak değeri bölümde yalnız tablo satırında', await p.evaluate((v) => !document.querySelector('.kpi-band, .kpi-num, .mcp-rail') && [...document.querySelectorAll('#canli-piyasa *')].filter(e => e.children.length === 0 && e.textContent.trim() === v).every(e => e.tagName === 'TD'), d.deger));
   ok('E1 önbellek anahtarı “voltage-ptf-cache” yazıldı; yalnız /ptf/today ve /ptf/stats çağrıldı', await p.evaluate(() => { const c = JSON.parse(localStorage.getItem('voltage-ptf-cache')); return c && c.prices.length === 24 && Number.isFinite(c.price); }) && [...new Set(durum.istekler.map(u => u.replace(/^https:\/\/[^/]+/, '')))].sort().join() === '/ptf/stats,/ptf/today', [...new Set(durum.istekler)].join());
-  await p.locator('.hero').screenshot({ path: `${CIKTI}/r2/durum/ptf-1-canli-kapak-1440.png` });
+  await p.locator('.hero').screenshot({ path: `${CIKTI}/r3/durum/ptf-1-canli-kapak-1440.png` });
   await p.locator('#canli-piyasa').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, -90)); await p.waitForTimeout(200);
-  await p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r2/durum/ptf-1-canli-bolum-1440.png` });
+  await p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r3/durum/ptf-1-canli-bolum-1440.png` });
   // E2 proxy kapalı + bugünkü önbellek
   durum.ptf = 'kapali';
   await ac(p);
@@ -288,9 +304,9 @@ const kartYuk = {}, bolumYuk = {};
   kartYuk.onbellek = s.yuk; bolumYuk.onbellek = s.bolumYuk;
   ok('E2 ÖNBELLEK: damga “SON SENKRON ss:dd”, durum cached, değer önbellekteki sayı', s.durum === 'cached' && /^SON SENKRON \d\d:\d\d$/.test(s.damga) && s.sinif === 'kf-stamp stale' && s.deger === d.deger, JSON.stringify([s.durum, s.deger, s.damga]));
   ok('E2 ÖNBELLEK: grafik ve tablo bugünün önbelleğinden; “şu an” noktası ve satır işareti yok; kip SON SENKRON', s.cizgi === d.cizgi && s.nokta === 'none' && s.mod === 'SON SENKRON' && JSON.stringify(s.hucre) === JSON.stringify(d.hucre) && s.simdi === '' && /^SON SENKRON/.test(s.cetvel[4]), JSON.stringify([s.nokta, s.mod, s.simdi]));
-  await p.locator('.hero').screenshot({ path: `${CIKTI}/r2/durum/ptf-2-onbellek-kapak-1440.png` });
+  await p.locator('.hero').screenshot({ path: `${CIKTI}/r3/durum/ptf-2-onbellek-kapak-1440.png` });
   await p.locator('#canli-piyasa').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, -90)); await p.waitForTimeout(200);
-  await p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r2/durum/ptf-2-onbellek-bolum-1440.png` });
+  await p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r3/durum/ptf-2-onbellek-bolum-1440.png` });
   // E2b dünkü önbellek
   await p.evaluate(() => { const c = JSON.parse(localStorage.getItem('voltage-ptf-cache')); const dun = new Date(Date.now() - 864e5); c.date = dun.toDateString(); c.ts = dun.getTime(); localStorage.setItem('voltage-ptf-cache', JSON.stringify(c)); });
   await ac(p);
@@ -307,9 +323,9 @@ const kartYuk = {}, bolumYuk = {};
   ok('E3 VERİ YOK: grafikler boş, nokta yok, “Saatlik veri bekleniyor”; özet “—”; tablo 24 × “—”; kip VERİ BEKLENİYOR', d.cizgi === '' && d.alan === '' && d.nokta === 'none' && d.bos !== 'none' && d.lm === '' && d.cetvel.slice(0, 4).every(v => v === '—') && d.hucre.length === 24 && d.hucre.every(v => v === '—') && d.mod === 'VERİ BEKLENİYOR' && d.simdi === '', JSON.stringify([d.cetvel, d.mod]));
   ok('E3 VERİ YOK: bölümde ve kartta saat etiketleri dışında rakam yok (0 ya da yer tutucu sayı yok)', !/\d/.test(d.kartMetin.replace(/\b\d\d:00\b/g, '')) && !/\d/.test(d.bolum.replace(/\b\d\d:00\b/g, '').replace(/24 (Saat|Hours)/i, '').replace(/24 SAAT/i, '')), d.bolum.replace(/\b\d\d:00\b/g, '').replace(/\s+/g, ' ').slice(0, 200));
   ok('E3 VERİ YOK: yalnız proxy isteği düştü, başka konsol hatası yok', durum.konsol.filter(k => !/ERR_CONNECTION_REFUSED|Failed to load resource/.test(k)).length === 0, durum.konsol.join(' | '));
-  await p.locator('.hero').screenshot({ path: `${CIKTI}/r2/durum/ptf-3-veri-yok-kapak-1440.png` });
+  await p.locator('.hero').screenshot({ path: `${CIKTI}/r3/durum/ptf-3-veri-yok-kapak-1440.png` });
   await p.locator('#canli-piyasa').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, -90)); await p.waitForTimeout(200);
-  await p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r2/durum/ptf-3-veri-yok-bolum-1440.png` });
+  await p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r3/durum/ptf-3-veri-yok-bolum-1440.png` });
   await p.click('.nav-right .lang-btn[data-lang="en"]');
   const e = await ptfOku(p);
   ok('E3 VERİ YOK (EN): “AWAITING EPIAS DATA”, değer “—”', e.damga === 'AWAITING EPIAS DATA' && e.deger === '—' && e.mod === 'AWAITING DATA', e.damga);
@@ -332,7 +348,7 @@ ok('E4 kapak kartı ve piyasa bölümü üç durumda aynı yükseklikte (kayma y
   ok('E5 EKSİK SAAT: tabloda eksik saatler “—”, öbürleri sayı; çizgi boşlukta kopuyor', eksik.every(h => d.hucre[h] === '—') && d.hucre.filter(v => SAYI.test(v)).length === 24 - eksik.length && parca >= 2 && d.nokta === 'none', JSON.stringify(eksik.map(h => d.hucre[h])) + ' parça ' + parca);
   ok('E5 EKSİK SAAT: hiçbir yerde 0,00 yok', !/(^|\D)0,00/.test(await p.evaluate(() => document.querySelector('main').innerText)));
   await p.locator('#canli-piyasa').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, -90)); await p.waitForTimeout(200);
-  await p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r2/durum/ptf-4-eksik-saat-bolum-1440.png` });
+  await p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r3/durum/ptf-4-eksik-saat-bolum-1440.png` });
   await ctx.close();
 }
 for (const w of [1440, 768, 375, 320]) { // E6 yükseklikler dil ve durumdan bağımsız
@@ -355,7 +371,7 @@ for (const w of [1440, 768, 375, 320]) { // E6 yükseklikler dil ve durumdan ba�
   await j.p.goto(SAYFA, { waitUntil: 'load' });
   const r = await j.p.evaluate(() => { const s = document.getElementById('canli-piyasa'); const v = s.querySelector('.lm-veri'); const n = s.querySelector('.lm-noscript'); return { veri: getComputedStyle(v).display, cumle: n ? n.innerText : '', bag: n ? !!n.querySelector('a[href="/canli-ptf"]') : false, yazi: s.innerText.replace(/\s+/g, ' '), bos: [...s.querySelectorAll('svg, table')].filter(e => e.getBoundingClientRect().height > 0).length }; });
   ok('E7 BETİK KAPALI: bölümde düz cümle ve /canli-ptf bağlantısı; boş grafik, özet ya da tablo görünmez', r.veri === 'none' && r.bag && /Canlı PTF sayfasında/.test(r.cumle) && r.bos === 0 && !/—/.test(r.yazi.replace('— ', '')), JSON.stringify(r));
-  await j.p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r2/durum/ptf-5-betik-kapali-bolum-1280.png` });
+  await j.p.locator('#canli-piyasa').screenshot({ path: `${CIKTI}/r3/durum/ptf-5-betik-kapali-bolum-1280.png` });
   // betik kapalıyken sayfanın bütün Türkçe içeriği görünür mü: betik açıkken görünen metinle karşılaştır
   const kapali = await j.p.evaluate(() => document.body.innerText.split('\n').map(s => s.trim()).filter(Boolean));
   const kart = await j.p.evaluate(() => [document.getElementById('kfPtf').textContent, document.getElementById('kfStamp').textContent, getComputedStyle(document.querySelector('.hero-photo img')).display, [...document.querySelectorAll('main section, .trust, footer')].filter(e => +getComputedStyle(e).opacity < 1 || getComputedStyle(e).visibility === 'hidden').length]);
@@ -364,7 +380,7 @@ for (const w of [1440, 768, 375, 320]) { // E6 yükseklikler dil ve durumdan ba�
   await ac(a.p);
   const acik = await a.p.evaluate(() => { document.querySelector('#canli-piyasa .lm-veri').remove(); return document.body.innerText.split('\n').map(s => s.trim()).filter(Boolean); });
   await a.ctx.close();
-  const eksikSatir = acik.filter(s => !kapali.includes(s));
+  const eksikSatir = acik.filter(s => !kapali.includes(s) && s !== 'Dosya Seç' && s !== 'Dosya seçilmedi'); // dosya seçicinin iki satırı betikle görünür; betiksiz yerli girdi durur
   ok('E8 BETİK KAPALI: betik açıkken görünen bütün Türkçe metin (piyasa sayıları dışında) betiksiz de görünür', eksikSatir.length === 0, eksikSatir.slice(0, 5).join(' | '));
   ok('E8 BETİK KAPALI: kapak kartı dürüst bekleme metniyle durur (“—”, “EPİAŞ VERİSİ BEKLENİYOR”); gizli bölüm yok', kart[0] === '—' && kart[1] === 'EPİAŞ VERİSİ BEKLENİYOR' && kart[3] === 0, kart.join());
   not(`betik kapalı görünür satır: ${kapali.length}; betik açık (piyasa göstergeleri hariç): ${acik.length}`);
@@ -403,7 +419,7 @@ for (const w of [1280, 375]) {
     const s = await gorunur(p, '.form-success');
     const yazi = await metin(p, '.form-success');
     ok(`F2 ${w}px başarı mesajı görünür, üst bandın altında ve odakta`, s && s.gor && s.odak && s.ust >= s.nav && s.ust < s.vh && /KAYIT ALINDI/.test(yazi) && /Talebiniz alındı\./.test(yazi) && /Genellikle bir iş günü içinde e-posta ya da telefonla dönüş yapıyoruz\./.test(yazi), JSON.stringify(s));
-    await p.screenshot({ path: `${CIKTI}/r2/durum/form-basari-${w}.png` });
+    await p.screenshot({ path: `${CIKTI}/r3/durum/form-basari-${w}.png` });
     await p.evaluate(() => window.setLanguage('en'));
     ok(`F2 ${w}px başarı mesajı dil değişince çevrilir`, /REQUEST RECEIVED/.test(await metin(p, '.form-success')) && /We usually get back to you by e-mail or phone within one business day\./.test(await metin(p, '.form-success')));
     await ctx.close();
@@ -413,7 +429,7 @@ for (const w of [1280, 375]) {
     await ac(p, '?kaynak=rehber-sktt#leadForm', 1200);
     const f = await p.evaluate(() => { const t = document.querySelector('.form-title').getBoundingClientRect(); const fr = document.getElementById('leadForm').getBoundingClientRect(); const n = document.getElementById('nav').getBoundingClientRect(); return { baslikUst: Math.round(t.top), baslikAlt: Math.round(t.bottom), formUst: Math.round(fr.top), nav: Math.round(n.bottom), vh: innerHeight }; });
     ok(`G1 ${w}px /?kaynak=rehber-sktt#leadForm: form başlığı sabit bandın altında görünür`, f.baslikUst >= f.nav && f.baslikAlt < f.vh && f.formUst >= f.nav && f.formUst <= f.nav + 24, JSON.stringify(f));
-    await p.screenshot({ path: `${CIKTI}/r2/durum/hash-leadForm-${w}.png` });
+    await p.screenshot({ path: `${CIKTI}/r3/durum/hash-leadForm-${w}.png` });
     await doldur(p);
     await p.click('#leadSubmit'); await p.waitForSelector('.form-success');
     ok(`F3 ${w}px ?kaynak=rehber-sktt gövdede “rehber-sktt”`, durum.gonderiler[0] && durum.gonderiler[0].govde.kaynak === 'rehber-sktt');
@@ -430,7 +446,7 @@ for (const w of [1280, 375]) {
     const s = await gorunur(p, '#leadStatus');
     const r = await p.evaluate(() => ({ yazi: document.getElementById('leadStatus').textContent, bag: !!document.querySelector('#leadStatus a[href="mailto:info@voltage.com.tr"]'), dugme: document.getElementById('leadSubmit').disabled, etiket: document.querySelector('#leadSubmit span').textContent, rol: document.getElementById('leadStatus').getAttribute('role'), ad: document.getElementById('lead-ad').value }));
     ok(`F4 ${w}px 500: hata mesajı görünür, odakta, görüş alanında; düğme yeniden etkin; girilenler duruyor`, s.gor && s.odak && s.ust >= s.nav && s.alt <= s.vh && /^Talebiniz gönderilemedi\. Lütfen tekrar deneyin veya info@voltage\.com\.tr adresine yazın\.$/.test(r.yazi) && r.bag && !r.dugme && r.etiket === 'Teklif Talep Et' && r.rol === 'alert' && r.ad === 'Test', JSON.stringify([s, r.yazi]));
-    await p.screenshot({ path: `${CIKTI}/r2/durum/form-hata-${w}.png` });
+    await p.screenshot({ path: `${CIKTI}/r3/durum/form-hata-${w}.png` });
     durum.lead = { status: 429, contentType: 'application/json', body: '{"ok":false,"error":"rate_limited"}' };
     await p.click('#leadSubmit'); await p.waitForTimeout(500);
     ok(`F4 ${w}px 429: hız sınırı mesajı`, /^Kısa sürede çok sayıda talep gönderildi/.test(await metin(p, '#leadStatus')));
@@ -446,7 +462,7 @@ for (const w of [1280, 375]) {
   await p.check('#lead-yesil'); await p.waitForTimeout(5200);
   const sonra = await renk();
   ok('F5 yeşil kutucuk: form “yesil” sınıfı, yeşil düğme ve kenar, zemin yeşerir, yaprak dalı çizilir', !once.yesil && once.zemin === '0' && once.yol === '0' && sonra.yesil && sonra.dugme === 'rgb(37, 96, 59)' && sonra.kenar === 'rgb(183, 209, 174)' && sonra.zemin === '1' && +sonra.yol > 0.7 && parseFloat(sonra.ofset) === 0 && sonra.ikon === 'rgb(47, 122, 68)', JSON.stringify([once, sonra]));
-  await p.locator('#leadForm').screenshot({ path: `${CIKTI}/r2/durum/form-yesil-1280.png` });
+  await p.locator('#leadForm').screenshot({ path: `${CIKTI}/r3/durum/form-yesil-1280.png` });
   await doldur(p);
   await p.click('#leadSubmit'); await p.waitForSelector('.form-success');
   ok('F5 yeşil seçim gövdede yesil:true', durum.gonderiler[0].govde.yesil === true);
@@ -455,7 +471,7 @@ for (const w of [1280, 375]) {
   await ac(k.p);
   await k.p.locator('#lead-yesil').scrollIntoViewIfNeeded();
   await k.p.check('#lead-yesil'); await k.p.waitForTimeout(5200);
-  await k.p.locator('#leadForm').screenshot({ path: `${CIKTI}/r2/durum/form-yesil-375.png` });
+  await k.p.locator('#leadForm').screenshot({ path: `${CIKTI}/r3/durum/form-yesil-375.png` });
   await k.p.uncheck('#lead-yesil'); await k.p.waitForTimeout(3200);
   const geri = await k.p.evaluate(() => { const f = document.getElementById('leadForm'); return [f.classList.contains('yesil'), getComputedStyle(document.getElementById('leadSubmit')).backgroundColor, getComputedStyle(f.querySelector('.fl-d')).opacity]; });
   ok('F5 kutucuk kaldırılınca form eski görünüme döner', geri[0] === false && geri[1] === 'rgb(245, 180, 28)' && geri[2] === '0', JSON.stringify(geri));
@@ -535,7 +551,7 @@ for (const w of [1280, 375]) {
 }
 
 // ───────────────────────── G. bağlantıyla geliş (#teklif, #iletisim, diğer çapalar) ─────────────────────────
-for (const w of [1280, 375]) {
+for (const w of [1440, 1280, 390, 375]) {
   for (const kare of ['#teklif', '#iletisim']) {
     const { ctx, p } = await baglam({ w, h: 800 });
     await ac(p, kare, 1200);
@@ -543,11 +559,11 @@ for (const w of [1280, 375]) {
     ok(`G2 ${w}px /${kare}: hedef bandın 16 px altında`, r[0] >= r[1] && r[0] <= r[1] + 24, r.join('/'));
     await ctx.close();
   }
-  for (const kare of ['#hakkimizda', '#yaklasim', '#hizmetler']) {
+  for (const kare of ['#hakkimizda', '#yaklasim', '#hizmetler', '#canli-piyasa']) {
     const { ctx, p } = await baglam({ w, h: 800 });
     await ac(p, kare, 900);
     const r = await p.evaluate((k) => { const e = document.querySelector(k).getBoundingClientRect(); const h = document.querySelector(k + ' h2').getBoundingClientRect(); return [Math.round(e.top), Math.round(h.top), Math.round(document.getElementById('nav').getBoundingClientRect().bottom), innerHeight]; }, kare);
-    ok(`G3 ${w}px /${kare}: bölüm başlığı bandın altında, ilk ekranda`, Math.abs(r[0]) <= 2 && r[1] >= r[2] && r[1] < r[3], r.join('/'));
+    ok(`G3 ${w}px /${kare}: bölüm başlığı bandın altında, ilk ekranda`, r[0] >= -2 && r[0] <= r[2] && r[1] >= r[2] && r[1] <= r[2] + 110 && r[1] < r[3], r.join('/'));
     await ctx.close();
   }
 }
@@ -556,7 +572,7 @@ for (const w of [1280, 375]) {
 {
   const { ctx, p } = await baglam({ w: 1280, h: 800, azalt: true });
   await ac(p);
-  const r = await p.evaluate(() => ({ kay: getComputedStyle(document.documentElement).scrollBehavior, anim: document.getAnimations().length, gizli: [...document.querySelectorAll('main *')].filter(e => +getComputedStyle(e).opacity === 0 && !e.closest('.form-flora, .form-flora-kutu, .hp-field') && e.getBoundingClientRect().height > 0).length }));
+  const r = await p.evaluate(() => ({ kay: getComputedStyle(document.documentElement).scrollBehavior, anim: document.getAnimations().length, gizli: [...document.querySelectorAll('main *')].filter(e => +getComputedStyle(e).opacity === 0 && !e.closest('.form-flora, .form-flora-kutu, .hp-field') && e.id !== 'lead-fatura' && e.getBoundingClientRect().height > 0).length }));
   ok('H1 hareket azaltma: yumuşak kaydırma kapalı, çalışan animasyon yok, gizli içerik yok', r.kay === 'auto' && r.anim === 0 && r.gizli === 0, JSON.stringify(r));
   await ctx.close();
   const n = await baglam({ w: 1280, h: 800 });
@@ -569,7 +585,7 @@ for (const w of [1280, 375]) {
   await ac(f.p);
   const y = await f.p.evaluate(() => [document.querySelector('.hero-media').classList.contains('yedek'), getComputedStyle(document.querySelector('.hero-placeholder')).display, getComputedStyle(document.querySelector('.hero-photo')).display]);
   ok('H3 fotoğraf yüklenemezse çizim silüet devreye girer', y[0] && y[1] === 'block' && y[2] === 'none', y.join());
-  await f.p.locator('.hero').screenshot({ path: `${CIKTI}/r2/durum/kapak-yedek-1440.png` });
+  await f.p.locator('.hero').screenshot({ path: `${CIKTI}/r3/durum/kapak-yedek-1440.png` });
   await f.ctx.close();
   const l = await baglam({ w: 1280, h: 800 });
   await l.ctx.route('**/voltage-enerji-logo.svg', (route) => route.abort());
@@ -607,6 +623,7 @@ for (const w of [320, 360, 375, 390, 414, 430, 768, 1024, 1280, 1440]) {
       return { sw: document.documentElement.scrollWidth, vw, tasan: tasan.slice(0, 6), kirpik: kirpik.slice(0, 6) };
     });
     ok(`I1 ${w}px ${dil.toUpperCase()} yatay sayfa kaydırması yok, kırpılan metin yok`, r.sw <= r.vw && r.tasan.length === 0 && r.kirpik.length === 0, JSON.stringify(r));
+    if (w < 760) { await p.evaluate(() => document.querySelectorAll('details.acilir').forEach(d => { d.open = true; })); const a = await p.evaluate(() => { const vw = document.documentElement.clientWidth; return { sw: document.documentElement.scrollWidth, vw, tasan: [...document.querySelectorAll('details.acilir *')].filter(e => { const q = e.getBoundingClientRect(); return q.width && (q.right > vw + 0.5 || q.left < -0.5); }).map(e => e.tagName + '.' + e.className).slice(0, 4) }; }); ok(`I1 ${w}px ${dil.toUpperCase()} açılır alanlar açıkken de yatay taşma yok`, a.sw <= a.vw && a.tasan.length === 0, JSON.stringify(a)); }
     await ctx.close();
   }
 }
@@ -635,29 +652,289 @@ for (const w of [320, 375]) {
 for (const w of [320, 375, 430]) {
   const { ctx, p } = await baglam({ w, h: 800, azalt: true });
   await ac(p);
-  const olc = () => p.evaluate(() => [...document.querySelectorAll('a, button, select, input:not([type=hidden]), textarea, label.form-choice, label.form-green, label.form-consent')].filter(e => { if (e.closest('.hp-field') || e.closest('[hidden]') || e.classList.contains('skip')) return false; const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return false; const r = e.getBoundingClientRect(); if (!r.width) return false; if ((e.type === 'checkbox' || e.type === 'radio') && e.closest('label')) return false; return r.width < 44 || r.height < 44; }).map(e => e.tagName + '.' + String(e.className).slice(0, 20) + ' "' + e.textContent.trim().slice(0, 18) + '" ' + Math.round(e.getBoundingClientRect().width) + 'x' + Math.round(e.getBoundingClientRect().height)));
+  const olc = () => p.evaluate(() => [...document.querySelectorAll('a, button, select, input:not([type=hidden]), textarea, summary, label.dosya-dugme, label.form-choice, label.form-green, label.form-consent')].filter(e => { if (e.closest('.hp-field') || e.closest('[hidden]') || e.classList.contains('skip')) return false; if (e.id === 'lead-fatura' && e.closest('.dosya.hazir')) return false; /* görsel olarak gizli; dokunma hedefi etiket düğmesidir */ const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return false; const r = e.getBoundingClientRect(); if (!r.width) return false; if ((e.type === 'checkbox' || e.type === 'radio') && e.closest('label')) return false; return r.width < 44 || r.height < 44; }).map(e => e.tagName + '.' + String(e.className).slice(0, 20) + ' "' + e.textContent.trim().slice(0, 18) + '" ' + Math.round(e.getBoundingClientRect().width) + 'x' + Math.round(e.getBoundingClientRect().height)));
   const kucuk = await olc();
+  await p.evaluate(() => document.querySelectorAll('details.acilir').forEach(d => { d.open = true; }));
+  kucuk.push(...(await olc()).filter(x => !kucuk.includes(x)).map(x => 'AÇIKKEN ' + x));
   await p.click('#mobileMenuBtn');
   const menude = await p.evaluate(() => [...document.querySelectorAll('#mobileMenu a, #mobileMenu button')].filter(e => { const r = e.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).map(e => e.textContent + ' ' + Math.round(e.getBoundingClientRect().width) + 'x' + Math.round(e.getBoundingClientRect().height)));
-  ok(`I3 ${w}px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi; menü paneli dahil)`, kucuk.length === 0 && menude.length === 0, kucuk.concat(menude).join(' | '));
+  ok(`I3 ${w}px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi, açılır alan başlığı, dosya düğmesi; alanlar kapalı ve açıkken; menü paneli dahil)`, kucuk.length === 0 && menude.length === 0, kucuk.concat(menude).join(' | '));
   await ctx.close();
 }
 for (const w of [1280, 1440, 1040]) {
   const { ctx, p } = await baglam({ w, h: 800, azalt: true });
   await ac(p);
-  const r = await p.evaluate(() => { const a = document.querySelector('.contact-info').getBoundingClientRect(), f = document.getElementById('leadForm').getBoundingClientRect(), t = document.getElementById('teklif').getBoundingClientRect(); return { yan: f.left >= a.right && Math.abs(f.top - a.top) < 40, capa: Math.round(t.top - f.top) }; });
-  ok(`I4 ${w}px form iletişim bilgilerinin yanında, aynı hizada; #teklif çapası formun üstünde`, r.yan && Math.abs(r.capa) <= 1, JSON.stringify(r));
+  const r = await p.evaluate(() => { const a = document.querySelector('.contact-head').getBoundingClientRect(), k = document.querySelector('.contact-kunye').getBoundingClientRect(), f = document.getElementById('leadForm').getBoundingClientRect(), t = document.getElementById('teklif').getBoundingClientRect(); return { yan: f.left >= a.right && Math.abs(f.top - a.top) < 40, kunye: k.top >= a.bottom && k.right <= f.left && k.bottom <= f.bottom, capa: Math.round(t.top - f.top) }; });
+  ok(`I4 ${w}px form başlık sütununun yanında, aynı hizada; iletişim ve sicil bilgileri sol sütunda başlığın altında; #teklif çapası formun üstünde`, r.yan && r.kunye && Math.abs(r.capa) <= 1, JSON.stringify(r));
   await ctx.close();
 }
 { // tablo telefonda: sayfa içinde, yatay kaydırma gerektirmeden okunur
   const { ctx, p } = await baglam({ w: 320, h: 640, azalt: true });
   await ac(p);
-  const t = await p.evaluate(() => { const s = document.getElementById('saatTablo').getBoundingClientRect(); const f = document.querySelector('.fin-table').getBoundingClientRect(); const sat = document.querySelector('#saatTablo tbody tr').getBoundingClientRect(); return { sol: Math.round(s.left), sag: Math.round(s.right), fsag: Math.round(f.right), satir: Math.round(sat.height), yazi: parseFloat(getComputedStyle(document.querySelector('#saatTablo td')).fontSize), model: [...document.querySelectorAll('.fin-table .ft-m')].filter(e => getComputedStyle(e).display !== 'none').length }; });
-  ok('I5 320px saatlik tablo ve model tablosu ekrana sığıyor (yatay kaydırma yok); model tablosunda her değerin başında model adı', t.sol >= 0 && t.sag <= 320 && t.fsag <= 320 && t.yazi >= 14 && t.model === 9, JSON.stringify(t));
+  await p.evaluate(() => { document.querySelector('.lm-saatlik details').open = true; });
+  const t = await p.evaluate(() => { const s = document.getElementById('saatTablo').getBoundingClientRect(); const f = document.querySelector('.fin-table').getBoundingClientRect(); const sat = document.querySelector('#saatTablo tbody tr').getBoundingClientRect(); return { sol: Math.round(s.left), sag: Math.round(s.right), fsag: Math.round(f.right), satir: Math.round(sat.height), yazi: parseFloat(getComputedStyle(document.querySelector('#saatTablo td')).fontSize), model: [...document.querySelectorAll('.fin-table .ft-m')].filter(e => getComputedStyle(e).display !== 'none').length, sutun: new Set([...document.querySelectorAll('#saatTablo table')].map(x => Math.round(x.getBoundingClientRect().left))).size }; });
+  ok('I5 320px saatlik tablo (açıkken, 2 × 2) ve model tablosu ekrana sığıyor (yatay kaydırma yok); model tablosunda her değerin başında model adı', t.sol >= 0 && t.sag <= 320 && t.fsag <= 320 && t.yazi >= 14 && t.model === 9 && t.sutun === 2, JSON.stringify(t));
+  await ctx.close();
+}
+
+// ───────────────────────── J. açılır alanlar (<details>): telefon, masaüstü, betiksiz, yeniden boyutlama ─────────────────────────
+const KAYNAK = await (await fetch(SAYFA)).text();
+const ALANLAR = ['Saatlik PTF · ₺/MWh', 'Şirket Bilgileri', 'EPDK Tedarik Lisansı', 'İletişim ve Sicil Bilgileri'];
+const alanOku = (p) => p.evaluate(() => [...document.querySelectorAll('details.acilir')].map(d => { const s = d.querySelector('summary'); const r = s.getBoundingClientRect(); const ic = [...d.children].filter(c => c !== s); return { ad: [...s.querySelectorAll('h3 span')].filter(x => getComputedStyle(x).display !== 'none').map(x => x.textContent).join('') || s.textContent.trim(), acik: d.open, y: Math.round(r.height), g: Math.round(r.width), icY: Math.round(d.getBoundingClientRect().height - r.height), icGor: ic.some(c => c.checkVisibility()), tab: s.getAttribute('tabindex'), isaret: getComputedStyle(s, '::after').content, h3: !!s.querySelector('h3'), imlec: getComputedStyle(s).cursor }; }));
+{
+  const govdeKaynak = KAYNAK.slice(KAYNAK.indexOf('<body'), KAYNAK.indexOf('<script>\n// Navigation'));
+  const kaynakAcik = (govdeKaynak.match(/<details class="acilir" open>/g) || []).length, kaynakTum = (govdeKaynak.match(/<details\b/g) || []).length;
+  const icerik = ['19 Eylül 2011 · Kurul Kararı 3424-8', '2031 · süre uzatımı EPDK onayına tabi', 'Enerji Piyasası Düzenleme Kurumu', '786882-0 · İstanbul', 'OSB + endüstriyel tesisler', 'GÖP · GİP · İkili Anlaşmalar', 'Acıbadem Mah. Elysium Elit', 'mailto:info@voltage.com.tr', '<th scope="row">00:00</th>', '<th scope="row">23:00</th>'].filter(t => !govdeKaynak.includes(t));
+  ok('J1 kaynak HTML: dört <details>, dördü de “open” ile gelir; açılır alanların bütün içeriği HTML’de (betikle eklenen içerik yok)', kaynakAcik === 4 && kaynakTum === 4 && icerik.length === 0 && (govdeKaynak.match(/<th scope="row">\d\d:00<\/th><td>—<\/td>/g) || []).length === 24, JSON.stringify([kaynakAcik, kaynakTum, icerik]));
+  for (const [w, h] of [[390, 844], [320, 568]]) {
+    const { ctx, p, durum } = await baglam({ w, h });
+    await ac(p);
+    let a = await alanOku(p);
+    ok(`J2 ${w}px telefon: dört alan kapalı başlar (saatlik tablo, şirket bilgileri, EPDK lisansı, iletişim ve sicil bilgileri); başlık satırı ≥ 44 px, tam genişlikte, işaretli, H3`, a.length === 4 && JSON.stringify(a.map(x => x.ad)) === JSON.stringify(ALANLAR) && a.every(x => !x.acik && x.y >= 44 && x.g >= w - 2 * 40 && x.icY <= 2 && !x.icGor && x.tab === null && x.isaret !== 'none' && x.h3 && x.imlec === 'pointer'), JSON.stringify(a));
+    const sira = await p.evaluate(() => { const y = (s) => Math.round(document.querySelector(s).getBoundingClientRect().top + scrollY); return { bas: y('.contact-head'), form: y('#leadForm'), kunye: y('.contact-kunye'), metin: y('.about-metin'), imza: y('.about-signature'), akunye: y('.about-kunye'), rozet: y('.marks'), ozet: y('.lm-ledger'), saat: y('.lm-saatlik') }; });
+    ok(`J3 ${w}px telefon sırası: İletişim başlığı → teklif formu → iletişim ve sicil bilgileri; Hakkında metni → imza → şirket bilgileri ve lisans → rozetler; piyasa özeti → saatlik tablo`, sira.bas < sira.form && sira.form < sira.kunye && sira.metin < sira.imza && sira.imza < sira.akunye && sira.akunye < sira.rozet && sira.ozet < sira.saat, JSON.stringify(sira));
+    const ara = await p.evaluate(() => { const f = document.getElementById('leadForm').getBoundingClientRect().top, b = document.getElementById('iletisim').getBoundingClientRect().top; return Math.round(f - b); });
+    ok(`J3 ${w}px İletişim bölümünün başından forma kadar yalnız başlık ve iki kısa cümle (≤ 330 px)`, ara <= 330, String(ara));
+    for (let i = 0; i < 4; i++) {
+      const sec = `details.acilir >> nth=${i}`;
+      await p.locator(sec).locator('summary').scrollIntoViewIfNeeded();
+      await p.locator(sec).locator('summary').click();
+      const acik = await p.locator(sec).evaluate(d => ({ acik: d.open, ic: Math.round(d.getBoundingClientRect().height - d.querySelector('summary').getBoundingClientRect().height), tasma: document.documentElement.scrollWidth > document.documentElement.clientWidth }));
+      await p.locator(sec).locator('summary').click();
+      const kapali = await p.locator(sec).evaluate(d => d.open);
+      ok(`J4 ${w}px “${ALANLAR[i]}”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır`, acik.acik && acik.ic > 60 && !acik.tasma && !kapali, JSON.stringify([acik, kapali]));
+    }
+    if (w === 390) {
+      // klavye: önceki bağlantıdan Tab ile başlığa gelinir; odak çerçevesi görünür; Enter açar
+      await p.evaluate(() => document.querySelector('.lm-link a').focus());
+      await p.keyboard.press('Tab');
+      const o = await p.evaluate(() => { const e = document.activeElement; const c = getComputedStyle(e); return { etiket: e.tagName, cerceve: c.outlineStyle + ' ' + c.outlineWidth, y: Math.round(e.getBoundingClientRect().height) }; });
+      await p.keyboard.press('Enter');
+      const ac1 = await p.evaluate(() => document.querySelector('.lm-saatlik details').open);
+      await p.keyboard.press('Enter');
+      ok('J5 390px klavye: Tab ile açılır alan başlığına gelinir, odak çerçevesi görünür (2 px), Enter açar ve kapatır', o.etiket === 'SUMMARY' && /solid 2px/.test(o.cerceve) && ac1 && !(await p.evaluate(() => document.querySelector('.lm-saatlik details').open)), JSON.stringify(o));
+      await p.evaluate(() => document.querySelectorAll('details.acilir').forEach(d => { d.open = true; }));
+      const tablo = await p.evaluate(() => { const t = [...document.querySelectorAll('#saatTablo table')].map(x => x.getBoundingClientRect()); return { sutun: new Set(t.map(r => Math.round(r.left))).size, satir: new Set(t.map(r => Math.round(r.top))).size, hucre: [...document.querySelectorAll('#saatTablo tbody td')].filter(x => /^\d{1,3}(\.\d{3})*,\d{2}$/.test(x.textContent)).length, yuk: Math.round(document.getElementById('saatTablo').getBoundingClientRect().height) }; });
+      ok('J6 390px saatlik tablo açıkken 2 × 2 dizilir (dört kısa tablo), 24 değer dolu; 24 alt alta satırdan kısa', tablo.sutun === 2 && tablo.satir === 2 && tablo.hucre === 24 && tablo.yuk < 420, JSON.stringify(tablo));
+      await p.screenshot({ path: `${CIKTI}/r3/durum/acilir-390-acik.png`, fullPage: true });
+    }
+    ok(`J2 ${w}px telefon: konsol hatası yok`, durum.konsol.length === 0, durum.konsol.join(' | '));
+    await ctx.close();
+  }
+  for (const w of [1440, 1280, 768]) {
+    const { ctx, p } = await baglam({ w, h: 900 });
+    await ac(p);
+    let a = await alanOku(p);
+    ok(`J7 ${w}px geniş ekran: dört alan açık, içerik görünür; başlık düz ara başlıktır (işaret yok, sekme sırasında değil)`, a.length === 4 && a.every(x => x.acik && x.icY > 60 && x.icGor && x.tab === '-1' && x.isaret === 'none' && x.imlec !== 'pointer'), JSON.stringify(a));
+    await p.evaluate(() => document.querySelectorAll('details.acilir summary').forEach(s => s.click()));
+    a = await alanOku(p);
+    ok(`J7 ${w}px geniş ekran: başlığa tıklamak alanı kapatmaz`, a.every(x => x.acik), JSON.stringify(a.map(x => x.acik)));
+    await ctx.close();
+  }
+  { // yeniden boyutlama: telefonda kapalı kalan alan geniş ekranda açılır
+    const { ctx, p } = await baglam({ w: 390, h: 844 });
+    await ac(p);
+    const once = (await alanOku(p)).map(x => x.acik).join();
+    await p.setViewportSize({ width: 1280, height: 800 }); await p.waitForTimeout(250);
+    const genis = await alanOku(p);
+    await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(250);
+    const dar = await alanOku(p);
+    ok('J8 ekran genişleyince (390 → 1280) kapalı alanlar açılır ve başlık sekme sırasından çıkar; daralınca başlık yeniden dokunulabilir olur', once === 'false,false,false,false' && genis.every(x => x.acik && x.tab === '-1') && dar.every(x => x.tab === null && x.isaret !== 'none'), JSON.stringify([once, genis.map(x => x.acik + ':' + x.tab), dar.map(x => x.tab)]));
+    await ctx.close();
+  }
+  for (const [w, h] of [[390, 844], [1280, 800]]) { // betik kapalı
+    const j = await baglam({ w, h, js: false });
+    await j.p.goto(SAYFA, { waitUntil: 'load' });
+    const r = await j.p.evaluate(() => ({ alan: [...document.querySelectorAll('details.acilir')].map(d => d.open && [...d.children].slice(1).reduce((t, c) => t + c.getBoundingClientRect().height, 0) > 0), gorsel: [...document.querySelectorAll('.sektor-foto img')].map(i => !!i.getAttribute('src') && i.getBoundingClientRect().height > 40).filter(Boolean).length, girdi: (() => { const g = document.getElementById('lead-fatura'); const q = g.getBoundingClientRect(); const c = getComputedStyle(g); return { g: Math.round(q.width), y: Math.round(q.height), opak: c.opacity, gor: c.display !== 'none' && c.visibility !== 'hidden' }; })(), ozel: [getComputedStyle(document.querySelector('.dosya-dugme')).display, getComputedStyle(document.querySelector('.dosya-durum')).display], form: [...document.querySelectorAll('#leadForm input:not([type=hidden]), #leadForm select, #leadForm textarea, #leadSubmit')].filter(e => !e.closest('.hp-field') && e.id !== 'lead-fatura').every(e => e.getBoundingClientRect().height >= 18 && !e.disabled), metin: document.body.innerText }));
+    // piyasa alanı betiksiz gizlenir (yerine cümle ve /canli-ptf bağlantısı): saatlik tablo alanı görünmez, öbür üç alan açık ve görünür
+    ok(`J9 ${w}px BETİK KAPALI: açılır alanlar açık (lisans, şirket, iletişim bilgileri görünür; piyasa alanı yerine cümle)`, r.alan.length === 4 && r.alan.slice(1).every(Boolean) && /19 Eylül 2011 · Kurul Kararı 3424-8/.test(r.metin) && /OSB \+ endüstriyel tesisler/.test(r.metin) && /Acıbadem Mah\. Elysium Elit/.test(r.metin) && /Canlı PTF sayfasında/.test(r.metin), JSON.stringify(r.alan));
+    ok(`J9 ${w}px BETİK KAPALI: yedi sektör görseli sayfada (src dolu, alanı ayrılmış); form alanları ve gönder düğmesi kullanılabilir`, r.gorsel === 7 && r.form, JSON.stringify([r.gorsel, r.form]));
+    ok(`J9 ${w}px BETİK KAPALI: yerli dosya girdisi görünür ve kullanılabilir; yerelleştirilmiş düğme ve durum satırı gizli`, r.girdi.gor && r.girdi.g > 150 && r.girdi.y >= 40 && r.girdi.opak === '1' && r.ozel.join() === 'none,none', JSON.stringify([r.girdi, r.ozel]));
+    if (w === 390) await j.p.screenshot({ path: `${CIKTI}/r3/durum/betik-kapali-390.png`, fullPage: true });
+    await j.ctx.close();
+  }
+}
+
+// ───────────────────────── K. dosya seçici (TR/EN düğme ve durum metni) ─────────────────────────
+{
+  const { readFileSync } = await import('fs');
+  const CANLI = readFileSync('/home/user/website/index.html', 'utf8');
+  const canliGirdi = (CANLI.match(/<input type="file"[^>]*id="lead-fatura"[^>]*>/) || [''])[0];
+  const yeniGirdi = (KAYNAK.match(/<input type="file"[^>]*id="lead-fatura"[^>]*>/) || [''])[0];
+  ok('K1 <input type="file"> etiketi canlı sayfadakiyle bayt bayt aynı (id, name, accept, multiple)', canliGirdi.length > 50 && canliGirdi === yeniGirdi && /id="lead-fatura" name="fatura" accept="[^"]+" multiple>$/.test(yeniGirdi), yeniGirdi);
+  const fa = CANLI.slice(CANLI.indexOf('<form class="form reveal"'), CANLI.indexOf('</form>') + 7), fb = KAYNAK.slice(KAYNAK.indexOf('<form class="form reveal"'), KAYNAK.indexOf('</form>') + 7);
+  const geri = fb.replace(/^ *<div class="dosya" id="leadFaturaKutu">\n( *)  (<input type="file"[^\n]*>)\n *<label class="dosya-dugme"[^\n]*<\/label>\n *<span class="dosya-durum"[^\n]*<\/span>\n *<\/div>\n/m, '$1$2\n');
+  ok('K1 form işaretlemesi: dosya seçici dönüşümü geri alınınca <form>…</form> canlıyla bayt bayt aynı (başka değişiklik yok)', fa !== fb && fa === geri, `canlı ${fa.length}, hazırlık ${fb.length}, geri alınmış ${geri.length}`);
+  const pdf = (ad, boy = 2000) => ({ name: ad, mimeType: 'application/pdf', buffer: Buffer.concat([Buffer.from('%PDF-1.4\n'), Buffer.alloc(boy, 32)]) });
+  for (const w of [1280, 390]) {
+    const { ctx, p, durum } = await baglam({ w, h: 844 });
+    await ac(p);
+    await p.locator('#leadFaturaKutu').scrollIntoViewIfNeeded();
+    const oku = () => p.evaluate(() => { const g = document.getElementById('lead-fatura'), l = document.querySelector('.dosya-dugme'), d = document.getElementById('leadFaturaDurum'), k = document.getElementById('leadFaturaKutu'); const q = g.getBoundingClientRect(), lq = l.getBoundingClientRect(), c = getComputedStyle(g); return { dugme: l.textContent, durum: d.textContent, icin: l.htmlFor, canli: d.getAttribute('aria-live'), girdi: { g: q.width, y: q.height, opak: c.opacity, gor: c.display !== 'none' && c.visibility !== 'hidden', tab: g.tabIndex, tur: g.type, ad: g.name, cok: g.multiple, kabul: g.accept, n: g.files.length }, dugmeBoy: [Math.round(lq.width), Math.round(lq.height)], hazir: k.className, kutuY: Math.round(k.getBoundingClientRect().height), tasma: d.getBoundingClientRect().right <= k.getBoundingClientRect().right + 0.5 && document.documentElement.scrollWidth <= document.documentElement.clientWidth, yerliYazi: getComputedStyle(g).opacity === '0' }; });
+    let d = await oku();
+    ok(`K2 ${w}px TR: görünen düğme “Dosya Seç”, durum “Dosya seçilmedi”; tarayıcının kendi “Choose Files” yazısı görünmez`, d.dugme === 'Dosya Seç' && d.durum === 'Dosya seçilmedi' && d.yerliYazi && /hazir/.test(d.hazir) && d.canli === 'polite', JSON.stringify(d));
+    ok(`K2 ${w}px girdi DOM’da, görsel olarak gizli ama odaklanabilir (aynı id/name/accept/multiple); düğme bir <label for="lead-fatura">, ≥ 44 px`, d.girdi.gor && d.girdi.g <= 1 && d.girdi.y <= 1 && d.girdi.opak === '0' && d.girdi.tab === 0 && d.girdi.tur === 'file' && d.girdi.ad === 'fatura' && d.girdi.cok && /application\/pdf/.test(d.girdi.kabul) && /\.heif$/.test(d.girdi.kabul) && d.icin === 'lead-fatura' && d.dugmeBoy[1] >= 44 && d.dugmeBoy[0] >= 44, JSON.stringify([d.girdi, d.icin, d.dugmeBoy]));
+    await p.evaluate(() => document.getElementById('lead-sektor').focus());
+    await p.keyboard.press('Tab');
+    const odak = await p.evaluate(() => { const l = getComputedStyle(document.querySelector('.dosya-dugme')); return { kim: document.activeElement.id, cerceve: l.outlineStyle + ' ' + l.outlineWidth }; });
+    ok(`K3 ${w}px klavye: Sektör alanından Tab ile dosya girdisine gelinir; odak çerçevesi etiket düğmesinde görünür`, odak.kim === 'lead-fatura' && /solid 2px/.test(odak.cerceve), JSON.stringify(odak));
+    const [secici] = await Promise.all([p.waitForEvent('filechooser'), p.click('.dosya-dugme')]);
+    ok(`K4 ${w}px düğmeye tıklamak dosya seçme penceresini açar (çoklu seçim açık)`, secici.isMultiple() && (await secici.element().getAttribute('id')) === 'lead-fatura');
+    await secici.setFiles([pdf('ekim-faturasi.pdf')]);
+    d = await oku();
+    ok(`K5 ${w}px bir dosya seçilince durum dosya adını gösterir`, d.durum === 'ekim-faturasi.pdf' && d.girdi.n === 1 && /dolu/.test(d.hazir), d.durum);
+    await p.evaluate(() => window.setLanguage('en'));
+    d = await oku();
+    ok(`K5 ${w}px EN: düğme “Choose Files”; seçili tek dosyanın adı durur`, d.dugme === 'Choose Files' && d.durum === 'ekim-faturasi.pdf', JSON.stringify([d.dugme, d.durum]));
+    await p.setInputFiles('#lead-fatura', [pdf('a.pdf'), pdf('b.pdf'), pdf('c.pdf')]);
+    d = await oku();
+    ok(`K6 ${w}px EN: üç dosya seçilince “3 files selected”`, d.durum === '3 files selected' && d.girdi.n === 3, d.durum);
+    await p.evaluate(() => window.setLanguage('tr'));
+    d = await oku();
+    ok(`K6 ${w}px TR: üç dosya seçiliyken “3 dosya seçildi”, düğme “Dosya Seç”`, d.durum === '3 dosya seçildi' && d.dugme === 'Dosya Seç', JSON.stringify([d.dugme, d.durum]));
+    await p.setInputFiles('#lead-fatura', [pdf('cok-uzun-bir-dosya-adi-2026-ekim-kasim-aralik-donemi-elektrik-faturasi-taranmis-kopya-son-hali.pdf')]);
+    d = await oku();
+    ok(`K7 ${w}px uzun dosya adı kutuyu taşırmaz (tek satır, sonu kısaltılır); kutu yüksekliği değişmez`, d.tasma && d.kutuY === 60, JSON.stringify([d.tasma, d.kutuY]));
+    await p.setInputFiles('#lead-fatura', []);
+    d = await oku();
+    ok(`K7 ${w}px seçim boşaltılınca “Dosya seçilmedi”; EN’de “No file chosen”`, d.durum === 'Dosya seçilmedi' && !/dolu/.test(d.hazir) && await p.evaluate(() => { window.setLanguage('en'); const t = document.getElementById('leadFaturaDurum').textContent; window.setLanguage('tr'); return t === 'No file chosen'; }), d.durum);
+    // seçiciyle seçilen dosya mevcut yükleme mantığıyla gider (multipart)
+    await doldur(p);
+    const [s2] = await Promise.all([p.waitForEvent('filechooser'), p.click('.dosya-dugme')]);
+    await s2.setFiles([pdf('fatura-1.pdf'), pdf('fatura-2.pdf')]);
+    await p.click('#leadSubmit'); await p.waitForSelector('.form-success');
+    const g = durum.gonderiler[0]; const ham = g.ham ? g.ham.toString('latin1') : '';
+    ok(`K8 ${w}px seçiciyle seçilen iki dosya mevcut yükleme mantığıyla gider (multipart, iki “fatura” parçası); konsol hatası yok`, durum.gonderiler.length === 1 && /multipart\/form-data/.test(g.tur) && (ham.match(/name="fatura"; filename="fatura-[12]\.pdf"/g) || []).length === 2 && durum.konsol.length === 0, durum.konsol.join(' | '));
+    await ctx.close();
+  }
+  { // dört dosya: mevcut sınır iletisi aynen çalışır; durum satırı sayıyı gösterir
+    const { ctx, p, durum } = await baglam({ w: 1280, h: 900 });
+    await ac(p);
+    await p.locator('#leadForm').scrollIntoViewIfNeeded();
+    await doldur(p);
+    await p.setInputFiles('#lead-fatura', [pdf('a.pdf'), pdf('b.pdf'), pdf('c.pdf'), pdf('d.pdf')]);
+    const dr = await metin(p, '#leadFaturaDurum');
+    await p.click('#leadSubmit'); await p.waitForSelector('#leadStatus.error');
+    ok('K9 dört dosya: durum “4 dosya seçildi”; gönderimde mevcut sınır iletisi (“En fazla 3 fatura dosyası yükleyebilirsiniz.”), istek yok', dr === '4 dosya seçildi' && (await metin(p, '#leadStatus')) === 'En fazla 3 fatura dosyası yükleyebilirsiniz.' && durum.gonderiler.length === 0, dr);
+    await p.check('#lead-yesil'); await p.waitForTimeout(400);
+    const kenar = await p.evaluate(() => getComputedStyle(document.getElementById('leadFaturaKutu')).borderTopStyle);
+    ok('K9 yeşil enerji seçiliyken dosya kutusu yerinde (kesik çizgili kenar durur)', kenar === 'dashed', kenar);
+    await ctx.close();
+  }
+}
+
+// ───────────────────────── L. sektör görselleri, hizmetler, zemin ritmi, sayfa boyu ─────────────────────────
+{
+  const SEKTOR = [['demir-celik', '/rehber/demir-celik-elektrik', 'Demir-Çelik & Döküm'], ['kimya', '/rehber/kimya-elektrik', 'Kimya & Petrokimya'], ['osb', '/rehber/osb-elektrik-tedariki', 'OSB & Endüstri Bölgeleri'], ['lojistik', '/rehber/soguk-zincir-elektrik', 'Lojistik & Soğuk Zincir'], ['cam-seramik', '/rehber/cam-seramik-elektrik', 'Cam & Seramik'], ['veri-merkezi', '/rehber/veri-merkezi-elektrik', 'Veri Merkezleri & Telekom'], ['tekstil', '/rehber/tekstil-elektrik', 'Tekstil & Kompozit']];
+  const eksikDosya = eksikGorseller();
+  ok('L0 sektör görseli dosyaları: 21/21 img/ klasöründe (7 sektör × 480/800/1200)', eksikDosya.length === 0, 'eksik: ' + eksikDosya.join(', '));
+  const { ctx, p, durum } = await baglam({ w: 1440, h: 900 });
+  await ac(p);
+  const y = await p.evaluate(() => ({
+    img: [...document.querySelectorAll('.sectors img')].map(i => ({ src: i.getAttribute('src'), srcset: i.getAttribute('srcset'), sizes: i.getAttribute('sizes'), w: i.getAttribute('width'), h: i.getAttribute('height'), lazy: i.loading, dec: i.decoding, alt: i.alt, ust: Math.round(i.getBoundingClientRect().top + scrollY), tr: i.getAttribute('data-alt-tr'), en: i.getAttribute('data-alt-en') })),
+    bag: [...document.querySelectorAll('.sectors .sektor h3 a')].map(a => [a.getAttribute('href'), a.textContent]), tum: [...document.querySelectorAll('.sectors a[href="/rehber"]')].map(a => a.textContent.trim()),
+    yazi: [...document.querySelectorAll('.sectors .sektor')].map(s => !!s.querySelector('h3') && s.querySelector('p').textContent.length > 10).filter(Boolean).length,
+    not: (() => { const n = document.querySelector('.sektor-not'); return [n.textContent, n.getAttribute('data-en'), Math.round(n.getBoundingClientRect().height), parseFloat(getComputedStyle(n).fontSize)]; })(),
+    kart: [...document.querySelectorAll('.sectors .sektor')].map(s => { const c = getComputedStyle(s); return c.borderRadius + '|' + c.boxShadow + '|' + c.backgroundColor + '|' + c.borderTopWidth; }), ortu: [...document.querySelectorAll('.sektor-foto *')].filter(e => e.tagName !== 'IMG').length,
+    svc: { h3: [...document.querySelectorAll('#hizmetler .svc-list h3')].map(h => h.textContent.trim()), bag: [...document.querySelectorAll('#hizmetler a')].map(a => a.getAttribute('href') + '|' + a.textContent.trim()), p: [...document.querySelectorAll('#hizmetler .svc-list p')].filter(x => x.textContent.length > 60).length, sus: document.querySelectorAll('#hizmetler img, #hizmetler svg:not(.arrow), #hizmetler [class*="num"]').length, sol: (() => { const w = document.querySelector('#hizmetler .wrap').getBoundingClientRect(), l = [...document.querySelectorAll('#hizmetler .svc-list li')].map(x => x.getBoundingClientRect()); return [Math.round(Math.min(...l.map(r => r.left)) - w.left - parseFloat(getComputedStyle(document.querySelector('#hizmetler .wrap')).paddingLeft)), Math.round(Math.max(...l.map(r => r.right)) - Math.min(...l.map(r => r.left)))]; })() },
+  }));
+  ok('L1 hizmetler: beş hizmet H3, beş açıklama; ilk hizmet /sanayi-elektrik-tedariki bağlantısını korur; görsel, şema, numara ya da simge yok', JSON.stringify(y.svc.h3) === JSON.stringify(['Endüstriyel Tedarik', 'GÖP & GİP Operasyonu', 'Portföy Yönetimi', 'Yenilenebilir Enerji Tedariki', 'Enerji Danışmanlığı']) && y.svc.bag.join() === '/sanayi-elektrik-tedariki|Endüstriyel Tedarik' && y.svc.p === 5 && y.svc.sus === 0, JSON.stringify(y.svc));
+  ok('L1 hizmetler 1440: ızgara içerik genişliğinin tamamını kullanır (solda boşluk yok)', y.svc.sol[0] <= 0 && y.svc.sol[1] >= 1240, JSON.stringify(y.svc.sol));
+  ok('L2 yedi sektör: adı H3 ve rehber bağlantısı, açıklaması duruyor; “Tüm sektör rehberleri” → /rehber', JSON.stringify(y.bag) === JSON.stringify(SEKTOR.map(s => [s[1], s[2]])) && y.yazi === 7 && y.tum.join() === 'Tüm sektör rehberleri', JSON.stringify(y.bag));
+  ok('L3 yedi görsel: srcset 480w/800w/1200w (kendi dosyaları), sizes dolu, width=1200 height=800, loading=lazy, decoding=async', y.img.length === 7 && y.img.every((i, n) => i.srcset === [480, 800, 1200].map(k => `img/sektor-${SEKTOR[n][0]}-${k}.webp ${k}w`).join(', ') && i.src === `img/sektor-${SEKTOR[n][0]}-800.webp` && /^\(min-width: 1384px\) \d+px, \(min-width: 1040px\) \d+vw, /.test(i.sizes) && i.w === '1200' && i.h === '800' && i.lazy === 'lazy' && i.dec === 'async'), JSON.stringify(y.img.map(i => i.sizes)));
+  ok('L3 görsellerin alt metni TR ve EN dolu, anahtar kelime yığını değil (≤ 12 kelime, “elektrik tedariki/fiyat” gibi arama kalıbı yok)', y.img.every(i => i.alt === i.tr && i.tr.length > 15 && i.en.length > 15 && i.tr.split(' ').length <= 12 && !/tedarik|fiyat|ucuz|voltage/i.test(i.tr + i.en)), JSON.stringify(y.img.map(i => i.alt)));
+  ok('L3 görsellerin hepsi ilk ekranın altında (1440×900): kapak görseli LCP adayı kalır', y.img.every(i => i.ust > 900), y.img.map(i => i.ust).join());
+  ok('L4 temsilî görsel notu bölümde görünür (TR ve EN)', y.not[0] === 'Görseller temsilîdir; Voltage Enerji tesislerini göstermez.' && y.not[1] === 'Images are illustrative and do not show Voltage Enerji facilities.' && y.not[2] > 0 && y.not[3] >= 13, JSON.stringify(y.not));
+  ok('L5 dizgi: kart kutusu yok (yuvarlak köşe, gölge, zemin, çerçeve yok); görsel üstünde yazı ya da örtü yok', y.kart.every(k => /^0px\|none\|rgba\(0, 0, 0, 0\)\|0px$/.test(k)) && y.ortu === 0, JSON.stringify(y.kart.slice(0, 2)));
+  const olcu = async (w, h, dsf = 1) => {
+    const k = await baglam({ w, h, dsf });
+    await ac(k.p, '', 200);
+    await k.p.evaluate(async () => { for (let yy = 0; yy < document.documentElement.scrollHeight; yy += 400) { scrollTo(0, yy); await new Promise(r => setTimeout(r, 60)); } });
+    await k.p.waitForLoadState('networkidle'); await k.p.waitForTimeout(300);
+    const r = await k.p.evaluate(() => [...document.querySelectorAll('.sektor-foto img')].map(i => { const q = i.getBoundingClientRect(); const dosya = (i.currentSrc || '').split('/').pop(); return { ad: i.getAttribute('src').replace(/^img\/sektor-|-800\.webp$/g, ''), g: Math.round(q.width), y: Math.round(q.height), dosya, dw: +((dosya.match(/-(\d+)\.webp$/) || [])[1] || 0), tamam: i.complete && i.naturalWidth > 0, yuva: i.naturalWidth /* w tanımlı srcset'te doğal genişlik = sizes ile bildirilen yuva genişliği */ }; }));
+    const boy = await k.p.evaluate(() => document.documentElement.scrollHeight);
+    await k.ctx.close();
+    return { r, boy, hata: k.durum.konsol };
+  };
+  const genislikler = [[1440, 900, 1], [1280, 800, 1], [1024, 768, 1], [768, 1024, 1], [390, 844, 1], [390, 844, 3], [320, 568, 2]];
+  const cesit = {};
+  for (const [w, h, dsf] of genislikler) {
+    const o = await olcu(w, h, dsf);
+    not(`sektör görselleri ${w}px @${dsf}x: ` + o.r.map(x => `${x.ad} ${x.g}×${x.y}${x.dosya ? ' → ' + x.dosya.replace('sektor-' + x.ad + '-', '') : ''}`).join(' · '));
+    cesit[w] = new Set(o.r.map(x => x.g + 'x' + x.y)).size;
+    ok(`L6 ${w}px @${dsf}x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil`, o.r.every(x => x.tamam && x.dw >= Math.min(1200, x.g * dsf) * 0.93 && (x.dw === 480 || x.g * dsf > (x.dw === 800 ? 480 : 800) * 0.93) && Math.abs(x.yuva - x.g) <= x.g * 0.08 + 6) && o.hata.length === 0, JSON.stringify(o.r.map(x => [x.ad, x.g, x.yuva, x.dw, x.tamam])) + o.hata.join('|'));
+  }
+  ok('L7 asimetrik dizgi: 1440 px’te en az dört farklı görsel ölçüsü; telefonda büyük + ikili düzen (iki ölçü)', cesit[1440] >= 4 && cesit[390] === 2, JSON.stringify(cesit));
+  // zemin ritmi
+  const zemin = await p.evaluate(() => [...document.querySelectorAll('main > section, main > .trust, footer')].map(e => { const c = getComputedStyle(e).backgroundColor.match(/\d+/g).map(Number); return { ad: e.id || e.className.split(' ')[0], koyu: c[0] + c[1] + c[2] < 200, renk: c.join(',') }; }));
+  let ust = 0, enUzun = 0; zemin.forEach(z => { ust = z.koyu ? 0 : ust + 1; enUzun = Math.max(enUzun, ust); });
+  ok('L8 zemin ritmi: art arda üç açık bölüm yok; koyu bölümler sektörler, süreç ve “Neden Voltage?”; ayrı koyu söz bandı yok', enUzun <= 2 && zemin.filter(z => z.koyu).map(z => z.ad).join() === 'kapak,sectors,process,yaklasim,footer' && !(await p.evaluate(() => !!document.querySelector('.quotec'))), JSON.stringify(zemin.map(z => z.ad + (z.koyu ? ':KOYU' : ':açık'))));
+  not('zemin sırası: ' + zemin.map(z => z.ad + (z.koyu ? ' (lacivert)' : z.renk === '255,255,255' ? ' (beyaz)' : ' (krem)')).join(' → '));
+  const soz = await p.evaluate(() => { const e = document.querySelector('#yaklasim .callout-t'); const etiket = [...document.querySelectorAll('.app-tag')]; return { var: !!e, yazi: e ? parseFloat(getComputedStyle(e).fontSize) : 0, metin: e ? e.innerText.trim() : '', etiket: etiket.map(x => x.textContent).join('|'), etiketBoy: Math.max(...etiket.map(x => parseFloat(getComputedStyle(x).fontSize))), govde: parseFloat(getComputedStyle(document.querySelector('.app-x')).fontSize), slogan: /Bir firma kadar köklü/.test(document.body.textContent) || /As established as a firm/.test(document.documentElement.innerHTML) }; });
+  ok('L9 şirket cümlesi “Neden Voltage?” bölümünün içinde, sakin (≤ 22 px); üç ilke etiketi duruyor ve gövde metninden küçük; “Bir firma kadar köklü…” satırı kaldırıldı (TR ve EN)', soz.var && soz.yazi <= 22 && /^Enerji bir emtia değil; işinizin nabzıdır\./.test(soz.metin) && soz.etiket === '— Taahhüt üzerine kurulu|— Derinlik üzerine kurulu|— Açıklık üzerine kurulu' && soz.etiketBoy < soz.govde && !soz.slogan, JSON.stringify(soz));
+  const kurum = await p.evaluate(() => { const h = document.getElementById('hakkimizda'); const t = h.innerText; const m = h.querySelector('.about-metin').getBoundingClientRect(), k = h.querySelector('.about-kunye').getBoundingClientRect(); return { h2: [...h.querySelectorAll('h2')].length, h3: [...h.querySelectorAll('h3')].map(x => x.innerText.trim()), yan: k.left >= m.right - 1 && Math.abs(k.top - m.top) < 60, fark: Math.round(Math.abs(k.bottom - m.bottom)), olgu: ['ETS/3424-8/2074', 'Voltan Elektrik Toptan Satış İth. ve İhr. A.Ş.', '19 Eylül 2011 · Kurul Kararı 3424-8', '2031 · süre uzatımı EPDK onayına tabi', 'Enerji Piyasası Düzenleme Kurumu', '786882-0 · İstanbul', 'Sabit · Endeksli · Hibrit', 'OSB + endüstriyel tesisler', 'GÖP · GİP · İkili Anlaşmalar', '— Emirhan Tan, Yönetim Kurulu Başkanı', 'YEK-G SERTİFİKALI SATICI', 'EPİAŞ PİYASA KATILIMCISI', 'İTO ÜYESİ', 'KVKK AYDINLATMA METNİ', 'Sözleşme ne diyorsa, o olur.'].filter(x => !t.includes(x)), gorsel: h.querySelectorAll('img, picture, svg').length, lisansBolum: document.querySelectorAll('section.licence').length }; });
+  ok('L10 kurumsal blok: EPDK lisansı “Voltage Enerji Hakkında” bölümünde H3 olarak şirket bilgilerinin yanında; ayrı lisans bölümü yok; tüm şirket ve lisans bilgileri, imza ve dört rozet duruyor; fotoğraf yok', kurum.h2 === 1 && JSON.stringify(kurum.h3) === JSON.stringify(['Şirket Bilgileri', 'EPDK Tedarik Lisansı']) && kurum.yan && kurum.olgu.length === 0 && kurum.gorsel === 0 && kurum.lisansBolum === 0, JSON.stringify(kurum));
+  ok('L0 1440: betiğin aradığı her id sayfada var (kaldırılmış öğeye bağlı betik yok); konsol hatası yok', (await p.evaluate(() => { const js = [...document.scripts].filter(s => !s.type || s.type === 'text/javascript').map(s => s.textContent).join('\n'); const ids = new Set([...js.matchAll(/getElementById\('([^']+)'\)/g), ...js.matchAll(/\$\('([^']+)'\)/g)].map(m => m[1])); return [...ids].filter(i => !document.getElementById(i)); })).length === 0 && durum.konsol.length === 0, durum.konsol.join(' | '));
+  await ctx.close();
+  // sayfa boyu
+  const boylar = {};
+  for (const [w, h] of [[1440, 900], [390, 844]]) { const k = await baglam({ w, h }); await ac(k.p); boylar[w] = await k.p.evaluate(() => document.documentElement.scrollHeight); const o = await baglam({ w, h }); await o.p.goto(ONCEKI, { waitUntil: 'networkidle' }); await o.p.waitForTimeout(400); boylar[w + 'o'] = await o.p.evaluate(() => document.documentElement.scrollHeight); await k.ctx.close(); await o.ctx.close(); }
+  not(`sayfa boyu: 1440 px’te ${boylar['1440o']} → ${boylar[1440]} px; 390 px’te ${boylar['390o']} → ${boylar[390]} px (hedef: ≈ 8.000 ve ≈ 10.500)`);
+  ok('L11 sayfa önceki hazırlık sürümünden kısa (içerik silinmeden): 1440 px’te en az 1.300 px, 390 px’te en az 3.000 px', boylar['1440o'] - boylar[1440] >= 1300 && boylar['390o'] - boylar[390] >= 3000, JSON.stringify(boylar));
+}
+
+// ───────────────────────── M. ilk ekran: önceki hazırlık sürümüyle piksel karşılaştırması ─────────────────────────
+{
+  const yardimci = await (await b.newContext()).newPage();
+  await yardimci.goto('about:blank');
+  const karsilastir = (a, c, sinir) => yardimci.evaluate(async ({ a, c, sinir }) => {
+    const oku = async (v) => { const bm = await createImageBitmap(await (await fetch('data:image/png;base64,' + v)).blob()); const k = new OffscreenCanvas(bm.width, bm.height); const x = k.getContext('2d'); x.drawImage(bm, 0, 0); return { w: bm.width, h: bm.height, d: x.getImageData(0, 0, bm.width, bm.height).data }; };
+    const A = await oku(a), C = await oku(c);
+    if (A.w !== C.w || A.h !== C.h) return { boyut: false };
+    let ust = 0, alt = 0, ilk = -1, son = -1;
+    for (let y = 0; y < A.h; y++) { let f = 0; for (let x = 0; x < A.w; x++) { const i = (y * A.w + x) * 4; if (A.d[i] !== C.d[i] || A.d[i + 1] !== C.d[i + 1] || A.d[i + 2] !== C.d[i + 2]) f++; } if (f) { if (ilk < 0) ilk = y; son = y; if (y < sinir) ust += f; else alt += f; } }
+    return { boyut: true, w: A.w, h: A.h, ust, alt, ilk, son };
+  }, { a: a.toString('base64'), c: c.toString('base64'), sinir });
+  for (const [w, h, dsf] of [[1440, 900, 1], [390, 844, 1], [390, 844, 2]]) {
+    const cek = async (url) => {
+      const k = await baglam({ w, h, ptf: 'kapali', azalt: true, dsf });
+      await k.p.goto(url, { waitUntil: 'networkidle' });
+      await k.p.evaluate(() => document.fonts.ready); await k.p.waitForTimeout(700);
+      const o = await k.p.evaluate(() => ({ kapak: Math.round(document.querySelector('.hero').getBoundingClientRect().bottom), bilgi: Math.round(document.querySelector('.trust').getBoundingClientRect().bottom), foto: document.querySelector('.hero-photo img').complete && document.querySelector('.hero-photo img').naturalWidth > 0, yazi: [...document.fonts].filter(f => f.status === 'loaded').length, durum: document.getElementById('ptfKart').dataset.state }));
+      const png = await k.p.screenshot();
+      await k.ctx.close();
+      return { o, png };
+    };
+    const once = await cek(ONCEKI), sonra = await cek(SAYFA);
+    const ad = `${w}x${h}${dsf > 1 ? '@' + dsf + 'x' : ''}`;
+    writeFileSync(`${CIKTI}/r3/durum/ilk-ekran-${ad}-once.png`, once.png); writeFileSync(`${CIKTI}/r3/durum/ilk-ekran-${ad}-sonra.png`, sonra.png);
+    const sinir = Math.min(h, sonra.o.bilgi) * dsf;
+    const f = await karsilastir(once.png, sonra.png, sinir);
+    ok(`M1 ${ad} ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk ${Math.round(sinir / dsf)} px)`, f.boyut && f.ust === 0 && once.o.kapak === sonra.o.kapak && once.o.bilgi === sonra.o.bilgi && once.o.foto && sonra.o.foto && once.o.yazi === sonra.o.yazi && sonra.o.durum === 'waiting', JSON.stringify([f, once.o, sonra.o]));
+    not(`${ad}: kapak alt kenarı ${sonra.o.kapak} px, bilgi satırı alt kenarı ${sonra.o.bilgi} px; karşılaştırılan ${f.w}×${f.h} piksel; ilk ${Math.round(sinir / dsf)} px içinde farklı piksel ${f.ust}; altında farklı piksel ${f.alt}` + (f.alt ? ` (satır ${Math.round(f.ilk / dsf)}–${Math.round(f.son / dsf)}: yeniden düzenlenen Hizmetler bölümünün başı)` : ' (ekranın tamamı aynı)'));
+  }
+  await yardimci.context().close();
+}
+
+// ───────────────────────── N. PTF üç durum: konsol ve sayfa hatası yok (telefon ve masaüstü) ─────────────────────────
+for (const [w, h] of [[390, 844], [1440, 900]]) {
+  const { ctx, p, durum } = await baglam({ w, h });
+  const hatalar = () => durum.konsol.filter(k => !/ERR_CONNECTION_REFUSED|Failed to load resource|requestfailed: https:\/\/epias-proxy/.test(k));
+  await ac(p);
+  const canli = await p.evaluate(() => [document.getElementById('ptfKart').dataset.state, document.getElementById('kfStamp').textContent, document.getElementById('lmMode').textContent]);
+  const h1 = hatalar().length;
+  durum.ptf = 'kapali';
+  await ac(p);
+  const onb = await p.evaluate(() => [document.getElementById('ptfKart').dataset.state, document.getElementById('kfStamp').textContent, document.getElementById('lmMode').textContent]);
+  const h2 = hatalar().length;
+  await p.evaluate(() => localStorage.removeItem('voltage-ptf-cache'));
+  await ac(p);
+  const bek = await p.evaluate(() => [document.getElementById('ptfKart').dataset.state, document.getElementById('kfStamp').textContent, document.getElementById('lmMode').textContent, [...document.querySelectorAll('#saatTablo tbody td')].every(t => t.textContent === '—')]);
+  ok(`N1 ${w}px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)`, canli[0] === 'live' && canli[2] === 'CANLI' && onb[0] === 'cached' && /^SON SENKRON \d\d:\d\d$/.test(onb[1]) && onb[2] === 'SON SENKRON' && bek[0] === 'waiting' && bek[1] === 'EPİAŞ VERİSİ BEKLENİYOR' && bek[3] === true && h1 === 0 && h2 === 0 && hatalar().length === 0, JSON.stringify([canli, onb, bek, hatalar()]));
   await ctx.close();
 }
 
 await b.close();
-writeFileSync(`${CIKTI}/r2/test-sonucu.txt`, 'HAZIRLIK SAYFASI — DAVRANIŞ TESTLERİ (2. tur)\nSayfa: ' + SAYFA + '\n\n' + sonuc.join('\n') + `\n\nTOPLAM: ${gecen} geçti, ${kalan} kaldı\n`);
-console.log(`\nTOPLAM: ${gecen} geçti, ${kalan} kaldı  (ayrıntı: ${CIKTI}/r2/test-sonucu.txt)`);
+writeFileSync(`${CIKTI}/r3/test-sonucu.txt`, 'HAZIRLIK SAYFASI — DAVRANIŞ TESTLERİ (3. tur, 24.11 revizyonu)\nSayfa: ' + SAYFA + '\n\n' + sonuc.join('\n') + `\n\nTOPLAM: ${gecen} geçti, ${kalan} kaldı\n`);
+console.log(`\nTOPLAM: ${gecen} geçti, ${kalan} kaldı  (ayrıntı: ${CIKTI}/r3/test-sonucu.txt)`);
 process.exit(kalan ? 1 : 0);

@@ -1,48 +1,76 @@
-HAZIRLIK SAYFASI — DAVRANIŞ TESTLERİ (2. tur)
-Sayfa: http://127.0.0.1:8765/docs/design/onizleme/yeni-tasarim/index.html
+HAZIRLIK SAYFASI — DAVRANIŞ TESTLERİ (3. tur, 24.11 revizyonu)
+Sayfa: /docs/design/onizleme/yeni-tasarim/index.html
 
+       UYARI: 21/21 sektör görseli dosyası img/ klasöründe yok; bu koşuda yerlerine aynı ölçüde düz renkli TEST görseli döndürüldü (dosya yazılmadı): sektor-demir-celik-480.webp, sektor-demir-celik-800.webp, sektor-demir-celik-1200.webp, sektor-kimya-480.webp, sektor-kimya-800.webp, sektor-kimya-1200.webp, sektor-osb-480.webp, sektor-osb-800.webp, sektor-osb-1200.webp, sektor-lojistik-480.webp, sektor-lojistik-800.webp, sektor-lojistik-1200.webp, sektor-cam-seramik-480.webp, sektor-cam-seramik-800.webp, sektor-cam-seramik-1200.webp, sektor-veri-merkezi-480.webp, sektor-veri-merkezi-800.webp, sektor-veri-merkezi-1200.webp, sektor-tekstil-480.webp, sektor-tekstil-800.webp, sektor-tekstil-1200.webp
 GEÇTİ  A1 konsol hatası yok (1440, canlı veri)
 GEÇTİ  A2 tek <h1>; içinde üst satır (.h1-ust) ve slogan (.h1-ana); ayrı üst başlık öğesi yok
 GEÇTİ  A3 H1 görünümü: üst satır küçük büyük harfli sans, slogan serif
 GEÇTİ  A4 başlık sırası: atlanan düzey yok (H1 → H2 → H3)
-       başlık sayısı: H1 1, H2 9, H3 23
+       başlık sayısı: H1 1, H2 8, H3 27
 GEÇTİ  A5 <main> var; içerik içinde, footer dışında; atlama bağlantısı #icerik
 GEÇTİ  A6 betiklerin ve gelen bağlantıların kullandığı id değerleri duruyor; yinelenen id yok
 GEÇTİ  A7 logo işareti görsel olarak yüklendi; marka yazısı kapakta ve altta sans (Archivo)
 GEÇTİ  A8 kapak fotoğrafı yüklendi (WebP), yedek kapalı
-GEÇTİ  A9 yollar kökten başlıyor (kapak görselleri dışında göreli yol yok)
+GEÇTİ  A9 yollar kökten başlıyor (kapak ve sektör görselleri dışında göreli yol yok)
 GEÇTİ  A10 süs öğeleri yok: bölüm numarası, folyo, hizmet numarası, tek hat şeması, halkalar, EXHIBIT A, S1–S5, A/B/C, felsefe etiketi, ray, belirme
 GEÇTİ  A11 ok simgesi yalnız gerçek bağlantı ve düğmelerde
 GEÇTİ  A12 PTF kartı düz panel: bulanıklık ve gölge yok, zemin opak
 GEÇTİ  A13 gölge kullanan öğe yok (form odak halkası dışında)
 GEÇTİ  A14 monospace yalnız piyasa verisi, saat damgası ve teknik kimliklerde (lisans no, sicil no)
        monospace kullanan öğeler: İZİNLİ #kfStamp İZİNLİ .ptf-ticks İZİNLİ .mono İZİNLİ #lmMode İZİNLİ .ptf-ticks.lm-ticks İZİNLİ #lgAvg İZİNLİ #lgMo İZİNLİ #lgMinH İZİNLİ #lgMaxH İZİNLİ #lgUpd İZİNLİ #saatTablo İZİNLİ .ldg-v.mono İZİNLİ .contact-detail-value.mono
-GEÇTİ  A15 serif yalnız üç yerde: kapak sloganı, Hakkında cümlesi ve imza, şirket sözü
+GEÇTİ  A15 serif yalnız üç yerde: kapak sloganı, imza, şirket cümlesi (slogan satırı kaldırıldı)
        serif kullanan öğeler: h1-ana tr-only
 GEÇTİ  A16 yerleşim kayması yok (CLS, 1440, canlı veri gelirken)
+GEÇTİ  A16 yerleşim kayması yok (CLS, 390, canlı veri gelirken)
 GEÇTİ  A16 yerleşim kayması yok (CLS, 375, canlı veri gelirken)
 GEÇTİ  B1 açılış Türkçe; tüm çiftler TR metninde; çocuklu çeviri çifti yok
 GEÇTİ  B1 TR H2 metinleri talimattaki gibi
+GEÇTİ  B1 TR H3 metinleri: beş hizmet, yedi sektör, piyasa ara başlıkları (“Günlük Piyasa Özeti”), beş adım (“Tedarikçi Değişimi”), şirket bilgileri, EPDK lisansı (H3), üç ilke, form, iletişim bilgileri
+GEÇTİ  B1 TR: yedi sektör görselinin alt metni Türkçe
+GEÇTİ  B2 EN H3 metinleri (“Daily Market Summary”, “Supplier Switch”, “Company Details”, “Contact and Registry Details” dahil)
+GEÇTİ  B2 EN: yedi sektör görselinin alt metni İngilizce (dil düğmesi alt metnini de değiştirir)
 GEÇTİ  B2 EN: html lang, tüm çiftler EN metninde, tr-only gizli
 GEÇTİ  B2 EN H2 metinleri talimattaki gibi
 GEÇTİ  B3 EN: title / description / og:title / og:locale değişti
 GEÇTİ  B4 EN: canlı damga, kip, aylık etiket, yer tutucu İngilizce
 GEÇTİ  B5 EN: aria-pressed ve etkin sınıf (üst bant ve menü panelindeki düğmeler birlikte)
 GEÇTİ  B6 EN H1: iki parça
-GEÇTİ  B7 TR’ye dönüş: tüm çiftler TR, başlık ve tanım TR, en-only gizli
-GEÇTİ  B8 ?lang=en ile açılış İngilizce
+GEÇTİ  B7 TR’ye dönüş: tüm çiftler TR, başlık ve tanım TR, en-only gizli, alt metinleri yeniden Türkçe
+GEÇTİ  B8 ?lang=en ile açılış İngilizce (alt metinleri ve dosya seçici dahil)
+GEÇTİ  C1 1440px menü → #hakkimizda: hedef üst bandın hemen altında
+GEÇTİ  C1 1440px menü → #hizmetler: hedef üst bandın hemen altında
+GEÇTİ  C1 1440px menü → #yaklasim: hedef üst bandın hemen altında
+GEÇTİ  C1 1440px menü → #iletisim: hedef üst bandın hemen altında
+GEÇTİ  C1 1440px üst banttaki “Teklif Al” → #teklif: hedef üst bandın hemen altında
+GEÇTİ  C1 1440px “Teklif Al” inişi: form başlığı ve ilk alan ilk ekranda, bandın altında (arada başka içerik yok)
+       1440px “Teklif Al” → form üst kenarı 80 px, üst bant alt kenarı 69 px, form başlığı 121 px, ilk alanın alt kenarı 278 px (ekran 900 px)
+GEÇTİ  C2 1440px kapak “Teklif Al” → form başlığı görünür
+GEÇTİ  C3 1440px kapak “Hizmetlerimizi İncele” → #hizmetler; üst bant “scrolled”
 GEÇTİ  C1 1280px menü → #hakkimizda: hedef üst bandın hemen altında
 GEÇTİ  C1 1280px menü → #hizmetler: hedef üst bandın hemen altında
 GEÇTİ  C1 1280px menü → #yaklasim: hedef üst bandın hemen altında
 GEÇTİ  C1 1280px menü → #iletisim: hedef üst bandın hemen altında
 GEÇTİ  C1 1280px üst banttaki “Teklif Al” → #teklif: hedef üst bandın hemen altında
+GEÇTİ  C1 1280px “Teklif Al” inişi: form başlığı ve ilk alan ilk ekranda, bandın altında (arada başka içerik yok)
+       1280px “Teklif Al” → form üst kenarı 80 px, üst bant alt kenarı 69 px, form başlığı 121 px, ilk alanın alt kenarı 278 px (ekran 800 px)
 GEÇTİ  C2 1280px kapak “Teklif Al” → form başlığı görünür
 GEÇTİ  C3 1280px kapak “Hizmetlerimizi İncele” → #hizmetler; üst bant “scrolled”
+GEÇTİ  C1 390px menü → #hakkimizda: hedef üst bandın hemen altında
+GEÇTİ  C1 390px menü → #hizmetler: hedef üst bandın hemen altında
+GEÇTİ  C1 390px menü → #yaklasim: hedef üst bandın hemen altında
+GEÇTİ  C1 390px menü → #iletisim: hedef üst bandın hemen altında
+GEÇTİ  C1 390px üst banttaki “Teklif Al” → #teklif: hedef üst bandın hemen altında
+GEÇTİ  C1 390px “Teklif Al” inişi: form başlığı ve ilk alan ilk ekranda, bandın altında (arada başka içerik yok)
+       390px “Teklif Al” → form üst kenarı 80 px, üst bant alt kenarı 65 px, form başlığı 103 px, ilk alanın alt kenarı 257 px (ekran 844 px)
+GEÇTİ  C2 390px kapak “Teklif Al” → form başlığı görünür
+GEÇTİ  C3 390px kapak “Hizmetlerimizi İncele” → #hizmetler; üst bant “scrolled”
 GEÇTİ  C1 375px menü → #hakkimizda: hedef üst bandın hemen altında
 GEÇTİ  C1 375px menü → #hizmetler: hedef üst bandın hemen altında
 GEÇTİ  C1 375px menü → #yaklasim: hedef üst bandın hemen altında
 GEÇTİ  C1 375px menü → #iletisim: hedef üst bandın hemen altında
 GEÇTİ  C1 375px üst banttaki “Teklif Al” → #teklif: hedef üst bandın hemen altında
+GEÇTİ  C1 375px “Teklif Al” inişi: form başlığı ve ilk alan ilk ekranda, bandın altında (arada başka içerik yok)
+       375px “Teklif Al” → form üst kenarı 80 px, üst bant alt kenarı 65 px, form başlığı 103 px, ilk alanın alt kenarı 256 px (ekran 667 px)
 GEÇTİ  C2 375px kapak “Teklif Al” → form başlığı görünür
 GEÇTİ  C3 375px kapak “Hizmetlerimizi İncele” → #hizmetler; üst bant “scrolled”
 GEÇTİ  D1 375px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
@@ -76,6 +104,7 @@ GEÇTİ  E1 CANLI kapak kartı: değer sayı, damga “SAAT ss:00 · EPİAŞ”,
 GEÇTİ  E1 CANLI kapak kartı: gün eğrisi çizildi (24 nokta), o saatin noktası görünür
 GEÇTİ  E1 kapak kartında yalnız: başlık, damga, PTF değeri, gün eğrisi, bağlantı (başka sayı yok)
 GEÇTİ  E1 CANLI bölüm: büyük grafik çizildi, özet dolu (gün ort., ay ort., en düşük, en yüksek, durum)
+GEÇTİ  E1 saatlik tablo dört kısa gerçek tablo: 6’şar satır (00, 06, 12, 18’den başlar), sütun başlıkları “Saat / PTF” (scope=col), adları “Saatlik PTF · ₺/MWh”; geniş ekranda yan yana
 GEÇTİ  E1 CANLI saatlik tablo: gerçek <table>, 24 satır (00:00–23:00), 24 değer sayı, o saatin satırı işaretli
 GEÇTİ  E1 tablo değerleri proxy yanıtındaki saatlik fiyatlarla birebir aynı; kapak değeri = o saatin tablo değeri
 GEÇTİ  E1 bölüm kapaktaki “şu anki saat” rakamını manşet yapmıyor: KPI bandı ve ray yok; kapak değeri bölümde yalnız tablo satırında
@@ -100,7 +129,7 @@ GEÇTİ  E6 320px kart, kapak ve piyasa bölümü yüksekliği veri durumundan b
 GEÇTİ  E7 BETİK KAPALI: bölümde düz cümle ve /canli-ptf bağlantısı; boş grafik, özet ya da tablo görünmez
 GEÇTİ  E8 BETİK KAPALI: betik açıkken görünen bütün Türkçe metin (piyasa sayıları dışında) betiksiz de görünür
 GEÇTİ  E8 BETİK KAPALI: kapak kartı dürüst bekleme metniyle durur (“—”, “EPİAŞ VERİSİ BEKLENİYOR”); gizli bölüm yok
-       betik kapalı görünür satır: 229; betik açık (piyasa göstergeleri hariç): 228
+       betik kapalı görünür satır: 231; betik açık (piyasa göstergeleri hariç): 232
 GEÇTİ  F1 1280px boş gönderim engellenir (istek yok, odak ilk zorunlu alanda)
 GEÇTİ  F2 1280px geçerli gönderim: tek JSON isteği, tüm alanlar gövdede
 GEÇTİ  F2 1280px kaynak “dogrudan”, UTM yakalandı
@@ -136,16 +165,30 @@ GEÇTİ  F7 her form alanının görünür etiketi var
 GEÇTİ  F7 KVKK onayı olmadan gönderilmez
 GEÇTİ  F7 KVKK bağlantısı /kvkk, yeni sekme
 GEÇTİ  F8 EN gönderim: lang en, İngilizce başarı metni
+GEÇTİ  G2 1440px /#teklif: hedef bandın 16 px altında
+GEÇTİ  G2 1440px /#iletisim: hedef bandın 16 px altında
+GEÇTİ  G3 1440px /#hakkimizda: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 1440px /#yaklasim: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 1440px /#hizmetler: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 1440px /#canli-piyasa: bölüm başlığı bandın altında, ilk ekranda
 GEÇTİ  G2 1280px /#teklif: hedef bandın 16 px altında
 GEÇTİ  G2 1280px /#iletisim: hedef bandın 16 px altında
 GEÇTİ  G3 1280px /#hakkimizda: bölüm başlığı bandın altında, ilk ekranda
 GEÇTİ  G3 1280px /#yaklasim: bölüm başlığı bandın altında, ilk ekranda
 GEÇTİ  G3 1280px /#hizmetler: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 1280px /#canli-piyasa: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G2 390px /#teklif: hedef bandın 16 px altında
+GEÇTİ  G2 390px /#iletisim: hedef bandın 16 px altında
+GEÇTİ  G3 390px /#hakkimizda: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 390px /#yaklasim: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 390px /#hizmetler: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 390px /#canli-piyasa: bölüm başlığı bandın altında, ilk ekranda
 GEÇTİ  G2 375px /#teklif: hedef bandın 16 px altında
 GEÇTİ  G2 375px /#iletisim: hedef bandın 16 px altında
 GEÇTİ  G3 375px /#hakkimizda: bölüm başlığı bandın altında, ilk ekranda
 GEÇTİ  G3 375px /#yaklasim: bölüm başlığı bandın altında, ilk ekranda
 GEÇTİ  G3 375px /#hizmetler: bölüm başlığı bandın altında, ilk ekranda
+GEÇTİ  G3 375px /#canli-piyasa: bölüm başlığı bandın altında, ilk ekranda
 GEÇTİ  H1 hareket azaltma: yumuşak kaydırma kapalı, çalışan animasyon yok, gizli içerik yok
 GEÇTİ  H2 kaydırınca belirme kaldırıldı: açılışta gizli ya da kaydırılmış öğe yok, IntersectionObserver yok
 GEÇTİ  H3 fotoğraf yüklenemezse çizim silüet devreye girer
@@ -156,17 +199,29 @@ GEÇTİ  H5 768px @1x kapak görseli: kapak-2172.webp
 GEÇTİ  H5 1440px @1x kapak görseli: kapak-2172.webp
 GEÇTİ  H5 1440px @2x kapak görseli: kapak-2172.webp
 GEÇTİ  I1 320px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 320px TR açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 320px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 320px EN açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 360px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 360px TR açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 360px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 360px EN açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 375px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 375px TR açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 375px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 375px EN açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 390px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 390px TR açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 390px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 390px EN açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 414px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 414px TR açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 414px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 414px EN açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 430px TR yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 430px TR açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 430px EN yatay sayfa kaydırması yok, kırpılan metin yok
+GEÇTİ  I1 430px EN açılır alanlar açıkken de yatay taşma yok
 GEÇTİ  I1 768px TR yatay sayfa kaydırması yok, kırpılan metin yok
 GEÇTİ  I1 768px EN yatay sayfa kaydırması yok, kırpılan metin yok
 GEÇTİ  I1 1024px TR yatay sayfa kaydırması yok, kırpılan metin yok
@@ -179,12 +234,109 @@ GEÇTİ  I2 320px TR seçim kutularında en uzun seçenek sığıyor (iş ve mes
 GEÇTİ  I2 320px EN seçim kutularında en uzun seçenek sığıyor (iş ve mesken bantları)
 GEÇTİ  I2 375px TR seçim kutularında en uzun seçenek sığıyor (iş ve mesken bantları)
 GEÇTİ  I2 375px EN seçim kutularında en uzun seçenek sığıyor (iş ve mesken bantları)
-GEÇTİ  I3 320px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi; menü paneli dahil)
-GEÇTİ  I3 375px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi; menü paneli dahil)
-GEÇTİ  I3 430px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi; menü paneli dahil)
-GEÇTİ  I4 1280px form iletişim bilgilerinin yanında, aynı hizada; #teklif çapası formun üstünde
-GEÇTİ  I4 1440px form iletişim bilgilerinin yanında, aynı hizada; #teklif çapası formun üstünde
-GEÇTİ  I4 1040px form iletişim bilgilerinin yanında, aynı hizada; #teklif çapası formun üstünde
-GEÇTİ  I5 320px saatlik tablo ve model tablosu ekrana sığıyor (yatay kaydırma yok); model tablosunda her değerin başında model adı
+GEÇTİ  I3 320px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi, açılır alan başlığı, dosya düğmesi; alanlar kapalı ve açıkken; menü paneli dahil)
+GEÇTİ  I3 375px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi, açılır alan başlığı, dosya düğmesi; alanlar kapalı ve açıkken; menü paneli dahil)
+GEÇTİ  I3 430px dokunma hedefleri en az 44×44 px (bağlantı, düğme, alan, seçenek etiketi, açılır alan başlığı, dosya düğmesi; alanlar kapalı ve açıkken; menü paneli dahil)
+GEÇTİ  I4 1280px form başlık sütununun yanında, aynı hizada; iletişim ve sicil bilgileri sol sütunda başlığın altında; #teklif çapası formun üstünde
+GEÇTİ  I4 1440px form başlık sütununun yanında, aynı hizada; iletişim ve sicil bilgileri sol sütunda başlığın altında; #teklif çapası formun üstünde
+GEÇTİ  I4 1040px form başlık sütununun yanında, aynı hizada; iletişim ve sicil bilgileri sol sütunda başlığın altında; #teklif çapası formun üstünde
+GEÇTİ  I5 320px saatlik tablo (açıkken, 2 × 2) ve model tablosu ekrana sığıyor (yatay kaydırma yok); model tablosunda her değerin başında model adı
+GEÇTİ  J1 kaynak HTML: dört <details>, dördü de “open” ile gelir; açılır alanların bütün içeriği HTML’de (betikle eklenen içerik yok)
+GEÇTİ  J2 390px telefon: dört alan kapalı başlar (saatlik tablo, şirket bilgileri, EPDK lisansı, iletişim ve sicil bilgileri); başlık satırı ≥ 44 px, tam genişlikte, işaretli, H3
+GEÇTİ  J3 390px telefon sırası: İletişim başlığı → teklif formu → iletişim ve sicil bilgileri; Hakkında metni → imza → şirket bilgileri ve lisans → rozetler; piyasa özeti → saatlik tablo
+GEÇTİ  J3 390px İletişim bölümünün başından forma kadar yalnız başlık ve iki kısa cümle (≤ 330 px)
+GEÇTİ  J4 390px “Saatlik PTF · ₺/MWh”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır
+GEÇTİ  J4 390px “Şirket Bilgileri”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır
+GEÇTİ  J4 390px “EPDK Tedarik Lisansı”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır
+GEÇTİ  J4 390px “İletişim ve Sicil Bilgileri”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır
+GEÇTİ  J5 390px klavye: Tab ile açılır alan başlığına gelinir, odak çerçevesi görünür (2 px), Enter açar ve kapatır
+GEÇTİ  J6 390px saatlik tablo açıkken 2 × 2 dizilir (dört kısa tablo), 24 değer dolu; 24 alt alta satırdan kısa
+GEÇTİ  J2 390px telefon: konsol hatası yok
+GEÇTİ  J2 320px telefon: dört alan kapalı başlar (saatlik tablo, şirket bilgileri, EPDK lisansı, iletişim ve sicil bilgileri); başlık satırı ≥ 44 px, tam genişlikte, işaretli, H3
+GEÇTİ  J3 320px telefon sırası: İletişim başlığı → teklif formu → iletişim ve sicil bilgileri; Hakkında metni → imza → şirket bilgileri ve lisans → rozetler; piyasa özeti → saatlik tablo
+GEÇTİ  J3 320px İletişim bölümünün başından forma kadar yalnız başlık ve iki kısa cümle (≤ 330 px)
+GEÇTİ  J4 320px “Saatlik PTF · ₺/MWh”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır
+GEÇTİ  J4 320px “Şirket Bilgileri”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır
+GEÇTİ  J4 320px “EPDK Tedarik Lisansı”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır
+GEÇTİ  J4 320px “İletişim ve Sicil Bilgileri”: dokununca açılır (içerik görünür, taşma yok), yeniden dokununca kapanır
+GEÇTİ  J2 320px telefon: konsol hatası yok
+GEÇTİ  J7 1440px geniş ekran: dört alan açık, içerik görünür; başlık düz ara başlıktır (işaret yok, sekme sırasında değil)
+GEÇTİ  J7 1440px geniş ekran: başlığa tıklamak alanı kapatmaz
+GEÇTİ  J7 1280px geniş ekran: dört alan açık, içerik görünür; başlık düz ara başlıktır (işaret yok, sekme sırasında değil)
+GEÇTİ  J7 1280px geniş ekran: başlığa tıklamak alanı kapatmaz
+GEÇTİ  J7 768px geniş ekran: dört alan açık, içerik görünür; başlık düz ara başlıktır (işaret yok, sekme sırasında değil)
+GEÇTİ  J7 768px geniş ekran: başlığa tıklamak alanı kapatmaz
+GEÇTİ  J8 ekran genişleyince (390 → 1280) kapalı alanlar açılır ve başlık sekme sırasından çıkar; daralınca başlık yeniden dokunulabilir olur
+GEÇTİ  J9 390px BETİK KAPALI: açılır alanlar açık (lisans, şirket, iletişim bilgileri görünür; piyasa alanı yerine cümle)
+GEÇTİ  J9 390px BETİK KAPALI: yedi sektör görseli sayfada (src dolu, alanı ayrılmış); form alanları ve gönder düğmesi kullanılabilir
+GEÇTİ  J9 390px BETİK KAPALI: yerli dosya girdisi görünür ve kullanılabilir; yerelleştirilmiş düğme ve durum satırı gizli
+GEÇTİ  J9 1280px BETİK KAPALI: açılır alanlar açık (lisans, şirket, iletişim bilgileri görünür; piyasa alanı yerine cümle)
+GEÇTİ  J9 1280px BETİK KAPALI: yedi sektör görseli sayfada (src dolu, alanı ayrılmış); form alanları ve gönder düğmesi kullanılabilir
+GEÇTİ  J9 1280px BETİK KAPALI: yerli dosya girdisi görünür ve kullanılabilir; yerelleştirilmiş düğme ve durum satırı gizli
+GEÇTİ  K1 <input type="file"> etiketi canlı sayfadakiyle bayt bayt aynı (id, name, accept, multiple)
+GEÇTİ  K1 form işaretlemesi: dosya seçici dönüşümü geri alınınca <form>…</form> canlıyla bayt bayt aynı (başka değişiklik yok)
+GEÇTİ  K2 1280px TR: görünen düğme “Dosya Seç”, durum “Dosya seçilmedi”; tarayıcının kendi “Choose Files” yazısı görünmez
+GEÇTİ  K2 1280px girdi DOM’da, görsel olarak gizli ama odaklanabilir (aynı id/name/accept/multiple); düğme bir <label for="lead-fatura">, ≥ 44 px
+GEÇTİ  K3 1280px klavye: Sektör alanından Tab ile dosya girdisine gelinir; odak çerçevesi etiket düğmesinde görünür
+GEÇTİ  K4 1280px düğmeye tıklamak dosya seçme penceresini açar (çoklu seçim açık)
+GEÇTİ  K5 1280px bir dosya seçilince durum dosya adını gösterir
+GEÇTİ  K5 1280px EN: düğme “Choose Files”; seçili tek dosyanın adı durur
+GEÇTİ  K6 1280px EN: üç dosya seçilince “3 files selected”
+GEÇTİ  K6 1280px TR: üç dosya seçiliyken “3 dosya seçildi”, düğme “Dosya Seç”
+GEÇTİ  K7 1280px uzun dosya adı kutuyu taşırmaz (tek satır, sonu kısaltılır); kutu yüksekliği değişmez
+GEÇTİ  K7 1280px seçim boşaltılınca “Dosya seçilmedi”; EN’de “No file chosen”
+GEÇTİ  K8 1280px seçiciyle seçilen iki dosya mevcut yükleme mantığıyla gider (multipart, iki “fatura” parçası); konsol hatası yok
+GEÇTİ  K2 390px TR: görünen düğme “Dosya Seç”, durum “Dosya seçilmedi”; tarayıcının kendi “Choose Files” yazısı görünmez
+GEÇTİ  K2 390px girdi DOM’da, görsel olarak gizli ama odaklanabilir (aynı id/name/accept/multiple); düğme bir <label for="lead-fatura">, ≥ 44 px
+GEÇTİ  K3 390px klavye: Sektör alanından Tab ile dosya girdisine gelinir; odak çerçevesi etiket düğmesinde görünür
+GEÇTİ  K4 390px düğmeye tıklamak dosya seçme penceresini açar (çoklu seçim açık)
+GEÇTİ  K5 390px bir dosya seçilince durum dosya adını gösterir
+GEÇTİ  K5 390px EN: düğme “Choose Files”; seçili tek dosyanın adı durur
+GEÇTİ  K6 390px EN: üç dosya seçilince “3 files selected”
+GEÇTİ  K6 390px TR: üç dosya seçiliyken “3 dosya seçildi”, düğme “Dosya Seç”
+GEÇTİ  K7 390px uzun dosya adı kutuyu taşırmaz (tek satır, sonu kısaltılır); kutu yüksekliği değişmez
+GEÇTİ  K7 390px seçim boşaltılınca “Dosya seçilmedi”; EN’de “No file chosen”
+GEÇTİ  K8 390px seçiciyle seçilen iki dosya mevcut yükleme mantığıyla gider (multipart, iki “fatura” parçası); konsol hatası yok
+GEÇTİ  K9 dört dosya: durum “4 dosya seçildi”; gönderimde mevcut sınır iletisi (“En fazla 3 fatura dosyası yükleyebilirsiniz.”), istek yok
+GEÇTİ  K9 yeşil enerji seçiliyken dosya kutusu yerinde (kesik çizgili kenar durur)
+KALDI  L0 sektör görseli dosyaları: 21/21 img/ klasöründe (7 sektör × 480/800/1200)  → eksik: sektor-demir-celik-480.webp, sektor-demir-celik-800.webp, sektor-demir-celik-1200.webp, sektor-kimya-480.webp, sektor-kimya-800.webp, sektor-kimya-1200.webp, sektor-osb-480.webp, sektor-osb-800.webp, sektor-osb-1200.webp, sektor-lojistik-480.webp, sektor-lojistik-800.webp, sektor-lojistik-1200.webp, sektor-cam-seramik-480.webp, sektor-cam-seramik-800.webp, sektor-cam-seramik-1200.webp, sektor-veri-merkezi-480.webp, sektor-veri-merkezi-800.webp, sektor-veri-merkezi-1200.webp, sektor-tekstil-480.webp, sektor-tekstil-800.webp, sektor-tekstil-1200.webp
+GEÇTİ  L1 hizmetler: beş hizmet H3, beş açıklama; ilk hizmet /sanayi-elektrik-tedariki bağlantısını korur; görsel, şema, numara ya da simge yok
+GEÇTİ  L1 hizmetler 1440: ızgara içerik genişliğinin tamamını kullanır (solda boşluk yok)
+GEÇTİ  L2 yedi sektör: adı H3 ve rehber bağlantısı, açıklaması duruyor; “Tüm sektör rehberleri” → /rehber
+GEÇTİ  L3 yedi görsel: srcset 480w/800w/1200w (kendi dosyaları), sizes dolu, width=1200 height=800, loading=lazy, decoding=async
+GEÇTİ  L3 görsellerin alt metni TR ve EN dolu, anahtar kelime yığını değil (≤ 12 kelime, “elektrik tedariki/fiyat” gibi arama kalıbı yok)
+GEÇTİ  L3 görsellerin hepsi ilk ekranın altında (1440×900): kapak görseli LCP adayı kalır
+GEÇTİ  L4 temsilî görsel notu bölümde görünür (TR ve EN)
+GEÇTİ  L5 dizgi: kart kutusu yok (yuvarlak köşe, gölge, zemin, çerçeve yok); görsel üstünde yazı ya da örtü yok
+       sektör görselleri 1440px @1x: demir-celik 710×376 → 800.webp · kimya 498×214 → 800.webp · osb 392×214 → 480.webp · lojistik 286×214 → 480.webp · cam-seramik 286×214 → 480.webp · veri-merkezi 392×214 → 480.webp · tekstil 498×214 → 800.webp
+GEÇTİ  L6 1440px @1x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil
+       sektör görselleri 1280px @1x: demir-celik 660×349 → 800.webp · kimya 463×192 → 480.webp · osb 364×192 → 480.webp · lojistik 266×192 → 480.webp · cam-seramik 266×192 → 480.webp · veri-merkezi 364×192 → 480.webp · tekstil 463×192 → 480.webp
+GEÇTİ  L6 1280px @1x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil
+       sektör görselleri 1024px @1x: demir-celik 922×369 → 1200.webp · kimya 292×194 → 480.webp · osb 292×194 → 480.webp · lojistik 292×194 → 480.webp · cam-seramik 292×194 → 480.webp · veri-merkezi 292×194 → 480.webp · tekstil 292×194 → 480.webp
+GEÇTİ  L6 1024px @1x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil
+       sektör görselleri 768px @1x: demir-celik 691×276 → 800.webp · kimya 217×145 → 480.webp · osb 217×145 → 480.webp · lojistik 217×145 → 480.webp · cam-seramik 217×145 → 480.webp · veri-merkezi 217×145 → 480.webp · tekstil 217×145 → 480.webp
+GEÇTİ  L6 768px @1x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil
+       sektör görselleri 390px @1x: demir-celik 351×197 → 480.webp · kimya 168×112 → 480.webp · osb 168×112 → 480.webp · lojistik 168×112 → 480.webp · cam-seramik 168×112 → 480.webp · veri-merkezi 168×112 → 480.webp · tekstil 168×112 → 480.webp
+GEÇTİ  L6 390px @1x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil
+       sektör görselleri 390px @3x: demir-celik 351×197 → 1200.webp · kimya 168×112 → 800.webp · osb 168×112 → 800.webp · lojistik 168×112 → 800.webp · cam-seramik 168×112 → 800.webp · veri-merkezi 168×112 → 800.webp · tekstil 168×112 → 800.webp
+GEÇTİ  L6 390px @3x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil
+       sektör görselleri 320px @2x: demir-celik 288×162 → 800.webp · kimya 136×91 → 480.webp · osb 136×91 → 480.webp · lojistik 136×91 → 480.webp · cam-seramik 136×91 → 480.webp · veri-merkezi 136×91 → 480.webp · tekstil 136×91 → 480.webp
+GEÇTİ  L6 320px @2x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil
+GEÇTİ  L7 asimetrik dizgi: 1440 px’te en az dört farklı görsel ölçüsü; telefonda büyük + ikili düzen (iki ölçü)
+GEÇTİ  L8 zemin ritmi: art arda üç açık bölüm yok; koyu bölümler sektörler, süreç ve “Neden Voltage?”; ayrı koyu söz bandı yok
+       zemin sırası: kapak (lacivert) → trust (krem) → hizmetler (beyaz) → sectors (lacivert) → canli-piyasa (krem) → process (lacivert) → calc-section (beyaz) → hakkimizda (krem) → yaklasim (lacivert) → iletisim (krem) → footer (lacivert)
+GEÇTİ  L9 şirket cümlesi “Neden Voltage?” bölümünün içinde, sakin (≤ 22 px); üç ilke etiketi duruyor ve gövde metninden küçük; “Bir firma kadar köklü…” satırı kaldırıldı (TR ve EN)
+GEÇTİ  L10 kurumsal blok: EPDK lisansı “Voltage Enerji Hakkında” bölümünde H3 olarak şirket bilgilerinin yanında; ayrı lisans bölümü yok; tüm şirket ve lisans bilgileri, imza ve dört rozet duruyor; fotoğraf yok
+GEÇTİ  L0 1440: betiğin aradığı her id sayfada var (kaldırılmış öğeye bağlı betik yok); konsol hatası yok
+       sayfa boyu: 1440 px’te 9541 → 7998 px; 390 px’te 14106 → 10587 px (hedef: ≈ 8.000 ve ≈ 10.500)
+GEÇTİ  L11 sayfa önceki hazırlık sürümünden kısa (içerik silinmeden): 1440 px’te en az 1.300 px, 390 px’te en az 3.000 px
+GEÇTİ  M1 1440x900 ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk 729 px)
+       1440x900: kapak alt kenarı 630 px, bilgi satırı alt kenarı 729 px; karşılaştırılan 1440×900 piksel; ilk 729 px içinde farklı piksel 0; altında farklı piksel 17561 (satır 815–887: yeniden düzenlenen Hizmetler bölümünün başı)
+GEÇTİ  M1 390x844 ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk 844 px)
+       390x844: kapak alt kenarı 767 px, bilgi satırı alt kenarı 922 px; karşılaştırılan 390×844 piksel; ilk 844 px içinde farklı piksel 0; altında farklı piksel 0 (ekranın tamamı aynı)
+GEÇTİ  M1 390x844@2x ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk 844 px)
+       390x844@2x: kapak alt kenarı 767 px, bilgi satırı alt kenarı 922 px; karşılaştırılan 780×1688 piksel; ilk 844 px içinde farklı piksel 0; altında farklı piksel 0 (ekranın tamamı aynı)
+GEÇTİ  N1 390px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
+GEÇTİ  N1 1440px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 
-TOPLAM: 177 geçti, 0 kaldı
+TOPLAM: 311 geçti, 1 kaldı

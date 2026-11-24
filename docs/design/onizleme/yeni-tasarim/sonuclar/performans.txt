@@ -1,49 +1,71 @@
-LABORATUVAR ÖLÇÜMÜ — önceki hazırlık (f467ddc) ile revize sayfa
+LABORATUVAR ÖLÇÜMÜ — önceki hazırlık (bc826d4) ile 24.11 revizyonu
 Chromium (Playwright) + CDP; yerel statik sunucu, sıkıştırma YOK (üretimde Cloudflare sıkıştırır; gzip boyutu ayrıca verildi).
 Telefon: 375×667 @2x, işlemci 4× yavaş, ağ 1,6 Mbit/sn ↓ · 750 kbit/sn ↑ · 150 ms. Masaüstü: 1440×900, kısıtlama yok.
 Google Fonts istekleri iki sayfada da kapalı; PTF yanıtı yerel taklit. Her değer 5 ölçümün ortancası. Gerçek kullanıcı ölçümü değildir.
 
-TELEFON (375×667, 4× işlemci, yavaş 4G)
-  ölçü                               önceki        revize
-  LCP (ms)                          1376          440
-  LCP öğesi                         SPAN.kf-stamp P.hero-sub
-  LCP, beş ölçüm (ms)               1380/528/1364/1376/1380440/440/420/444/428
-  FCP (ms)                          464           408
-  CLS (ortanca)                     0.0000        0.0036
-  CLS (beş ölçümün en büyüğü)       0.0000        0.0036
-  DOMContentLoaded (ms)             1301          1220
-  load (ms)                         1303          1220
-  toplam aktarım, yerel (bayt)      227322        203365
-  DOM öğe sayısı                    1128          885
-  sayfa yüksekliği (px)             15572         14520
-  etkileşim: menü aç → kare (ms)    13.0          12.2
-  etkileşim: dil değiştir → kare (ms)81.4          68.3
-  etkileşim: tarife seç → kare (ms) 24.8          29.7
+UYARI: 21/21 sektör görseli dosyası img/ klasöründe yok. Bu ölçümde yerlerine birkaç yüz baytlık düz renkli TEST görseli döndü;
+       sektör görseli bayt sayıları ve onlara bağlı aktarım toplamları GERÇEK DEĞİLDİR. Dosyalar gelince ölçüm yeniden koşulmalı.
 
-MASAÜSTÜ (1440×900)
-  ölçü                               önceki        revize
-  LCP (ms)                          84.0          76.0
-  LCP öğesi                         IMG. kapak-2172.webpIMG. kapak-2172.webp
-  LCP, beş ölçüm (ms)               120/84/84/84/10476/76/68/80/76
-  FCP (ms)                          84.0          76.0
+TELEFON (375×667, 4× işlemci, yavaş 4G)
+  ölçü                               önceki        yeni
+  LCP (ms)                          448           504
+  LCP öğesi                         P.hero-sub            P.hero-sub
+  LCP, beş ölçüm (ms)               448/468/436/464/440         504/508/508/484/480
+  kapak görseli indi (ms)           1039          1083
+  kapak görseli dosyası             kapak-mobil-579.webpkapak-mobil-579.webp
+  FCP (ms)                          408           464
   CLS (ortanca)                     0.0000        0.0000
   CLS (beş ölçümün en büyüğü)       0.0000        0.0000
-  DOMContentLoaded (ms)             76.8          60.3
-  load (ms)                         77.0          60.4
-  toplam aktarım, yerel (bayt)      294043        270086
-  DOM öğe sayısı                    1128          885
-  sayfa yüksekliği (px)             10034         9615
-  etkileşim: dil değiştir → kare (ms)30.7          17.1
-  etkileşim: tarife seç → kare (ms) 26.5          7.4
+  DOMContentLoaded (ms)             1253          1349
+  load (ms)                         1254          1351
+  CLS, sayfa sonuna kaydırınca      0.0000        0.0000
+  aktarım, yükleme anı (bayt)       203589        221160
+    içinde sektör görseli (adet)    0.0000        0.0000
+    içinde sektör görseli (bayt)    0.0000        0.0000
+  aktarım, sayfa sonuna kadar (bayt)203589        227849
+    içinde sektör görseli (adet)    0.0000        7.0
+    içinde sektör görseli (bayt)    0.0000        6689
+  DOM öğe sayısı                    885           945
+  sayfa yüksekliği (px)             14520         11031
+  etkileşim: menü aç → kare (ms)    16.6          13.3
+  etkileşim: dil değiştir → kare (ms)126           88.4
+  etkileşim: tarife seç → kare (ms) 27.5          26.0
+
+MASAÜSTÜ (1440×900)
+  ölçü                               önceki        yeni
+  LCP (ms)                          112           68.0
+  LCP öğesi                         IMG. kapak-2172.webp  IMG. kapak-2172.webp
+  LCP, beş ölçüm (ms)               116/112/112/128/104         64/68/76/104/60
+  kapak görseli indi (ms)           16.9          18.0
+  kapak görseli dosyası             kapak-2172.webpkapak-2172.webp
+  FCP (ms)                          112           68.0
+  CLS (ortanca)                     0.0000        0.0000
+  CLS (beş ölçümün en büyüğü)       0.0000        0.0000
+  DOMContentLoaded (ms)             88.7          93.7
+  load (ms)                         89.1          94.0
+  CLS, sayfa sonuna kaydırınca      0.0000        0.0000
+  aktarım, yükleme anı (bayt)       270310        295572
+    içinde sektör görseli (adet)    0.0000        7.0
+    içinde sektör görseli (bayt)    0.0000        7691
+  aktarım, sayfa sonuna kadar (bayt)270310        295572
+    içinde sektör görseli (adet)    0.0000        7.0
+    içinde sektör görseli (bayt)    0.0000        7691
+  DOM öğe sayısı                    885           945
+  sayfa yüksekliği (px)             9615          8106
+  etkileşim: dil değiştir → kare (ms)18.9          20.6
+  etkileşim: tarife seç → kare (ms) 6.7           2.9
 
 HTML
-  ölçü                               önceki        revize
-  HTML (bayt)                       176975        153018
-  HTML gzip -9 (bayt)               47550         42023
-  satır içi stil (bayt)             47282         36833
-  satır içi betik (bayt)            39296         36292
+  ölçü                               önceki        yeni
+  HTML (bayt)                       153242        170813
+  HTML gzip -9 (bayt)               42130         46094
+  satır içi stil (bayt)             37059         45516
+  satır içi betik (bayt)            36292         38097
 
 Notlar
   - Etkileşim süresi: olayın tetiklenmesinden sonraki ikinci animasyon karesine kadar; 60 Hz ekranda en az ~17–33 ms çıkar.
-  - Toplam aktarım yalnız yerel sunucudan gelenleri sayar (HTML + kapak görseli + logo); yazı tipleri dahil değildir.
+  - Aktarım yalnız yerel sunucudan gelenleri sayar (HTML + kapak görseli + logo + sektör görselleri); yazı tipleri dahil değildir.
+  - Sektör görselleri loading="lazy": tarayıcı yalnız görüş alanına yaklaşanları indirir. “Yükleme anı” satırı kaydırmadan önce inenleri,
+    “sayfa sonuna kadar” satırı ziyaretçi sayfanın tamamını gezdiğinde inen toplamı gösterir.
+  - Telefonda Chromium, ekranı tümüyle kaplayan kapak görselini LCP adayı saymıyor; LCP metin öğesidir. Görselin indiği an ayrı satırda verildi.
   - Telefon LCP değeri sıkıştırmasız HTML ile ölçüldü; üretimde HTML sıkıştırılmış gelir, değer bundan düşük olur. Ölçülmedi.

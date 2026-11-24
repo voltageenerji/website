@@ -1,7 +1,7 @@
-KARŞITLIK DENETİMİ (2. tur) — her metin kutusunun altındaki gerçek piksellere karşı, en kötü piksel
+KARŞITLIK DENETİMİ (3. tur, 24.11 revizyonu) — her metin kutusunun altındaki gerçek piksellere karşı, en kötü piksel
 Eşik: normal metin 4,5:1; büyük metin (≥24 px ya da ≥18,66 px kalın) 3:1
 
-Toplam metin kutusu: 5462; eşik altında kalan: 0
+Toplam metin kutusu: 5754; eşik altında kalan: 0
 En düşük sekiz: 
   4.74:1  1920px TR .lm-mode "CANLI" 12px
   4.74:1  1440px TR .lm-mode "CANLI" 12px
@@ -13,160 +13,160 @@ En düşük sekiz:
   4.74:1  390px TR .lm-mode "CANLI" 12px
 
 GÖRÜNÜM BAŞINA:
-  1920px TR: 343 metin kutusu, en düşük 4.74:1, eşik altı 0
-  1440px TR: 342 metin kutusu, en düşük 4.74:1, eşik altı 0
-  1440px EN veri-yok: 348 metin kutusu, en düşük 5.34:1, eşik altı 0
-  1280px TR: 345 metin kutusu, en düşük 4.74:1, eşik altı 0
-  1280px EN: 352 metin kutusu, en düşük 4.74:1, eşik altı 0
-  1040px TR: 365 metin kutusu, en düşük 4.74:1, eşik altı 0
-  768px TR: 324 metin kutusu, en düşük 4.74:1, eşik altı 0
+  1920px TR: 354 metin kutusu, en düşük 4.74:1, eşik altı 0
+  1440px TR: 354 metin kutusu, en düşük 4.74:1, eşik altı 0
+  1440px EN veri-yok: 364 metin kutusu, en düşük 6.09:1, eşik altı 0
+  1280px TR: 358 metin kutusu, en düşük 4.74:1, eşik altı 0
+  1280px EN: 374 metin kutusu, en düşük 4.74:1, eşik altı 0
+  1040px TR: 397 metin kutusu, en düşük 4.74:1, eşik altı 0
+  768px TR: 349 metin kutusu, en düşük 4.74:1, eşik altı 0
   768px TR menü: 12 metin kutusu, en düşük 7.59:1, eşik altı 0
-  768px EN veri-yok: 332 metin kutusu, en düşük 7.05:1, eşik altı 0
-  430px TR: 348 metin kutusu, en düşük 4.74:1, eşik altı 0
+  768px EN veri-yok: 357 metin kutusu, en düşük 5.99:1, eşik altı 0
+  430px TR: 365 metin kutusu, en düşük 4.74:1, eşik altı 0
   430px TR menü: 11 metin kutusu, en düşük 7.59:1, eşik altı 0
-  390px TR: 363 metin kutusu, en düşük 4.74:1, eşik altı 0
+  390px TR: 379 metin kutusu, en düşük 4.74:1, eşik altı 0
   390px TR menü: 11 metin kutusu, en düşük 7.59:1, eşik altı 0
-  390px EN: 375 metin kutusu, en düşük 4.74:1, eşik altı 0
-  375px TR: 369 metin kutusu, en düşük 4.74:1, eşik altı 0
+  390px EN: 392 metin kutusu, en düşük 4.74:1, eşik altı 0
+  375px TR: 386 metin kutusu, en düşük 4.74:1, eşik altı 0
   375px TR menü: 11 metin kutusu, en düşük 7.59:1, eşik altı 0
-  375px EN veri-yok: 379 metin kutusu, en düşük 7.05:1, eşik altı 0
-  320px TR: 401 metin kutusu, en düşük 4.74:1, eşik altı 0
+  375px EN veri-yok: 400 metin kutusu, en düşük 6.43:1, eşik altı 0
+  320px TR: 421 metin kutusu, en düşük 4.74:1, eşik altı 0
   320px TR menü: 11 metin kutusu, en düşük 7.59:1, eşik altı 0
-  320px EN: 420 metin kutusu, en düşük 4.74:1, eşik altı 0
+  320px EN: 448 metin kutusu, en düşük 4.74:1, eşik altı 0
 
 EŞİK ALTI:
   yok
 
 KAPAK VE ÜST BANT (fotoğraf üstü) — öğe başına en kötü piksel:
-   11.09:1  1040px TR · A  "İletişim" 15.5px
+   10.40:1  1040px TR · A  "İletişim" 15.5px
     9.86:1  1040px TR · SPAN  "00:00" 11.5px
-   16.96:1  1040px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
-   17.69:1  1040px TR · btn nav-cta  "Teklif Al" 15px
-    9.80:1  (büyük) 1040px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 44.72px
-   13.32:1  1040px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
-    5.45:1  1040px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
-   18.60:1  1040px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 11.5px
-   13.95:1  1040px TR · lang-btn active  "TR" 13.5px
-    8.04:1  1040px TR · lang-btn  "EN" 13.5px
-    6.43:1  1040px TR · lang-sep  "/" 13.5px
-   18.83:1  1040px TR · nav-logo-name  "Voltage" 17px
-   14.58:1  1040px TR · nav-logo-sub  "ENERJİ" 17px
+   16.61:1  1040px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
+   17.37:1  1040px TR · btn nav-cta  "Teklif Al" 15px
+   10.79:1  (büyük) 1040px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 44.72px
+   14.04:1  1040px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
+    5.76:1  1040px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
+   18.60:1  1040px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 11.5px
+   13.02:1  1040px TR · lang-btn active  "TR" 13.5px
+    7.62:1  1040px TR · lang-btn  "EN" 13.5px
+    6.13:1  1040px TR · lang-sep  "/" 13.5px
+   18.69:1  1040px TR · nav-logo-name  "Voltage" 17px
+   14.30:1  1040px TR · nav-logo-sub  "ENERJİ" 17px
     9.86:1  1040px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  1040px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 1040px TR · ptf-value  "1.595,00" 44px
-   11.24:1  1280px EN · A  "Contact" 15.5px
+   18.60:1  (büyük) 1040px TR · ptf-value  "1.981,26" 44px
+   10.44:1  1280px EN · A  "Contact" 15.5px
     9.86:1  1280px EN · SPAN  "00:00" 11.5px
-   18.10:1  1280px EN · btn btn-ghost  "Explore Our Services" 16px
-   18.07:1  1280px EN · btn nav-cta  "Get a Quote" 15px
-   10.48:1  (büyük) 1280px EN · h1-ana  "We connect industry's energy with the ma" 55.04px
-   16.41:1  1280px EN · h1-ust  "Electricity Supply for Industry and Busi" 13px
-    6.75:1  1280px EN · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.64px
-   18.60:1  1280px EN · kf-stamp  "HOUR 02:00 · EPİAŞ" 11.5px
-   14.16:1  1280px EN · lang-btn active  "EN" 13.5px
-    8.12:1  1280px EN · lang-btn  "TR" 13.5px
-    6.39:1  1280px EN · lang-sep  "/" 13.5px
-   18.98:1  1280px EN · nav-logo-name  "Voltage" 17px
-   14.59:1  1280px EN · nav-logo-sub  "ENERGY" 17px
+   17.90:1  1280px EN · btn btn-ghost  "Explore Our Services" 16px
+   17.88:1  1280px EN · btn nav-cta  "Get a Quote" 15px
+   11.02:1  (büyük) 1280px EN · h1-ana  "We connect industry's energy with the ma" 55.04px
+   16.03:1  1280px EN · h1-ust  "Electricity Supply for Industry and Busi" 13px
+    8.20:1  1280px EN · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.64px
+   18.60:1  1280px EN · kf-stamp  "HOUR 05:00 · EPİAŞ" 11.5px
+   13.25:1  1280px EN · lang-btn active  "EN" 13.5px
+    7.62:1  1280px EN · lang-btn  "TR" 13.5px
+    6.09:1  1280px EN · lang-sep  "/" 13.5px
+   18.73:1  1280px EN · nav-logo-name  "Voltage" 17px
+   14.49:1  1280px EN · nav-logo-sub  "ENERGY" 17px
     9.86:1  1280px EN · ptf-label  "(₺/MWh)" 15px
    14.44:1  1280px EN · ptf-title  "Current Market Data" 13px
-   18.60:1  (büyük) 1280px EN · ptf-value  "1.595,00" 44px
-   11.12:1  1280px TR · A  "İletişim" 15.5px
+   18.60:1  (büyük) 1280px EN · ptf-value  "1.981,26" 44px
+   10.40:1  1280px TR · A  "İletişim" 15.5px
     9.86:1  1280px TR · SPAN  "00:00" 11.5px
-   19.23:1  1280px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
-   18.07:1  1280px TR · btn nav-cta  "Teklif Al" 15px
-    7.10:1  (büyük) 1280px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 55.04px
-   15.22:1  1280px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
-    7.29:1  1280px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.64px
-   18.60:1  1280px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 11.5px
-   14.16:1  1280px TR · lang-btn active  "TR" 13.5px
-    8.32:1  1280px TR · lang-btn  "EN" 13.5px
-    6.43:1  1280px TR · lang-sep  "/" 13.5px
-   18.98:1  1280px TR · nav-logo-name  "Voltage" 17px
-   14.59:1  1280px TR · nav-logo-sub  "ENERJİ" 17px
+   19.12:1  1280px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
+   17.88:1  1280px TR · btn nav-cta  "Teklif Al" 15px
+    8.44:1  (büyük) 1280px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 55.04px
+   15.24:1  1280px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
+    7.54:1  1280px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.64px
+   18.60:1  1280px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 11.5px
+   13.25:1  1280px TR · lang-btn active  "TR" 13.5px
+    7.92:1  1280px TR · lang-btn  "EN" 13.5px
+    6.19:1  1280px TR · lang-sep  "/" 13.5px
+   18.73:1  1280px TR · nav-logo-name  "Voltage" 17px
+   14.49:1  1280px TR · nav-logo-sub  "ENERJİ" 17px
     9.86:1  1280px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  1280px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 1280px TR · ptf-value  "1.595,00" 44px
-   11.60:1  1440px EN veri-yok · A  "Contact" 15.5px
+   18.60:1  (büyük) 1280px TR · ptf-value  "1.981,26" 44px
+   10.54:1  1440px EN veri-yok · A  "Contact" 15.5px
     9.86:1  1440px EN veri-yok · SPAN  "00:00" 11.5px
-   19.21:1  1440px EN veri-yok · btn btn-ghost  "Explore Our Services" 16px
-   17.92:1  1440px EN veri-yok · btn nav-cta  "Get a Quote" 15px
-    9.51:1  (büyük) 1440px EN veri-yok · h1-ana  "We connect industry's energy with the ma" 61.92px
-   16.25:1  1440px EN veri-yok · h1-ust  "Electricity Supply for Industry and Busi" 13px
-    5.34:1  1440px EN veri-yok · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 18.5px
+   19.10:1  1440px EN veri-yok · btn btn-ghost  "Explore Our Services" 16px
+   17.73:1  1440px EN veri-yok · btn nav-cta  "Get a Quote" 15px
+    9.31:1  (büyük) 1440px EN veri-yok · h1-ana  "We connect industry's energy with the ma" 61.92px
+   16.01:1  1440px EN veri-yok · h1-ust  "Electricity Supply for Industry and Busi" 13px
+    7.82:1  1440px EN veri-yok · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 18.5px
    14.44:1  1440px EN veri-yok · kf-stamp waiting  "AWAITING EPIAS DATA" 11.5px
-   14.42:1  1440px EN veri-yok · lang-btn active  "EN" 13.5px
-    8.20:1  1440px EN veri-yok · lang-btn  "TR" 13.5px
-    6.39:1  1440px EN veri-yok · lang-sep  "/" 13.5px
-   18.98:1  1440px EN veri-yok · nav-logo-name  "Voltage" 17px
-   14.66:1  1440px EN veri-yok · nav-logo-sub  "ENERGY" 17px
+   13.51:1  1440px EN veri-yok · lang-btn active  "EN" 13.5px
+    7.69:1  1440px EN veri-yok · lang-btn  "TR" 13.5px
+    6.09:1  1440px EN veri-yok · lang-sep  "/" 13.5px
+   18.81:1  1440px EN veri-yok · nav-logo-name  "Voltage" 17px
+   14.51:1  1440px EN veri-yok · nav-logo-sub  "ENERGY" 17px
     9.86:1  1440px EN veri-yok · ptf-empty  "Awaiting hourly data" 13px
     9.86:1  1440px EN veri-yok · ptf-label  "(₺/MWh)" 15px
    14.44:1  1440px EN veri-yok · ptf-title  "Current Market Data" 13px
     9.86:1  (büyük) 1440px EN veri-yok · ptf-value  "—" 44px
-   11.18:1  1440px TR · A  "İletişim" 15.5px
+   10.30:1  1440px TR · A  "İletişim" 15.5px
     9.86:1  1440px TR · SPAN  "00:00" 11.5px
-   19.12:1  1440px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
-   17.92:1  1440px TR · btn nav-cta  "Teklif Al" 15px
-    5.11:1  (büyük) 1440px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 61.92px
-   15.46:1  1440px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
+   19.08:1  1440px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
+   17.73:1  1440px TR · btn nav-cta  "Teklif Al" 15px
+    5.13:1  (büyük) 1440px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 61.92px
+   15.27:1  1440px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
     7.09:1  1440px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 18.5px
-   18.60:1  1440px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 11.5px
-   14.18:1  1440px TR · lang-btn active  "TR" 13.5px
-    8.49:1  1440px TR · lang-btn  "EN" 13.5px
-    6.49:1  1440px TR · lang-sep  "/" 13.5px
-   18.98:1  1440px TR · nav-logo-name  "Voltage" 17px
-   14.66:1  1440px TR · nav-logo-sub  "ENERJİ" 17px
+   18.60:1  1440px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 11.5px
+   13.25:1  1440px TR · lang-btn active  "TR" 13.5px
+    8.15:1  1440px TR · lang-btn  "EN" 13.5px
+    6.20:1  1440px TR · lang-sep  "/" 13.5px
+   18.81:1  1440px TR · nav-logo-name  "Voltage" 17px
+   14.51:1  1440px TR · nav-logo-sub  "ENERJİ" 17px
     9.86:1  1440px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  1440px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 1440px TR · ptf-value  "1.595,00" 44px
-   12.19:1  1920px TR · A  "İletişim" 15.5px
+   18.60:1  (büyük) 1440px TR · ptf-value  "1.981,26" 44px
+   10.79:1  1920px TR · A  "İletişim" 15.5px
     9.86:1  1920px TR · SPAN  "00:00" 11.5px
-   19.08:1  1920px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
-   17.69:1  1920px TR · btn nav-cta  "Teklif Al" 15px
-    6.80:1  (büyük) 1920px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 62px
-   14.85:1  1920px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
-    7.56:1  1920px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 18.5px
-   18.60:1  1920px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 11.5px
-   14.73:1  1920px TR · lang-btn active  "TR" 13.5px
-    8.24:1  1920px TR · lang-btn  "EN" 13.5px
-    6.55:1  1920px TR · lang-sep  "/" 13.5px
-   18.94:1  1920px TR · nav-logo-name  "Voltage" 17px
-   14.59:1  1920px TR · nav-logo-sub  "ENERJİ" 17px
+   18.98:1  1920px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
+   17.34:1  1920px TR · btn nav-cta  "Teklif Al" 15px
+    6.37:1  (büyük) 1920px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 62px
+   14.99:1  1920px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
+    7.78:1  1920px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 18.5px
+   18.60:1  1920px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 11.5px
+   13.39:1  1920px TR · lang-btn active  "TR" 13.5px
+    7.72:1  1920px TR · lang-btn  "EN" 13.5px
+    6.19:1  1920px TR · lang-sep  "/" 13.5px
+   18.79:1  1920px TR · nav-logo-name  "Voltage" 17px
+   14.49:1  1920px TR · nav-logo-sub  "ENERJİ" 17px
     9.86:1  1920px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  1920px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 1920px TR · ptf-value  "1.595,00" 44px
+   18.60:1  (büyük) 1920px TR · ptf-value  "1.981,26" 44px
    10.48:1  320px EN · SPAN  "Get a Quote" 16px
     8.64:1  320px EN · btn btn-ghost  "Explore Our Services" 16px
    10.48:1  320px EN · btn nav-cta  "Get a Quote" 15px
-   16.33:1  (büyük) 320px EN · h1-ana  "We connect industry's energy with the ma" 36px
-   17.17:1  320px EN · h1-ust  "Electricity Supply for Industry and Busi" 11.5px
-    8.32:1  320px EN · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.5px
-   18.60:1  320px EN · kf-stamp  "HOUR 02:00 · EPİAŞ" 10.5px
-   18.52:1  320px EN · nav-logo-name  "Voltage" 15px
+   14.56:1  (büyük) 320px EN · h1-ana  "We connect industry's energy with the ma" 36px
+   15.46:1  320px EN · h1-ust  "Electricity Supply for Industry and Busi" 11.5px
+    5.85:1  320px EN · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.5px
+   18.60:1  320px EN · kf-stamp  "HOUR 05:00 · EPİAŞ" 10.5px
+   18.02:1  320px EN · nav-logo-name  "Voltage" 15px
     9.86:1  320px EN · ptf-label  "(₺/MWh)" 15px
    14.44:1  320px EN · ptf-title  "Current Market Data" 13px
-   18.60:1  (büyük) 320px EN · ptf-value  "1.595,00" 32px
+   18.60:1  (büyük) 320px EN · ptf-value  "1.981,26" 32px
    10.48:1  320px TR menü · btn nav-cta  "Teklif Al" 15px
    18.81:1  320px TR menü · nav-logo-name  "Voltage" 15px
    10.48:1  320px TR · SPAN  "Teklif Al" 16px
     9.70:1  320px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
    10.48:1  320px TR · btn nav-cta  "Teklif Al" 15px
-   12.04:1  (büyük) 320px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
-   17.33:1  320px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 11.5px
-    9.39:1  320px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
-   18.60:1  320px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 10.5px
-   18.49:1  320px TR · nav-logo-name  "Voltage" 15px
+    8.74:1  (büyük) 320px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
+   15.92:1  320px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 11.5px
+    6.92:1  320px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
+   18.60:1  320px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 10.5px
+   18.02:1  320px TR · nav-logo-name  "Voltage" 15px
     9.86:1  320px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  320px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 320px TR · ptf-value  "1.595,00" 32px
+   18.60:1  (büyük) 320px TR · ptf-value  "1.981,26" 32px
    10.48:1  375px EN veri-yok · SPAN  "Get a Quote" 16px
     8.54:1  375px EN veri-yok · btn btn-ghost  "Explore Our Services" 16px
    10.48:1  375px EN veri-yok · btn nav-cta  "Get a Quote" 15px
-   16.33:1  (büyük) 375px EN veri-yok · h1-ana  "We connect industry's energy with the ma" 36px
-   17.07:1  375px EN veri-yok · h1-ust  "Electricity Supply for Industry and Busi" 11.5px
-    8.90:1  375px EN veri-yok · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.5px
+   14.56:1  (büyük) 375px EN veri-yok · h1-ana  "We connect industry's energy with the ma" 36px
+   15.43:1  375px EN veri-yok · h1-ust  "Electricity Supply for Industry and Busi" 11.5px
+    6.43:1  375px EN veri-yok · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.5px
    14.44:1  375px EN veri-yok · kf-stamp waiting  "AWAITING EPIAS DATA" 11.5px
-   18.52:1  375px EN veri-yok · nav-logo-name  "Voltage" 17px
+   17.90:1  375px EN veri-yok · nav-logo-name  "Voltage" 17px
     9.86:1  375px EN veri-yok · ptf-label  "(₺/MWh)" 15px
    14.44:1  375px EN veri-yok · ptf-title  "Current Market Data" 13px
     9.86:1  (büyük) 375px EN veri-yok · ptf-value  "—" 32px
@@ -175,60 +175,60 @@ KAPAK VE ÜST BANT (fotoğraf üstü) — öğe başına en kötü piksel:
    10.48:1  375px TR · SPAN  "Teklif Al" 16px
    10.19:1  375px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
    10.48:1  375px TR · btn nav-cta  "Teklif Al" 15px
-   16.05:1  (büyük) 375px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
-   17.33:1  375px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 11.5px
-    9.35:1  375px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
-   18.60:1  375px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 11.5px
-   18.52:1  375px TR · nav-logo-name  "Voltage" 17px
+   14.15:1  (büyük) 375px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
+   15.77:1  375px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 11.5px
+    6.84:1  375px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
+   18.60:1  375px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 11.5px
+   17.90:1  375px TR · nav-logo-name  "Voltage" 17px
     9.86:1  375px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  375px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 375px TR · ptf-value  "1.595,00" 32px
+   18.60:1  (büyük) 375px TR · ptf-value  "1.981,26" 32px
    10.48:1  390px EN · SPAN  "Get a Quote" 16px
     8.64:1  390px EN · btn btn-ghost  "Explore Our Services" 16px
    10.48:1  390px EN · btn nav-cta  "Get a Quote" 15px
-   16.33:1  (büyük) 390px EN · h1-ana  "We connect industry's energy with the ma" 36px
-   17.14:1  390px EN · h1-ust  "Electricity Supply for Industry and Busi" 11.5px
-    8.62:1  390px EN · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.5px
-   18.60:1  390px EN · kf-stamp  "HOUR 02:00 · EPİAŞ" 11.5px
-   18.52:1  390px EN · nav-logo-name  "Voltage" 17px
+   14.56:1  (büyük) 390px EN · h1-ana  "We connect industry's energy with the ma" 36px
+   15.43:1  390px EN · h1-ust  "Electricity Supply for Industry and Busi" 11.5px
+    6.12:1  390px EN · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.5px
+   18.60:1  390px EN · kf-stamp  "HOUR 05:00 · EPİAŞ" 11.5px
+   17.90:1  390px EN · nav-logo-name  "Voltage" 17px
     9.86:1  390px EN · ptf-label  "(₺/MWh)" 15px
    14.44:1  390px EN · ptf-title  "Current Market Data" 13px
-   18.60:1  (büyük) 390px EN · ptf-value  "1.595,00" 32px
+   18.60:1  (büyük) 390px EN · ptf-value  "1.981,26" 32px
    10.48:1  390px TR menü · btn nav-cta  "Teklif Al" 15px
    18.81:1  390px TR menü · nav-logo-name  "Voltage" 17px
    10.48:1  390px TR · SPAN  "Teklif Al" 16px
     9.70:1  390px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
    10.48:1  390px TR · btn nav-cta  "Teklif Al" 15px
-   16.08:1  (büyük) 390px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
-   17.39:1  390px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 11.5px
-    9.35:1  390px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
-   18.60:1  390px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 11.5px
-   18.52:1  390px TR · nav-logo-name  "Voltage" 17px
+   14.17:1  (büyük) 390px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
+   16.03:1  390px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 11.5px
+    6.84:1  390px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
+   18.60:1  390px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 11.5px
+   17.90:1  390px TR · nav-logo-name  "Voltage" 17px
     9.86:1  390px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  390px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 390px TR · ptf-value  "1.595,00" 32px
+   18.60:1  (büyük) 390px TR · ptf-value  "1.981,26" 32px
    10.48:1  430px TR menü · btn nav-cta  "Teklif Al" 15px
    18.81:1  430px TR menü · nav-logo-name  "Voltage" 17px
    10.48:1  430px TR · SPAN  "Teklif Al" 16px
    10.81:1  430px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
    10.48:1  430px TR · btn nav-cta  "Teklif Al" 15px
-   16.14:1  (büyük) 430px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
-   17.79:1  430px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 11.5px
-    8.99:1  430px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
-   18.60:1  430px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 11.5px
-   18.52:1  430px TR · nav-logo-name  "Voltage" 17px
+   14.31:1  (büyük) 430px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
+   16.75:1  430px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 11.5px
+    6.47:1  430px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
+   18.60:1  430px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 11.5px
+   17.90:1  430px TR · nav-logo-name  "Voltage" 17px
     9.86:1  430px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  430px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 430px TR · ptf-value  "1.595,00" 32px
+   18.60:1  (büyük) 430px TR · ptf-value  "1.981,26" 32px
     9.86:1  768px EN veri-yok · SPAN  "00:00" 11.5px
-   12.31:1  768px EN veri-yok · btn btn-ghost  "Explore Our Services" 16px
+   10.50:1  768px EN veri-yok · btn btn-ghost  "Explore Our Services" 16px
    10.48:1  768px EN veri-yok · btn nav-cta  "Get a Quote" 15px
-   16.74:1  (büyük) 768px EN veri-yok · h1-ana  "We connect industry's energy with the ma" 36px
-   16.72:1  768px EN veri-yok · h1-ust  "Electricity Supply for Industry and Busi" 13px
-    9.68:1  768px EN veri-yok · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.5px
+   15.35:1  (büyük) 768px EN veri-yok · h1-ana  "We connect industry's energy with the ma" 36px
+   14.60:1  768px EN veri-yok · h1-ust  "Electricity Supply for Industry and Busi" 13px
+    5.99:1  768px EN veri-yok · hero-sub  "Under Voltan Elektrik A.Ş., we provide c" 16.5px
    14.44:1  768px EN veri-yok · kf-stamp waiting  "AWAITING EPIAS DATA" 11.5px
-   18.69:1  768px EN veri-yok · nav-logo-name  "Voltage" 17px
-   14.48:1  768px EN veri-yok · nav-logo-sub  "ENERGY" 17px
+   18.25:1  768px EN veri-yok · nav-logo-name  "Voltage" 17px
+   14.17:1  768px EN veri-yok · nav-logo-sub  "ENERGY" 17px
     9.86:1  768px EN veri-yok · ptf-empty  "Awaiting hourly data" 13px
     9.86:1  768px EN veri-yok · ptf-label  "(₺/MWh)" 15px
    14.44:1  768px EN veri-yok · ptf-title  "Current Market Data" 13px
@@ -237,14 +237,14 @@ KAPAK VE ÜST BANT (fotoğraf üstü) — öğe başına en kötü piksel:
    18.81:1  768px TR menü · nav-logo-name  "Voltage" 17px
    14.58:1  768px TR menü · nav-logo-sub  "ENERJİ" 17px
     9.86:1  768px TR · SPAN  "00:00" 11.5px
-   12.87:1  768px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
+   12.23:1  768px TR · btn btn-ghost  "Hizmetlerimizi İncele" 16px
    10.48:1  768px TR · btn nav-cta  "Teklif Al" 15px
-   16.71:1  (büyük) 768px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
-   17.58:1  768px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
-    9.94:1  768px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
-   18.60:1  768px TR · kf-stamp  "SAAT 02:00 · EPİAŞ" 11.5px
-   18.69:1  768px TR · nav-logo-name  "Voltage" 17px
-   14.48:1  768px TR · nav-logo-sub  "ENERJİ" 17px
+   15.18:1  (büyük) 768px TR · h1-ana  "Sanayinin enerjisini piyasayla buluşturu" 36px
+   14.89:1  768px TR · h1-ust  "Sanayi ve Ticarethaneler için Elektrik T" 13px
+    6.16:1  768px TR · hero-sub  "Voltan Elektrik A.Ş. çatısı altında, GÖP" 16.5px
+   18.60:1  768px TR · kf-stamp  "SAAT 05:00 · EPİAŞ" 11.5px
+   18.25:1  768px TR · nav-logo-name  "Voltage" 17px
+   14.17:1  768px TR · nav-logo-sub  "ENERJİ" 17px
     9.86:1  768px TR · ptf-label  "(₺/MWh)" 15px
    14.44:1  768px TR · ptf-title  "Güncel Piyasa Verisi" 13px
-   18.60:1  (büyük) 768px TR · ptf-value  "1.595,00" 44px
+   18.60:1  (büyük) 768px TR · ptf-value  "1.981,26" 44px

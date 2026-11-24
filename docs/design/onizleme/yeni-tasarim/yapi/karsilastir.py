@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Önce/sonra karşılaştırması: canlı ana sayfa (kök index.html) ile hazırlık sayfası.
+"""Önce/sonra karşılaştırması: canlı ana sayfa (kök index.html) ile hazırlık sayfası; ya da iki hazırlık sürümü.
 Kaynak HTML üzerinden çalışır (betik çalıştırmaz): baş bölümü, JSON-LD, başlık ağacı, iç bağlantılar ve
 çapa metinleri, görünür TR ve EN metin (blok düzeyinde), kelime sayıları, id değerleri.
-Kullanım: karsilastir.py [canlı.html] [hazırlık.html]"""
+Görsellerin alt metinleri (TR/EN) ayrıca listelenir. Kullanım: karsilastir.py [önce.html] [sonra.html]"""
 import re, sys
 from html.parser import HTMLParser
 
@@ -180,7 +180,15 @@ for ad, desen in [('title', r'<title>.*?</title>'), ('meta description', r'<meta
 print('  robots değeri:', re.findall(r'<meta name="robots" content="([^"]*)"', ham_y))
 fa = ham_c[ham_c.index('<form class="form reveal"'):ham_c.index('</form>') + 7]
 fb = ham_y[ham_y.index('<form class="form reveal"'):ham_y.index('</form>') + 7]
-print('  teklif formu (<form>…</form>) bayt bayt aynı: %s (%d bayt)' % (fa == fb, len(fa.encode())))
+print('  teklif formu (<form>…</form>) bayt bayt aynı: %s (önce %d, sonra %d bayt)' % (fa == fb, len(fa.encode()), len(fb.encode())))
+DOSYA = re.compile(r'^ *<div class="dosya" id="leadFaturaKutu">\n( *)  (<input type="file"[^\n]*>)\n *<label class="dosya-dugme"[^\n]*</label>\n *<span class="dosya-durum"[^\n]*</span>\n *</div>\n', re.M)
+def geri(f):
+    return DOSYA.sub(lambda m: m.group(1) + m.group(2) + '\n', f)
+if fa != fb:
+    print('  dosya seçici dönüşümü geri alınınca bayt bayt aynı: %s (formdaki tek fark bu dönüşüm)' % (geri(fa) == geri(fb)))
+    import difflib as _d
+    for l in _d.unified_diff(fa.split('\n'), fb.split('\n'), 'önce', 'sonra', lineterm='', n=1):
+        print('    ' + l[:330])
 
 print('\n== 2. BAŞLIK AĞACI (TR) ==')
 for ad, kok in (('ÖNCE', c), ('SONRA', y)):
@@ -256,6 +264,18 @@ for dil in ('tr', 'en'):
     for t in ek:
         if not SUS.match(t):
             print('    + ' + t)
+
+print('\n== 4b. GÖRSELLER (<img>) VE ALT METİNLERİ ==')
+def gorseller(kok):
+    return [(d.nit.get('src', ''), d.nit.get('alt', ''), d.nit.get('data-alt-tr'), d.nit.get('data-alt-en'), d.nit.get('loading'), d.nit.get('width'), d.nit.get('height'), bool(d.nit.get('srcset')), bool(d.nit.get('sizes'))) for d in gez(govde(kok)) if d.etiket == 'img']
+gc_, gy_ = gorseller(c), gorseller(y)
+print('  önce %d, sonra %d <img>' % (len(gc_), len(gy_)))
+for g in gy_:
+    if g not in gc_:
+        print('    + %s | alt TR: "%s" | alt EN: "%s" | loading=%s %sx%s srcset=%s sizes=%s' % (g[0], g[2] if g[2] is not None else g[1], g[3] if g[3] is not None else '(aynı)', g[4], g[5], g[6], g[7], g[8]))
+for g in gc_:
+    if g not in gy_:
+        print('    - %s | alt: "%s"' % (g[0], g[1]))
 
 print('\n== 5. data-tr / data-en ÇİFTLERİ ==')
 def ciftler(kok):

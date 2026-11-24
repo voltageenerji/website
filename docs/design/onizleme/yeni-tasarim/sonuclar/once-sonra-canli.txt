@@ -1,6 +1,6 @@
 ÖNCE/SONRA KARŞILAŞTIRMASI
 önce : /home/user/website/index.html (166810 bayt)
-sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 bayt)
+sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 bayt)
 
 == 1. BAŞ BÖLÜMÜ ==
   <!DOCTYPE> … yazı tipi bağlantısı bayt bayt aynı: True (6391 bayt)
@@ -14,7 +14,19 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
   favicon                aynı: True  (önce 3, sonra 3 öğe)
   JSON-LD blokları       aynı: True  (önce 1, sonra 1 öğe)
   robots değeri: ['index, follow, max-snippet:-1, max-image-preview:large']
-  teklif formu (<form>…</form>) bayt bayt aynı: True (31482 bayt)
+  teklif formu (<form>…</form>) bayt bayt aynı: False (önce 31482, sonra 31825 bayt)
+  dosya seçici dönüşümü geri alınınca bayt bayt aynı: True (formdaki tek fark bu dönüşüm)
+    --- önce
+    +++ sonra
+    @@ -112,3 +112,7 @@
+               <label class="form-label" for="lead-fatura" data-tr="Son faturanız (opsiyonel)" data-en="Latest invoice (optional)">Son faturanız (opsiyonel)</label>
+    -          <input type="file" class="form-input" id="lead-fatura" name="fatura" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple>
+    +          <div class="dosya" id="leadFaturaKutu">
+    +            <input type="file" class="form-input" id="lead-fatura" name="fatura" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple>
+    +            <label class="dosya-dugme" for="lead-fatura" data-tr="Dosya Seç" data-en="Choose Files">Dosya Seç</label>
+    +            <span class="dosya-durum" id="leadFaturaDurum" aria-live="polite" data-tr="Dosya seçilmedi" data-en="No file chosen">Dosya seçilmedi</span>
+    +          </div>
+               <small class="form-hint" data-tr="PDF ya da fotoğraf · en fazla 3 dosya, her biri en fazla 8 MB, toplamı en fazla 10 MB. Fotoğraflar gönderilirken küçültülür. Fatura eklerseniz tüketiminizi ve tarifenizi faturadan biz okuruz." data-en="PDF or photo · up to 3 files, max 8 MB each and 10 MB in total. Photos are resized 
 
 == 2. BAŞLIK AĞACI (TR) ==
   ÖNCE: 14 başlık (H1 1, H2 8, H3 5)
@@ -32,7 +44,7 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
         H3 Şeffaf Yapı
       H2 İletişim
         H3 Teklif Talebi
-  SONRA: 33 başlık (H1 1, H2 9, H3 23)
+  SONRA: 36 başlık (H1 1, H2 8, H3 27)
     H1 Sanayi ve Ticarethaneler için Elektrik Tedariki Sanayinin enerjisini piyasayla buluşturuyoruz.
       H2 Hizmetlerimiz
         H3 Endüstriyel Tedarik
@@ -50,22 +62,25 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
         H3 Tekstil & Kompozit
       H2 Güncel Elektrik Piyasası Verileri
         H3 Gün Öncesi PTF · 24 Saat · ₺/MWh
-        H3 Bugünün Cetveli
+        H3 Günlük Piyasa Özeti
+        H3 Saatlik PTF · ₺/MWh
       H2 Elektrik Tedarik Süreci
         H3 Keşif
         H3 Modelleme
         H3 Teklif
-        H3 Onboard
+        H3 Tedarikçi Değişimi
         H3 Devreye Alma
       H2 Elektrik Tedarik Sözleşmesi Modelleri
-      H2 EPDK Tedarik Lisansı
       H2 Voltage Enerji Hakkında
+        H3 Şirket Bilgileri
+        H3 EPDK Tedarik Lisansı
       H2 Neden Voltage?
         H3 Sözleşme Disiplini
         H3 Elektrik Piyasalarında Uzmanlık
         H3 Şeffaf Yapı
       H2 İletişim
         H3 Teklif Talebi
+        H3 İletişim ve Sicil Bilgileri
   SONRA (EN):
     H1 Electricity Supply for Industry and Businesses We connect industry's energy with the market.
       H2 Our Services
@@ -84,22 +99,25 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
         H3 Textile & Composites
       H2 Current Electricity Market Data
         H3 Day-Ahead MCP · 24 Hours · ₺/MWh
-        H3 Today's Ledger
+        H3 Daily Market Summary
+        H3 Hourly MCP · ₺/MWh
       H2 Electricity Supply Process
         H3 Discovery
         H3 Modeling
         H3 Proposal
-        H3 Onboard
+        H3 Supplier Switch
         H3 Go-live
       H2 Electricity Supply Contract Models
-      H2 EPDK Supply License
       H2 About Voltage Enerji
+        H3 Company Details
+        H3 EPDK Supply License
       H2 Why Voltage?
         H3 Contract Discipline
         H3 Expertise in Electricity Markets
         H3 Transparent Structure
       H2 Contact
         H3 Request a Proposal
+        H3 Contact and Registry Details
 
 == 3. İÇ BAĞLANTILAR VE ÇAPA METİNLERİ (TR) ==
   önce 36 bağlantı (21 farklı hedef), sonra 40 bağlantı (22 farklı hedef)
@@ -140,8 +158,8 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
   EN çapa metinleri — eklenen: [('#hizmetler', 'Explore Our Services'), ('#icerik', 'Skip to content'), ('/canli-ptf', 'Live MCP'), ('/canli-ptf', 'View detailed market data'), ('/rehber', 'All sector guides')]
 
 == 4. GÖRÜNÜR METİN (TR) — metin birimi düzeyinde ==
-  birim sayısı: önce 294 (farklı 235), sonra 329 (farklı 243) · kelime sayısı: önce 1123, sonra 1147
-  KALDIRILAN: 44 (süs ve numara işaretleri: · 01 / 09 02 03 ◆ 04 S1 ▸ S2 S3 S4 S5 05 06 07 01 08 A B C 09)
+  birim sayısı: önce 294 (farklı 235), sonra 339 (farklı 247) · kelime sayısı: önce 1123, sonra 1163
+  KALDIRILAN: 47 (süs ve numara işaretleri: · 01 / 09 02 03 ◆ 04 S1 ▸ S2 S3 S4 S5 05 06 07 01 08 A B C 09)
     - KAPAK
     - Kurumsal Enerji Tedariki
     - Türkiye'nin endüstriyel enerji ortağı, Voltage.
@@ -158,14 +176,17 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
     - Bugünün En Düşüğü
     - Bugünün En Yükseği
     - KAYNAK: EPİAŞ ŞEFFAFLIK PLATFORMU · SAATLİK PTF
+    - Bugünün Cetveli
     - Çalıştığımız Tesis Sınıfları
+    - Onboard
     - Üç Sözleşme Modeli
     - EXHIBIT A
+    - Bir firma kadar köklü, bir ortak kadar yakın.
     - Uçtan uca enerji çözüm portföyü.
     - TEK HAT ŞEMASI — ŞEMATİK · ÖLÇEKSİZ
     - Piyasa Zekâsı
     - VOLTAGE FELSEFESİ · EST. 2011
-  EKLENEN: 52 (saat etiketleri vb.: 25)
+  EKLENEN: 59 (saat etiketleri vb.: 25)
     + İçeriğe atla
     + Canlı PTF
     + Sanayi ve Ticarethaneler için Elektrik Tedariki
@@ -185,18 +206,25 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
     + Sanayi ve ticarethane
     + Hizmet Verdiğimiz Sektörler
     + Tüm sektör rehberleri
+    + Görseller temsilîdir; Voltage Enerji tesislerini göstermez.
     + Güncel Elektrik Piyasası Verileri
     + Gün öncesi piyasasında oluşan saatlik PTF değerleri. Kaynak: EPİAŞ Şeffaflık Platformu.
+    + Günlük Piyasa Özeti
     + Saatlik PTF · ₺/MWh
     + Saat
     + Elektrik Tedarik Süreci
+    + Tedarikçi Değişimi
     + Elektrik Tedarik Sözleşmesi Modelleri
     + Voltage Enerji Hakkında
+    + Şirket Bilgileri
     + Elektrik Piyasalarında Uzmanlık
+    + Dosya Seç
+    + Dosya seçilmedi
+    + İletişim ve Sicil Bilgileri
 
 == 4. GÖRÜNÜR METİN (EN) — metin birimi düzeyinde ==
-  birim sayısı: önce 294 (farklı 233), sonra 329 (farklı 242) · kelime sayısı: önce 1344, sonra 1368
-  KALDIRILAN: 43 (süs ve numara işaretleri: · 01 / 09 02 03 ◆ 04 S1 ▸ S2 S3 S4 S5 05 06 07 01 08 A B C 09)
+  birim sayısı: önce 294 (farklı 233), sonra 339 (farklı 246) · kelime sayısı: önce 1344, sonra 1387
+  KALDIRILAN: 46 (süs ve numara işaretleri: · 01 / 09 02 03 ◆ 04 S1 ▸ S2 S3 S4 S5 05 06 07 01 08 A B C 09)
     - KAPAK
     - Corporate Energy Supply
     - Türkiye's industrial energy partner, Voltage.
@@ -212,14 +240,17 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
     - Today's Low
     - Today's High
     - SOURCE: EPIAS TRANSPARENCY PLATFORM · HOURLY MCP
+    - Today's Ledger
     - Facility Classes We Serve
+    - Onboard
     - Three Contract Models
     - EXHIBIT A
+    - As established as a firm, as close as a partner.
     - End-to-end energy solutions portfolio.
     - SINGLE-LINE DIAGRAM — SCHEMATIC · NOT TO SCALE
     - Market Intelligence
     - THE VOLTAGE PHILOSOPHY · EST. 2011
-  EKLENEN: 52 (saat etiketleri vb.: 25)
+  EKLENEN: 59 (saat etiketleri vb.: 25)
     + Skip to content
     + Live MCP
     + Electricity Supply for Industry and Businesses
@@ -239,18 +270,37 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
     + Industrial and commercial
     + Sectors We Serve
     + All sector guides
+    + Images are illustrative and do not show Voltage Enerji facilities.
     + Current Electricity Market Data
     + Hourly day-ahead market clearing prices (MCP). Source: EPİAŞ Transparency Platform.
+    + Daily Market Summary
     + Hourly MCP · ₺/MWh
     + Hour
     + Electricity Supply Process
+    + Supplier Switch
     + Electricity Supply Contract Models
     + About Voltage Enerji
+    + Company Details
     + Expertise in Electricity Markets
+    + Choose Files
+    + No file chosen
+    + Contact and Registry Details
+
+== 4b. GÖRSELLER (<img>) VE ALT METİNLERİ ==
+  önce 1, sonra 9 <img>
+    + img/kapak-1600.webp | alt TR: "" | alt EN: "(aynı)" | loading=None 2172x724 srcset=True sizes=True
+    + img/sektor-demir-celik-800.webp | alt TR: "Çelik fabrikasında elektrik ark ocağından erimiş çelik dökümü" | alt EN: "Molten steel being poured at an electric arc furnace steel plant" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-kimya-800.webp | alt TR: "Alacakaranlıkta bir petrokimya tesisinin damıtma kuleleri ve boru hatları" | alt EN: "Distillation columns and pipe racks of a petrochemical plant at dusk" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-osb-800.webp | alt TR: "Organize sanayi bölgesindeki fabrika binalarının havadan görünümü" | alt EN: "Aerial view of factory buildings in an organised industrial zone" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-lojistik-800.webp | alt TR: "Yüksek raflı soğuk hava deposunun içi" | alt EN: "Interior of a high-bay cold storage warehouse" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-cam-seramik-800.webp | alt TR: "Cam üretim hattında kızgın cam" | alt EN: "Glowing glass on a glass production line" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-veri-merkezi-800.webp | alt TR: "Veri merkezinde sunucu kabinleri arasındaki koridor" | alt EN: "Aisle between server racks in a data centre" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-tekstil-800.webp | alt TR: "Dokuma fabrikasında sıra sıra dokuma tezgâhları" | alt EN: "Rows of looms in a weaving mill" | loading=lazy 1200x800 srcset=True sizes=True
 
 == 5. data-tr / data-en ÇİFTLERİ ==
-  önce 164, sonra 170 · kaldırılan 14 · eklenen 20
+  önce 164, sonra 176 · kaldırılan 15 · eklenen 27
     - 15 yıl · Est. 2011 | 15 yrs · Est. 2011
+    - Bugünün Cetveli | Today's Ledger
     - Bugünün En Düşüğü | Today's Low
     - Bugünün En Yükseği | Today's High
     - Gün Öncesi PTF — Canlı | Day-Ahead MCP — Live
@@ -266,10 +316,14 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
     - Şu Anki Saat · Gün Öncesi PTF | Current Hour · Day-Ahead MCP
     + 2011'den bu yana | Since 2011
     + Canlı PTF | Live MCP
+    + Dosya Seç | Choose Files
+    + Dosya seçilmedi | No file chosen
     + EPDK lisanslı tedarikçi | EPDK-licensed supplier
     + Elektrik Piyasalarında Uzmanlık | Expertise in Electricity Markets
     + GÖP ve GİP | DAM and IDM
+    + Görseller temsilîdir; Voltage Enerji tesislerini göstermez. | Images are illustrative and do not show Voltage Enerji facilities.
     + Güncel Piyasa Verisi | Current Market Data
+    + Günlük Piyasa Özeti | Daily Market Summary
     + Hizmetlerimizi İncele | Explore Our Services
     + PTF | MCP
     + Piyasa katılımcısı | Market participant
@@ -280,17 +334,20 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
     + Sanayi ve Ticarethaneler için Elektrik Tedariki | Electricity Supply for Industry and Businesses
     + Sanayi ve ticarethane | Industrial and commercial
     + Sanayinin enerjisini piyasayla buluşturuyoruz. | We connect industry's energy with the market.
+    + Tedarikçi Değişimi | Supplier Switch
     + Tüm sektör rehberleri | All sector guides
     + Türkiye'nin tamamı | All of Türkiye
     + Voltan Elektrik A.Ş. çatısı altında, GÖP, GİP ve ikili anlaşmalar üzerinden sanayi ve ticarethanelere sözleşmeye dayalı elektrik tedariki sağlıyoruz. | Under Voltan Elektrik A.Ş., we provide contract-based electricity supply to industrial and commercial consumers via the Day-Ahead Market (DAM), Intra-Day Market (IDM), and bilateral agreements.
+    + İletişim ve Sicil Bilgileri | Contact and Registry Details
     + İçeriğe atla | Skip to content
+    + Şirket Bilgileri | Company Details
 
 == 6. id DEĞERLERİ ==
-  önce 54, sonra 51
+  önce 54, sonra 54
   kaldırılan: ['flow', 'kpiMax', 'kpiMin', 'kpiNow', 'kpiStamp', 'lmFill', 'mcpRail', 'mcpTrack', 'rhNum', 'rhSec', 'tline']
-  eklenen   : ['heroArea', 'heroDot', 'heroLine', 'icerik', 'kapakBaslik', 'ptfBaslik', 'ptfKart', 'saatTablo']
+  eklenen   : ['heroArea', 'heroDot', 'heroLine', 'icerik', 'kapakBaslik', 'leadFaturaDurum', 'leadFaturaKutu', 'ptfBaslik', 'ptfKart', 'saatBaslik', 'saatTablo']
   gelen bağlantıların kullandığı çapalar duruyor: True  ['leadForm', 'teklif', 'iletisim', 'hakkimizda', 'yaklasim', 'hizmetler', 'kapak', 'canli-piyasa']
-  sayfadaki betiğin aradığı ama sayfada OLMAYAN id: ['kpiMax', 'kpiMin', 'kpiNow', 'kpiStamp']
+  sayfadaki betiğin aradığı ama sayfada OLMAYAN id: []
 
 == 7. KİMLİK VE LİSANS BİLGİLERİ (kaynakta geçme sayısı: önce → sonra) ==
   ETS/3424-8/2074                                         6 → 5
@@ -305,18 +362,25 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
   Emirhan Tan, Yönetim Kurulu Başkanı                     1 → 1
 
 == 8. BETİK ==
-  satır içi betik: önce 38484 bayt, sonra 36259 bayt
-  satır içi stil : önce 43652 bayt, sonra 37044 bayt
-  betik satır farkı: -89 +20
+  satır içi betik: önce 38484 bayt, sonra 38000 bayt
+  satır içi stil : önce 43652 bayt, sonra 45501 bayt
+  betik satır farkı: -98 +62
   çıkarılan bloklar (sayfada öğesi kalmayanlar): SMIL temizliği, kaydırınca belirme (IntersectionObserver), saatlik ray, folyo, tek hat şeması
   eklenen satırlar:
+    +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
+    +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
+    +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
+    +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
     +    if (href === '#' || href === '#icerik') return; // atlama bağlantısı: odağı tarayıcı taşır
     +  if (['#leadForm', '#teklif', '#iletisim', '#hakkimizda', '#yaklasim', '#hizmetler', '#canli-piyasa'].indexOf(h) < 0) return;
     +  const hedef = document.getElementById(h === '#leadForm' || h === '#teklif' ? 'leadForm' : h.slice(1));
     +    btn.setAttribute('aria-pressed', btn.dataset.lang === lang ? 'true' : 'false');
+    +  // Görsellerin alt metni (sektör fotoğrafları)
+    +  document.querySelectorAll('img[data-alt-tr][data-alt-en]').forEach(el => { el.alt = el.getAttribute('data-alt-' + lang); });
     +// 2) Canlı veri denetleyicisi — kapak PTF kartı (değer, damga, gün grafiği) + cetvel + grafik + saatlik tablo.
     +  const ptfKart = $('ptfKart'), heroLine = $('heroLine'), heroArea = $('heroArea'), heroDot = $('heroDot');
-    +  const saatHucre = document.querySelectorAll('#saatTablo tbody td');
+    +  const saatHucre = document.querySelectorAll('#saatTablo tbody td'); /* dört kısa tablo; belge sırası = saat sırası (00–23) */
+    +  if(!kfPtf) return;
     +  /* Aynı çizim iki hedefe gider: bölümdeki büyük grafik ve kapak kartındaki gün grafiği */
     +    drawOne(prices, lmLine, lmArea, lmDot, 800, 260, 24, 24);
     +    drawOne(prices, heroLine, heroArea, heroDot, 360, 94, 10, 10);
@@ -330,6 +394,38 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (153242 b
     +      saatHucre[i].textContent = (state.prices && Number.isFinite(state.prices[i])) ? fmt(state.prices[i]) : DASH;
     +      saatHucre[i].parentNode.classList.toggle('simdi', state.mode === 'live' && i === simdiH);
     +    }
+    +// 7) Açılır alanlar: telefonda kapalı başlar (satır içi betik), geniş ekranda hep açık
+    +(function(){
+    +  var dar = window.matchMedia('(max-width: 759px)');
+    +  var alanlar = document.querySelectorAll('details.acilir');
+    +  function uygula(){
+    +    alanlar.forEach(function(d){
+    +      var s = d.querySelector('summary');
+    +      if(dar.matches){ if(s) s.removeAttribute('tabindex'); }
+    +      else { d.open = true; if(s) s.setAttribute('tabindex', '-1'); }
+    +    });
+    +  }
+    +  alanlar.forEach(function(d){
+    +    var s = d.querySelector('summary');
+    +    if(s) s.addEventListener('click', function(e){ if(!dar.matches) e.preventDefault(); });
+    +  });
+    +  uygula();
+    +  if(dar.addEventListener) dar.addEventListener('change', uygula); else if(dar.addListener) dar.addListener(uygula);
+    +})();
+    +// 8) Dosya seçici: yerelleştirilmiş düğme ve durum metni. Girdi (#lead-fatura) aynıdır; yükleme mantığına dokunulmaz.
+    +(function(){
+    +  var girdi = document.getElementById('lead-fatura'), kutu = document.getElementById('leadFaturaKutu'), durum = document.getElementById('leadFaturaDurum');
+    +  if(!girdi || !kutu || !durum) return;
+    +  function yaz(){
+    +    var n = girdi.files ? girdi.files.length : 0, en = document.documentElement.lang === 'en';
+    +    durum.textContent = n === 0 ? durum.getAttribute(en ? 'data-en' : 'data-tr') : (n === 1 ? girdi.files[0].name : (en ? n + ' files selected' : n + ' dosya seçildi'));
+    +    kutu.classList.toggle('dolu', n > 0);
+    +  }
+    +  girdi.addEventListener('change', yaz);
+    +  window.addEventListener('languagechange', yaz);
+    +  kutu.classList.add('hazir');
+    +  yaz();
+    +})();
   çıkarılan satırlar içinde veri/önbellek/form mantığına dokunan: 0
   form betiği (// 6) Teklif formu … init) bayt bayt aynı: True
 
