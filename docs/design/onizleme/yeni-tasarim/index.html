@@ -259,7 +259,9 @@ linear-gradient(180deg,rgba(8,13,28,.56) 0,rgba(8,13,28,.24) 96px,rgba(8,13,28,0
 
 /* ============ SAATLİK PTF ŞERİDİ — kapağın alt kenarında; mutlak konumlu olduğu için kapağın yerleşimini itmez,
    veri geç gelse de sayfa kaymaz. Üstüne gelince ya da odaklanınca durur. ============ */
-.mcp-rail{position:absolute;inset:auto 0 0 0;z-index:1;display:flex;height:40px;background:rgba(8,13,28,.9);border-top:1px solid var(--hair-dark);color:var(--on-dark)}
+.mcp-rail{position:absolute;inset:auto 0 0 0;z-index:1;display:flex;height:40px;background:rgba(8,13,28,.9);color:var(--on-dark)}
+/* Üst çizgi şeridin değil içindeki iki kutunun kenarlığıdır: şeridin ve düğmenin yüksekliği tam 40 / 44 px kalır */
+.mcp-rail-link,.mcp-rail-dur{border-top:1px solid var(--hair-dark)}
 .mcp-rail[hidden]{display:none}
 .mcp-rail-link{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden}
 .mcp-rail-link:focus-visible{outline:2px solid var(--cta);outline-offset:-2px}
@@ -270,7 +272,7 @@ linear-gradient(180deg,rgba(8,13,28,.56) 0,rgba(8,13,28,.24) 96px,rgba(8,13,28,0
 .mcp-rail-track .cell .up{color:var(--green-bright)}
 .mcp-rail-track .cell .dn{color:#F2A08F}
 /* Durdur / devam düğmesi: şeridin sağ ucunda, şeritle aynı yükseklikte kare */
-.mcp-rail-dur{flex:none;display:grid;place-items:center;width:44px;height:100%;padding:0;border:0;border-left:1px solid var(--hair-dark);background:var(--night);color:var(--on-dark);cursor:pointer}
+.mcp-rail-dur{flex:none;display:grid;place-items:center;width:44px;height:100%;padding:0;border:0;border-top:1px solid var(--hair-dark);border-left:1px solid var(--hair-dark);background:var(--night);color:var(--on-dark);cursor:pointer}
 .mcp-rail-dur:hover{color:var(--cta)}
 .mcp-rail-dur:focus-visible{outline:2px solid var(--cta);outline-offset:-2px}
 .mcp-rail-dur svg{width:14px;height:14px;fill:currentColor}

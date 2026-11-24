@@ -6,12 +6,12 @@ Bu sürüm **24.11 revizyon talimatının** sonucudur (önceki hazırlık sürü
 
 **24.11 eki (sahibin isteği: "Kayan PTF barını koymayalım mı?"): saatlik PTF şeridi.** Canlıdaki ray (`#mcpRail`, `#mcpTrack`) geri geldi; onay bekliyor.
 - Yeri: kapağın alt kenarı, 40 px, `position: absolute` (kapağın alt boşluğunun içinde). Üst bant, başlık, düğmeler ve PTF kartının yeri piksel olarak aynı; kapak yüksekliği aynı. Değişen tek şey fotoğrafın en alt 40 pikselinin koyu şeritle örtülmesi.
-- Telefonda ve dar ekranda da var (sahip, 24.11: "Telefona da ekle"). 1040 px altında kapağın altına 44 px yer ayrılır (`.hero { padding-bottom: 44px }`) ve şerit oraya oturur; yer veri olsa da olmasa da ayrıldığı için kayma olmaz. Sonuç: dar ekranda kapak 44 px uzadı (390 px'te 767 → 811), üst bant, başlık, düğmeler ve kartın yeri aynı; sayfa boyu 44 px arttı. Şerit dar ekranda 44 px (dokunma hedefi). Dokunmatik ekranda üstüne gelerek durdurma yok; hareket azaltma tercihi geçerli.
+- Telefonda ve dar ekranda da var (sahip, 24.11: "Telefona da ekle"). 1040 px altında kapağın altına 44 px yer ayrılır (`.hero { padding-bottom: 44px }`) ve şerit oraya oturur; yer veri olsa da olmasa da ayrıldığı için kayma olmaz. Sonuç: dar ekranda kapak 44 px uzadı (390 px'te 767 → 811), üst bant, başlık, düğmeler ve kartın yeri aynı; sayfa boyu 44 px arttı. Şerit dar ekranda 44 px (dokunma hedefi). Durdur/devam düğmesi (`#mcpDur`, sahip 24.11): şeridin sağ ucunda, dar ekranda 44×44, geniş ekranda 44×40; `aria-pressed` ile durum bildirir, tercih `localStorage` (`voltage-serit-durdu`) ile bu tarayıcıda hatırlanır; hareket azaltma tercihinde şerit zaten durduğu için düğme gösterilmez. Şerit artık `<div id="mcpRail">` içinde bir bağlantı (`.mcp-rail-link`) ve bir düğmedir (düğme bağlantının içine konamaz).
 - Veri: yalnız `/ptf/today` yanıtı; veri yoksa ya da 6 saatten az geçerli değer varsa `hidden` kalır. Uydurma değer yok.
 - Betik canlıdakiyle aynı (ilk saatte fark yazılmaması 24.11'de canlıya da işlendi); burada kalan iki fark (`yapi/kur.py`, 2c): fark sıfırsa ok yazılmaz, fark binlik ayraçla yazılır.
 - Hareket: 140 sn'de bir tur; üstüne gelince ve klavye odağında durur; hareket azaltma tercihinde durur. Şeridin tamamı `/canli-ptf` bağlantısıdır, erişilebilir adı dille değişir (`data-aria-tr` / `data-aria-en`).
 - Bilinen ödün: saatlik değerler sayfada üçüncü kez görünür (kart: o saat; şerit: 24 saat, yuvarlanmış; bölüm: grafik ve tablo). Monospace yalnız piyasa verisinde kuralına uyar.
-- Test: 322/322 (`sonuclar/test-sonucu.txt`, "şerit" satırları). Gerçek tarayıcıda yalnız Chromium ile denendi.
+- Test: 330/330 (`sonuclar/test-sonucu.txt`, "şerit" satırları). Gerçek tarayıcıda yalnız Chromium ile denendi.
 
 ## Dosyalar
 

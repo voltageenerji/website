@@ -77,6 +77,7 @@ GEÇTİ  D1 375px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü d�
 GEÇTİ  D2 375px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
 GEÇTİ  D3 375px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
 GEÇTİ  D3 375px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
+GEÇTİ  D3 375px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur
 GEÇTİ  D4 375px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
        375×667: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
 GEÇTİ  D5 menü kapalı açılır
@@ -88,18 +89,21 @@ GEÇTİ  D1 390px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü d�
 GEÇTİ  D2 390px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
 GEÇTİ  D3 390px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
 GEÇTİ  D3 390px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
+GEÇTİ  D3 390px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur
 GEÇTİ  D4 390px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
        390×844: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
 GEÇTİ  D1 320px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
 GEÇTİ  D2 320px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
 GEÇTİ  D3 320px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
 GEÇTİ  D3 320px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
+GEÇTİ  D3 320px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur
 GEÇTİ  D4 320px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
        320×568: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
 GEÇTİ  D1 430px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
 GEÇTİ  D2 430px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
 GEÇTİ  D3 430px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
 GEÇTİ  D3 430px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
+GEÇTİ  D3 430px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur
 GEÇTİ  D4 430px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
        430×932: kapak yüksekliği 746 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 398 px
 GEÇTİ  D10 ilk Tab atlama bağlantısını gösterir; Enter odağı <main>’e taşır
@@ -115,7 +119,11 @@ GEÇTİ  E1 bölüm kapaktaki “şu anki saat” rakamını manşet yapmıyor: 
 GEÇTİ  E1 şerit: veriyle göründü, 24 saat × 2 (kesintisiz döngü), 00:00–23:00, /canli-ptf bağlantısı, adı var
 GEÇTİ  E1 şerit değerleri proxy yanıtındaki saatlik fiyatların yuvarlanmışı; günün ilk saatinde fark yazılmaz
 GEÇTİ  E1 şerit kapağın alt kenarında (40 px), kart ve düğmelerle çakışmıyor (≥ 24 px boşluk), yatay taşma yok
-GEÇTİ  E1 şerit üstüne gelince durur (hareketi durdurma yolu)
+GEÇTİ  E1 hareket azaltma tercihinde şerit durur ve durdur düğmesi gösterilmez
+GEÇTİ  E1 şerit hareketli (1 animasyon) ve üstüne gelince durur
+GEÇTİ  E1 şerit düğmesi: basınca durur (aria-pressed=true, tercih saklanır), klavyeyle yeniden basınca devam eder
+GEÇTİ  E1 şerit düğmesi: durdurma tercihi sayfa yenilenince korunur
+GEÇTİ  E1 şerit düğmesi geniş ekranda: şeritle aynı yükseklikte (40 px), sağ uçta
 GEÇTİ  E1 önbellek anahtarı “voltage-ptf-cache” yazıldı; yalnız /ptf/today ve /ptf/stats çağrıldı
 GEÇTİ  E2 ÖNBELLEK: damga “SON SENKRON ss:dd”, durum cached, değer önbellekteki sayı
 GEÇTİ  E2 ÖNBELLEK: grafik ve tablo bugünün önbelleğinden; “şu an” noktası ve satır işareti yok; kip SON SENKRON
@@ -349,4 +357,4 @@ GEÇTİ  M1 390x844@2x ilk ekran (bekleme durumu): üst bant, başlık, alt meti
 GEÇTİ  N1 390px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 GEÇTİ  N1 1440px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 
-TOPLAM: 322 geçti, 0 kaldı
+TOPLAM: 330 geçti, 0 kaldı

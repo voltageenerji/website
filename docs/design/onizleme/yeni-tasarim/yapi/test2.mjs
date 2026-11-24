@@ -303,13 +303,21 @@ const kartYuk = {}, bolumYuk = {};
   ok('E1 şerit: veriyle göründü, 24 saat × 2 (kesintisiz döngü), 00:00–23:00, /canli-ptf bağlantısı, adı var', !serit.gizli && serit.n === 48 && serit.es && serit.saat.startsWith('00:00,01:00') && serit.saat.endsWith('22:00,23:00') && serit.href === '/canli-ptf' && /PTF/.test(serit.ad), JSON.stringify([serit.gizli, serit.n, serit.es, serit.href]));
   ok('E1 şerit değerleri proxy yanıtındaki saatlik fiyatların yuvarlanmışı; günün ilk saatinde fark yazılmaz', JSON.stringify(serit.fiyat) === JSON.stringify(ornek.items.map(i => Math.round(i.price).toLocaleString('tr-TR'))) && serit.ilkFark, serit.fiyat.slice(0, 3).join());
   ok('E1 şerit kapağın alt kenarında (40 px), kart ve düğmelerle çakışmıyor (≥ 24 px boşluk), yatay taşma yok', Math.abs(serit.alt - serit.kapakAlt) < 1 && Math.round(serit.alt - serit.ust) === 40 && serit.ust - Math.max(serit.kartAlt, serit.dugmeAlt) >= 24 && serit.tasma === 0 && serit.anim === 'rail', JSON.stringify(serit));
-  await p.hover('#mcpRail a'); const durdu = await p.evaluate(() => getComputedStyle(document.getElementById('mcpTrack')).animationPlayState); await p.mouse.move(5, 5);
-  ok('E1 şerit üstüne gelince durur (hareketi durdurma yolu)', durdu === 'paused', durdu);
-  const oyn = () => p.evaluate(() => [getComputedStyle(document.getElementById('mcpTrack')).animationPlayState, document.getElementById('mcpDur').getAttribute('aria-pressed'), localStorage.getItem('voltage-serit-durdu')].join());
-  const d0 = await oyn(); await p.click('#mcpDur'); await p.mouse.move(5, 5); const d1 = await oyn(); await p.keyboard.press('Enter'); const d2 = await oyn();
-  ok('E1 şerit düğmesi: basınca durur (aria-pressed=true, tercih saklanır), klavyeyle yeniden basınca devam eder', d0 === 'running,false,' && d1 === 'paused,true,1' && d2 === 'running,false,0', [d0, d1, d2].join(' → '));
-  await p.click('#mcpDur'); await p.reload({ waitUntil: 'networkidle' }); const d3 = await oyn(); await p.click('#mcpDur'); await p.mouse.move(5, 5);
-  ok('E1 şerit düğmesi: durdurma tercihi sayfa yenilenince korunur', d3 === 'paused,true,1', d3);
+  ok('E1 hareket azaltma tercihinde şerit durur ve durdur düğmesi gösterilmez', await p.evaluate(() => document.getAnimations().length === 0 && getComputedStyle(document.getElementById('mcpDur')).display === 'none'));
+  {
+    const s2 = await baglam({ w: 1440, h: 900 }); const q = s2.p; await ac(q);
+    const oyn = () => q.evaluate(() => [getComputedStyle(document.getElementById('mcpTrack')).animationPlayState, document.getElementById('mcpDur').getAttribute('aria-pressed'), localStorage.getItem('voltage-serit-durdu')].join());
+    const kosuyor = await q.evaluate(() => document.getAnimations().filter(a => a.animationName === 'rail' && a.playState === 'running').length);
+    await q.hover('#mcpRail a'); const durdu = (await oyn()).split(',')[0]; await q.mouse.move(5, 5);
+    ok('E1 şerit hareketli (1 animasyon) ve üstüne gelince durur', kosuyor === 1 && durdu === 'paused', kosuyor + ' ' + durdu);
+    const d0 = await oyn(); await q.click('#mcpDur'); await q.mouse.move(5, 5); const d1 = await oyn(); await q.focus('#mcpDur'); await q.keyboard.press('Enter'); const d2 = await oyn();
+    ok('E1 şerit düğmesi: basınca durur (aria-pressed=true, tercih saklanır), klavyeyle yeniden basınca devam eder', d0 === 'running,false,' && d1 === 'paused,true,1' && d2 === 'running,false,0', [d0, d1, d2].join(' → '));
+    await q.click('#mcpDur'); await q.reload({ waitUntil: 'networkidle' }); const d3 = await oyn();
+    ok('E1 şerit düğmesi: durdurma tercihi sayfa yenilenince korunur', d3 === 'paused,true,1', d3);
+    const dk = await q.evaluate(() => { const b = document.getElementById('mcpDur').getBoundingClientRect(), r = document.getElementById('mcpRail').getBoundingClientRect(); return [Math.round(b.width), Math.round(b.height), Math.round(r.height), Math.round(innerWidth - b.right)]; });
+    ok('E1 şerit düğmesi geniş ekranda: şeritle aynı yükseklikte (40 px), sağ uçta', dk[1] === 40 && dk[2] === 40 && dk[3] === 0, JSON.stringify(dk));
+    await s2.ctx.close();
+  }
   ok('E1 önbellek anahtarı “voltage-ptf-cache” yazıldı; yalnız /ptf/today ve /ptf/stats çağrıldı', await p.evaluate(() => { const c = JSON.parse(localStorage.getItem('voltage-ptf-cache')); return c && c.prices.length === 24 && Number.isFinite(c.price); }) && [...new Set(durum.istekler.map(u => u.replace(/^https:\/\/[^/]+/, '')))].sort().join() === '/ptf/stats,/ptf/today', [...new Set(durum.istekler)].join());
   await p.locator('.hero').screenshot({ path: `${CIKTI}/r3/durum/ptf-1-canli-kapak-1440.png` });
   await p.locator('#canli-piyasa').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, -90)); await p.waitForTimeout(200);
