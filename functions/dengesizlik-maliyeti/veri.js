@@ -20,6 +20,8 @@
  * DÜRÜSTLÜK: veri yoksa 503 döner; boş ama "başarılı" dosya üretilmez.
  * Bilerek /api/ altında DEĞİL: robots.txt /api/ yolunu kapatır, bu uç yapay zekâ
  * ajanlarınca çekilebilir kalmalı. Arama dizinine girmesin diye X-Robots-Tag: noindex.
+ * CORS başlığı ve OPTIONS işleyicisi YOK (aynı köken). HEAD yalnız önbellekten
+ * yanıtlanır; EPİAŞ'a gitmez.
  */
 import {
   kuralBul, KURALLAR, ozet, tarihGecerli, ymdGecerli, istanbulBugun, gunEkle, gunFarki, donemGunu, donemDakikasi,
@@ -28,11 +30,16 @@ import {
 import { gunGetir, aralikGetir } from '../_lib/epias.js';
 import { xlsxYaz } from '../_lib/xlsx.js';
 
+// CORS başlığı BİLEREK yok: sayfa aynı kökenden çalışır; başka sitelerin bu ucu
+// ziyaretçi tarayıcısından çağırması istenmez (Hukuk R7). Sunucudan sunucuya
+// (ajanlar, betikler) erişim CORS'a bağlı değildir.
 const ORTAK = {
   'X-Robots-Tag': 'noindex',
-  'Access-Control-Allow-Origin': '*',
   'X-Content-Type-Options': 'nosniff',
 };
+
+/** Toplam süre sınırı (giriş + rapor): aşılırsa bayat veri ya da 503. */
+const SURE_MS = 9000;
 
 const NOT = 'Değerler EPİAŞ Şeffaflık Platformu\'nda yayımlandığı hâliyle aktarılır ve sonradan revize edilebilir. Kesin tutarlar EPİAŞ\'ın nihai uzlaştırma bildirimiyle belirlenir; geçmişe dönük düzeltme yapılabilir. maliyetPozitif ve maliyetNegatif mevzuat terimi değildir; Voltage Enerji\'nin bu veriden türettiği göstergedir. Yayımlanmamış değer null\'dır. Bilgilendirme amaçlıdır; teklif ya da taahhüt değildir.';
 
@@ -125,6 +132,8 @@ async function yanit(context, govdesiz) {
     // context.secenek yalnız testlerde vardır (sahte fetch / sabit saat); üretimde tanımsızdır.
     const sec = context.secenek;
     const bugun = istanbulBugun(sec && typeof sec.simdi === 'function' ? sec.simdi() : Date.now());
+    // HEAD yalnız önbellekten yanıtlanır: gövdesiz bir istek EPİAŞ'a gitmez.
+    const cekim = { sureMs: SURE_MS, ...(sec || {}), yalnizOnbellek: govdesiz };
     const bicim = (q.get('bicim') || 'json').toLowerCase();
     if (!['json', 'csv', 'xlsx'].includes(bicim)) {
       return hata(400, 'gecersiz-bicim', 'Geçersiz biçim. Geçerli değerler: json, csv, xlsx.');
@@ -144,7 +153,7 @@ async function yanit(context, govdesiz) {
       if (gunFarki(bas, bit) + 1 > AZAMI_ARALIK_GUN) {
         return hata(400, 'aralik-uzun', `Tek istekte en çok ${AZAMI_ARALIK_GUN} gün indirilebilir.`);
       }
-      sonuc = await aralikGetir(env, context, bas, bit, sec);
+      sonuc = await aralikGetir(env, context, bas, bit, cekim);
       dosyaAdi = `dengesizlik-maliyeti-${bas}_${bit}`;
       ust = { bas, bit };
     } else {
@@ -153,11 +162,16 @@ async function yanit(context, govdesiz) {
       if (!tarihGecerli(tarih, bugun)) {
         return hata(400, 'tarih-aralik-disi', `Tarih ${ILK_GUN} ile ${bugun} (bugün) arasında olmalıdır.`);
       }
-      sonuc = await gunGetir(env, context, tarih, sec);
+      sonuc = await gunGetir(env, context, tarih, cekim);
       dosyaAdi = `dengesizlik-maliyeti-${tarih}`;
       ust = { tarih };
     }
 
+    if (govdesiz && sonuc && sonuc.durum !== 'veri' && sonuc.neden === 'onbellek-yok') {
+      // Önbellekte kayıt yok: durum bilinmiyor. EPİAŞ'a gidilmez; asıl sonucu GET verir.
+      const tur = { json: 'application/json; charset=utf-8', csv: 'text/csv; charset=utf-8', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }[bicim];
+      return new Response(null, { status: 200, headers: { ...ORTAK, 'Content-Type': tur, 'Cache-Control': 'no-store', 'X-Veri-Durum': 'onbellekte-yok' } });
+    }
     if (!sonuc || sonuc.durum !== 'veri' || !sonuc.donemler.length) {
       const neden = (sonuc && sonuc.neden) || 'hata';
       const acik = NEDEN_MESAJI[neden] || 'EPİAŞ Şeffaflık Platformu\'na şu anda ulaşılamıyor.';
@@ -223,6 +237,3 @@ async function yanit(context, govdesiz) {
 
 export async function onRequestGet(context) { return yanit(context, false); }
 export async function onRequestHead(context) { return yanit(context, true); }
-export async function onRequestOptions() {
-  return new Response(null, { status: 204, headers: { ...ORTAK, 'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS', 'Access-Control-Max-Age': '86400', 'Cache-Control': 'public, max-age=86400' } });
-}

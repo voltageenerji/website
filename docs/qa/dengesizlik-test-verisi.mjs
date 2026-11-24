@@ -35,9 +35,11 @@ const gunEkle = (ymd, n) => { const [y, m, d] = ymd.split('-').map(Number); retu
 
 /**
  * Sahte EPİAŞ (giris + rapor). Ağ yok; her istek kaydedilir.
- * ayar: girisDurum, girisGovde, girisAsili, raporDurum, raporGovde, raporAsili, govdeAsili,
- *       raporFirlat, zarf ('items'|'body.content'|'body.items'|'content'|'dizi'|'body'),
- *       gun(ymd) → kalemler, biletGecersiz (bu bilet 401 alır)
+ * ayar: girisDurum, girisGovde, girisAsili, girisFirlat, raporDurum, raporGovde, raporAsili,
+ *       govdeAsili, raporFirlat, raporGecikmeMs, zarf ('items'|'body.content'|'body.items'|
+ *       'content'|'dizi'|'body'), gun(ymd) → kalemler, biletGecersiz (bu bilet 401 alır),
+ *       sayfaBoyu (yanıt sayfalanır: {items, page{number,size,total}}), sayfaHata (bu
+ *       sayfadan itibaren 500), sayfaBos (bu sayfadan itibaren boş liste)
  */
 export function sahteEpias(ayar = {}) {
   const e = {
@@ -59,6 +61,7 @@ export function sahteEpias(ayar = {}) {
     if (u.startsWith('https://giris.epias.com.tr/cas/v1/tickets')) {
       e.sayac.giris++;
       if (a.girisAsili) return asili();
+      if (a.girisFirlat) throw new TypeError('ag hatasi');
       if (a.girisDurum !== 201) return new Response('giris reddedildi', { status: a.girisDurum });
       e.sonBilet = `TGT-${1000 + e.sayac.giris}-sahteBiletDegeri-cas01`;
       return new Response(a.girisGovde !== undefined ? a.girisGovde : e.sonBilet, { status: 201 });
@@ -66,6 +69,7 @@ export function sahteEpias(ayar = {}) {
     if (u.startsWith('https://seffaflik.epias.com.tr/reporting-service/v1/data/ptf-smf-sdf')) {
       e.sayac.rapor++;
       if (a.raporAsili) return asili();
+      if (a.raporGecikmeMs) await new Promise((coz) => setTimeout(coz, a.raporGecikmeMs));
       if (a.raporFirlat) throw new TypeError('ag hatasi');
       if (a.biletGecersiz && headers.tgt === a.biletGecersiz) return new Response('yetkisiz', { status: 401 });
       if (a.raporDurum !== 200) return new Response('{"hata":"sunucu"}', { status: a.raporDurum });
@@ -75,6 +79,12 @@ export function sahteEpias(ayar = {}) {
       const bas = g.startDate.slice(0, 10), bit = g.endDate.slice(0, 10);
       let liste = [];
       for (let d = bas; d <= bit; d = gunEkle(d, 1)) liste = liste.concat(a.gun(d));
+      if (a.sayfaBoyu) {
+        const no = (g.page && g.page.number) || 1;
+        if (a.sayfaHata && no >= a.sayfaHata) return new Response('{"hata":"sunucu"}', { status: 500 });
+        const dilim = a.sayfaBos && no >= a.sayfaBos ? [] : liste.slice((no - 1) * a.sayfaBoyu, no * a.sayfaBoyu);
+        return new Response(JSON.stringify({ items: dilim, page: { number: no, size: a.sayfaBoyu, sort: null, total: liste.length } }), { status: 200 });
+      }
       const zarflar = {
         items: { items: liste, page: null }, 'body.content': { resultCode: '0', body: { content: liste } }, 'body.items': { body: { items: liste } },
         content: { content: liste }, dizi: liste, body: { body: liste },

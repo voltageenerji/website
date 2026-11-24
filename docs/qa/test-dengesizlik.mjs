@@ -5,11 +5,11 @@
 // değildir, sayfada ya da herhangi bir yayında KULLANILMAZ.
 import {
   KURALLAR, TAVANLAR, kuralBul, tavanBul, sayi, temiz, yonCoz, birimFiyat, ogelerCikar, donemler,
-  ozet, gunSinirlari, aralikSinirlari, tarihGecerli, ymdGecerli, gunEkle, gunFarki, gunIzgarasi,
+  ozet, donemlerAyrintili, sayfaBilgisi, gunSinirlari, aralikSinirlari, tarihGecerli, ymdGecerli, gunEkle, gunFarki, gunIzgarasi,
   yayimlandi, veriVar, donemEtiketi, istanbulBugun, istanbulDakika, ATIF,
 } from '../../functions/_lib/dengesizlik.js';
 import { sahteGun, sahteEpias, sahteCache, sahteKv, SABIT_AN, SAHTE_ENV } from './dengesizlik-test-verisi.mjs';
-import { gunGetir, aralikGetir, _bellekTemizle } from '../../functions/_lib/epias.js';
+import { gunGetir, aralikGetir, _bellekTemizle, BUTCE, sayaclar } from '../../functions/_lib/epias.js';
 import { xlsxYaz, crc32, sutunHarfi } from '../../functions/_lib/xlsx.js';
 import * as veriUcu from '../../functions/dengesizlik-maliyeti/veri.js';
 import * as sayfa from '../../functions/dengesizlik-maliyeti.js';
@@ -191,7 +191,48 @@ d = donemler([
   { date: '2026-11-23T05:00:00+03:00', time: '05:00', ptf: 2100, smf: 2500, positiveImbalance: 2037, negativeImbalance: 2650, systemStatus: 'Enerji Açığı' },
 ]);
 ok('kopyada bos alan dolu kopyadan tamamlanir', d.length === 1 && d[0].smf === 2500 && d[0].yon === 'acik' && d[0].negatif === 2650);
-ok('kopyada ilk dolu deger kalir', donemler([{ date: '2026-11-23T05:00:00+03:00', ptf: 1 }, { date: '2026-11-23T05:00:00+03:00', ptf: 2 }])[0].ptf === 1);
+// çelişen kopyalar: hangisi doğru bilinemez → o dönem tümüyle null ("—"), sayaç artar
+{
+  const a = donemlerAyrintili([
+    { date: '2026-11-23T05:00:00+03:00', ptf: 2100, smf: 2500, positiveImbalance: 2037, negativeImbalance: 2650, systemStatus: 'Enerji Açığı' },
+    { date: '2026-11-23T05:00:00+03:00', ptf: 2100, smf: 2600, positiveImbalance: 2037, negativeImbalance: 2756, systemStatus: 'Enerji Açığı' },
+    { date: '2026-11-23T06:00:00+03:00', ptf: 2200, smf: 2200, positiveImbalance: 2134, negativeImbalance: 2266, systemStatus: 'Dengede' },
+    { date: '2026-11-23T06:00:00+03:00', ptf: 2200, smf: 2200, positiveImbalance: 2134, negativeImbalance: 2266, systemStatus: 'Dengede' },
+  ]);
+  ok('celisen kopya: donem tumuyle null (ilk kopya sessizce KAZANMAZ)', a.donemler[0].ptf === null && a.donemler[0].smf === null && a.donemler[0].pozitif === null && a.donemler[0].negatif === null && a.donemler[0].yon === null && a.donemler[0].maliyetNegatif === null);
+  ok('celisen kopya: sayac 1, cokme degil', a.cakisma === 1 && a.cokme === false);
+  ok('ayni degerli kopya celiski sayilmaz', a.donemler[1].ptf === 2200 && a.donemler[1].negatif === 2266);
+  ok('yon celiskisi de celiskidir', donemlerAyrintili([{ date: '2026-11-23T05:00:00+03:00', ptf: 1, systemStatus: 'Enerji Açığı' }, { date: '2026-11-23T05:00:00+03:00', ptf: 1, systemStatus: 'Enerji Fazlası' }]).cakisma === 1);
+  ok('celiskisiz veri: sayac 0', donemlerAyrintili(sahteGun('2026-11-23')).cakisma === 0 && donemlerAyrintili([...sahteGun('2026-11-23'), ...sahteGun('2026-11-23')]).cakisma === 0);
+  ok('donemlerAyrintili dizi degilse bos', donemlerAyrintili(null).donemler.length === 0 && donemlerAyrintili(null).cokme === false);
+}
+// dönem başlangıcı: gün içinde SAATİ DEĞİŞEN alan seçilir
+{
+  const saatISO = (g, h) => `${g}T${String(h).padStart(2, '0')}:00:00+03:00`;
+  const G = '2026-11-23';
+  const bicimler = {
+    'date=gun, time=saat ISO': (h) => ({ date: saatISO(G, 0), time: saatISO(G, h) }),
+    'date=saat, time=gunun 00:00 ISO': (h) => ({ date: saatISO(G, h), time: saatISO(G, 0) }),
+    'date=saat, time=HH:MM': (h) => ({ date: saatISO(G, h), time: `${String(h).padStart(2, '0')}:00` }),
+    'date=saat, time=1970 00:00': (h) => ({ date: saatISO(G, h), time: '1970-01-01T00:00:00+03:00' }),
+    'date=gun, time=1970 saat': (h) => ({ date: saatISO(G, 0), time: saatISO('1970-01-01', h) }),
+    'date=saat, time yok': (h) => ({ date: saatISO(G, h) }),
+    'date=gun (saatsiz), hour=HH:MM': (h) => ({ date: G, hour: `${String(h).padStart(2, '0')}:00` }),
+    'date=saat UTC, time=00:00': (h) => ({ date: new Date(Date.UTC(2026, 10, 22, 21 + h)).toISOString(), time: '00:00' }),
+  };
+  for (const [ad, f] of Object.entries(bicimler)) {
+    const a = donemlerAyrintili(Array.from({ length: 24 }, (_, h) => ({ ...f(h), ptf: 1000 + h })));
+    ok(`zaman bicimi "${ad}": 24 donem, dogru saat`, a.donemler.length === 24 && a.cokme === false && a.cakisma === 0 && a.donemler.every((d, h) => d.bas === saatISO(G, h) && d.ptf === 1000 + h), `-> ${a.donemler.length} donem, cokme ${a.cokme}`);
+  }
+  const cok = donemlerAyrintili(Array.from({ length: 24 }, (_, h) => ({ date: saatISO(G, 0), time: saatISO(G, 0), ptf: 1000 + h })));
+  ok('iki alan da sabitse: 24 satir tek doneme coker -> cokme = true', cok.cokme === true && cok.donemler.length === 1 && cok.donemler[0].ptf === null);
+  ok('uclu ayni kopya cokme DEGIL', donemlerAyrintili(Array.from({ length: 5 }, () => ({ date: saatISO(G, 3), ptf: 7 }))).cokme === false);
+  ok('tek satir: 00:00 olmayan alan secilir', donemler([{ date: saatISO(G, 5), time: saatISO(G, 0), ptf: 1 }])[0].bas === saatISO(G, 5) && donemler([{ date: saatISO(G, 0), time: '05:00', ptf: 1 }])[0].bas === saatISO(G, 5));
+}
+// sayfaBilgisi
+ok('sayfaBilgisi ust duzey', JSON.stringify(sayfaBilgisi({ items: [], page: { number: 1, size: 20, sort: null, total: 24 } })) === '{"number":1,"size":20,"total":24}');
+ok('sayfaBilgisi body icinde', sayfaBilgisi({ body: { content: [], page: { number: 2, size: 10, total: 30 } } }).number === 2);
+ok('sayfaBilgisi yok / bozuk -> null', sayfaBilgisi({ items: [] }) === null && sayfaBilgisi({ items: [], page: null }) === null && sayfaBilgisi([]) === null && sayfaBilgisi(null) === null && sayfaBilgisi({ page: { total: 'cok' } }) === null);
 
 // sırasız girdi, farklı zaman alanı biçimleri
 d = donemler([
@@ -461,7 +502,9 @@ for (const zarf of ['body.content', 'body.items', 'items', 'content', 'dizi', 'b
   let { e, sec } = yeni({ cache });
   await gunGetir(SAHTE_ENV, null, DUN, sec);
   await bosalt(); // önbellek yazımı arka planda (ctx.waitUntil) yapılır
-  ok('Cache API\'ye sentetik anahtarla yazilir', [...cache.depo.keys()].every((k) => k.startsWith('https://dengesizlik-onbellek.invalid/')) && cache.depo.size === 2, `-> ${[...cache.depo.keys()]}`);
+  ok('Cache API\'ye sentetik anahtarla yazilir', [...cache.depo.keys()].every((k) => k.startsWith('https://dengesizlik-onbellek.invalid/v1/')) && ['tgt', 'gun/' + DUN].every((a) => cache.depo.has('https://dengesizlik-onbellek.invalid/v1/' + a)), `-> ${[...cache.depo.keys()]}`);
+  ok('Cache API\'de bilet DUZ METIN degil (AES-GCM)', ![...cache.depo.values()].some((v) => /TGT-/.test(v)) && /"sifreli":\{"iv":"[A-Za-z0-9+/=]+","veri":"[A-Za-z0-9+/=]+"\}/.test(cache.depo.get('https://dengesizlik-onbellek.invalid/v1/tgt')));
+  ok('onbellek anahtarinda bilet/kimlik yok', ![...cache.depo.keys()].some((k) => /TGT-|kullanici|parola/.test(k)));
   _bellekTemizle();
   const e2 = sahteEpias();
   const x = await gunGetir(SAHTE_ENV, null, DUN, { fetch: e2.fetch, simdi: e2.simdi, cache });
@@ -472,6 +515,7 @@ for (const zarf of ['body.content', 'body.items', 'items', 'content', 'dizi', 'b
   await gunGetir({ ...SAHTE_ENV, PIYASA: kv }, null, DUN, sec);
   await bosalt();
   ok('KV varsa oraya da yazilir', kv.depo.has('dengesizlik:gun/' + DUN) && kv.depo.has('dengesizlik:tgt'));
+  ok('KV\'de bilet DUZ METIN degil', ![...kv.depo.values()].some((v) => /TGT-/.test(v)));
   ok('KV kaydi TTL ile yazilir', kv.ttl.get('dengesizlik:gun/' + DUN) === 86400 && kv.ttl.get('dengesizlik:tgt') === 6000);
   _bellekTemizle();
   const e3 = sahteEpias();
@@ -524,6 +568,254 @@ for (const zarf of ['body.content', 'body.items', 'items', 'content', 'dizi', 'b
   ({ e, sec } = yeni({ gun: (g) => [...sahteGun(g, g === BUGUN ? 10 : 24), ...sahteGun(g, g === BUGUN ? 10 : 24)] }));
   x = await aralikGetir(SAHTE_ENV, null, '2026-11-22', '2026-11-24', sec);
   ok('aralikta kopya + kismi gun', x.donemler.length === 72 && x.donemler.filter(yayimlandi).length === 58);
+}
+
+// ============================================================================
+// REVİZYON 1 / A — ÜST-AKIŞ KORUMASI (QA B1 ölçüm senaryoları)
+// ============================================================================
+const TUM_GUNLER = []; for (let g = '2026-01-01'; g <= BUGUN; g = gunEkle(g, 1)) TUM_GUNLER.push(g);
+ok('secilebilir gun sayisi 328', TUM_GUNLER.length === 328);
+ok('butce sabitleri: dakikada 12 rapor + 2 giris', BUTCE.rapor === 12 && BUTCE.giris === 2);
+
+{ // A1 tek-uçuş: 50 eşzamanlı FARKLI gün (soğuk) → 1 giriş
+  const { e, sec } = yeni();
+  const sonuc = await Promise.all(TUM_GUNLER.slice(-50).map((g) => gunGetir(SAHTE_ENV, null, g, sec)));
+  ok('A1 50 eszamanli farkli gun -> 1 GIRIS (tek-ucus)', e.sayac.giris === 1, `-> ${e.sayac.giris}`);
+  ok('A3 ayni dakikada en cok 12 rapor istegi', e.sayac.rapor === BUTCE.rapor, `-> ${e.sayac.rapor}`);
+  ok('A3 butce asilinca: veri yok / neden butce (uydurma yok)', sonuc.filter((x) => x.durum === 'veri').length === 12 && sonuc.filter((x) => x.durum === 'yok' && x.neden === 'butce').length === 38);
+  e.ilerlet(60 * 1000);
+  const x = await gunGetir(SAHTE_ENV, null, TUM_GUNLER[5], sec);
+  ok('A3 sonraki dakikada butce yenilenir', x.durum === 'veri' && e.sayac.rapor === 13 && e.sayac.giris === 1);
+}
+{ // A1 aynı gün 50 eşzamanlı → 1 giriş + 1 rapor
+  const { e, sec } = yeni();
+  await Promise.all(Array.from({ length: 50 }, () => gunGetir(SAHTE_ENV, null, DUN, sec)));
+  ok('A1 ayni gun 50 eszamanli -> 1 giris + 1 rapor', e.sayac.giris === 1 && e.sayac.rapor === 1);
+}
+{ // A2 reddedilen giriş: süpürme başına 1 deneme, 5 dk paylaşılan engel
+  const { e, sec } = yeni({ girisDurum: 401 });
+  for (const g of TUM_GUNLER) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A2 giris 401: 328 gunluk supurmede 1 GIRIS denemesi', e.sayac.giris === 1 && e.sayac.rapor === 0, `-> ${e.sayac.giris}`);
+  e.ilerlet(61 * 1000);
+  for (const g of TUM_GUNLER) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A2 61 sn sonra supurme: yeni giris YOK (5 dk engel)', e.sayac.giris === 1, `-> ${e.sayac.giris}`);
+  const es = await Promise.all(TUM_GUNLER.slice(0, 50).map((g) => gunGetir(SAHTE_ENV, null, g, sec)));
+  ok('A2 engel suresince tum tarihler kisa devre (giris-reddedildi)', es.every((x) => x.durum === 'yok' && x.neden === 'giris-reddedildi') && e.sayac.giris === 1);
+  e.ilerlet(5 * 60 * 1000);
+  for (const g of TUM_GUNLER) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A2 5 dk sonra supurme: yine yalniz 1 deneme', e.sayac.giris === 2, `-> ${e.sayac.giris}`);
+  e.ayar.girisDurum = 201; e.ilerlet(5 * 60 * 1000 + 1000);
+  const x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A2 parola duzelince engel suresi dolunca veri gelir', x.durum === 'veri' && e.sayac.giris === 3);
+}
+{ // A2 ağ hatası / zaman aşımı: 60 sn paylaşılan engel
+  let { e, sec } = yeni({ girisFirlat: true });
+  for (const g of TUM_GUNLER.slice(0, 40)) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A2 giris ag hatasi: 40 gunde 1 deneme', e.sayac.giris === 1);
+  e.ilerlet(30 * 1000);
+  await gunGetir(SAHTE_ENV, null, TUM_GUNLER[100], sec);
+  ok('A2 ag hatasi engeli 30 sn\'de surer', e.sayac.giris === 1);
+  e.ilerlet(31 * 1000);
+  await gunGetir(SAHTE_ENV, null, TUM_GUNLER[101], sec);
+  ok('A2 ag hatasi engeli 60 sn\'de kalkar (1 yeni deneme)', e.sayac.giris === 2);
+  ({ e, sec } = yeni({ girisAsili: true, zamanAsimiMs: 30 }));
+  await Promise.all(TUM_GUNLER.slice(0, 30).map((g) => gunGetir(SAHTE_ENV, null, g, sec)));
+  for (const g of TUM_GUNLER.slice(30, 60)) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A2 asili giris: 60 istekte 1 deneme', e.sayac.giris === 1, `-> ${e.sayac.giris}`);
+  ({ e, sec } = yeni({ girisDurum: 500 }));
+  for (const g of TUM_GUNLER.slice(0, 20)) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A2 giris 500: 20 gunde 1 deneme', e.sayac.giris === 1);
+}
+{ // A2 engel Cache API üzerinden süreçler arasında paylaşılır
+  const cache = sahteCache();
+  const { e, sec } = yeni({ girisDurum: 401, cache });
+  await gunGetir(SAHTE_ENV, null, DUN, sec);
+  await bosalt();
+  _bellekTemizle(); // yeni süreç, aynı Cache API
+  await gunGetir(SAHTE_ENV, null, TUM_GUNLER[7], sec);
+  ok('A2 giris engeli yeni surecte de gecerli (Cache API)', e.sayac.giris === 1, `-> ${e.sayac.giris}`);
+}
+{ // A6 rapor 401: bilet bir kez yenilenir; yine 401 ise paylaşılan engel
+  const { e, sec } = yeni({ raporDurum: 401 });
+  for (const g of TUM_GUNLER) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A6 kalici rapor 401: 328 gunde 2 giris + 2 rapor (dongu yok)', e.sayac.giris === 2 && e.sayac.rapor === 2, `-> ${e.sayac.giris} giris, ${e.sayac.rapor} rapor`);
+  const x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A6 engel suresince neden servis-yetki', x.durum === 'yok' && x.neden === 'servis-yetki');
+  e.ilerlet(5 * 60 * 1000 + 1000);
+  for (const g of TUM_GUNLER.slice(0, 50)) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A6 5 dk sonra: en cok 2 giris + 2 rapor daha', e.sayac.giris <= 4 && e.sayac.rapor <= 4, `-> ${e.sayac.giris} / ${e.sayac.rapor}`);
+}
+{ // A6 eskimiş bilet: 50 eşzamanlı 401 → 1 yenileme
+  const { e, sec } = yeni();
+  await gunGetir(SAHTE_ENV, null, DUN, sec);
+  e.ayar.biletGecersiz = e.sonBilet;
+  e.ilerlet(60 * 1000);
+  const r3 = await Promise.all(TUM_GUNLER.slice(0, 6).map((g) => gunGetir(SAHTE_ENV, null, g, sec)));
+  ok('A6 eskimis bilet + 6 eszamanli istek: 1 yenileme, hepsi veri', e.sayac.giris === 2 && r3.every((x) => x.durum === 'veri'), `-> ${e.sayac.giris} giris`);
+}
+{ // A3 bütçe Cache API sayacıyla süreçler arasında paylaşılır; bayat veri korunur
+  const cache = sahteCache();
+  const { e, sec } = yeni({ cache });
+  for (const g of TUM_GUNLER.slice(0, 12)) await gunGetir(SAHTE_ENV, null, g, sec);
+  await bosalt();
+  _bellekTemizle();
+  const x = await gunGetir(SAHTE_ENV, null, TUM_GUNLER[40], sec);
+  ok('A3 butce yeni surecte de dolu (Cache API sayaci)', x.durum === 'yok' && x.neden === 'butce' && e.sayac.rapor === 12, `-> ${x.neden} ${e.sayac.rapor}`);
+  ok('A3 butce asimi sayaci', sayaclar.butceAsimi >= 1);
+  // bugünün verisi var, tazeliği doldu, bütçe dolu → bayat sunulur
+  e.ilerlet(60 * 1000);
+  await gunGetir(SAHTE_ENV, null, BUGUN, sec);
+  e.ilerlet(6 * 60 * 1000);
+  for (const g of TUM_GUNLER.slice(60, 72)) await gunGetir(SAHTE_ENV, null, g, sec);
+  const once = e.sayac.rapor;
+  const y = await gunGetir(SAHTE_ENV, null, BUGUN, sec);
+  ok('A3 butce doluyken eskimis veri BAYAT olarak sunulur, EPİAŞ\'a gidilmez', y.durum === 'veri' && y.bayat === true && y.neden === 'butce' && e.sayac.rapor === once);
+}
+{ // A4 önbelleksiz mod: süreç belleği 328 günü tutar; ikinci tarama 0 rapor
+  const { e, sec } = yeni();
+  for (let i = 0; i < TUM_GUNLER.length; i++) { if (i && i % 12 === 0) e.ilerlet(60 * 1000); await gunGetir(SAHTE_ENV, null, TUM_GUNLER[i], sec); }
+  const ilk = e.sayac.rapor;
+  ok('A4 onbelleksiz ilk tarama: gun basina 1 rapor, 1 giris', ilk === 328 && e.sayac.giris === 1, `-> ${ilk} / ${e.sayac.giris}`);
+  e.ilerlet(60 * 1000);
+  let veri = 0;
+  for (const g of TUM_GUNLER.slice(0, 326)) { const x = await gunGetir(SAHTE_ENV, null, g, sec); if (x.durum === 'veri') veri++; }
+  ok('A4 onbelleksiz ikinci tarama: 0 yeni rapor (bellek siniri >= 512)', e.sayac.rapor === ilk && veri === 326, `-> ${e.sayac.rapor - ilk} yeni rapor, ${veri} veri`);
+  // sınırsız tarama: dakikada en çok 12
+  const { e: e2, sec: sec2 } = yeni();
+  for (let tur2 = 0; tur2 < 3; tur2++) for (const g of TUM_GUNLER) await gunGetir(SAHTE_ENV, null, g, sec2);
+  ok('A3 onbelleksiz 3 x 328 tarama ayni dakikada: en cok 12 rapor + 1 giris', e2.sayac.rapor === 12 && e2.sayac.giris === 1, `-> ${e2.sayac.rapor} / ${e2.sayac.giris}`);
+}
+{ // A7 bilet şifreli saklanır; yeni süreç çözer; parola değişirse çözülemez → yeniden giriş
+  const cache = sahteCache();
+  const { e, sec } = yeni({ cache });
+  await gunGetir(SAHTE_ENV, null, DUN, sec);
+  await bosalt();
+  const kayit = cache.depo.get('https://dengesizlik-onbellek.invalid/v1/tgt');
+  ok('A7 Cache API bilet kaydi sifreli', !!kayit && !kayit.includes(e.sonBilet) && !/TGT-/.test(kayit));
+  _bellekTemizle();
+  await gunGetir(SAHTE_ENV, null, TUM_GUNLER[3], sec);
+  ok('A7 yeni surec sifreli bileti cozer: yeni giris yok', e.sayac.giris === 1 && e.istekler.at(-1).headers.tgt === e.sonBilet);
+  _bellekTemizle();
+  await gunGetir({ ...SAHTE_ENV, EPIAS_PASSWORD: 'baska-test-parolasi' }, null, TUM_GUNLER[4], sec);
+  ok('A7 parola degisince kayit cozulemez -> yeniden giris', e.sayac.giris === 2);
+  await bosalt();
+  _bellekTemizle();
+  e.ilerlet(61 * 1000); // giriş bütçesi dakikada 2
+  const bozuk = JSON.parse(cache.depo.get('https://dengesizlik-onbellek.invalid/v1/tgt'));
+  bozuk.kayit.sifreli.veri = bozuk.kayit.sifreli.veri.slice(0, -4) + 'AAAA';
+  cache.depo.set('https://dengesizlik-onbellek.invalid/v1/tgt', JSON.stringify(bozuk));
+  const x = await gunGetir({ ...SAHTE_ENV, EPIAS_PASSWORD: 'baska-test-parolasi' }, null, TUM_GUNLER[5], sec);
+  ok('A7 kurcalanmis kayit reddedilir -> yeniden giris, veri gelir', x.durum === 'veri' && e.sayac.giris === 3, `-> ${x.durum} ${x.neden || ''} ${e.sayac.giris}`);
+  await bosalt();
+  _bellekTemizle();
+  e.ilerlet(61 * 1000);
+  cache.depo.set('https://dengesizlik-onbellek.invalid/v1/tgt', JSON.stringify({ son: e.simdi() + 1e6, kayit: { tgt: 'TGT-9999-duzMetinEskiKayit', taze: e.simdi() + 1e6 } }));
+  await gunGetir(SAHTE_ENV, null, TUM_GUNLER[6], sec);
+  ok('A7 duz metin (eski bicim) kayit KULLANILMAZ', e.istekler.at(-1).headers.tgt !== 'TGT-9999-duzMetinEskiKayit' && e.sayac.giris === 4, `-> ${e.sayac.giris}`);
+  // giriş bütçesi: aynı dakikada 3. giriş denenmez
+  const { e: e3, sec: sec3 } = yeni();
+  await gunGetir(SAHTE_ENV, null, DUN, sec3);
+  for (const g of TUM_GUNLER.slice(0, 3)) { e3.ayar.biletGecersiz = e3.sonBilet; await gunGetir(SAHTE_ENV, null, g, sec3); }
+  ok('A3 giris butcesi: ayni dakikada en cok 2 giris', e3.sayac.giris === BUTCE.giris, `-> ${e3.sayac.giris}`);
+}
+{ // A5 yalnız önbellek (HEAD yolu): üst-akışa gidilmez
+  const { e, sec } = yeni();
+  let x = await gunGetir(SAHTE_ENV, null, DUN, { ...sec, yalnizOnbellek: true });
+  ok('A5 yalnizOnbellek (soguk): yok/onbellek-yok, istek yok', x.durum === 'yok' && x.neden === 'onbellek-yok' && e.sayac.giris === 0 && e.sayac.rapor === 0);
+  await gunGetir(SAHTE_ENV, null, DUN, sec);
+  x = await gunGetir(SAHTE_ENV, null, DUN, { ...sec, yalnizOnbellek: true });
+  ok('A5 yalnizOnbellek (sicak): veri, yeni istek yok', x.durum === 'veri' && e.sayac.rapor === 1);
+  e.ilerlet(10 * 60 * 1000);
+  x = await gunGetir(SAHTE_ENV, null, DUN, { ...sec, yalnizOnbellek: true });
+  ok('A5 yalnizOnbellek (eskimis): bayat isaretli veri, yeni istek yok', x.durum === 'veri' && x.bayat === true && e.sayac.rapor === 1);
+  x = await aralikGetir(SAHTE_ENV, null, '2026-11-01', '2026-11-05', { ...sec, yalnizOnbellek: true });
+  ok('A5 aralik yalnizOnbellek: istek yok', x.durum === 'yok' && e.sayac.rapor === 1);
+}
+{ // A8 toplam süre sınırı: aşılırsa bekleme/bayat döner, çekim arka planda tamamlanır
+  const { e, sec } = yeni({ raporGecikmeMs: 250 });
+  const bekleyen = [];
+  const ctx = { waitUntil: (p) => bekleyen.push(p) };
+  let t0 = Date.now();
+  let x = await gunGetir(SAHTE_ENV, ctx, BUGUN, { ...sec, sureMs: 40 });
+  ok('A8 sure asimi: hemen doner (yok/sure)', x.durum === 'yok' && x.neden === 'sure' && Date.now() - t0 < 200, `-> ${x.neden} ${Date.now() - t0} ms`);
+  ok('A8 cekim waitUntil ile arka plana verilir', bekleyen.length >= 1);
+  await Promise.all(bekleyen);
+  await bosalt();
+  x = await gunGetir(SAHTE_ENV, ctx, BUGUN, { ...sec, sureMs: 40 });
+  ok('A8 arka plandaki cekim onbellege yazildi: sonraki istek veri, yeni istek yok', x.durum === 'veri' && e.sayac.rapor === 1);
+  e.ilerlet(6 * 60 * 1000);
+  t0 = Date.now();
+  x = await gunGetir(SAHTE_ENV, ctx, BUGUN, { ...sec, sureMs: 40 });
+  ok('A8 sure asimi + eski veri: BAYAT doner (rakam silinmez)', x.durum === 'veri' && x.bayat === true && x.neden === 'sure' && Date.now() - t0 < 200);
+  await Promise.all(bekleyen); await bosalt();
+  x = await gunGetir(SAHTE_ENV, ctx, BUGUN, { ...sec, sureMs: 40 });
+  ok('A8 yenileme tamamlaninca taze veri', x.durum === 'veri' && x.bayat === undefined && e.sayac.rapor === 2);
+  // sınır aşılmıyorsa normal yol
+  const h = yeni({ raporGecikmeMs: 10 });
+  x = await gunGetir(SAHTE_ENV, null, BUGUN, { ...h.sec, sureMs: 2000 });
+  ok('A8 sure yeterliyse veri dogrudan doner', x.durum === 'veri');
+}
+{ // A9 sayfalama
+  let { e, sec } = yeni({ sayfaBoyu: 10 });
+  let x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  const govdeler = e.istekler.filter((i) => i.url.includes('ptf-smf-sdf')).map((i) => JSON.parse(i.body));
+  ok('A9 sayfali yanit: kalan sayfalar cekilir (3 istek), 24 donem tam', x.durum === 'veri' && x.donemler.length === 24 && x.donemler.filter(yayimlandi).length === 24 && e.sayac.rapor === 3, `-> ${x.durum} ${e.sayac.rapor}`);
+  ok('A9 ilk istekte page yok; sonrakilerde {number,size}', govdeler[0].page === undefined && JSON.stringify(govdeler[1].page) === '{"number":2,"size":10}' && JSON.stringify(govdeler[2].page) === '{"number":3,"size":10}');
+  ({ e, sec } = yeni({ sayfaBoyu: 20, sayfaHata: 2 }));
+  x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A9 kalan sayfa alinamazsa: yok/eksik (20/24 "yayimlanmadi" diye SUNULMAZ)', x.durum === 'yok' && x.neden === 'eksik' && x.donemler.length === 0);
+  ({ e, sec } = yeni({ sayfaBoyu: 20, sayfaBos: 2 }));
+  x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A9 kalan sayfa bos donerse: yok/eksik', x.durum === 'yok' && x.neden === 'eksik');
+  ({ e, sec } = yeni({ raporGovde: JSON.stringify({ items: sahteGun(DUN).slice(0, 20), page: { number: 1, size: 0, total: 24 } }) }));
+  x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A9 total > gelen ama sayfa boyu bilinmiyor: yok/eksik', x.durum === 'yok' && x.neden === 'eksik');
+  ({ e, sec } = yeni({ sayfaBoyu: 1 }));
+  x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A9 asiri sayfa sayisi: yok/eksik, tek istek', x.durum === 'yok' && x.neden === 'eksik' && e.sayac.rapor === 1);
+  ({ e, sec } = yeni({ sayfaBoyu: 3 }));
+  for (const g of TUM_GUNLER.slice(0, 8)) await gunGetir(SAHTE_ENV, null, g, sec);
+  ok('A9 sayfalar da butceden duser (dakikada 12)', e.sayac.rapor === 12, `-> ${e.sayac.rapor}`);
+  ({ e, sec } = yeni({ raporGovde: JSON.stringify({ items: sahteGun(DUN), page: { number: 1, size: 24, total: 24 } }) }));
+  x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A9 total = gelen: tek istek, veri', x.durum === 'veri' && e.sayac.rapor === 1);
+  ({ e, sec } = yeni({ sayfaBoyu: 100 }));
+  x = await aralikGetir(SAHTE_ENV, null, '2026-11-20', '2026-11-22', sec);
+  ok('A9 ay dilimi sayfali (576 kalem / 100): 6 istek, aralik tam', x.durum === 'veri' && x.donemler.length === 72 && e.sayac.rapor === 6, `-> ${x.durum} ${x.neden || ''} ${e.sayac.rapor}`);
+}
+{ // A10 / A11 uçtan uca
+  const saatISO = (g, h) => `${g}T${String(h).padStart(2, '0')}:00:00+03:00`;
+  let { sec } = yeni({ gun: (g) => sahteGun(g).map((o, h) => ({ ...o, date: saatISO(g, h), time: saatISO(g, 0) })) });
+  let x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A10 date saati tasir, time gunun 00:00\'i: 24 donem dogru', x.durum === 'veri' && x.donemler.filter(yayimlandi).length === 24 && x.donemler[13].ptf === 2130);
+  ({ sec } = yeni({ gun: (g) => sahteGun(g).map((o) => ({ ...o, date: saatISO(g, 0), time: saatISO(g, 0) })) }));
+  x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A10 24 satir tek doneme cokerse: yok/bicim (veri gosterilmez)', x.durum === 'yok' && x.neden === 'bicim' && x.donemler.length === 0);
+  const h = yeni({ gun: (g) => [...sahteGun(g), { ...sahteGun(g)[7], negativeImbalance: 9999.99 }] });
+  x = await gunGetir(SAHTE_ENV, null, DUN, h.sec);
+  ok('A11 celisen kopya: o donem tumuyle null, digerleri saglam', x.durum === 'veri' && x.donemler[7].ptf === null && x.donemler[7].negatif === null && x.donemler[7].pozitif === null && x.donemler[6].negatif !== null && x.donemler.filter(yayimlandi).length === 23);
+  ok('A11 ic sayac artar; log yalniz sayac ve tarih', sayaclar.cakisma === 1 && loglar.some((l) => /çakışan yinelenen satır — 1 dönem 2026-11-23 2026-11-23$/.test(l)) && !loglar.some((l) => l.includes('9999')));
+}
+{ // A5 / A8 sayfa ve uç düzeyinde
+  const { e, sec } = yeni({ raporGecikmeMs: 250 });
+  const bekleyen = [];
+  const ctxS = { request: new Request('https://voltage.com.tr/dengesizlik-maliyeti'), env: SAHTE_ENV, secenek: { ...sec, sureMs: 40 }, waitUntil: (p) => bekleyen.push(p), next: async () => new Response(readFileSync(new URL('../../dengesizlik-maliyeti.html', import.meta.url), 'utf8'), { status: 200 }) };
+  const t0 = Date.now();
+  let y = await sayfa.onRequestGet(ctxS);
+  let hS = await y.text();
+  ok('A8 SSR: ust-akis yavassa sure dolunca bekleme kabugu doner', y.status === 200 && Date.now() - t0 < 220 && hS.includes('Veri bekleniyor') && !hS.includes('data-ssr="1"') && y.headers.get('Cache-Control') === 'public, max-age=30, s-maxage=60, must-revalidate', `-> ${Date.now() - t0} ms`);
+  await Promise.all(bekleyen); await bosalt();
+  y = await sayfa.onRequestGet({ ...ctxS, request: new Request('https://voltage.com.tr/dengesizlik-maliyeti') });
+  hS = await y.text();
+  ok('A8 SSR: arka plan cekimi bitince sonraki istek verili, yeni rapor yok', hS.includes('data-ssr="1"') && e.sayac.rapor === 1);
+  ok('A8 SSR varsayilan toplam sure siniri 3,5 sn', readFileSync(new URL('../../functions/dengesizlik-maliyeti.js', import.meta.url), 'utf8').includes('const SSR_SURE_MS = 3500;'));
+  // HEAD sayfa: üst-akış yok; tarihli HEAD noindex
+  const h2 = yeni();
+  const kabukYanit = async () => new Response(null, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+  let hd = await sayfa.onRequestHead({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti?tarih=2026-11-20', { method: 'HEAD' }), env: SAHTE_ENV, secenek: h2.sec, next: kabukYanit });
+  ok('A5 HEAD sayfa (tarihli): X-Robots-Tag noindex, follow; ust-akis yok', hd.status === 200 && hd.headers.get('X-Robots-Tag') === 'noindex, follow' && h2.e.sayac.giris === 0 && h2.e.sayac.rapor === 0);
+  hd = await sayfa.onRequestHead({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti', { method: 'HEAD' }), env: SAHTE_ENV, secenek: h2.sec, next: kabukYanit });
+  ok('A5 HEAD sayfa (tarihsiz): X-Robots-Tag yok', hd.status === 200 && hd.headers.get('X-Robots-Tag') === null && h2.e.sayac.giris === 0);
 }
 
 // --- sır sızıntısı yok ---
@@ -602,7 +894,7 @@ const ucCtx = (sorgu, ayar = {}, env = SAHTE_ENV, yontem = 'GET') => {
   const r2 = await veriUcu.onRequestGet(ctx);
   const j = await r2.json();
   ok('uc JSON 200', r2.status === 200 && r2.headers.get('Content-Type') === 'application/json; charset=utf-8');
-  ok('uc basliklar: noindex + CORS + nosniff', r2.headers.get('X-Robots-Tag') === 'noindex' && r2.headers.get('Access-Control-Allow-Origin') === '*' && r2.headers.get('X-Content-Type-Options') === 'nosniff');
+  ok('uc basliklar: noindex + nosniff, CORS basligi YOK', r2.headers.get('X-Robots-Tag') === 'noindex' && r2.headers.get('Access-Control-Allow-Origin') === null && r2.headers.get('X-Content-Type-Options') === 'nosniff');
   ok('uc Cache-Control dun 300 sn', r2.headers.get('Cache-Control') === 'public, max-age=300');
   ok('uc JSON dosya adi', r2.headers.get('Content-Disposition') === 'inline; filename="dengesizlik-maliyeti-2026-11-23.json"');
   ok('uc JSON ust alanlar', j.surum === '1' && j.tarih === '2026-11-23' && j.birim === 'TL/MWh' && j.sayfa === 'https://voltage.com.tr/dengesizlik-maliyeti' && j.bayat === false);
@@ -692,7 +984,7 @@ for (const [sorgu, kod] of [
   const r2 = await veriUcu.onRequestGet(ctx);
   const j = await r2.json();
   ok(`uc 400 ${sorgu} -> ${kod}`, r2.status === 400 && j.hata.kod === kod && j.hata.mesaj.length > 10 && e.sayac.giris === 0, `-> ${r2.status} ${j.hata && j.hata.kod}`);
-  ok(`uc 400 ${sorgu} no-store + JSON + CORS`, r2.headers.get('Cache-Control') === 'no-store' && r2.headers.get('Content-Type').startsWith('application/json') && r2.headers.get('Access-Control-Allow-Origin') === '*');
+  ok(`uc 400 ${sorgu} no-store + JSON, CORS yok`, r2.headers.get('Cache-Control') === 'no-store' && r2.headers.get('Content-Type').startsWith('application/json') && r2.headers.get('Access-Control-Allow-Origin') === null);
 }
 ok('uc 400 mesaji Turkce', /Geçersiz tarih/.test((await (await veriUcu.onRequestGet(ucCtx('?tarih=abc').ctx)).json()).hata.mesaj));
 // 503 yolları: boş ama "başarılı" dosya YOK
@@ -716,12 +1008,17 @@ for (const [ad, ayar, env, sorgu] of [
   const j = await r2.json();
   ok('uc bayat veri: 200, bayat:true, ilk cekim zamani, 60 sn onbellek', r2.status === 200 && j.bayat === true && j.cekildi === '2026-11-24T14:30:00+03:00' && r2.headers.get('Cache-Control') === 'public, max-age=60');
 }
-{ // HEAD / OPTIONS
-  const { ctx } = ucCtx('?tarih=2026-11-23&bicim=csv', {}, SAHTE_ENV, 'HEAD');
-  const r2 = await veriUcu.onRequestHead(ctx);
-  ok('uc HEAD 200 govdesiz, basliklar tam', r2.status === 200 && (await r2.text()) === '' && r2.headers.get('Content-Type') === 'text/csv; charset=utf-8');
-  const r3 = await veriUcu.onRequestOptions();
-  ok('uc OPTIONS 204 CORS', r3.status === 204 && r3.headers.get('Access-Control-Allow-Origin') === '*');
+{ // HEAD yalnız önbellekten; OPTIONS/CORS yok
+  const { ctx, e } = ucCtx('?tarih=2026-11-23&bicim=csv', {}, SAHTE_ENV, 'HEAD');
+  let r2 = await veriUcu.onRequestHead(ctx);
+  ok('uc HEAD (soguk): 200 govdesiz, EPİAŞ\'a HIC istek yok', r2.status === 200 && (await r2.text()) === '' && e.sayac.giris === 0 && e.sayac.rapor === 0 && r2.headers.get('Content-Type') === 'text/csv; charset=utf-8' && r2.headers.get('X-Veri-Durum') === 'onbellekte-yok' && r2.headers.get('Cache-Control') === 'no-store');
+  await veriUcu.onRequestGet({ ...ctx, request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=2026-11-23&bicim=csv') });
+  const once = e.sayac.rapor;
+  r2 = await veriUcu.onRequestHead(ctx);
+  ok('uc HEAD (onbellekte): GET basliklari, yeni istek yok', r2.status === 200 && (await r2.text()) === '' && r2.headers.get('Content-Disposition') === 'attachment; filename="dengesizlik-maliyeti-2026-11-23.csv"' && r2.headers.get('Cache-Control') === 'public, max-age=300' && e.sayac.rapor === once && once === 1);
+  r2 = await veriUcu.onRequestHead({ ...ctx, request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=abc', { method: 'HEAD' }) });
+  ok('uc HEAD gecersiz tarih -> 400', r2.status === 400);
+  ok('uc OPTIONS isleyicisi YOK (CORS kaldirildi)', veriUcu.onRequestOptions === undefined && veriUcu.onRequest === undefined);
 }
 { // beklenmeyen hata da 503 (500 patlaması değil)
   const r2 = await veriUcu.onRequestGet({ request: { url: 'bu bir url degil' }, env: SAHTE_ENV });

@@ -26,6 +26,9 @@ import {
 } from './_lib/dengesizlik.js';
 import { gunGetir } from './_lib/epias.js';
 
+/** Sunucu render'ının EPİAŞ'ı bekleyeceği en uzun toplam süre. */
+const SSR_SURE_MS = 3500;
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** tr-TR, 2 ondalık, gerçek eksi işareti (U+2212); sayı değilse "—". İstemcideki bicim() ile AYNI. */
@@ -286,7 +289,9 @@ export async function onRequestGet(context) {
 
     const kabuk = await shell.clone().text();
     const hazir = kabukHazirla(kabuk, { tarih, bugun, tarihli, gecersiz });
-    const sonuc = await gunGetir(context.env, context, tarih, sec);
+    // Toplam süre sınırı (giriş + rapor tek sınır): aşılırsa bayat veri ya da bekleme
+    // hâli döner; çekim ctx.waitUntil ile sürer ve bir sonraki isteğe hazır olur.
+    const sonuc = await gunGetir(context.env, context, tarih, { sureMs: SSR_SURE_MS, ...(sec || {}) });
     // Dürüstlük: gerçek veri yoksa rakamsız kabuk döner ("—" + EPİAŞ VERİSİ BEKLENİYOR)
     if (!sonuc || sonuc.durum !== 'veri' || !sonuc.donemler.length) return htmlYanit(hazir, shell, 30, 60, noindex);
 
@@ -306,5 +311,14 @@ export async function onRequestGet(context) {
 
 // HEAD istekleri 405 almasın; SSR yolundan geçmez (gövdesiz yanıt için EPİAŞ'a gidilmez).
 export async function onRequestHead(context) {
-  return context.next();
+  const yanit = await context.next();
+  try {
+    // Tarihli (ve geçersiz tarihli) görünüm GET'te noindex'tir; HEAD de aynı başlığı taşır.
+    if (yanit && yanit.status === 200 && new URL(context.request.url).searchParams.has('tarih')) {
+      const h = new Headers(yanit.headers);
+      h.set('X-Robots-Tag', 'noindex, follow');
+      return new Response(null, { status: 200, headers: h });
+    }
+  } catch (e) { /* başlık eklenemediyse varlık yanıtı aynen döner */ }
+  return yanit;
 }
