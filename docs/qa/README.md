@@ -11,6 +11,7 @@ CI'da sessizce yeşil görünmezler.
 | `node docs/qa/test-ssr-ptf.mjs` | `/canli-ptf` sunucu render'ı: biçimlendirme, eksik saat dürüstlüğü, `onRequestGet` dayanıklılık matrisi |
 | `node docs/qa/test-admin.mjs` | **Panel kimlik doğrulama:** PBKDF2, oturum imzası/süresi, kurcalama, kaba kuvvet, veri ucu yetkilendirme ve sayfalama |
 | `node docs/qa/test-report-windows.mjs` | Rapor dönemleri (haftalık/aylık/3-6 aylık/yıllık) — bitişiklik: ne boşluk ne çakışma |
+| `node docs/qa/test-dengesizlik.mjs` | **`/dengesizlik-maliyeti`:** kural tablosu ve birim fiyat formülü (föydeki altı örnek, sınır ve boş girdi), dönem normalleştirme (tekilleştirme, 96 dönem, null), EPİAŞ istemcisi dayanıklılık matrisi (kimlik yok, giriş 401, servis 500, zaman aşımı, boş liste, kısmi gün, kopya satır, önbellek, bayat veri), XLSX yazıcı, veri ucu (JSON/CSV/XLSX, 400/503), sayfa kabuğu ve JSON-LD (SSS = görünen metin), sunucu render'ı. Sahte `fetch` ile çalışır; ağ gerekmez. XLSX denetimi için `python3` gerekir |
 
 ## Tarayıcı gerektirenler (Playwright)
 
@@ -24,6 +25,7 @@ export CHROMIUM_PATH=/opt/pw-browsers/chromium   # yoksa: npx playwright install
 | Test | Kapsam |
 |---|---|
 | `node docs/qa/test-ssr-hydration.mjs` | **Kritik.** Sunucu render'ı istemci hidrasyonundan sağ çıkıyor mu (QA DEF-1/DEF-13). S1 boş önbellek, S2 dünkü önbellek, S3 canlı proxy |
+| `node docs/qa/test-dengesizlik-tarayici.mjs` | **`/dengesizlik-maliyeti` uçtan uca:** gerçek fonksiyon modülleri + sahte EPİAŞ (wrangler gerekmez). Hesaplayıcının iki modu klavyeyle, istemci formülü = kütüphane, indirme bağlantıları, 320/390/768/1440'ta yatay taşma, tablo kaydırma kabı, kontrast, konsol hataları, dürüst bekleme, tazelik merdiveni, istemci çizimi = sunucu çizimi, JS'siz kullanım, 31/12/2026 sonrası kapanış. Playwright `/opt/node-tools/node_modules/` altından yüklenir |
 | `node docs/qa/smoke.mjs` | 404 oyunu: açılış → oyun → skor → tekrar |
 | `node docs/qa/smoke2.mjs` | 404 yedek içerik: hareket azaltma ve JS kapalı yolları |
 | `node docs/qa/smoke3.mjs` | Lider tablosu uçtan uca (route ile taklit edilen API) |
@@ -31,6 +33,11 @@ export CHROMIUM_PATH=/opt/pw-browsers/chromium   # yoksa: npx playwright install
 | `node docs/qa/qa-lb-submit.mjs` | Çift gönderim koruması, yeniden başlatma, düşük skor senaryosu |
 | `node docs/qa/censor-probe.mjs` | İsim sansürünün bilinen kaçakları ve yanlış pozitifleri |
 | `node docs/qa/test-panel.mjs` | **Panel uçtan uca:** gerçek fonksiyon modülleri + gerçek arayüz — giriş, yanlış parola, listeleme, arama, sayfalama, CSV, çıkış, XSS kaçışı |
+
+Yardımcı dosyalar (test değildir, tek başına çalıştırılmaz): `dengesizlik-test-verisi.mjs`
+(UYDURMA fiyat üreten sahte EPİAŞ, sahte Cache API ve KV) ve `dengesizlik-test-sunucu.mjs`
+(fonksiyon modüllerini sahte EPİAŞ'la sunan küçük http sunucusu). Buradaki rakamlar gerçek
+piyasa verisi değildir; sayfada ya da herhangi bir yayında kullanılmaz.
 
 ## Değişmez kurallar (her testin koruduğu)
 
@@ -44,3 +51,6 @@ export CHROMIUM_PATH=/opt/pw-browsers/chromium   # yoksa: npx playwright install
 5. **Kalıcılık yoksa sahte başarı yok:** `/api/*` uçları 503 döner.
 6. **Panel kapısı:** yapılandırma eksikse panel açılmaz (503); yanlış kullanıcı
    ile yanlış parola AYNI yanıtı verir; oturumsuz veri ucu 401.
+7. **Doğrulanmamış kural uygulanmaz:** dengesizlik formülü yalnız kural tablosundaki
+   tarihlerde çalışır (`kuralBul` → 31/12/2026 sonrası `null`); sistem yönü EPİAŞ'tan
+   gelir, PTF–SMF kıyasından çıkarılmaz; yayımlanmamış dönem için rakam üretilmez.

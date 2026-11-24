@@ -31,6 +31,12 @@
 # seçer (veri varsa 60/300 sn, dürüst bekleme hâlinde 30/60 sn). Buraya kural
 # yazmak o ayrımı ezer ve bir kesintiyi CDN'de 5 dakika dondururdu (QA DEF-5).
 
+# Dengesizlik Maliyeti (/dengesizlik-maliyeti ve /dengesizlik-maliyeti/veri): ikisi de
+# Pages Function'dır (functions/dengesizlik-maliyeti.js, functions/dengesizlik-maliyeti/veri.js)
+# ve Cache-Control'ü kendileri seçer (veri varsa / bekleme hâli / bayat veri ayrı pencereler).
+# Canlı PTF ile aynı gerekçeyle buraya BİLEREK kural yazılmadı (QA DEF-5). Sayfa yanıtı
+# kabuğun güvenlik başlıklarını (yukarıdaki "/*" kuralı) korur.
+
 /kurumsal
   Cache-Control: public, max-age=300, must-revalidate
 

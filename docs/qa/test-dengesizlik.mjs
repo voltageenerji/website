@@ -13,7 +13,7 @@ import { gunGetir, aralikGetir, _bellekTemizle } from '../../functions/_lib/epia
 import { xlsxYaz, crc32, sutunHarfi } from '../../functions/_lib/xlsx.js';
 import * as veriUcu from '../../functions/dengesizlik-maliyeti/veri.js';
 import * as sayfa from '../../functions/dengesizlik-maliyeti.js';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -1007,6 +1007,50 @@ for (const kotu of ['abc', '2026-11-25', '2025-12-31', '2026-02-30', '', '%3Cscr
 }
 ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.EPIAS_PASSWORD) || /TGT-/.test(l)));
 
+
+// ============================================================================
+// M5 — SEO DOSYALARI VE KAPSAM SINIRLARI
+// ============================================================================
+{
+  const kok = new URL('../../', import.meta.url);
+  const oku = (ad) => readFileSync(new URL(ad, kok), 'utf8');
+  const harita = oku('sitemap.xml');
+  const giris = /<url>\s*<loc>https:\/\/voltage\.com\.tr\/dengesizlik-maliyeti<\/loc>\s*<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>\s*<changefreq>(\w+)<\/changefreq>\s*<priority>[\d.]+<\/priority>\s*<\/url>/.exec(harita);
+  ok('sitemap: /dengesizlik-maliyeti tek kayit', !!giris && (harita.match(/dengesizlik-maliyeti/g) || []).length === 1);
+  ok('sitemap: lastmod = sayfa dateModified = gorunen tarih', !!giris && giris[1] === tur(KABUK, 'WebPage').dateModified && KABUK.includes(`Sayfa metni: ${giris[1].split('-').reverse().join('.')}`));
+  ok('sitemap: changefreq hourly/daily', !!giris && ['hourly', 'daily'].includes(giris[2]));
+  ok('sitemap: tarihli gorunum ya da veri ucu YOK', !/dengesizlik-maliyeti\?|dengesizlik-maliyeti\/veri/.test(harita));
+  const llms = oku('llms.txt');
+  const canli = llms.slice(llms.indexOf('## Canlı Veri'), llms.indexOf('## Kurallar'));
+  ok('llms.txt: "Canlı Veri" altinda sayfa ve veri ucu', canli.includes('[Dengesizlik Maliyeti](https://voltage.com.tr/dengesizlik-maliyeti)') && canli.includes('`https://voltage.com.tr/dengesizlik-maliyeti/veri`'));
+  ok('llms.txt: parametreler ve alanlar belgeli', ['tarih=YYYY-AA-GG', 'bas=YYYY-AA-GG&bit=YYYY-AA-GG', 'bicim=json', '`csv`', '`xlsx`', '`ptf`', '`smf`', '`yon`', '`pozitif`', '`negatif`', '`maliyetPozitif`', '`maliyetNegatif`', '`cekildi`'].every((x) => canli.includes(x)));
+  ok('llms.txt: durustluk kurali + kaynak', canli.includes('Yayımlanmamış değer `null`') && canli.includes('boş dosya üretilmez') && canli.includes('EPİAŞ') && canli.includes('mevzuat terimi değildir'));
+  ok('llms.txt: yasak ifade yok', !/en ucuz|tasarruf %|garanti/.test(canli.toLocaleLowerCase('tr')));
+  // llms.txt'te belgelenen alanlar gerçekten uçta var
+  const ornekJson = await (await veriUcu.onRequestGet(ucCtx('?tarih=2026-11-23').ctx)).json();
+  ok('llms.txt alan adlari = uc alan adlari', ['bas', 'bit', 'dk', 'ptf', 'smf', 'yon', 'pozitif', 'negatif', 'maliyetPozitif', 'maliyetNegatif'].every((a) => a in ornekJson.donemler[0] && canli.includes('`' + a + '`')) && ['birim', 'cekildi', 'bayat', 'ozet', 'kurallar', 'atif', 'not'].every((a) => a in ornekJson && canli.includes('`' + a + '`')));
+  // _headers: sayfa ve uç için kural YOK (fonksiyon kendi önbellek penceresini seçer)
+  const basliklar = oku('_headers').split('\n').filter((l) => !l.startsWith('#'));
+  ok('_headers: /dengesizlik-maliyeti icin kural yok (yalniz yorum)', !basliklar.some((l) => l.includes('dengesizlik')) && oku('_headers').includes('# Dengesizlik Maliyeti'));
+  ok('_headers: kok guvenlik kurali duruyor', basliklar.some((l) => l.startsWith('  Content-Security-Policy:') && l.includes("connect-src 'self'")));
+  // robots / yönlendirmeler: sayfa ve uç taranabilir, iç dosyalar kapalı
+  const robots = oku('robots.txt');
+  ok('robots: sayfa ve veri ucu engelli degil', !/Disallow:\s*\/dengesizlik/.test(robots) && robots.includes('Disallow: /api/'));
+  const yonlendirme = oku('_redirects');
+  ok('_redirects: ic dosya kurallari duruyor, yeni yol yonlenmiyor', ['/docs/* / 302', '/lib/* / 302', '/tools/* / 302', '/.claude/* / 302'].every((k) => yonlendirme.includes(k)) && !yonlendirme.includes('dengesizlik'));
+  // Kapsam: mevcut sayfalardan yeni sayfaya henüz bağlantı YOK (SEO deneyleri 10 Aralık'a kadar)
+  const sayfalar = [...readdirSync(kok).filter((f) => f.endsWith('.html')), ...readdirSync(new URL('rehber/', kok)).map((f) => 'rehber/' + f)].filter((f) => f !== 'dengesizlik-maliyeti.html');
+  const baglayan = sayfalar.filter((f) => oku(f).includes('dengesizlik-maliyeti'));
+  ok('mevcut sayfalardan yeni sayfaya baglanti yok', sayfalar.length > 20 && baglayan.length === 0, `-> ${baglayan}`);
+  // Fonksiyon kütüphaneleri rota üretmez (onRequest* dışa aktarmaz)
+  for (const f of ['dengesizlik.js', 'epias.js', 'xlsx.js']) ok(`functions/_lib/${f} rota uretmez`, !/export\s+(async\s+)?function\s+onRequest|export\s+const\s+onRequest/.test(oku('functions/_lib/' + f)));
+  // Sunulan dosyalarda uydurma veri / sır yok
+  for (const f of ['dengesizlik-maliyeti.html', 'functions/dengesizlik-maliyeti.js', 'functions/dengesizlik-maliyeti/veri.js', 'functions/_lib/dengesizlik.js', 'functions/_lib/epias.js', 'functions/_lib/xlsx.js']) {
+    const m = oku(f);
+    ok(`${f}: test verisi / sahte kimlik / telefon yok`, !m.includes('sahteGun') && !m.includes('test-parola') && !/TGT-\d/.test(m) && !/479\s*05\s*10/.test(m));
+  }
+  ok('kimlik yalniz env\'den okunur', (oku('functions/_lib/epias.js').match(/EPIAS_PASSWORD/g) || []).length >= 2 && !/EPIAS_(USERNAME|PASSWORD)\s*[:=]\s*['"]/.test(oku('functions/_lib/epias.js')) && !/console\.(log|error)\([^)]*(tgt|EPIAS_|govde|metin)/i.test(oku('functions/_lib/epias.js')));
+}
 
 console.error = gercekHata;
 rmSync(gecici, { recursive: true, force: true });
