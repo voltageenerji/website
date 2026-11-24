@@ -111,7 +111,14 @@
 
   <!-- Saatlik PTF şeridi (canlı sitedeki ray): yalnız gerçek EPİAŞ verisiyle dolar, veri yoksa gizli kalır.
        Kapağın alt kenarında durur; geniş ekranda kapağın alt boşluğunun içinde, dar ekranda kapağın altına ayrılan 44 px'lik yerde. -->
-  <a class="mcp-rail" id="mcpRail" href="/canli-ptf" aria-label="Saatlik PTF değerleri: Canlı PTF sayfasını aç" data-aria-tr="Saatlik PTF değerleri: Canlı PTF sayfasını aç" data-aria-en="Hourly MCP values: open the Live MCP page" hidden><div class="mcp-rail-track" id="mcpTrack"></div></a>
+  <div class="mcp-rail" id="mcpRail" hidden>
+    <a class="mcp-rail-link" href="/canli-ptf" aria-label="Saatlik PTF değerleri: Canlı PTF sayfasını aç" data-aria-tr="Saatlik PTF değerleri: Canlı PTF sayfasını aç" data-aria-en="Hourly MCP values: open the Live MCP page"><div class="mcp-rail-track" id="mcpTrack"></div></a>
+    <!-- Durdur / devam ettir: basılıyken (aria-pressed="true") şerit durur; tercih bu tarayıcıda hatırlanır -->
+    <button type="button" class="mcp-rail-dur" id="mcpDur" aria-pressed="false" aria-label="Fiyat şeridini durdur" data-aria-tr="Fiyat şeridini durdur" data-aria-en="Pause the price ticker">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-dur" d="M4 3h3v10H4zM9 3h3v10H9z"/><path class="i-oynat" d="M4.5 2.5v11l9-5.5z"/></svg>
+    </button>
+  </div>
+  <script>(function(){var r=document.getElementById('mcpRail'),d=document.getElementById('mcpDur'),K='voltage-serit-durdu';function yaz(v){r.classList.toggle('durdu',v);d.setAttribute('aria-pressed',v?'true':'false')}try{if(localStorage.getItem(K)==='1')yaz(true)}catch(e){}d.addEventListener('click',function(){var v=!r.classList.contains('durdu');yaz(v);try{localStorage.setItem(K,v?'1':'0')}catch(e){}})})()</script>
 </section>
 
 <!-- KURUMSAL BİLGİ SATIRI -->
