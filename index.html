@@ -2104,11 +2104,11 @@ async function fetchPtfLive(){
   let html = '';
   for(let rep = 0; rep < 2; rep++){
     items.forEach((it, i) => {
-      const prev = i === 0 ? items[items.length - 1].p : items[i - 1].p;
-      const diff = it.p - prev;
+      /* Günün ilk saati: önceki saat bu veride yok (eskiden aynı günün 23:00'üyle kıyaslanıyordu) — fark yazılmaz */
+      const diff = i === 0 ? null : it.p - items[i - 1].p;
       const cls = diff >= 0 ? 'up' : 'dn';
       const arr = diff >= 0 ? '\u25B2' : '\u25BC';
-      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh <span class="' + cls + '">' + arr + ' ' + Math.abs(diff) + '</span></span>';
+      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh' + (diff === null ? '' : ' <span class="' + cls + '">' + arr + ' ' + Math.abs(diff) + '</span>') + '</span>';
     });
   }
   track.innerHTML = html;

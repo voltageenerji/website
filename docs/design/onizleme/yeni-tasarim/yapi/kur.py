@@ -107,12 +107,10 @@ js = degistir(js, "  // Update textarea placeholders specifically\n",
               "  document.querySelectorAll('img[data-alt-tr][data-alt-en]').forEach(el => { el.alt = el.getAttribute('data-alt-' + lang); });\n"
               "  document.querySelectorAll('[data-aria-tr][data-aria-en]').forEach(el => { el.setAttribute('aria-label', el.getAttribute('data-aria-' + lang)); });\n\n"
               "  // Update textarea placeholders specifically\n")
-# 2c) saatlik şerit: günün ilk saatinde fark yazılmaz (canlıda 00:00, aynı günün 23:00'üyle kıyaslanıyordu: sonraki bir saatle
-#     kıyas yanıltıcıdır); fark sıfırsa ok yazılmaz; fark binlik ayraçla yazılır. Veri çağrısı ve fiyat kapısı aynıdır.
-js = degistir(js, "      const prev = i === 0 ? items[items.length - 1].p : items[i - 1].p;\n      const diff = it.p - prev;\n",
-              "      const diff = i === 0 ? 0 : it.p - items[i - 1].p;   // ilk saat: önceki saat bu veride yok\n")
-js = degistir(js, "</b> \\u20BA/MWh <span class=\"' + cls + '\">' + arr + ' ' + Math.abs(diff) + '</span></span>';\n",
-              "</b> \\u20BA/MWh' + (diff === 0 ? '' : ' <span class=\"' + cls + '\">' + arr + ' ' + Math.abs(diff).toLocaleString('tr-TR') + '</span>') + '</span>';\n")
+# 2c) saatlik şerit: ilk saatte fark yazılmaması 24.11'de canlıya da işlendi (betik oradan gelir). Burada kalan iki küçük fark:
+#     fark sıfırsa ok yazılmaz; fark binlik ayraçla yazılır. Veri çağrısı ve fiyat kapısı aynıdır.
+js = degistir(js, "(diff === null ? '' : ' <span class=\"' + cls + '\">' + arr + ' ' + Math.abs(diff) + '</span>')",
+              "(diff === null || diff === 0 ? '' : ' <span class=\"' + cls + '\">' + arr + ' ' + Math.abs(diff).toLocaleString('tr-TR') + '</span>')")
 # 3) canlı veri denetleyicisi: kapak kartı, kartın gün grafiği ve saatlik tablo (yalnız DOM hedefleri; veri mantığı aynı)
 js = degistir(js, "// 2) Canlı veri denetleyicisi — kapak key-facts + KPI bandı + cetvel + grafik.",
               "// 2) Canlı veri denetleyicisi — kapak PTF kartı (değer, damga, gün grafiği) + cetvel + grafik + saatlik tablo.")
