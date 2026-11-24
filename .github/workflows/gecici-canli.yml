@@ -12,43 +12,6 @@ jobs:
       YENI: https://8eeeeabf.website-dh5.pages.dev/onizleme-yeni-tasarim/
       ONCEKI: https://c9f4b390.website-dh5.pages.dev/onizleme-yeni-tasarim/
     steps:
-      - name: HTTP basliklari
-        run: |
-          B=https://8eeeeabf.website-dh5.pages.dev
-          curl -sS -D h.txt -o p.html "$B/onizleme-yeni-tasarim/"
-          echo "sayfa=$(head -1 h.txt | tr -d '\r') xrobots=$(grep -i '^x-robots-tag' h.txt | tr -d '\r' | head -1) meta_noindex=$(grep -c 'noindex, nofollow' p.html || true) bayt=$(wc -c < p.html)"
-          curl -sS -D c.txt -o /dev/null "https://voltage.com.tr/"
-          echo "canli_xrobots_sayisi=$(grep -ci '^x-robots-tag' c.txt || true) (uretim ayari: degismedi, 0 beklenir)"
-          echo "ptf_today_durum=$(curl -sS -o /dev/null -w '%{http_code}' "$B/onizleme-ptf/ptf/today")"
-      - name: Tarayici denetimi (serit)
-        run: |
-          mkdir t && cd t && npm init -y >/dev/null && npm i playwright-core >/dev/null 2>&1
-          cat > k.mjs <<'JS'
-          import { chromium } from 'playwright-core';
-          const b = await chromium.launch({ channel: 'chrome' });
-          for (const [ad, w, h, mob] of [['masaustu', 1440, 900, false], ['mobil', 390, 844, true]]) {
-            const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: mob, hasTouch: mob, locale: 'tr-TR', timezoneId: 'Europe/Istanbul' });
-            const p = await ctx.newPage(); const hata = []; const kons = [];
-            p.on('pageerror', e => hata.push(String(e).slice(0, 160)));
-            p.on('console', m => { if (m.type() === 'error') kons.push(m.text().slice(0, 160)); });
-            await p.goto(process.env.YENI, { waitUntil: 'networkidle' });
-            await p.waitForTimeout(1500);
-            const r = await p.evaluate(() => {
-              const say = s => /^\d{1,3}(\.\d{3})*,\d{2}$/.test((s || '').trim());
-              const hucre = [...document.querySelectorAll('#saatTablo td')].map(x => x.textContent.trim());
-              const kart = document.getElementById('ptfKart'); const ray = document.getElementById('mcpRail'); const rr = ray.getBoundingClientRect();
-              const c = [...ray.querySelectorAll('.cell')];
-              return { durum: kart.dataset.state, kapakSayisal: say(document.getElementById('kfPtf').textContent), tabloSayisal: hucre.filter(say).length,
-                seritGizli: ray.hidden, seritGorunum: getComputedStyle(ray).display, seritHucre: c.length, seritSayisal: c.filter(x => /^\d\d:00 \d{1,3}(\.\d{3})* ₺\/MWh/.test(x.textContent)).length, seritIlkFarkYok: c.length ? c[0].querySelector('.up,.dn') === null : null,
-                seritYer: [Math.round(rr.top), Math.round(rr.bottom)], kapakAlt: Math.round(document.getElementById('kapak').getBoundingClientRect().bottom), kartAlt: Math.round(kart.getBoundingClientRect().bottom),
-                genislik: document.documentElement.scrollWidth, yukseklik: document.documentElement.scrollHeight };
-            });
-            console.log('TARAYICI', ad, JSON.stringify(r), 'sayfaHatasi=' + hata.length, 'konsolHatasi=' + kons.length, JSON.stringify(hata.concat(kons).slice(0, 4)));
-            await ctx.close();
-          }
-          await b.close();
-          JS
-          node k.mjs
       - name: Lighthouse
         run: |
           npm i -g lighthouse >/dev/null 2>&1
@@ -56,19 +19,15 @@ jobs:
           import { readFileSync } from 'fs';
           const [ad, mod] = process.argv.slice(2);
           const med = a => a.sort((x, y) => x - y)[Math.floor(a.length / 2)];
-          const rs = [1, 2, 3].map(i => { try { return JSON.parse(readFileSync(`${ad}-${mod}-${i}.json`, 'utf8')); } catch { return null; } }).filter(Boolean);
+          const rs = [1, 2, 3, 4, 5].map(i => { try { return JSON.parse(readFileSync(`${ad}-${mod}-${i}.json`, 'utf8')); } catch { return null; } }).filter(Boolean);
           if (!rs.length) { console.log('LH', ad, mod, 'olcum yok'); process.exit(0); }
           const c = k => Math.round(med(rs.map(r => (r.categories[k] || {}).score || 0)) * 100);
           const a = k => med(rs.map(r => (r.audits[k] || {}).numericValue || 0));
-          console.log('LH', ad, mod, `kosu=${rs.length} perf=${c('performance')} erisilebilirlik=${c('accessibility')} LCP=${Math.round(a('largest-contentful-paint'))}ms CLS=${a('cumulative-layout-shift').toFixed(3)} TBT=${Math.round(a('total-blocking-time'))}ms bayt=${Math.round(a('total-byte-weight'))}`);
+          console.log('LH', ad, mod, 'LCPler=' + rs.map(r => Math.round(r.audits['largest-contentful-paint'].numericValue)).join('/'), 'perf=' + rs.map(r => Math.round(r.categories.performance.score*100)).join('/'), `kosu=${rs.length} perf=${c('performance')} erisilebilirlik=${c('accessibility')} LCP=${Math.round(a('largest-contentful-paint'))}ms CLS=${a('cumulative-layout-shift').toFixed(3)} TBT=${Math.round(a('total-blocking-time'))}ms bayt=${Math.round(a('total-byte-weight'))}`);
           JS
-          for ad in ONCEKI YENI; do
-            url=$(printenv $ad)
-            for mod in mobil masaustu; do
-              for i in 1 2 3; do
-                if [ "$mod" = masaustu ]; then P="--preset=desktop"; else P=""; fi
-                lighthouse "$url" $P --quiet --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="$ad-$mod-$i.json" >/dev/null 2>&1 || true
-              done
-              node lh.mjs $ad $mod
+          for i in 1 2 3 4 5; do
+            for ad in YENI ONCEKI; do
+              lighthouse "$(printenv $ad)" --quiet --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="$ad-mobil-$i.json" >/dev/null 2>&1 || true
             done
           done
+          node lh.mjs ONCEKI mobil; node lh.mjs YENI mobil
