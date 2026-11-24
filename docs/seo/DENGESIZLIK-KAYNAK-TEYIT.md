@@ -22,11 +22,27 @@
 - `POST https://seffaflik.epias.com.tr/reporting-service/v1/data/ptf-smf-sdf` ("PTF SMF ve SDF Listeleme Servisi", reporting-service v1.3.28). Gövde: `startDate`, `endDate` (ISO-8601, +03:00). Yanıt alanları: `date`, `time`, `ptf`, `smf`, `positiveImbalance`, `negativeImbalance`, `systemStatus`. `TGT` başlığı zorunlu (giris.epias.com.tr CAS; bilet ömrü 2 saat). Girişsiz istek 401 döner (24.11'de denendi).
 - Sayfada EPİAŞ'ın yayımladığı pozitif/negatif dengesizlik fiyatı gösterilir; formül açıklama ve hesaplayıcı içindir.
 
+## Hukuk okuması eki (24 Kasım 2026; Hukuk & Uyum ajanı birincil metinleri yeniden indirip okudu)
+
+- **Sistem dengesizlik fiyatı tanımı (TEYİT EDİLDİ, DUY m.4):** "Sistem dengesizlik fiyatı: Uzlaştırma dönemi bazında belirlenen piyasa katılımcılarının denge sorumluluklarından kaynaklanan enerji dengesizliklerine uygulanan fiyatı" (Orchestrator konsolide metinde ayrıca gördü).
+- **V = 150 TL/MWh, 1 Ocak – 31 Ekim 2026 (TEYİT EDİLDİ, çekinceyle):** DUY m.110(2) başlangıç değeri; arada başka karar olmadığı tam taramayla doğrulanmadı. Sayfada formüle dayalı gün içeriği yalnız 1 Kasım 2026 ve sonrası için gösterilir.
+- **KÜPST ayrı kalemdir (TEYİT EDİLDİ, DUY m.110(3)); 14907 sayılı Karar:** tüketim kapsamındaki uzlaştırmaya esas veriş-çekiş birimleri için katsayı 0,01, tolerans 0,30; 1/1/2027'den itibaren (Geçici m.1). Muhatap piyasa katılımcısıdır, son tüketici değil.
+- **m.111(5) grup içi değerlendirme:** madde oranın sınırını koyar; 2026 için oran %5 (Kurul Kararı 13869), konsolide metindeki %10 değil. Sayfada oran rakamı yazılmaz.
+- **m.132/A(1):** ön uzlaştırma bildirimi "en geç" izleyen ayın 11'i; nihai bildirim 15'i, tatile denk gelirse izleyen ilk iş günü.
+- **m.68(1)(e):** SMF'yi dört saat içinde belirleyip piyasa katılımcılarına duyuran Sistem İşletmecisidir.
+- **Karar 14459:** RG 3/4/2026, sayı 33213.
+- **EPİAŞ Şeffaflık yeniden kullanım koşulu (BULUNDU; platformun canlı arayüz metni, 24.11.2026):** "EPİAŞ ŞEFFAFLIK PLATFORMU | Tüm hakları saklıdır. Burada sunulan tüm görsel, grafik ve veriler bilgilendirme amaçlı olup söz konusu verilerden kaynaklanabilecek kayıp ve zararlardan dolayı Enerji Piyasaları İşletme A.Ş. hukuken sorumluluk kabul etmez. Sunulan tüm içerik ve veriler kaynak gösterilmek suretiyle çoğaltılabilir ve kullanılabilir." → gösterim, türetilmiş gösterge ve dosya indirme kaynak gösterilerek yapılabilir. **Okunamayan:** üyelik formu / hesap koşulları (kayit.epias.com.tr ve giris.epias.com.tr'ye erişilemedi) → açık çapraz köken erişimi (CORS `*`) bu yüzden kapalı tutulur.
+- **14/2/2026 tarihli Şeffaflık ve Piyasa Bozucu Davranışlar Yönetmeliği (RG 33168, yürürlük 1/6/2026):** yeniden kullanım kuralı yok; m.9(2) yanlış/yanıltıcı fiyat bilgisi yaymayı (bilmesi gereken yayıncı için) manipülasyon sayar, m.13 idari para cezası. EPDK "Piyasa Bozucu Davranışlar Rehberi" (15 Ekim 2026) Örnek 42: doğrulanmamış bilgi yayan enerji veri platformu. Sayfanın önlemleri: yalnız yayımlanan değer, eksikte "—", zaman damgası, bayat etiketi, formül–yayım karşılaştırması, hata bildirim kanalı.
+- **Kurul Kararı 14968 (RG 20/10/2026):** 1/1/2027'den geçerli yayımlanacak veri listesi; okunan satırlarda SMF ve sistem yönü saatlik kalıyor.
+- **m.110 ve 1/1/2027 (Hukuk okuması):** çatışma yalnız (1)–(2). fıkralarda; RG 32789 m.13'ün (3)–(4). fıkra kısmı 1/1/2027'de çatışmasız yürürlüğe girer. Sonraki değişikliklerin hiçbiri m.13'ü anmıyor, kaldırmıyor, ertelemiyor. Hukuk görüşü: 33122/33405 formülünün sürmesi daha olası (büyük olasılıkla Aralık sonunda temizlik değişikliğiyle), kesinlik düşük-orta; sayfa "değişecek" ya da "aynı kalacak" DEMEZ. EPDK'dan yazılı görüş ve kısa avukat notu önerilir.
+
+**Uyum takvimi:** 1/12/2026 m.111(5) 2027 oranı kararı · 20–31/12/2026 Resmî Gazete taraması (m.110, 32789 m.13, k, l, V, B, tavan) · 1/1/2027 yürürlük (32789 m.5 ve m.13, 15 dk DGP, 14968, 14907 Geçici m.1) · 2/1/2027 sayfa metni gözden geçirme.
+
 ## Açık (yayında hüküm kurulmaz)
 
 1. **1/1/2027 sonrası m.110:** RG 21/1/2025-32789 m.13, m.110(1)–(4)'ü eski tek formülle (V, B, tavan zammı ve yöne bağlı katsayı yok) yeniden yazıyor ve m.20'ye göre 1/1/2027'de yürürlüğe giriyor; 2025 ve 2026 değişiklikleriyle ilişkisi konsolide metinde notlanmamış. Hukuk ya da EPDK teyidi gelene kadar 2027 sonrası formül hakkında cümle kurulmaz; kural tablosunda 31/12/2026 sonrası "doğrulanmadı" durur.
 2. 15 dakikalık DGP uzlaştırması başlayınca saatin sistem yönünün nasıl belirleneceği ve Şeffaflık'ın 15 dakikalık SMF yayımlayıp yayımlamayacağı.
-3. EPİAŞ Şeffaflık verisinin yeniden yayım / atıf koşulları (metin bulunamadı) — Hukuk.
+3. EPİAŞ Şeffaflık üyelik / hesap koşulları (otomatik erişim, hesapla alınan verinin yeniden dağıtımı) okunamadı; genel yeniden kullanım koşulu yukarıda bulundu — sahipten üyelik formunda kabul edilen metin ve EPİAŞ Yardım Masası'na yazılı soru.
 4. Kimlik gerektiren canlı veri denetimleri: eşik altı dalda `positiveImbalance` işareti, geçmiş derinliği, istek başına tarih aralığı sınırı, değerlerin sonradan revize edilip edilmediği.
 5. Dengeden sorumlu grup içi netleştirme oranının güncel Kurul kararı (DUY m.111(5) metni %10 diyor, oran her yıl Kurulca belirlenir).
 6. Yuvarlama kuralı (okunan metinlerde yok).
