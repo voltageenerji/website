@@ -34,6 +34,7 @@ export async function sunucuBaslat(ayar = {}) {
       let r;
       if (u.pathname === '/dengesizlik-maliyeti') r = await (req.method === 'HEAD' ? sayfa.onRequestHead(ctx) : sayfa.onRequestGet(ctx));
       else if (u.pathname === '/dengesizlik-maliyeti/veri') r = await (req.method === 'HEAD' ? veriUcu.onRequestHead(ctx) : veriUcu.onRequestGet(ctx));
+      else if (u.pathname === '/kabuk') r = await ctx.next(); // SSR'sız statik kabuk (istemci çizimi testleri)
       else if (/^\/(favicon\.(svg|ico)|apple-touch-icon\.png)$/.test(u.pathname)) r = new Response(null, { status: 204 });
       else r = new Response('yok', { status: 404 });
       const basliklar = {};
