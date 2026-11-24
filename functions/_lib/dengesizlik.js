@@ -297,19 +297,31 @@ function baslangicCoz(o) {
   };
 
   const dDuvar = duvar(d);
-  // 1) time/hour alanı tam ISO ise dönemi o belirler
+  // GÜN her zaman date alanından gelir (varsa). time/hour alanı tam ISO olsa bile
+  // yalnız SAATİ belirler: bazı servisler saat alanını "1970-01-01T13:00:00+03:00"
+  // gibi tarihsiz bir an olarak döndürür; o tarih güne karıştırılmaz.
   if (zIso && zIso[4] !== undefined) {
-    const z = duvar(zIso);
-    if (z) return { ymd: z.ymd, dk: z.dk };
+    const hh = +zIso[4], mm = +zIso[5];
+    if (hh > 23 || mm > 59) return null;
+    let dk = hh * 60 + mm;
+    const of = zIso[7];
+    if (of && of !== OFSET && of !== '+0300') { // başka ofset → İstanbul duvar saati
+      const r = of === 'Z' ? ['+', '00', '00'] : /^([+-])(\d{2}):?(\d{2})$/.exec(of).slice(1);
+      const ofDk = (r[0] === '-' ? -1 : 1) * (+r[1] * 60 + +r[2]);
+      dk = (((dk - ofDk + 180) % 1440) + 1440) % 1440;
+    }
+    if (dDuvar) return { ymd: dDuvar.ymd, dk };
+    const z = duvar(zIso); // date yoksa gün de bu alandan (geçerli bir takvim günüyse)
+    return z ? { ymd: z.ymd, dk: z.dk } : null;
   }
   if (!dDuvar) return null;
-  // 2) time/hour alanı "HH:MM" ise gün date'ten, saat bu alandan
+  // time/hour alanı "HH:MM" ise gün date'ten, saat bu alandan
   if (zSaat) {
     const hh = +zSaat[1], mm = +zSaat[2];
     if (hh > 23 || mm > 59) return null;
     return { ymd: dDuvar.ymd, dk: hh * 60 + mm };
   }
-  // 3) yalnız date: kendi saat bölümü (yoksa 00:00)
+  // yalnız date: kendi saat bölümü (yoksa 00:00)
   return { ymd: dDuvar.ymd, dk: dDuvar.dk };
 }
 
