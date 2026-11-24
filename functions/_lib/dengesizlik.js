@@ -108,6 +108,11 @@ export function istanbulBugun(simdi = Date.now()) {
   return new Date(simdi + OFSET_MS).toISOString().slice(0, 10);
 }
 
+/** Epoch ms → "YYYY-MM-DDTHH:MM:SS+03:00" (Europe/Istanbul duvar saati). */
+export function istanbulIso(simdi = Date.now()) {
+  return new Date(simdi + OFSET_MS).toISOString().slice(0, 19) + OFSET;
+}
+
 /** Europe/Istanbul duvar saati, gün başından dakika olarak (0–1439). */
 export function istanbulDakika(simdi = Date.now()) {
   const t = new Date(simdi + OFSET_MS);
@@ -452,3 +457,9 @@ export function aralikSinirlari(bas, bit) {
 
 /** Sistem yönünün görünen adı (EPİAŞ'ın terimleri). */
 export const YON_ADI = Object.freeze({ acik: 'Enerji açığı', fazla: 'Enerji fazlası', denge: 'Dengede' });
+
+/** Atıf satırı — föydeki TR metin, birebir (24 Kasım 2026 itibarıyla). */
+export const ATIF = 'Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği (RG 14/4/2009-27200) m.110 (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik); k ve l katsayıları: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122); V değeri: 24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405); azami fiyat limiti: 2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026). Veri: EPİAŞ Şeffaflık Platformu. 24 Kasım 2026 itibarıyla.';
+
+export const SAYFA_URL = 'https://voltage.com.tr/dengesizlik-maliyeti';
+export const VERI_URL = 'https://voltage.com.tr/dengesizlik-maliyeti/veri';
