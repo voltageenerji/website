@@ -214,7 +214,9 @@ for (const [w, h] of [[375, 667], [390, 844], [320, 568], [430, 932]]) {
   });
   ok(`D1 ${w}px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil`, d.cta.gor && d.cta.y >= 44 && d.ctaZemin === 'rgb(245, 180, 28)' && d.dugme.g === 44 && d.dugme.y === 44 && !d.dilUst && d.logo.sag <= d.cta.sol - 6 && d.cta.sag <= d.dugme.sol - 6 && d.dugme.sag <= w - 14, JSON.stringify([d.logo.sag, d.cta, d.dugme]));
   ok(`D2 ${w}px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)`, d.h1.alt <= d.alt.ust && d.alt.alt <= d.birincil.ust && d.birincil.alt <= d.ikincil.ust && d.ikincil.alt <= d.kart.ust && !d.grafik && d.kartIc.every(Boolean), JSON.stringify([d.h1.alt, d.alt.ust, d.birincil.ust, d.ikincil.ust, d.kart.ust, d.grafik]));
-  ok(`D3 ${w}px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok`, d.kapak.alt - d.kart.alt <= 48 && d.kart.y <= 200 && d.sabit === 0, JSON.stringify([d.kapak.y, d.kapak.alt - d.kart.alt, d.kart.y, d.sabit]));
+  ok(`D3 ${w}px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok`, d.kapak.alt - d.kart.alt <= 48 + 44 && d.kart.y <= 200 && d.sabit === 0, JSON.stringify([d.kapak.y, d.kapak.alt - d.kart.alt, d.kart.y, d.sabit]));
+  const ds = await p.evaluate(() => { const e = document.getElementById('mcpRail'); const r = e.getBoundingClientRect(); const k = document.getElementById('ptfKart').getBoundingClientRect(); const hb = document.getElementById('kapak').getBoundingClientRect(); return [e.hidden, Math.round(r.height), Math.round(hb.bottom - r.bottom), Math.round(r.top - k.bottom), e.querySelectorAll('.cell').length]; });
+  ok(`D3 ${w}px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)`, ds[0] === false && ds[1] === 44 && ds[2] === 0 && ds[3] >= 24 && ds[4] === 48, JSON.stringify(ds));
   ok(`D4 ${w}px ilk ekranda “Teklif Al” (kapak düğmesi) görünür`, d.birincil.alt <= d.vh, d.birincil.alt + '/' + d.vh);
   not(`${w}×${h}: kapak yüksekliği ${d.kapak.y} px, PTF kartı ${d.kart.y} px, kapak “Teklif Al” alt kenarı ${d.birincil.alt} px`);
   if (w === 375) {
@@ -909,7 +911,7 @@ const alanOku = (p) => p.evaluate(() => [...document.querySelectorAll('details.a
       const k = await baglam({ w, h, ptf: 'kapali', azalt: true, dsf });
       await k.p.goto(url, { waitUntil: 'networkidle' });
       await k.p.evaluate(() => document.fonts.ready); await k.p.waitForTimeout(700);
-      const o = await k.p.evaluate(() => ({ kapak: Math.round(document.querySelector('.hero').getBoundingClientRect().bottom), bilgi: Math.round(document.querySelector('.trust').getBoundingClientRect().bottom), foto: document.querySelector('.hero-photo img').complete && document.querySelector('.hero-photo img').naturalWidth > 0, yazi: [...document.fonts].filter(f => f.status === 'loaded').length, durum: document.getElementById('ptfKart').dataset.state }));
+      const o = await k.p.evaluate(() => ({ kapak: Math.round(document.querySelector('.hero').getBoundingClientRect().bottom), bilgi: Math.round(document.querySelector('.trust').getBoundingClientRect().bottom), foto: document.querySelector('.hero-photo img').complete && document.querySelector('.hero-photo img').naturalWidth > 0, yazi: [...document.fonts].filter(f => f.status === 'loaded').length, durum: document.getElementById('ptfKart').dataset.state, kutu: JSON.stringify(['#nav', '#kapakBaslik', '.hero-sub', '.hero-actions', '#ptfKart'].map(q => { const r = document.querySelector(q).getBoundingClientRect(); return [r.x, r.y, r.width, r.height].map(Math.round); })) }));
       const png = await k.p.screenshot();
       await k.ctx.close();
       return { o, png };
@@ -919,7 +921,11 @@ const alanOku = (p) => p.evaluate(() => [...document.querySelectorAll('details.a
     writeFileSync(`${CIKTI}/r3/durum/ilk-ekran-${ad}-once.png`, once.png); writeFileSync(`${CIKTI}/r3/durum/ilk-ekran-${ad}-sonra.png`, sonra.png);
     const sinir = Math.min(h, sonra.o.bilgi) * dsf;
     const f = await karsilastir(once.png, sonra.png, sinir);
-    ok(`M1 ${ad} ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk ${Math.round(sinir / dsf)} px)`, f.boyut && f.ust === 0 && once.o.kapak === sonra.o.kapak && once.o.bilgi === sonra.o.bilgi && once.o.foto && sonra.o.foto && once.o.yazi === sonra.o.yazi && sonra.o.durum === 'waiting', JSON.stringify([f, once.o, sonra.o]));
+    if (w >= 1040) {
+      ok(`M1 ${ad} ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk ${Math.round(sinir / dsf)} px)`, f.boyut && f.ust === 0 && once.o.kapak === sonra.o.kapak && once.o.bilgi === sonra.o.bilgi && once.o.foto && sonra.o.foto && once.o.yazi === sonra.o.yazi && sonra.o.durum === 'waiting', JSON.stringify([f, once.o, sonra.o]));
+    } else {
+      ok(`M1 ${ad} ilk ekran (bekleme durumu): üst bant, başlık, alt metin, düğmeler ve PTF kartı önceki hazırlık sürümüyle aynı yerde ve ölçüde; kapak yalnız şerit yeri kadar (44 px) uzadı`, once.o.kutu === sonra.o.kutu && sonra.o.kapak - once.o.kapak === 44 && sonra.o.bilgi - once.o.bilgi === 44 && once.o.foto && sonra.o.foto && sonra.o.durum === 'waiting', JSON.stringify([once.o, sonra.o]));
+    }
     not(`${ad}: kapak alt kenarı ${sonra.o.kapak} px, bilgi satırı alt kenarı ${sonra.o.bilgi} px; karşılaştırılan ${f.w}×${f.h} piksel; ilk ${Math.round(sinir / dsf)} px içinde farklı piksel ${f.ust}; altında farklı piksel ${f.alt}` + (f.alt ? ` (satır ${Math.round(f.ilk / dsf)}–${Math.round(f.son / dsf)}: yeniden düzenlenen Hizmetler bölümünün başı)` : ' (ekranın tamamı aynı)'));
   }
   await yardimci.context().close();

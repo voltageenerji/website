@@ -269,7 +269,8 @@ linear-gradient(180deg,rgba(8,13,28,.56) 0,rgba(8,13,28,.24) 96px,rgba(8,13,28,0
 .mcp-rail-track .cell .up{color:var(--green-bright)}
 .mcp-rail-track .cell .dn{color:#F2A08F}
 @keyframes rail{from{transform:translateX(0)} to{transform:translateX(-50%)}}
-@media (max-width:1039px){.mcp-rail{display:none}}
+/* Dar ekranda (kapak tek sütun) şerit için kapağın altına 44 px yer ayrılır (dokunma hedefi): veri gelse de gelmese de yükseklik aynı, kayma olmaz */
+@media (max-width:1039px){.hero{padding-bottom:44px} .mcp-rail{height:44px} .mcp-rail-track{font-size:11.5px;line-height:44px} .mcp-rail-track .cell{padding:0 18px;gap:8px}}
 
 /* ============ KURUMSAL BİLGİ SATIRI ============ */
 .trust{background:var(--paper);border-bottom:1px solid var(--line)}
@@ -820,7 +821,7 @@ p.form-hint{margin-bottom:16px}
   </div>
 
   <!-- Saatlik PTF şeridi (canlı sitedeki ray): yalnız gerçek EPİAŞ verisiyle dolar, veri yoksa gizli kalır.
-       Kapağın alt boşluğunun içinde durur; kapaktaki hiçbir öğenin yerini değiştirmez. 1040 px altında (kapak tek sütuna geçince) gösterilmez. -->
+       Kapağın alt kenarında durur; geniş ekranda kapağın alt boşluğunun içinde, dar ekranda kapağın altına ayrılan 44 px'lik yerde. -->
   <a class="mcp-rail" id="mcpRail" href="/canli-ptf" aria-label="Saatlik PTF değerleri: Canlı PTF sayfasını aç" data-aria-tr="Saatlik PTF değerleri: Canlı PTF sayfasını aç" data-aria-en="Hourly MCP values: open the Live MCP page" hidden><div class="mcp-rail-track" id="mcpTrack"></div></a>
 </section>
 

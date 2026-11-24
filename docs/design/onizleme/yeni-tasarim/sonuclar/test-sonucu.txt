@@ -75,9 +75,10 @@ GEÇTİ  C2 375px kapak “Teklif Al” → form başlığı görünür
 GEÇTİ  C3 375px kapak “Hizmetlerimizi İncele” → #hizmetler; üst bant “scrolled”
 GEÇTİ  D1 375px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
 GEÇTİ  D2 375px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
-GEÇTİ  D3 375px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D3 375px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D3 375px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
 GEÇTİ  D4 375px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
-       375×667: kapak yüksekliği 767 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
+       375×667: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
 GEÇTİ  D5 menü kapalı açılır
 GEÇTİ  D6 düğme menüyü açar: 6 bağlantı ≥44 px, dil düğmeleri panelde ≥44×44, gövde kilidi
 GEÇTİ  D7 paneldeki dil düğmesi dili değiştirir, panel açık kalır
@@ -85,19 +86,22 @@ GEÇTİ  D8 Escape menüyü kapatır
 GEÇTİ  D9 düğmeye ikinci dokunuş kapatır
 GEÇTİ  D1 390px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
 GEÇTİ  D2 390px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
-GEÇTİ  D3 390px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D3 390px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D3 390px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
 GEÇTİ  D4 390px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
-       390×844: kapak yüksekliği 767 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
+       390×844: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
 GEÇTİ  D1 320px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
 GEÇTİ  D2 320px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
-GEÇTİ  D3 320px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D3 320px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D3 320px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
 GEÇTİ  D4 320px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
-       320×568: kapak yüksekliği 767 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
+       320×568: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
 GEÇTİ  D1 430px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
 GEÇTİ  D2 430px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
-GEÇTİ  D3 430px kapak gereğinden uzun değil: karttan sonra en çok 48 px; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D3 430px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
+GEÇTİ  D3 430px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
 GEÇTİ  D4 430px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
-       430×932: kapak yüksekliği 702 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 398 px
+       430×932: kapak yüksekliği 746 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 398 px
 GEÇTİ  D10 ilk Tab atlama bağlantısını gösterir; Enter odağı <main>’e taşır
 GEÇTİ  D11 klavye odağı her öğede görünür (70 Tab adımı: üst bant, kapak, bağlantılar, form alanları)
 GEÇTİ  E1 CANLI kapak kartı: değer sayı, damga “SAAT ss:00 · EPİAŞ”, durum live
@@ -334,15 +338,15 @@ GEÇTİ  L8 zemin ritmi: art arda üç açık bölüm yok; koyu bölümler sekt�
 GEÇTİ  L9 şirket cümlesi “Neden Voltage?” bölümünün içinde, sakin (≤ 22 px); üç ilke etiketi duruyor ve gövde metninden küçük; “Bir firma kadar köklü…” satırı kaldırıldı (TR ve EN)
 GEÇTİ  L10 kurumsal blok: EPDK lisansı “Voltage Enerji Hakkında” bölümünde H3 olarak şirket bilgilerinin yanında; ayrı lisans bölümü yok; tüm şirket ve lisans bilgileri, imza ve dört rozet duruyor; fotoğraf yok
 GEÇTİ  L0 1440: betiğin aradığı her id sayfada var (kaldırılmış öğeye bağlı betik yok); konsol hatası yok
-       sayfa boyu: 1440 px’te 9541 → 7998 px; 390 px’te 14106 → 10587 px (hedef: ≈ 8.000 ve ≈ 10.500)
+       sayfa boyu: 1440 px’te 9541 → 7998 px; 390 px’te 14106 → 10631 px (hedef: ≈ 8.000 ve ≈ 10.500)
 GEÇTİ  L11 sayfa önceki hazırlık sürümünden kısa (içerik silinmeden): 1440 px’te en az 1.300 px, 390 px’te en az 3.000 px
 GEÇTİ  M1 1440x900 ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk 729 px)
        1440x900: kapak alt kenarı 630 px, bilgi satırı alt kenarı 729 px; karşılaştırılan 1440×900 piksel; ilk 729 px içinde farklı piksel 0; altında farklı piksel 17561 (satır 815–887: yeniden düzenlenen Hizmetler bölümünün başı)
-GEÇTİ  M1 390x844 ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk 844 px)
-       390x844: kapak alt kenarı 767 px, bilgi satırı alt kenarı 922 px; karşılaştırılan 390×844 piksel; ilk 844 px içinde farklı piksel 0; altında farklı piksel 0 (ekranın tamamı aynı)
-GEÇTİ  M1 390x844@2x ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk 844 px)
-       390x844@2x: kapak alt kenarı 767 px, bilgi satırı alt kenarı 922 px; karşılaştırılan 780×1688 piksel; ilk 844 px içinde farklı piksel 0; altında farklı piksel 0 (ekranın tamamı aynı)
+GEÇTİ  M1 390x844 ilk ekran (bekleme durumu): üst bant, başlık, alt metin, düğmeler ve PTF kartı önceki hazırlık sürümüyle aynı yerde ve ölçüde; kapak yalnız şerit yeri kadar (44 px) uzadı
+       390x844: kapak alt kenarı 811 px, bilgi satırı alt kenarı 966 px; karşılaştırılan 390×844 piksel; ilk 844 px içinde farklı piksel 201431; altında farklı piksel 0 (ekranın tamamı aynı)
+GEÇTİ  M1 390x844@2x ilk ekran (bekleme durumu): üst bant, başlık, alt metin, düğmeler ve PTF kartı önceki hazırlık sürümüyle aynı yerde ve ölçüde; kapak yalnız şerit yeri kadar (44 px) uzadı
+       390x844@2x: kapak alt kenarı 811 px, bilgi satırı alt kenarı 966 px; karşılaştırılan 780×1688 piksel; ilk 844 px içinde farklı piksel 800508; altında farklı piksel 0 (ekranın tamamı aynı)
 GEÇTİ  N1 390px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 GEÇTİ  N1 1440px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 
-TOPLAM: 318 geçti, 0 kaldı
+TOPLAM: 322 geçti, 0 kaldı

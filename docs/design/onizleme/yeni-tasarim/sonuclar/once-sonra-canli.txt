@@ -1,6 +1,6 @@
 ÖNCE/SONRA KARŞILAŞTIRMASI
-önce : /home/user/website/index.html (166810 bayt)
-sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174313 bayt)
+önce : /home/user/website/index.html (166927 bayt)
+sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174693 bayt)
 
 == 1. BAŞ BÖLÜMÜ ==
   <!DOCTYPE> … yazı tipi bağlantısı bayt bayt aynı: True (6391 bayt)
@@ -363,9 +363,9 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174313 b
   Emirhan Tan, Yönetim Kurulu Başkanı                     1 → 1
 
 == 8. BETİK ==
-  satır içi betik: önce 38484 bayt, sonra 39722 bayt
-  satır içi stil : önce 43652 bayt, sonra 46713 bayt
-  betik satır farkı: -67 +65
+  satır içi betik: önce 38601 bayt, sonra 39830 bayt
+  satır içi stil : önce 43652 bayt, sonra 46997 bayt
+  betik satır farkı: -65 +64
   çıkarılan bloklar (sayfada öğesi kalmayanlar): SMIL temizliği, kaydırınca belirme (IntersectionObserver), saatlik ray, folyo, tek hat şeması
   eklenen satırlar:
     +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
@@ -379,8 +379,7 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174313 b
     +  // Görsellerin alt metni (sektör fotoğrafları)
     +  document.querySelectorAll('img[data-alt-tr][data-alt-en]').forEach(el => { el.alt = el.getAttribute('data-alt-' + lang); });
     +  document.querySelectorAll('[data-aria-tr][data-aria-en]').forEach(el => { el.setAttribute('aria-label', el.getAttribute('data-aria-' + lang)); });
-    +      const diff = i === 0 ? 0 : it.p - items[i - 1].p;   // ilk saat: önceki saat bu veride yok
-    +      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh' + (diff === 0 ? '' : ' <span class="' + cls + '">' + arr + ' ' + Mat
+    +      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh' + (diff === null || diff === 0 ? '' : ' <span class="' + cls + '">' 
     +// 2) Canlı veri denetleyicisi — kapak PTF kartı (değer, damga, gün grafiği) + cetvel + grafik + saatlik tablo.
     +  const ptfKart = $('ptfKart'), heroLine = $('heroLine'), heroArea = $('heroArea'), heroDot = $('heroDot');
     +  const saatHucre = document.querySelectorAll('#saatTablo tbody td'); /* dört kısa tablo; belge sırası = saat sırası (00–23) */

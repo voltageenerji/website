@@ -1,6 +1,6 @@
 ÖNCE/SONRA KARŞILAŞTIRMASI
 önce : /tmp/claude-0/-home-user-website/25c75427-f784-5804-91b7-4539c0d36614/scratchpad/yeni-tasarim/kok/olcum/onceki/index.html (153242 bayt)
-sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174313 bayt)
+sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174693 bayt)
 
 == 1. BAŞ BÖLÜMÜ ==
   <!DOCTYPE> … yazı tipi bağlantısı bayt bayt aynı: True (6391 bayt)
@@ -240,9 +240,9 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174313 b
   Emirhan Tan, Yönetim Kurulu Başkanı                     1 → 1
 
 == 8. BETİK ==
-  satır içi betik: önce 36259 bayt, sonra 39722 bayt
-  satır içi stil : önce 37044 bayt, sonra 46713 bayt
-  betik satır farkı: -10 +77
+  satır içi betik: önce 36259 bayt, sonra 39830 bayt
+  satır içi stil : önce 37044 bayt, sonra 46997 bayt
+  betik satır farkı: -10 +78
   çıkarılan bloklar (sayfada öğesi kalmayanlar): SMIL temizliği, kaydırınca belirme (IntersectionObserver), saatlik ray, folyo, tek hat şeması
   eklenen satırlar:
     +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
@@ -275,10 +275,11 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174313 b
     +  let html = '';
     +  for(let rep = 0; rep < 2; rep++){
     +    items.forEach((it, i) => {
-    +      const diff = i === 0 ? 0 : it.p - items[i - 1].p;   // ilk saat: önceki saat bu veride yok
+    +      /* Günün ilk saati: önceki saat bu veride yok (eskiden aynı günün 23:00'üyle kıyaslanıyordu) — fark yazılmaz */
+    +      const diff = i === 0 ? null : it.p - items[i - 1].p;
     +      const cls = diff >= 0 ? 'up' : 'dn';
     +      const arr = diff >= 0 ? '\u25B2' : '\u25BC';
-    +      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh' + (diff === 0 ? '' : ' <span class="' + cls + '">' + arr + ' ' + Mat
+    +      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh' + (diff === null || diff === 0 ? '' : ' <span class="' + cls + '">' 
     +    });
     +  }
     +  track.innerHTML = html;
