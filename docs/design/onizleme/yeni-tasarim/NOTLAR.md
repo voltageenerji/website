@@ -247,3 +247,12 @@ Kırpma: geniş ekranda ilk görsel 1,89:1; 5 sütunluklar 2,3:1 (üstten ve alt
   - `performans.txt` içindeki sayfa yükseklikleri (375 px'te 11.031, 1440 px'te 8.106) yazı tipleri kapalıyken ölçülmüştür; yazı tipleriyle 390 px'te 10.587, 1440 px'te 7.998 px'tir.
 - Eski `sonuclar/once-sonra.txt` silindi; yerine iki karşılaştırma dosyası geldi.
 - Önizleme bağlantısı üretilirken sunulan kopyada iki fark olur: `robots` değeri `noindex, nofollow` ve `PTF_PROXY` aynı kökenli geçici aktarıcıya bakar. Bu klasördeki `index.html` üretim değerlerini taşır.
+
+## Sektör görselleri (24.11)
+
+- Yedi görsel yapay zekâ üretimidir (Kling, ücretsiz hesap; altısı `kling-image-v4_0` 2k, tekstil `kling-image-v3_0` 1k). Ortak dil: alacakaranlık / lacivert gölge, kehribar ışık; insan, yazı, logo yok.
+- Kaynak görsellerin sağ alt köşesinde araç filigranı vardı. Sahibin talimatıyla (24.11: "Alttan kırparak KlingAI filigranlarını kaldır") alttan %9,5 kırpıldı, 3:2 oranı için yanlardan eşit kırpıldı; sonra 1200×800, 800×533, 480×320 WebP üretildi (`img/sektor-*-{1200,800,480}.webp`, toplam ≈1,1 MB; tarayıcı tek ziyarette yalnız ihtiyacı olan genişliği indirir).
+- YAYIN ÖNCESİ AÇIK NOKTA: ücretsiz hesapla üretilen görsellerin ticari kullanım ve filigran koşulları aracın kullanım şartlarına bağlıdır. Canlıya almadan önce ya şartlar teyit edilir ya da görseller kapak görselinde olduğu gibi sahibin kullanım hakkı bulunan bir araçla yeniden üretilip aynı dosya adlarıyla değiştirilir (üretim istemleri defterde).
+- Alt metinler görsele göre düzeltildi: çelik "Çelik fabrikasında potadan dökülen erimiş metal" / "Molten metal being poured from a ladle in a steel plant"; cam "Cam şişe üretim hattında kızgın şişeler" / "Glowing hot bottles on a glass production line". Diğer beşi ilk taslaktaki gibi.
+- Bölümde "Görseller temsilîdir; Voltage Enerji tesislerini göstermez." notu yer alır.
+- Son koşu (gerçek görsellerle): davranış testi 312/312; telefon LCP 464 → 520 ms (metin öğesi; fark HTML boyutundan), CLS 0; masaüstü LCP 120 → 76 ms, CLS 0; masaüstünde yedi sektör görseli yüklemede iner (≈215 KB, LCP'yi engellemez), telefonda yalnız kaydırınca iner (≈170 KB).

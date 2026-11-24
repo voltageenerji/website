@@ -1,7 +1,7 @@
 HAZIRLIK SAYFASI — DAVRANIŞ TESTLERİ (3. tur, 24.11 revizyonu)
-Sayfa: /docs/design/onizleme/yeni-tasarim/index.html
+Sayfa: http://127.0.0.1:8765/docs/design/onizleme/yeni-tasarim/index.html
 
-       UYARI: 21/21 sektör görseli dosyası img/ klasöründe yok; bu koşuda yerlerine aynı ölçüde düz renkli TEST görseli döndürüldü (dosya yazılmadı): sektor-demir-celik-480.webp, sektor-demir-celik-800.webp, sektor-demir-celik-1200.webp, sektor-kimya-480.webp, sektor-kimya-800.webp, sektor-kimya-1200.webp, sektor-osb-480.webp, sektor-osb-800.webp, sektor-osb-1200.webp, sektor-lojistik-480.webp, sektor-lojistik-800.webp, sektor-lojistik-1200.webp, sektor-cam-seramik-480.webp, sektor-cam-seramik-800.webp, sektor-cam-seramik-1200.webp, sektor-veri-merkezi-480.webp, sektor-veri-merkezi-800.webp, sektor-veri-merkezi-1200.webp, sektor-tekstil-480.webp, sektor-tekstil-800.webp, sektor-tekstil-1200.webp
+       sektör görselleri: 21/21 dosya img/ klasöründe; testler gerçek dosyalarla koştu
 GEÇTİ  A1 konsol hatası yok (1440, canlı veri)
 GEÇTİ  A2 tek <h1>; içinde üst satır (.h1-ust) ve slogan (.h1-ana); ayrı üst başlık öğesi yok
 GEÇTİ  A3 H1 görünümü: üst satır küçük büyük harfli sans, slogan serif
@@ -299,7 +299,7 @@ GEÇTİ  K7 390px seçim boşaltılınca “Dosya seçilmedi”; EN’de “No f
 GEÇTİ  K8 390px seçiciyle seçilen iki dosya mevcut yükleme mantığıyla gider (multipart, iki “fatura” parçası); konsol hatası yok
 GEÇTİ  K9 dört dosya: durum “4 dosya seçildi”; gönderimde mevcut sınır iletisi (“En fazla 3 fatura dosyası yükleyebilirsiniz.”), istek yok
 GEÇTİ  K9 yeşil enerji seçiliyken dosya kutusu yerinde (kesik çizgili kenar durur)
-KALDI  L0 sektör görseli dosyaları: 21/21 img/ klasöründe (7 sektör × 480/800/1200)  → eksik: sektor-demir-celik-480.webp, sektor-demir-celik-800.webp, sektor-demir-celik-1200.webp, sektor-kimya-480.webp, sektor-kimya-800.webp, sektor-kimya-1200.webp, sektor-osb-480.webp, sektor-osb-800.webp, sektor-osb-1200.webp, sektor-lojistik-480.webp, sektor-lojistik-800.webp, sektor-lojistik-1200.webp, sektor-cam-seramik-480.webp, sektor-cam-seramik-800.webp, sektor-cam-seramik-1200.webp, sektor-veri-merkezi-480.webp, sektor-veri-merkezi-800.webp, sektor-veri-merkezi-1200.webp, sektor-tekstil-480.webp, sektor-tekstil-800.webp, sektor-tekstil-1200.webp
+GEÇTİ  L0 sektör görseli dosyaları: 21/21 img/ klasöründe (7 sektör × 480/800/1200)
 GEÇTİ  L1 hizmetler: beş hizmet H3, beş açıklama; ilk hizmet /sanayi-elektrik-tedariki bağlantısını korur; görsel, şema, numara ya da simge yok
 GEÇTİ  L1 hizmetler 1440: ızgara içerik genişliğinin tamamını kullanır (solda boşluk yok)
 GEÇTİ  L2 yedi sektör: adı H3 ve rehber bağlantısı, açıklaması duruyor; “Tüm sektör rehberleri” → /rehber
@@ -339,4 +339,4 @@ GEÇTİ  M1 390x844@2x ilk ekran (bekleme durumu): üst bant, kapak ve bilgi sat
 GEÇTİ  N1 390px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 GEÇTİ  N1 1440px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 
-TOPLAM: 311 geçti, 1 kaldı
+TOPLAM: 312 geçti, 0 kaldı

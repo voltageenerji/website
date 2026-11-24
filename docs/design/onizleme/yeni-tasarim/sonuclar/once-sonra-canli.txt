@@ -1,6 +1,6 @@
 ÖNCE/SONRA KARŞILAŞTIRMASI
 önce : /home/user/website/index.html (166810 bayt)
-sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 bayt)
+sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170800 bayt)
 
 == 1. BAŞ BÖLÜMÜ ==
   <!DOCTYPE> … yazı tipi bağlantısı bayt bayt aynı: True (6391 bayt)
@@ -289,11 +289,11 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 b
 == 4b. GÖRSELLER (<img>) VE ALT METİNLERİ ==
   önce 1, sonra 9 <img>
     + img/kapak-1600.webp | alt TR: "" | alt EN: "(aynı)" | loading=None 2172x724 srcset=True sizes=True
-    + img/sektor-demir-celik-800.webp | alt TR: "Çelik fabrikasında elektrik ark ocağından erimiş çelik dökümü" | alt EN: "Molten steel being poured at an electric arc furnace steel plant" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-demir-celik-800.webp | alt TR: "Çelik fabrikasında potadan dökülen erimiş metal" | alt EN: "Molten metal being poured from a ladle in a steel plant" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-kimya-800.webp | alt TR: "Alacakaranlıkta bir petrokimya tesisinin damıtma kuleleri ve boru hatları" | alt EN: "Distillation columns and pipe racks of a petrochemical plant at dusk" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-osb-800.webp | alt TR: "Organize sanayi bölgesindeki fabrika binalarının havadan görünümü" | alt EN: "Aerial view of factory buildings in an organised industrial zone" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-lojistik-800.webp | alt TR: "Yüksek raflı soğuk hava deposunun içi" | alt EN: "Interior of a high-bay cold storage warehouse" | loading=lazy 1200x800 srcset=True sizes=True
-    + img/sektor-cam-seramik-800.webp | alt TR: "Cam üretim hattında kızgın cam" | alt EN: "Glowing glass on a glass production line" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-cam-seramik-800.webp | alt TR: "Cam şişe üretim hattında kızgın şişeler" | alt EN: "Glowing hot bottles on a glass production line" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-veri-merkezi-800.webp | alt TR: "Veri merkezinde sunucu kabinleri arasındaki koridor" | alt EN: "Aisle between server racks in a data centre" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-tekstil-800.webp | alt TR: "Dokuma fabrikasında sıra sıra dokuma tezgâhları" | alt EN: "Rows of looms in a weaving mill" | loading=lazy 1200x800 srcset=True sizes=True
 

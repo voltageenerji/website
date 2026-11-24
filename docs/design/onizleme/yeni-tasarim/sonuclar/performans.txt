@@ -3,62 +3,59 @@ Chromium (Playwright) + CDP; yerel statik sunucu, sıkıştırma YOK (üretimde 
 Telefon: 375×667 @2x, işlemci 4× yavaş, ağ 1,6 Mbit/sn ↓ · 750 kbit/sn ↑ · 150 ms. Masaüstü: 1440×900, kısıtlama yok.
 Google Fonts istekleri iki sayfada da kapalı; PTF yanıtı yerel taklit. Her değer 5 ölçümün ortancası. Gerçek kullanıcı ölçümü değildir.
 
-UYARI: 21/21 sektör görseli dosyası img/ klasöründe yok. Bu ölçümde yerlerine birkaç yüz baytlık düz renkli TEST görseli döndü;
-       sektör görseli bayt sayıları ve onlara bağlı aktarım toplamları GERÇEK DEĞİLDİR. Dosyalar gelince ölçüm yeniden koşulmalı.
-
 TELEFON (375×667, 4× işlemci, yavaş 4G)
   ölçü                               önceki        yeni
-  LCP (ms)                          448           504
+  LCP (ms)                          464           520
   LCP öğesi                         P.hero-sub            P.hero-sub
-  LCP, beş ölçüm (ms)               448/468/436/464/440         504/508/508/484/480
-  kapak görseli indi (ms)           1039          1083
+  LCP, beş ölçüm (ms)               496/440/440/484/464         504/532/496/520/532
+  kapak görseli indi (ms)           1040          1083
   kapak görseli dosyası             kapak-mobil-579.webpkapak-mobil-579.webp
-  FCP (ms)                          408           464
+  FCP (ms)                          416           472
   CLS (ortanca)                     0.0000        0.0000
   CLS (beş ölçümün en büyüğü)       0.0000        0.0000
-  DOMContentLoaded (ms)             1253          1349
-  load (ms)                         1254          1351
+  DOMContentLoaded (ms)             1240          1383
+  load (ms)                         1241          1386
   CLS, sayfa sonuna kaydırınca      0.0000        0.0000
-  aktarım, yükleme anı (bayt)       203589        221160
+  aktarım, yükleme anı (bayt)       203589        221147
     içinde sektör görseli (adet)    0.0000        0.0000
     içinde sektör görseli (bayt)    0.0000        0.0000
-  aktarım, sayfa sonuna kadar (bayt)203589        227849
+  aktarım, sayfa sonuna kadar (bayt)203589        390761
     içinde sektör görseli (adet)    0.0000        7.0
-    içinde sektör görseli (bayt)    0.0000        6689
+    içinde sektör görseli (bayt)    0.0000        169614
   DOM öğe sayısı                    885           945
   sayfa yüksekliği (px)             14520         11031
-  etkileşim: menü aç → kare (ms)    16.6          13.3
-  etkileşim: dil değiştir → kare (ms)126           88.4
-  etkileşim: tarife seç → kare (ms) 27.5          26.0
+  etkileşim: menü aç → kare (ms)    17.9          16.5
+  etkileşim: dil değiştir → kare (ms)119           133
+  etkileşim: tarife seç → kare (ms) 25.2          24.3
 
 MASAÜSTÜ (1440×900)
   ölçü                               önceki        yeni
-  LCP (ms)                          112           68.0
+  LCP (ms)                          120           76.0
   LCP öğesi                         IMG. kapak-2172.webp  IMG. kapak-2172.webp
-  LCP, beş ölçüm (ms)               116/112/112/128/104         64/68/76/104/60
-  kapak görseli indi (ms)           16.9          18.0
+  LCP, beş ölçüm (ms)               132/112/124/120/112         80/124/76/56/68
+  kapak görseli indi (ms)           18.5          16.4
   kapak görseli dosyası             kapak-2172.webpkapak-2172.webp
-  FCP (ms)                          112           68.0
+  FCP (ms)                          120           72.0
   CLS (ortanca)                     0.0000        0.0000
   CLS (beş ölçümün en büyüğü)       0.0000        0.0000
-  DOMContentLoaded (ms)             88.7          93.7
-  load (ms)                         89.1          94.0
+  DOMContentLoaded (ms)             97.4          106
+  load (ms)                         97.7          106
   CLS, sayfa sonuna kaydırınca      0.0000        0.0000
-  aktarım, yükleme anı (bayt)       270310        295572
+  aktarım, yükleme anı (bayt)       270310        502574
     içinde sektör görseli (adet)    0.0000        7.0
-    içinde sektör görseli (bayt)    0.0000        7691
-  aktarım, sayfa sonuna kadar (bayt)270310        295572
+    içinde sektör görseli (bayt)    0.0000        214706
+  aktarım, sayfa sonuna kadar (bayt)270310        502574
     içinde sektör görseli (adet)    0.0000        7.0
-    içinde sektör görseli (bayt)    0.0000        7691
+    içinde sektör görseli (bayt)    0.0000        214706
   DOM öğe sayısı                    885           945
   sayfa yüksekliği (px)             9615          8106
-  etkileşim: dil değiştir → kare (ms)18.9          20.6
-  etkileşim: tarife seç → kare (ms) 6.7           2.9
+  etkileşim: dil değiştir → kare (ms)20.0          31.0
+  etkileşim: tarife seç → kare (ms) 13.3          3.3
 
 HTML
   ölçü                               önceki        yeni
-  HTML (bayt)                       153242        170813
-  HTML gzip -9 (bayt)               42130         46094
+  HTML (bayt)                       153242        170800
+  HTML gzip -9 (bayt)               42130         46103
   satır içi stil (bayt)             37059         45516
   satır içi betik (bayt)            36292         38097
 
