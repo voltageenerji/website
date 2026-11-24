@@ -1,6 +1,6 @@
 ÖNCE/SONRA KARŞILAŞTIRMASI
 önce : /home/user/website/index.html (166810 bayt)
-sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170800 bayt)
+sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174313 bayt)
 
 == 1. BAŞ BÖLÜMÜ ==
   <!DOCTYPE> … yazı tipi bağlantısı bayt bayt aynı: True (6391 bayt)
@@ -120,16 +120,17 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170800 b
         H3 Contact and Registry Details
 
 == 3. İÇ BAĞLANTILAR VE ÇAPA METİNLERİ (TR) ==
-  önce 36 bağlantı (21 farklı hedef), sonra 40 bağlantı (22 farklı hedef)
+  önce 36 bağlantı (21 farklı hedef), sonra 41 bağlantı (22 farklı hedef)
   KALDIRILAN (hedef, çapa metni): 3
     - #hizmetler                             "Hizmetlerimiz"
     - #teklif                                "Teklif Talep Edin"
     - /canli-ptf                             "[Canlı PTF sayfasını aç]"
-  EKLENEN: 5
+  EKLENEN: 6
     + #hizmetler                             "Hizmetlerimizi İncele"
     + #icerik                                "İçeriğe atla"
     + /canli-ptf                             "Canlı PTF"
     + /canli-ptf                             "Piyasa verilerini detaylı incele"
+    + /canli-ptf                             "[Saatlik PTF değerleri: Canlı PTF sayfasını aç]"
     + /rehber                                "Tüm sektör rehberleri"
   hedef başına adet (önce → sonra):
     #                                      1 → 1
@@ -139,7 +140,7 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170800 b
     #iletisim                              3 → 3
     #teklif                                3 → 2  *
     #yaklasim                              3 → 3
-    /canli-ptf                             1 → 4  *
+    /canli-ptf                             1 → 5  *
     /cerez-politikasi                      1 → 1
     /kullanim-kosullari                    1 → 1
     /kurumsal                              1 → 1
@@ -155,7 +156,7 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170800 b
     /sanayi-elektrik-tedariki              1 → 1
     mailto:info@voltage.com.tr             2 → 2
   EN çapa metinleri — kaldırılan: [('#hizmetler', 'Our Services'), ('#teklif', 'Request a Proposal'), ('/canli-ptf', '[Canlı PTF sayfasını aç]')]
-  EN çapa metinleri — eklenen: [('#hizmetler', 'Explore Our Services'), ('#icerik', 'Skip to content'), ('/canli-ptf', 'Live MCP'), ('/canli-ptf', 'View detailed market data'), ('/rehber', 'All sector guides')]
+  EN çapa metinleri — eklenen: [('#hizmetler', 'Explore Our Services'), ('#icerik', 'Skip to content'), ('/canli-ptf', 'Live MCP'), ('/canli-ptf', 'View detailed market data'), ('/canli-ptf', '[Saatlik PTF değerleri: Canlı PTF sayfasını aç]'), ('/rehber', 'All sector guides')]
 
 == 4. GÖRÜNÜR METİN (TR) — metin birimi düzeyinde ==
   birim sayısı: önce 294 (farklı 235), sonra 339 (farklı 247) · kelime sayısı: önce 1123, sonra 1163
@@ -343,8 +344,8 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170800 b
     + Şirket Bilgileri | Company Details
 
 == 6. id DEĞERLERİ ==
-  önce 54, sonra 54
-  kaldırılan: ['flow', 'kpiMax', 'kpiMin', 'kpiNow', 'kpiStamp', 'lmFill', 'mcpRail', 'mcpTrack', 'rhNum', 'rhSec', 'tline']
+  önce 54, sonra 56
+  kaldırılan: ['flow', 'kpiMax', 'kpiMin', 'kpiNow', 'kpiStamp', 'lmFill', 'rhNum', 'rhSec', 'tline']
   eklenen   : ['heroArea', 'heroDot', 'heroLine', 'icerik', 'kapakBaslik', 'leadFaturaDurum', 'leadFaturaKutu', 'ptfBaslik', 'ptfKart', 'saatBaslik', 'saatTablo']
   gelen bağlantıların kullandığı çapalar duruyor: True  ['leadForm', 'teklif', 'iletisim', 'hakkimizda', 'yaklasim', 'hizmetler', 'kapak', 'canli-piyasa']
   sayfadaki betiğin aradığı ama sayfada OLMAYAN id: []
@@ -362,9 +363,9 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170800 b
   Emirhan Tan, Yönetim Kurulu Başkanı                     1 → 1
 
 == 8. BETİK ==
-  satır içi betik: önce 38484 bayt, sonra 38000 bayt
-  satır içi stil : önce 43652 bayt, sonra 45501 bayt
-  betik satır farkı: -98 +62
+  satır içi betik: önce 38484 bayt, sonra 39722 bayt
+  satır içi stil : önce 43652 bayt, sonra 46713 bayt
+  betik satır farkı: -67 +65
   çıkarılan bloklar (sayfada öğesi kalmayanlar): SMIL temizliği, kaydırınca belirme (IntersectionObserver), saatlik ray, folyo, tek hat şeması
   eklenen satırlar:
     +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
@@ -377,6 +378,9 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170800 b
     +    btn.setAttribute('aria-pressed', btn.dataset.lang === lang ? 'true' : 'false');
     +  // Görsellerin alt metni (sektör fotoğrafları)
     +  document.querySelectorAll('img[data-alt-tr][data-alt-en]').forEach(el => { el.alt = el.getAttribute('data-alt-' + lang); });
+    +  document.querySelectorAll('[data-aria-tr][data-aria-en]').forEach(el => { el.setAttribute('aria-label', el.getAttribute('data-aria-' + lang)); });
+    +      const diff = i === 0 ? 0 : it.p - items[i - 1].p;   // ilk saat: önceki saat bu veride yok
+    +      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh' + (diff === 0 ? '' : ' <span class="' + cls + '">' + arr + ' ' + Mat
     +// 2) Canlı veri denetleyicisi — kapak PTF kartı (değer, damga, gün grafiği) + cetvel + grafik + saatlik tablo.
     +  const ptfKart = $('ptfKart'), heroLine = $('heroLine'), heroArea = $('heroArea'), heroDot = $('heroDot');
     +  const saatHucre = document.querySelectorAll('#saatTablo tbody td'); /* dört kısa tablo; belge sırası = saat sırası (00–23) */

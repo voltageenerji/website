@@ -257,6 +257,20 @@ linear-gradient(180deg,rgba(8,13,28,.56) 0,rgba(8,13,28,.24) 96px,rgba(8,13,28,0
 .ptf-link{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:4px;min-height:48px;border-top:1px solid var(--hair-dark);font-size:15px;font-weight:500}
 .ptf-link:hover{color:var(--cta)}
 
+/* ============ SAATLİK PTF ŞERİDİ — kapağın alt kenarında; mutlak konumlu olduğu için kapağın yerleşimini itmez,
+   veri geç gelse de sayfa kaymaz. Üstüne gelince ya da odaklanınca durur. ============ */
+.mcp-rail{position:absolute;inset:auto 0 0 0;z-index:1;display:flex;align-items:center;height:40px;overflow:hidden;background:rgba(8,13,28,.9);border-top:1px solid var(--hair-dark);color:var(--on-dark)}
+.mcp-rail[hidden]{display:none}
+.mcp-rail:focus-visible{outline:2px solid var(--cta);outline-offset:-2px}
+.mcp-rail-track{display:inline-flex;white-space:nowrap;font-family:var(--mono);font-size:12px;line-height:40px;letter-spacing:.04em;animation:rail 140s linear infinite}
+.mcp-rail:hover .mcp-rail-track,.mcp-rail:focus-visible .mcp-rail-track{animation-play-state:paused}
+.mcp-rail-track .cell{display:inline-flex;align-items:center;gap:10px;padding:0 26px;border-right:1px solid var(--hair-dark)}
+.mcp-rail-track .cell b{font-weight:500;color:var(--white)}
+.mcp-rail-track .cell .up{color:var(--green-bright)}
+.mcp-rail-track .cell .dn{color:#F2A08F}
+@keyframes rail{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+@media (max-width:1039px){.mcp-rail{display:none}}
+
 /* ============ KURUMSAL BİLGİ SATIRI ============ */
 .trust{background:var(--paper);border-bottom:1px solid var(--line)}
 .trust ul{display:grid;grid-template-columns:repeat(4,auto);justify-content:space-between;gap:0 32px;padding-block:26px}
@@ -804,6 +818,10 @@ p.form-hint{margin-bottom:16px}
       </a>
     </aside>
   </div>
+
+  <!-- Saatlik PTF şeridi (canlı sitedeki ray): yalnız gerçek EPİAŞ verisiyle dolar, veri yoksa gizli kalır.
+       Kapağın alt boşluğunun içinde durur; kapaktaki hiçbir öğenin yerini değiştirmez. 1040 px altında (kapak tek sütuna geçince) gösterilmez. -->
+  <a class="mcp-rail" id="mcpRail" href="/canli-ptf" aria-label="Saatlik PTF değerleri: Canlı PTF sayfasını aç" data-aria-tr="Saatlik PTF değerleri: Canlı PTF sayfasını aç" data-aria-en="Hourly MCP values: open the Live MCP page" hidden><div class="mcp-rail-track" id="mcpTrack"></div></a>
 </section>
 
 <!-- KURUMSAL BİLGİ SATIRI -->
@@ -1557,6 +1575,7 @@ function setLanguage(lang) {
   
   // Görsellerin alt metni (sektör fotoğrafları)
   document.querySelectorAll('img[data-alt-tr][data-alt-en]').forEach(el => { el.alt = el.getAttribute('data-alt-' + lang); });
+  document.querySelectorAll('[data-aria-tr][data-aria-en]').forEach(el => { el.setAttribute('aria-label', el.getAttribute('data-aria-' + lang)); });
 
   // Update textarea placeholders specifically
   document.querySelectorAll('input[data-' + lang + '-placeholder], textarea[data-' + lang + '-placeholder]').forEach(el => {
@@ -1590,6 +1609,39 @@ async function fetchPtfLive(){
     return j;
   }catch(e){ console.warn('PTF proxy unavailable, using fallback:', e.message); return null; }
 }
+
+// 1) MCP rail ticker — yalnız gerçek EPİAŞ verisi; veri yoksa ray gizli kalır
+(async function(){
+  const rail = document.getElementById('mcpRail');
+  const track = document.getElementById('mcpTrack');
+  if(!rail || !track) return;
+  const data = await fetchPtfLive();
+  if(!data || !data.items || !data.items.length) return;
+  /* Fiyat kapısı: yalnızca sayı veya boş olmayan sayısal metin — null/'' ASLA 0 olmaz (QA DEF-D6) */
+  const railPrice = function(v){
+    if(typeof v === 'number') return Number.isFinite(v) ? v : null;
+    if(typeof v === 'string' && v.trim() !== ''){ const n = Number(v); return Number.isFinite(n) ? n : null; }
+    return null;
+  };
+  const items = [];
+  for(let h = 0; h < 24; h++){
+    const it = data.items.find(x => x.hour === h);
+    const pv = it ? railPrice(it.price) : null;
+    if(pv !== null) items.push({ h: h, p: Math.round(pv) });   /* geçersiz saat rayda hiç görünmez */
+  }
+  if(items.length < 6) return;
+  let html = '';
+  for(let rep = 0; rep < 2; rep++){
+    items.forEach((it, i) => {
+      const diff = i === 0 ? 0 : it.p - items[i - 1].p;   // ilk saat: önceki saat bu veride yok
+      const cls = diff >= 0 ? 'up' : 'dn';
+      const arr = diff >= 0 ? '\u25B2' : '\u25BC';
+      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh' + (diff === 0 ? '' : ' <span class="' + cls + '">' + arr + ' ' + Math.abs(diff).toLocaleString('tr-TR') + '</span>') + '</span>';
+    });
+  }
+  track.innerHTML = html;
+  rail.hidden = false;
+})();
 
 // 2) Canlı veri denetleyicisi — kapak PTF kartı (değer, damga, gün grafiği) + cetvel + grafik + saatlik tablo.
 // E1: micro-jitter yok; değer saatlik gerçek PTF, damga saati söyler.

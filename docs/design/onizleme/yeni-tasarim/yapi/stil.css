@@ -165,6 +165,20 @@ body.menu-open { overflow: hidden; }
 .ptf-link { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 4px; min-height: 48px; border-top: 1px solid var(--hair-dark); font-size: 15px; font-weight: 500; }
 .ptf-link:hover { color: var(--cta); }
 
+/* ============ SAATLİK PTF ŞERİDİ — kapağın alt kenarında; mutlak konumlu olduğu için kapağın yerleşimini itmez,
+   veri geç gelse de sayfa kaymaz. Üstüne gelince ya da odaklanınca durur. ============ */
+.mcp-rail { position: absolute; inset: auto 0 0 0; z-index: 1; display: flex; align-items: center; height: 40px; overflow: hidden; background: rgba(8, 13, 28, 0.9); border-top: 1px solid var(--hair-dark); color: var(--on-dark); }
+.mcp-rail[hidden] { display: none; }
+.mcp-rail:focus-visible { outline: 2px solid var(--cta); outline-offset: -2px; }
+.mcp-rail-track { display: inline-flex; white-space: nowrap; font-family: var(--mono); font-size: 12px; line-height: 40px; letter-spacing: 0.04em; animation: rail 140s linear infinite; }
+.mcp-rail:hover .mcp-rail-track, .mcp-rail:focus-visible .mcp-rail-track { animation-play-state: paused; }
+.mcp-rail-track .cell { display: inline-flex; align-items: center; gap: 10px; padding: 0 26px; border-right: 1px solid var(--hair-dark); }
+.mcp-rail-track .cell b { font-weight: 500; color: var(--white); }
+.mcp-rail-track .cell .up { color: var(--green-bright); }
+.mcp-rail-track .cell .dn { color: #F2A08F; }
+@keyframes rail { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (max-width: 1039px) { .mcp-rail { display: none; } }
+
 /* ============ KURUMSAL BİLGİ SATIRI ============ */
 .trust { background: var(--paper); border-bottom: 1px solid var(--line); }
 .trust ul { display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; gap: 0 32px; padding-block: 26px; }

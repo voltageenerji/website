@@ -17,7 +17,7 @@ GEÇTİ  A11 ok simgesi yalnız gerçek bağlantı ve düğmelerde
 GEÇTİ  A12 PTF kartı düz panel: bulanıklık ve gölge yok, zemin opak
 GEÇTİ  A13 gölge kullanan öğe yok (form odak halkası dışında)
 GEÇTİ  A14 monospace yalnız piyasa verisi, saat damgası ve teknik kimliklerde (lisans no, sicil no)
-       monospace kullanan öğeler: İZİNLİ #kfStamp İZİNLİ .ptf-ticks İZİNLİ .mono İZİNLİ #lmMode İZİNLİ .ptf-ticks.lm-ticks İZİNLİ #lgAvg İZİNLİ #lgMo İZİNLİ #lgMinH İZİNLİ #lgMaxH İZİNLİ #lgUpd İZİNLİ #saatTablo İZİNLİ .ldg-v.mono İZİNLİ .contact-detail-value.mono
+       monospace kullanan öğeler: İZİNLİ #kfStamp İZİNLİ .ptf-ticks İZİNLİ #mcpRail İZİNLİ .mono İZİNLİ #lmMode İZİNLİ .ptf-ticks.lm-ticks İZİNLİ #lgAvg İZİNLİ #lgMo İZİNLİ #lgMinH İZİNLİ #lgMaxH İZİNLİ #lgUpd İZİNLİ #saatTablo İZİNLİ .ldg-v.mono İZİNLİ .contact-detail-value.mono
 GEÇTİ  A15 serif yalnız üç yerde: kapak sloganı, imza, şirket cümlesi (slogan satırı kaldırıldı)
        serif kullanan öğeler: h1-ana tr-only
 GEÇTİ  A16 yerleşim kayması yok (CLS, 1440, canlı veri gelirken)
@@ -107,7 +107,11 @@ GEÇTİ  E1 CANLI bölüm: büyük grafik çizildi, özet dolu (gün ort., ay or
 GEÇTİ  E1 saatlik tablo dört kısa gerçek tablo: 6’şar satır (00, 06, 12, 18’den başlar), sütun başlıkları “Saat / PTF” (scope=col), adları “Saatlik PTF · ₺/MWh”; geniş ekranda yan yana
 GEÇTİ  E1 CANLI saatlik tablo: gerçek <table>, 24 satır (00:00–23:00), 24 değer sayı, o saatin satırı işaretli
 GEÇTİ  E1 tablo değerleri proxy yanıtındaki saatlik fiyatlarla birebir aynı; kapak değeri = o saatin tablo değeri
-GEÇTİ  E1 bölüm kapaktaki “şu anki saat” rakamını manşet yapmıyor: KPI bandı ve ray yok; kapak değeri bölümde yalnız tablo satırında
+GEÇTİ  E1 bölüm kapaktaki “şu anki saat” rakamını manşet yapmıyor: KPI bandı yok; kapak değeri bölümde yalnız tablo satırında
+GEÇTİ  E1 şerit: veriyle göründü, 24 saat × 2 (kesintisiz döngü), 00:00–23:00, /canli-ptf bağlantısı, adı var
+GEÇTİ  E1 şerit değerleri proxy yanıtındaki saatlik fiyatların yuvarlanmışı; günün ilk saatinde fark yazılmaz
+GEÇTİ  E1 şerit kapağın alt kenarında (40 px), kart ve düğmelerle çakışmıyor (≥ 24 px boşluk), yatay taşma yok
+GEÇTİ  E1 şerit üstüne gelince durur (hareketi durdurma yolu)
 GEÇTİ  E1 önbellek anahtarı “voltage-ptf-cache” yazıldı; yalnız /ptf/today ve /ptf/stats çağrıldı
 GEÇTİ  E2 ÖNBELLEK: damga “SON SENKRON ss:dd”, durum cached, değer önbellekteki sayı
 GEÇTİ  E2 ÖNBELLEK: grafik ve tablo bugünün önbelleğinden; “şu an” noktası ve satır işareti yok; kip SON SENKRON
@@ -117,7 +121,9 @@ GEÇTİ  E3 VERİ YOK: grafikler boş, nokta yok, “Saatlik veri bekleniyor”;
 GEÇTİ  E3 VERİ YOK: bölümde ve kartta saat etiketleri dışında rakam yok (0 ya da yer tutucu sayı yok)
 GEÇTİ  E3 VERİ YOK: yalnız proxy isteği düştü, başka konsol hatası yok
 GEÇTİ  E3 VERİ YOK (EN): “AWAITING EPIAS DATA”, değer “—”
+GEÇTİ  E3 şeridin erişilebilir adı dille değişir (EN)
 GEÇTİ  E3 ?ptfoff test kancası: istek atılmaz, dürüst bekleme
+GEÇTİ  E3 veri yokken şerit gizli kalır (uydurma değer yok)
 GEÇTİ  E4 kapak kartı ve piyasa bölümü üç durumda aynı yükseklikte (kayma yok)
 GEÇTİ  E5 EKSİK SAAT: şu anki saat yoksa kapak değeri “—” (0 değil), durum live
 GEÇTİ  E5 EKSİK SAAT: tabloda eksik saatler “—”, öbürleri sayı; çizgi boşlukta kopuyor
@@ -339,4 +345,4 @@ GEÇTİ  M1 390x844@2x ilk ekran (bekleme durumu): üst bant, kapak ve bilgi sat
 GEÇTİ  N1 390px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 GEÇTİ  N1 1440px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 
-TOPLAM: 312 geçti, 0 kaldı
+TOPLAM: 318 geçti, 0 kaldı

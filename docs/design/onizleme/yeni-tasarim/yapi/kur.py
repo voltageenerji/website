@@ -66,12 +66,13 @@ menu_js = "(function(){\n  var btn = document.getElementById('mobileMenuBtn');" 
 analitik = arasi(CANLI, '<!-- Cloudflare Web Analytics', '-->', dahil=True)
 
 # A) Sayfada karşılığı kalmayan bloklar çıkarıldı (öğeleri yok): SMIL temizliği, kaydırınca belirme,
-#    saatlik ray (yerine tablo), folyo, tek hat şeması.
+#    folyo, tek hat şeması.
 js = cikar(js, '// Reduced motion: strip SMIL animations', '// Navigation scroll effect')
 js = cikar(js, '// Reveal on scroll', '// Smooth scroll')
-js = cikar(js, '// 1) MCP rail ticker', '// 2) Canlı veri denetleyicisi')
+# saatlik ray 24.11'de sahibin isteğiyle geri geldi: betiği canlıdakiyle aynı kalır (çıkarılmaz)
 js = cikar(js, '// 4) Running header folio', '// 6) Teklif formu')
-assert 'IntersectionObserver' not in js and 'mcpRail' not in js and 'rhSec' not in js and 'tline' not in js
+assert 'IntersectionObserver' not in js and 'rhSec' not in js and 'tline' not in js
+assert js.count("getElementById('mcpRail')") == 1
 # A2) Ölü aramalar: KPI bandı (kpiNow, kpiMin, kpiMax, kpiStamp) sayfada yok. Yalnız bu öğelere YAZAN satırlar çıkarılır;
 #     hesap (min, max, ortalama), önbellek ve veri çağrıları aynı kalır. Her satır tek tek ve sayısı doğrulanarak silinir.
 for satir, kac in [("  const kpiNow = $('kpiNow'), kpiMin = $('kpiMin'), kpiMax = $('kpiMax'), kpiStamp = $('kpiStamp');\n", 1),
@@ -103,8 +104,15 @@ js = degistir(js, "    btn.classList.toggle('active', btn.dataset.lang === lang)
 # 2b) dil değişince görsellerin alt metni de değişir (data-alt-tr / data-alt-en); setLanguage yalnız metin düğümlerini çeviriyordu
 js = degistir(js, "  // Update textarea placeholders specifically\n",
               "  // Görsellerin alt metni (sektör fotoğrafları)\n"
-              "  document.querySelectorAll('img[data-alt-tr][data-alt-en]').forEach(el => { el.alt = el.getAttribute('data-alt-' + lang); });\n\n"
+              "  document.querySelectorAll('img[data-alt-tr][data-alt-en]').forEach(el => { el.alt = el.getAttribute('data-alt-' + lang); });\n"
+              "  document.querySelectorAll('[data-aria-tr][data-aria-en]').forEach(el => { el.setAttribute('aria-label', el.getAttribute('data-aria-' + lang)); });\n\n"
               "  // Update textarea placeholders specifically\n")
+# 2c) saatlik şerit: günün ilk saatinde fark yazılmaz (canlıda 00:00, aynı günün 23:00'üyle kıyaslanıyordu: sonraki bir saatle
+#     kıyas yanıltıcıdır); fark sıfırsa ok yazılmaz; fark binlik ayraçla yazılır. Veri çağrısı ve fiyat kapısı aynıdır.
+js = degistir(js, "      const prev = i === 0 ? items[items.length - 1].p : items[i - 1].p;\n      const diff = it.p - prev;\n",
+              "      const diff = i === 0 ? 0 : it.p - items[i - 1].p;   // ilk saat: önceki saat bu veride yok\n")
+js = degistir(js, "</b> \\u20BA/MWh <span class=\"' + cls + '\">' + arr + ' ' + Math.abs(diff) + '</span></span>';\n",
+              "</b> \\u20BA/MWh' + (diff === 0 ? '' : ' <span class=\"' + cls + '\">' + arr + ' ' + Math.abs(diff).toLocaleString('tr-TR') + '</span>') + '</span>';\n")
 # 3) canlı veri denetleyicisi: kapak kartı, kartın gün grafiği ve saatlik tablo (yalnız DOM hedefleri; veri mantığı aynı)
 js = degistir(js, "// 2) Canlı veri denetleyicisi — kapak key-facts + KPI bandı + cetvel + grafik.",
               "// 2) Canlı veri denetleyicisi — kapak PTF kartı (değer, damga, gün grafiği) + cetvel + grafik + saatlik tablo.")

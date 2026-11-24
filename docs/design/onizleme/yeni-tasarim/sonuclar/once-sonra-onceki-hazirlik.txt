@@ -1,6 +1,6 @@
 ÖNCE/SONRA KARŞILAŞTIRMASI
-önce : önceki hazırlık sürümü: git show bc826d4:docs/design/onizleme/yeni-tasarim/index.html (153242 bayt)
-sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 bayt)
+önce : /tmp/claude-0/-home-user-website/25c75427-f784-5804-91b7-4539c0d36614/scratchpad/yeni-tasarim/kok/olcum/onceki/index.html (153242 bayt)
+sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (174313 bayt)
 
 == 1. BAŞ BÖLÜMÜ ==
   <!DOCTYPE> … yazı tipi bağlantısı bayt bayt aynı: True (6391 bayt)
@@ -139,9 +139,10 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 b
         H3 Contact and Registry Details
 
 == 3. İÇ BAĞLANTILAR VE ÇAPA METİNLERİ (TR) ==
-  önce 40 bağlantı (22 farklı hedef), sonra 40 bağlantı (22 farklı hedef)
+  önce 40 bağlantı (22 farklı hedef), sonra 41 bağlantı (22 farklı hedef)
   KALDIRILAN (hedef, çapa metni): 0
-  EKLENEN: 0
+  EKLENEN: 1
+    + /canli-ptf                             "[Saatlik PTF değerleri: Canlı PTF sayfasını aç]"
   hedef başına adet (önce → sonra):
     #                                      1 → 1
     #hakkimizda                            3 → 3
@@ -150,7 +151,7 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 b
     #iletisim                              3 → 3
     #teklif                                2 → 2
     #yaklasim                              3 → 3
-    /canli-ptf                             4 → 4
+    /canli-ptf                             4 → 5  *
     /cerez-politikasi                      1 → 1
     /kullanim-kosullari                    1 → 1
     /kurumsal                              1 → 1
@@ -166,7 +167,7 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 b
     /sanayi-elektrik-tedariki              1 → 1
     mailto:info@voltage.com.tr             2 → 2
   EN çapa metinleri — kaldırılan: []
-  EN çapa metinleri — eklenen: []
+  EN çapa metinleri — eklenen: [('/canli-ptf', '[Saatlik PTF değerleri: Canlı PTF sayfasını aç]')]
 
 == 4. GÖRÜNÜR METİN (TR) — metin birimi düzeyinde ==
   birim sayısı: önce 329 (farklı 243), sonra 339 (farklı 247) · kelime sayısı: önce 1147, sonra 1163
@@ -200,11 +201,11 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 b
 
 == 4b. GÖRSELLER (<img>) VE ALT METİNLERİ ==
   önce 2, sonra 9 <img>
-    + img/sektor-demir-celik-800.webp | alt TR: "Çelik fabrikasında elektrik ark ocağından erimiş çelik dökümü" | alt EN: "Molten steel being poured at an electric arc furnace steel plant" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-demir-celik-800.webp | alt TR: "Çelik fabrikasında potadan dökülen erimiş metal" | alt EN: "Molten metal being poured from a ladle in a steel plant" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-kimya-800.webp | alt TR: "Alacakaranlıkta bir petrokimya tesisinin damıtma kuleleri ve boru hatları" | alt EN: "Distillation columns and pipe racks of a petrochemical plant at dusk" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-osb-800.webp | alt TR: "Organize sanayi bölgesindeki fabrika binalarının havadan görünümü" | alt EN: "Aerial view of factory buildings in an organised industrial zone" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-lojistik-800.webp | alt TR: "Yüksek raflı soğuk hava deposunun içi" | alt EN: "Interior of a high-bay cold storage warehouse" | loading=lazy 1200x800 srcset=True sizes=True
-    + img/sektor-cam-seramik-800.webp | alt TR: "Cam üretim hattında kızgın cam" | alt EN: "Glowing glass on a glass production line" | loading=lazy 1200x800 srcset=True sizes=True
+    + img/sektor-cam-seramik-800.webp | alt TR: "Cam şişe üretim hattında kızgın şişeler" | alt EN: "Glowing hot bottles on a glass production line" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-veri-merkezi-800.webp | alt TR: "Veri merkezinde sunucu kabinleri arasındaki koridor" | alt EN: "Aisle between server racks in a data centre" | loading=lazy 1200x800 srcset=True sizes=True
     + img/sektor-tekstil-800.webp | alt TR: "Dokuma fabrikasında sıra sıra dokuma tezgâhları" | alt EN: "Rows of looms in a weaving mill" | loading=lazy 1200x800 srcset=True sizes=True
 
@@ -220,9 +221,9 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 b
     + Şirket Bilgileri | Company Details
 
 == 6. id DEĞERLERİ ==
-  önce 51, sonra 54
+  önce 51, sonra 56
   kaldırılan: []
-  eklenen   : ['leadFaturaDurum', 'leadFaturaKutu', 'saatBaslik']
+  eklenen   : ['leadFaturaDurum', 'leadFaturaKutu', 'mcpRail', 'mcpTrack', 'saatBaslik']
   gelen bağlantıların kullandığı çapalar duruyor: True  ['leadForm', 'teklif', 'iletisim', 'hakkimizda', 'yaklasim', 'hizmetler', 'kapak', 'canli-piyasa']
   sayfadaki betiğin aradığı ama sayfada OLMAYAN id: []
 
@@ -239,9 +240,9 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 b
   Emirhan Tan, Yönetim Kurulu Başkanı                     1 → 1
 
 == 8. BETİK ==
-  satır içi betik: önce 36259 bayt, sonra 38000 bayt
-  satır içi stil : önce 37044 bayt, sonra 45501 bayt
-  betik satır farkı: -10 +43
+  satır içi betik: önce 36259 bayt, sonra 39722 bayt
+  satır içi stil : önce 37044 bayt, sonra 46713 bayt
+  betik satır farkı: -10 +77
   çıkarılan bloklar (sayfada öğesi kalmayanlar): SMIL temizliği, kaydırınca belirme (IntersectionObserver), saatlik ray, folyo, tek hat şeması
   eklenen satırlar:
     +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
@@ -250,6 +251,39 @@ sonra: /home/user/website/docs/design/onizleme/yeni-tasarim/index.html (170813 b
     +if(matchMedia('(max-width:759px)').matches)document.currentScript.previousElementSibling.removeAttribute('open')
     +  // Görsellerin alt metni (sektör fotoğrafları)
     +  document.querySelectorAll('img[data-alt-tr][data-alt-en]').forEach(el => { el.alt = el.getAttribute('data-alt-' + lang); });
+    +  document.querySelectorAll('[data-aria-tr][data-aria-en]').forEach(el => { el.setAttribute('aria-label', el.getAttribute('data-aria-' + lang)); });
+    +// 1) MCP rail ticker — yalnız gerçek EPİAŞ verisi; veri yoksa ray gizli kalır
+    +(async function(){
+    +  const rail = document.getElementById('mcpRail');
+    +  const track = document.getElementById('mcpTrack');
+    +  if(!rail || !track) return;
+    +  const data = await fetchPtfLive();
+    +  if(!data || !data.items || !data.items.length) return;
+    +  /* Fiyat kapısı: yalnızca sayı veya boş olmayan sayısal metin — null/'' ASLA 0 olmaz (QA DEF-D6) */
+    +  const railPrice = function(v){
+    +    if(typeof v === 'number') return Number.isFinite(v) ? v : null;
+    +    if(typeof v === 'string' && v.trim() !== ''){ const n = Number(v); return Number.isFinite(n) ? n : null; }
+    +    return null;
+    +  };
+    +  const items = [];
+    +  for(let h = 0; h < 24; h++){
+    +    const it = data.items.find(x => x.hour === h);
+    +    const pv = it ? railPrice(it.price) : null;
+    +    if(pv !== null) items.push({ h: h, p: Math.round(pv) });   /* geçersiz saat rayda hiç görünmez */
+    +  }
+    +  if(items.length < 6) return;
+    +  let html = '';
+    +  for(let rep = 0; rep < 2; rep++){
+    +    items.forEach((it, i) => {
+    +      const diff = i === 0 ? 0 : it.p - items[i - 1].p;   // ilk saat: önceki saat bu veride yok
+    +      const cls = diff >= 0 ? 'up' : 'dn';
+    +      const arr = diff >= 0 ? '\u25B2' : '\u25BC';
+    +      html += '<span class="cell">' + String(it.h).padStart(2, '0') + ':00 <b>' + it.p.toLocaleString('tr-TR') + '</b> \u20BA/MWh' + (diff === 0 ? '' : ' <span class="' + cls + '">' + arr + ' ' + Mat
+    +    });
+    +  }
+    +  track.innerHTML = html;
+    +  rail.hidden = false;
+    +})();
     +  const saatHucre = document.querySelectorAll('#saatTablo tbody td'); /* dört kısa tablo; belge sırası = saat sırası (00–23) */
     +  if(!kfPtf) return;
     +// 7) Açılır alanlar: telefonda kapalı başlar (satır içi betik), geniş ekranda hep açık

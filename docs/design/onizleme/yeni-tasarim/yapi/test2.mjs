@@ -79,11 +79,11 @@ const clsKur = (p) => p.addInitScript(() => { window.__cls = 0; new PerformanceO
       marka: [getComputedStyle(document.querySelector('.nav-logo-name')).fontFamily, getComputedStyle(document.querySelector('.cl-word')).fontFamily].join(' | '),
       foto: (() => { const i = document.querySelector('.hero-photo img'); return [i.complete, i.naturalWidth, i.currentSrc.split('/').pop(), document.querySelector('.hero-media').className]; })(),
       kok: [...document.querySelectorAll('[src],[href],[action]')].map(e => e.getAttribute('src') || e.getAttribute('href') || e.getAttribute('action')).filter(u => !/^(\/|#|https:\/\/|mailto:|img\/kapak|img\/sektor-)/.test(u)),
-      sus: ['.sec-no', '.nav-folio', '.service-num', '.tline-svg', '.art-rings', '.exhibit-tag', '.step-s', '.app-l', '.callout-src', '.callout-d', '.mcp-rail', '.kpi-band', '.reveal:not(form)'].filter(s => document.querySelector(s)),
+      sus: ['.sec-no', '.nav-folio', '.service-num', '.tline-svg', '.art-rings', '.exhibit-tag', '.step-s', '.app-l', '.callout-src', '.callout-d', '.kpi-band', '.reveal:not(form)'].filter(s => document.querySelector(s)),
       yazi: ['EXHIBIT A', 'VOLTAGE FELSEFESİ', 'TEK HAT ŞEMASI', 'KAPAK ·', '01 / 09'].filter(t => document.body.innerText.includes(t)),
       okSuz: [...document.querySelectorAll('svg.arrow')].filter(s => !s.closest('a, button')).length,
       kart: (() => { const c = getComputedStyle(document.getElementById('ptfKart')); return [c.backdropFilter, c.boxShadow, c.backgroundColor].join(' | '); })(),
-      mono: [...new Set(mono.map(e => { const k = e.closest('.kf-stamp, .ptf-ticks, .lm-mode, .lg-v, .saat-tablo, .mono'); return k ? 'İZİNLİ ' + (k.id ? '#' + k.id : '.' + String(k.className).split(' ').join('.')) : 'DIŞ ' + e.tagName + '.' + e.className; }))],
+      mono: [...new Set(mono.map(e => { const k = e.closest('.kf-stamp, .ptf-ticks, .lm-mode, .lg-v, .saat-tablo, .mono, .mcp-rail'); return k ? 'İZİNLİ ' + (k.id ? '#' + k.id : '.' + String(k.className).split(' ').join('.')) : 'DIŞ ' + e.tagName + '.' + e.className; }))],
       serif: [...new Set(serif.map(e => e.className || e.tagName))],
       claim: document.querySelectorAll('.about-claim, .quotec').length,
       golge: [...document.querySelectorAll('main *, footer *')].filter(e => { const s = getComputedStyle(e).boxShadow; return s !== 'none' && !e.closest('form') && !e.closest('.saat-tablo'); }).map(e => e.className).slice(0, 5),
@@ -292,7 +292,14 @@ const kartYuk = {}, bolumYuk = {};
   const ornek = ornekVeri();
   const bekle = ornek.items.map(i => i.price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
   ok('E1 tablo değerleri proxy yanıtındaki saatlik fiyatlarla birebir aynı; kapak değeri = o saatin tablo değeri', JSON.stringify(d.hucre) === JSON.stringify(bekle) && d.deger === d.hucre[+simdi.slice(0, 2)], d.hucre.slice(0, 2) + ' / ' + bekle.slice(0, 2));
-  ok('E1 bölüm kapaktaki “şu anki saat” rakamını manşet yapmıyor: KPI bandı ve ray yok; kapak değeri bölümde yalnız tablo satırında', await p.evaluate((v) => !document.querySelector('.kpi-band, .kpi-num, .mcp-rail') && [...document.querySelectorAll('#canli-piyasa *')].filter(e => e.children.length === 0 && e.textContent.trim() === v).every(e => e.tagName === 'TD'), d.deger));
+  ok('E1 bölüm kapaktaki “şu anki saat” rakamını manşet yapmıyor: KPI bandı yok; kapak değeri bölümde yalnız tablo satırında', await p.evaluate((v) => !document.querySelector('.kpi-band, .kpi-num') && [...document.querySelectorAll('#canli-piyasa *')].filter(e => e.children.length === 0 && e.textContent.trim() === v).every(e => e.tagName === 'TD'), d.deger));
+  // Saatlik PTF şeridi (24.11, sahibin isteği): yalnız gerçek veriyle dolar; kapağın yerleşimini değiştirmez
+  const serit = await p.evaluate(() => { const r = document.getElementById('mcpRail'); const k = s => document.querySelector(s).getBoundingClientRect(); const rr = r.getBoundingClientRect(); const h = [...r.querySelectorAll('.cell')]; return { gizli: r.hidden, href: r.getAttribute('href'), ad: r.getAttribute('aria-label'), ust: rr.top, alt: rr.bottom, kapakAlt: k('#kapak').bottom, kartAlt: k('#ptfKart').bottom, dugmeAlt: k('.hero-actions').bottom, n: h.length, saat: h.slice(0, 24).map(c => c.textContent.slice(0, 5)).join(), fiyat: h.slice(0, 24).map(c => c.querySelector('b').textContent), ilkFark: h[0].querySelector('.up, .dn') === null, es: h.slice(0, 24).map(c => c.textContent).join('|') === h.slice(24).map(c => c.textContent).join('|'), anim: getComputedStyle(r.firstElementChild).animationName, tasma: document.documentElement.scrollWidth - innerWidth }; });
+  ok('E1 şerit: veriyle göründü, 24 saat × 2 (kesintisiz döngü), 00:00–23:00, /canli-ptf bağlantısı, adı var', !serit.gizli && serit.n === 48 && serit.es && serit.saat.startsWith('00:00,01:00') && serit.saat.endsWith('22:00,23:00') && serit.href === '/canli-ptf' && /PTF/.test(serit.ad), JSON.stringify([serit.gizli, serit.n, serit.es, serit.href]));
+  ok('E1 şerit değerleri proxy yanıtındaki saatlik fiyatların yuvarlanmışı; günün ilk saatinde fark yazılmaz', JSON.stringify(serit.fiyat) === JSON.stringify(ornek.items.map(i => Math.round(i.price).toLocaleString('tr-TR'))) && serit.ilkFark, serit.fiyat.slice(0, 3).join());
+  ok('E1 şerit kapağın alt kenarında (40 px), kart ve düğmelerle çakışmıyor (≥ 24 px boşluk), yatay taşma yok', Math.abs(serit.alt - serit.kapakAlt) < 1 && Math.round(serit.alt - serit.ust) === 40 && serit.ust - Math.max(serit.kartAlt, serit.dugmeAlt) >= 24 && serit.tasma === 0 && serit.anim === 'rail', JSON.stringify(serit));
+  await p.hover('#mcpRail'); const durdu = await p.evaluate(() => getComputedStyle(document.getElementById('mcpTrack')).animationPlayState); await p.mouse.move(5, 5);
+  ok('E1 şerit üstüne gelince durur (hareketi durdurma yolu)', durdu === 'paused', durdu);
   ok('E1 önbellek anahtarı “voltage-ptf-cache” yazıldı; yalnız /ptf/today ve /ptf/stats çağrıldı', await p.evaluate(() => { const c = JSON.parse(localStorage.getItem('voltage-ptf-cache')); return c && c.prices.length === 24 && Number.isFinite(c.price); }) && [...new Set(durum.istekler.map(u => u.replace(/^https:\/\/[^/]+/, '')))].sort().join() === '/ptf/stats,/ptf/today', [...new Set(durum.istekler)].join());
   await p.locator('.hero').screenshot({ path: `${CIKTI}/r3/durum/ptf-1-canli-kapak-1440.png` });
   await p.locator('#canli-piyasa').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, -90)); await p.waitForTimeout(200);
@@ -329,11 +336,13 @@ const kartYuk = {}, bolumYuk = {};
   await p.click('.nav-right .lang-btn[data-lang="en"]');
   const e = await ptfOku(p);
   ok('E3 VERİ YOK (EN): “AWAITING EPIAS DATA”, değer “—”', e.damga === 'AWAITING EPIAS DATA' && e.deger === '—' && e.mod === 'AWAITING DATA', e.damga);
+  ok('E3 şeridin erişilebilir adı dille değişir (EN)', await p.evaluate(() => document.getElementById('mcpRail').getAttribute('aria-label')) === 'Hourly MCP values: open the Live MCP page');
   await ctx.close();
   const o = await baglam({ w: 1280 });
   await ac(o.p, '?ptfoff');
   const od = await ptfOku(o.p);
   ok('E3 ?ptfoff test kancası: istek atılmaz, dürüst bekleme', od.deger === '—' && od.durum === 'waiting' && o.durum.istekler.length === 0, JSON.stringify([od.deger, o.durum.istekler.length]));
+  ok('E3 veri yokken şerit gizli kalır (uydurma değer yok)', await o.p.evaluate(() => { const r = document.getElementById('mcpRail'); return r.hidden && r.getBoundingClientRect().height === 0 && r.querySelectorAll('.cell').length === 0; }));
   await o.ctx.close();
 }
 ok('E4 kapak kartı ve piyasa bölümü üç durumda aynı yükseklikte (kayma yok)', kartYuk.canli === kartYuk.onbellek && kartYuk.canli === kartYuk.bekleme && bolumYuk.canli === bolumYuk.onbellek && bolumYuk.canli === bolumYuk.bekleme, JSON.stringify([kartYuk, bolumYuk]));
@@ -577,7 +586,7 @@ for (const w of [1440, 1280, 390, 375]) {
   await ctx.close();
   const n = await baglam({ w: 1280, h: 800 });
   await ac(n.p);
-  const g = await n.p.evaluate(() => ({ anim: document.getAnimations().length, gizli: [...document.querySelectorAll('main *')].filter(e => (+getComputedStyle(e).opacity < 1 || getComputedStyle(e).transform !== 'none') && !e.closest('.form-flora, .form-flora-kutu, .hp-field, form')).map(e => e.className).slice(0, 5), io: /IntersectionObserver/.test([...document.scripts].map(s => s.textContent).join('')) }));
+  const g = await n.p.evaluate(() => ({ anim: document.getAnimations().length, gizli: [...document.querySelectorAll('main *')].filter(e => (+getComputedStyle(e).opacity < 1 || getComputedStyle(e).transform !== 'none') && !e.closest('.form-flora, .form-flora-kutu, .hp-field, form, .mcp-rail')).map(e => e.className).slice(0, 5), io: /IntersectionObserver/.test([...document.scripts].map(s => s.textContent).join('')) }));
   ok('H2 kaydırınca belirme kaldırıldı: açılışta gizli ya da kaydırılmış öğe yok, IntersectionObserver yok', g.gizli.length === 0 && !g.io, JSON.stringify(g));
   await n.ctx.close();
   const f = await baglam({ w: 1440, h: 900, azalt: true });
@@ -619,7 +628,7 @@ for (const w of [320, 360, 375, 390, 414, 430, 768, 1024, 1280, 1440]) {
         while (a && a !== document.documentElement) { if (/(hidden|clip|auto|scroll)/.test(getComputedStyle(a).overflowX)) { kirp = true; break; } a = a.parentElement; }
         if (!kirp) tasan.push(el.tagName + '.' + String(el.className.baseVal ?? el.className).slice(0, 24));
       });
-      const kirpik = [...document.querySelectorAll('header a, header span, main h1, main h2, main h3, main p, main a, main span, main td, main th, main dt, main dd, main li, main label, main button, main div, footer a, footer div, footer span')].filter(e => { const cs = getComputedStyle(e); return cs.display !== 'none' && cs.display !== 'inline' && e.clientWidth > 0 && e.scrollWidth > e.clientWidth + 1 && !/(auto|scroll)/.test(cs.overflowX) && !e.closest('.form-flora') && !e.closest('.hp-field') && !e.classList.contains('form') && !e.classList.contains('form-flora-kutu') && !e.classList.contains('hero-media') && !e.classList.contains('hero-copy') && !e.classList.contains('hero-text'); }).map(e => e.tagName + '.' + String(e.className).slice(0, 24) + ':' + e.scrollWidth + '>' + e.clientWidth);
+      const kirpik = [...document.querySelectorAll('header a, header span, main h1, main h2, main h3, main p, main a, main span, main td, main th, main dt, main dd, main li, main label, main button, main div, footer a, footer div, footer span')].filter(e => { const cs = getComputedStyle(e); return cs.display !== 'none' && cs.display !== 'inline' && e.clientWidth > 0 && e.scrollWidth > e.clientWidth + 1 && !/(auto|scroll)/.test(cs.overflowX) && !e.closest('.form-flora') && !e.closest('.hp-field') && !e.classList.contains('form') && !e.classList.contains('form-flora-kutu') && !e.classList.contains('mcp-rail') && !e.classList.contains('hero-media') && !e.classList.contains('hero-copy') && !e.classList.contains('hero-text'); }).map(e => e.tagName + '.' + String(e.className).slice(0, 24) + ':' + e.scrollWidth + '>' + e.clientWidth);
       return { sw: document.documentElement.scrollWidth, vw, tasan: tasan.slice(0, 6), kirpik: kirpik.slice(0, 6) };
     });
     ok(`I1 ${w}px ${dil.toUpperCase()} yatay sayfa kaydırması yok, kırpılan metin yok`, r.sw <= r.vw && r.tasan.length === 0 && r.kirpik.length === 0, JSON.stringify(r));

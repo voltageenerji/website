@@ -4,6 +4,15 @@
 
 Bu sürüm **24.11 revizyon talimatının** sonucudur (önceki hazırlık sürümü: `bc826d4`). Sahibin kararı: genel yön onaylı; **ilk ekran (üst bant + kapak) masaüstünde ve telefonda aynen kalır**. Değişenler: Hizmetler dizgisi, fotoğraflı Sektörler, kısalan sayfa ve telefonda açılır alanlar, tek kurumsal blok (Hakkında + lisans), sakinleşen şirket cümlesi, yerelleştirilmiş dosya seçici, zemin ritmi.
 
+**24.11 eki (sahibin isteği: "Kayan PTF barını koymayalım mı?"): saatlik PTF şeridi.** Canlıdaki ray (`#mcpRail`, `#mcpTrack`) geri geldi; onay bekliyor.
+- Yeri: kapağın alt kenarı, 40 px, `position: absolute` (kapağın alt boşluğunun içinde). Üst bant, başlık, düğmeler ve PTF kartının yeri piksel olarak aynı; kapak yüksekliği aynı. Değişen tek şey fotoğrafın en alt 40 pikselinin koyu şeritle örtülmesi.
+- 1040 px altında gösterilmez (kapak tek sütuna geçtiği genişlik; canlıda sınır 1024 px). Telefonda yok.
+- Veri: yalnız `/ptf/today` yanıtı; veri yoksa ya da 6 saatten az geçerli değer varsa `hidden` kalır. Uydurma değer yok.
+- Betik canlıdakiyle aynı, iki fark (`yapi/kur.py`, 2c): günün ilk saatinde fark yazılmaz (canlıda 00:00, aynı günün 23:00'üyle kıyaslanıyor); fark sıfırsa ok yazılmaz, fark binlik ayraçla yazılır.
+- Hareket: 140 sn'de bir tur; üstüne gelince ve klavye odağında durur; hareket azaltma tercihinde durur. Şeridin tamamı `/canli-ptf` bağlantısıdır, erişilebilir adı dille değişir (`data-aria-tr` / `data-aria-en`).
+- Bilinen ödün: saatlik değerler sayfada üçüncü kez görünür (kart: o saat; şerit: 24 saat, yuvarlanmış; bölüm: grafik ve tablo). Monospace yalnız piyasa verisinde kuralına uyar.
+- Test: 318/318 (`sonuclar/test-sonucu.txt`, "şerit" satırları). Gerçek tarayıcıda yalnız Chromium ile denendi.
+
 ## Dosyalar
 
 - `index.html` — ana sayfanın tamamı, tek dosya (stil ve betik satır içi).
@@ -51,7 +60,7 @@ Sorun: yerli `<input type="file">` tarayıcının kendi dilinde "Choose Files / 
 
 ## Betikte yapılanlar
 
-Çıkarılanlar (sayfada öğesi yok): SMIL temizliği, kaydırınca belirme, saatlik ray, folyo, tek hat şeması. **Bu turda:** KPI bandına (`kpiNow`, `kpiMin`, `kpiMax`, `kpiStamp`) ait sekiz satır çıkarıldı (bir arama, yedi yazma), baştaki koruma `if(!kfPtf && !kpiNow)` → `if(!kfPtf)` oldu. Çıkarılanlar yalnız DOM'a yazan, zaten `if(öğe)` ile korunan satırlardı; en düşük, en yüksek ve ortalama hesabı, önbellek ve veri çağrıları aynıdır. Betiğin aradığı her id artık sayfada vardır (`once-sonra-*.txt`, 6. bölüm: "OLMAYAN id: []").
+Çıkarılanlar (sayfada öğesi yok): SMIL temizliği, kaydırınca belirme, folyo, tek hat şeması (saatlik ray 24.11 ekiyle geri geldi). **Bu turda:** KPI bandına (`kpiNow`, `kpiMin`, `kpiMax`, `kpiStamp`) ait sekiz satır çıkarıldı (bir arama, yedi yazma), baştaki koruma `if(!kfPtf && !kpiNow)` → `if(!kfPtf)` oldu. Çıkarılanlar yalnız DOM'a yazan, zaten `if(öğe)` ile korunan satırlardı; en düşük, en yüksek ve ortalama hesabı, önbellek ve veri çağrıları aynıdır. Betiğin aradığı her id artık sayfada vardır (`once-sonra-*.txt`, 6. bölüm: "OLMAYAN id: []").
 
 Eklenenler:
 1. Atlama bağlantısı yumuşak kaydırma işleyicisinin dışında.
