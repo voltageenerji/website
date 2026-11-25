@@ -1,0 +1,367 @@
+#!/usr/bin/env node
+/**
+ * /dengesizlik-maliyeti — GERÇEK VERİ KABUL DENETİMİ (13 madde).
+ *
+ * Çalıştırma (çalışma dizini bir scratch klasörü olmalı; repo köküne hiçbir şey yazılmaz):
+ *   KABUL_TABAN=https://<onizleme>.pages.dev node docs/qa/kabul-dengesizlik.mjs
+ *   KABUL_TABAN=… KABUL_PROXY_URL=https://<proxy> KABUL_PROXY_ANAHTAR=<okuma belirteci> node docs/qa/kabul-dengesizlik.mjs
+ *   … --yerel     insan denetimi gereken maddeler için TAM DEĞERLİ kontrol listesi basar
+ *
+ * ÇIKTI GÜVENLİĞİ (repo herkese açık; CI günlüğü herkese açık):
+ *   - Varsayılan çıktı YALNIZ geçti/kaldı/atlandı ve toplamlardır (sayılar, en büyük fark, durum
+ *     kodları). Ham satır, fiyat, yanıt gövdesi, belirteç, proxy adresi BASILMAZ.
+ *   - Kesin değerli kontrol listesi (Şeffaflık ekranıyla elle karşılaştırma, Excel'de açma)
+ *     yalnız --yerel ile basılır; --yerel CI'da kullanılmaz.
+ *   - KABUL_PROXY_ANAHTAR yalnız proxy isteğinin Authorization başlığına girer; hiçbir çıktıda,
+ *     hata metninde ya da dosyada yer almaz. Görülen her yanıtta belirtecin GEÇMEDİĞİ denetlenir.
+ *
+ * MADDELER (QA 2. tur "gerçek veri kabul denetimleri"; 1 ve 9–11 proxy mimarisine uyarlandı):
+ *   1  İlk istek 200; X-Veri-Cekildi (ISO +03:00), X-Veri-Bayat, X-Veri-Uretildi var
+ *   2  Bir tam gün (dün): dönem sayısı veriden, dönemler bitişik, hepsi yayımlanmış; proxy varsa birebir
+ *   3  Bugün: yayımlanmamış dönemler null (0 değil), yayımlananlar başta; proxy varsa null'lar eşleşir
+ *   4  Null/0 dürüstlüğü ve türetilmiş alanlar (maliyet = fark; tek işlenen yoksa null)
+ *   5  Eşik altı dönemlerde (min(PTF; SMF) < V) yayımlanan pozitif fiyatın işareti
+ *   6  Formül ile yayımlanan fiyat (yalnız kuralı doğrulanmış günler): en büyük fark ≤ 0,01
+ *   7  Aylık aralık (30 gün) JSON/CSV/XLSX tek dosya, satır sayıları tutarlı; 32 gün → 400
+ *   8  CSV/XLSX biçimi: BOM, 12 sütun, Kaynak, XLSX 2 sayfa; üç biçimde X-Veri-* başlıkları
+ *   9  Önbellek penceresinde iki istemci aynı proxy yanıtını paylaşır (aynı X-Veri-Uretildi)
+ *   10 Ziyaretçi trafiği bütçeyi aşan proxy çağrısı doğurmaz (farklı X-Veri-Uretildi ≤ 12/dk;
+ *      aşan istekler dürüst 503 + Retry-After); HEAD proxy'ye gitmez
+ *   11 Sitede EPİAŞ kimliği yok: repo taraması (functions/, sayfa) + canlı yanıt taraması
+ *   12 SSR kanıtı: JS'siz (düz fetch ve Googlebot) sunucu HTML'inde 3 yayımlanmış dönemin
+ *      sayıları tabloda, özet cümlesinde ortalamalar, JSON-LD'de çekim anı / kapsam
+ *   13 Damga ve dizin: damga = cekildi (SON SENKRON iff bayat); önizleme hostunda
+ *      X-Robots-Tag + meta "noindex, nofollow", üretimde tarihsiz sayfa dizine açık
+ *
+ * Çıkış kodu: kalan madde varsa 1. Proxy bilgisi verilmezse proxy karşılaştırmaları "atlandı".
+ */
+import { readFileSync, readdirSync } from 'node:fs';
+import { birimFiyat } from '../../functions/_lib/dengesizlik.js';
+import { bicim } from '../../functions/dengesizlik-maliyeti.js';
+
+const YEREL = process.argv.includes('--yerel');
+const TABAN = (process.env.KABUL_TABAN || '').replace(/\/+$/, '');
+const PROXY = (process.env.KABUL_PROXY_URL || '').replace(/\/+$/, '');
+const ANAHTAR = process.env.KABUL_PROXY_ANAHTAR || '';
+const ZAMAN_ASIMI_MS = Number(process.env.KABUL_ZAMAN_ASIMI_MS) || 20000;
+const GOOGLEBOT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+const KOK = new URL('../../', import.meta.url);
+
+if (!/^https?:\/\/[^/]+$/.test(TABAN)) {
+  console.log('KABUL_TABAN gerekli (örnek: https://<dal>.<proje>.pages.dev). Çıkılıyor.');
+  process.exit(2);
+}
+const proxyVar = !!(PROXY && ANAHTAR);
+
+// ------------------------------------------------------------------ yardımcılar --
+const sonuclar = [];
+const kontrolListesi = [];
+const gorulen = []; // canlı yanıtlar (yalnız tarama için; BASILMAZ)
+function madde(no, ad, durum, ozet) { sonuclar.push({ no, ad, durum, ozet }); }
+const GECTI = 'GEÇTİ', KALDI = 'KALDI', ATLANDI = 'ATLANDI';
+const CEKILDI_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+03:00$/;
+const gunEkle = (ymd, n) => { const [y, m, d] = ymd.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
+const tarihTR = (ymd) => `${ymd.slice(8, 10)}.${ymd.slice(5, 7)}.${ymd.slice(0, 4)}`;
+const yayimlandi = (d) => d.pozitif !== null && d.negatif !== null;
+const coz = (s) => s.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
+
+async function al(yol, { yontem = 'GET', accept = 'application/json', ua = null, proxy = false } = {}) {
+  const url = proxy ? `${PROXY}${yol}` : `${TABAN}${yol}`;
+  const headers = { Accept: accept };
+  if (ua) headers['User-Agent'] = ua;
+  if (proxy) headers.Authorization = `Bearer ${ANAHTAR}`;
+  try {
+    const r = await fetch(url, { method: yontem, headers, redirect: 'manual', signal: AbortSignal.timeout(ZAMAN_ASIMI_MS) });
+    const bayt = yontem === 'HEAD' ? new Uint8Array() : new Uint8Array(await r.arrayBuffer());
+    const basliklar = {};
+    r.headers.forEach((v, k) => { basliklar[k] = v; });
+    const metin = new TextDecoder().decode(bayt);
+    if (!proxy) gorulen.push(Object.entries(basliklar).map(([k, v]) => `${k}: ${v}`).join('\n') + '\n' + metin);
+    return { durum: r.status, basliklar, bayt, metin, json: () => JSON.parse(metin) };
+  } catch (e) {
+    // Hata metni adres ya da belirteç taşıyabilir: yalnız türü döner.
+    return { durum: 0, basliklar: {}, bayt: new Uint8Array(), metin: '', hata: e && e.name, json: () => null };
+  }
+}
+const jsonAl = async (yol, sec) => { const r = await al(yol, sec); let j = null; try { j = r.durum === 200 ? r.json() : null; } catch (e) { j = null; } return { ...r, j }; };
+
+const proxyGun = async (tarih) => {
+  if (!proxyVar) return null;
+  const r = await jsonAl(`/piyasa/v1/dengesizlik?tarih=${tarih}`, { proxy: true });
+  const g = r.j && Array.isArray(r.j.gunler) ? r.j.gunler.find((x) => x && x.tarih === tarih) : null;
+  return g ? g.donemler : null;
+};
+
+/** Sitedeki dönemleri proxy'nin dönemleriyle karşılaştırır → {karsilastirilan, uyusmayan, azamiFark, nullUyusmaz}. */
+function karsilastir(site, proxyDonemleri) {
+  const harita = new Map();
+  for (const d of proxyDonemleri || []) if (!harita.has(d.bas)) harita.set(d.bas, d);
+  let karsilastirilan = 0, uyusmayan = 0, azamiFark = 0, nullUyusmaz = 0, sifirUydurma = 0;
+  for (const d of site) {
+    const p = harita.get(d.bas);
+    for (const a of ['ptf', 'smf', 'pozitif', 'negatif']) {
+      const sv = d[a], pv = p ? p[a] : null;
+      karsilastirilan++;
+      if ((sv === null) !== (pv === null || pv === undefined)) { nullUyusmaz++; if (sv === 0) sifirUydurma++; continue; }
+      if (sv === null) continue;
+      const f = Math.abs(sv - pv);
+      if (f > azamiFark) azamiFark = f;
+      if (f > 1e-9) uyusmayan++;
+    }
+    if ((d.yon || null) !== ((p && p.yon) || null)) uyusmayan++;
+  }
+  return { karsilastirilan, uyusmayan, azamiFark, nullUyusmaz, sifirUydurma };
+}
+
+const kuralFor = (kurallar, ymd) => (Array.isArray(kurallar) ? kurallar.find((k) => ymd >= k.bas && ymd <= k.bit) : null) || null;
+
+// ----------------------------------------------------------------------- akış --
+console.log(`Dengesizlik maliyeti kabul denetimi · proxy karşılaştırması: ${proxyVar ? 'açık' : 'kapalı (KABUL_PROXY_URL/ANAHTAR yok)'}${YEREL ? ' · --yerel' : ''}`);
+
+// 1 — ilk istek
+const ilk = await jsonAl('/dengesizlik-maliyeti/veri?bicim=json');
+const BUGUN = ilk.j && typeof ilk.j.tarih === 'string' ? ilk.j.tarih : null;
+{
+  const h = ilk.basliklar;
+  const iyi = ilk.durum === 200 && !!ilk.j && CEKILDI_RE.test(h['x-veri-cekildi'] || '') && /^(true|false)$/.test(h['x-veri-bayat'] || '') && CEKILDI_RE.test(h['x-veri-uretildi'] || '') && Array.isArray(ilk.j.donemler) && ilk.j.donemler.length > 0;
+  madde(1, 'İlk istek 200 + X-Veri-Cekildi/Bayat/Uretildi', iyi ? GECTI : KALDI, `durum ${ilk.durum}, dönem ${ilk.j && ilk.j.donemler ? ilk.j.donemler.length : 0}, bayat ${h['x-veri-bayat'] || '-'}`);
+}
+if (!BUGUN) {
+  for (let no = 2; no <= 13; no++) madde(no, '(ilk istek başarısız; sonraki maddeler koşulamadı)', KALDI, `durum ${ilk.durum}`);
+  bitir();
+}
+const DUN = gunEkle(BUGUN, -1);
+
+// 2 — tam gün (dün)
+const dun = await jsonAl(`/dengesizlik-maliyeti/veri?tarih=${DUN}&bicim=json`);
+{
+  const d = dun.j ? dun.j.donemler : [];
+  const dk = d.length ? d[0].dk : null;
+  const bitisik = d.every((x, i) => x.dk === dk && (i === 0 || Date.parse(x.bas) - Date.parse(d[i - 1].bas) === dk * 60000));
+  const beklenenSayi = dk ? 1440 / dk : 0;
+  const yayim = d.filter(yayimlandi).length;
+  let ek = '', iyi = dun.durum === 200 && d.length === beklenenSayi && bitisik && yayim === d.length;
+  if (proxyVar) {
+    const k = karsilastir(d, await proxyGun(DUN));
+    ek = `; proxy: ${k.karsilastirilan} değer, uyuşmayan ${k.uyusmayan}, null uyuşmazlığı ${k.nullUyusmaz}, en büyük fark ${k.azamiFark}`;
+    iyi = iyi && k.uyusmayan === 0 && k.nullUyusmaz === 0;
+  } else ek = '; proxy karşılaştırması atlandı';
+  madde(2, `Tam gün (${DUN}): dönem sayısı veriden, bitişik, tamamı yayımlanmış`, iyi ? GECTI : KALDI, `dönem ${d.length} (${dk} dk), yayımlanan ${yayim}, bitişik ${bitisik}${ek}`);
+  if (YEREL && d.length) {
+    const sec = [d[0], d[Math.floor(d.length / 2)], d[d.length - 1]];
+    kontrolListesi.push(`Şeffaflık ekranı (PTF, SMF ve SDF Listeleme) · ${tarihTR(DUN)} · şu dönemleri elle karşılaştırın:`);
+    for (const x of sec) kontrolListesi.push(`  ${x.bas.slice(11, 16)}  PTF ${bicim(x.ptf)} · SMF ${bicim(x.smf)} · yön ${x.yon || '—'} · pozitif ${bicim(x.pozitif)} · negatif ${bicim(x.negatif)}`);
+  }
+}
+
+// 3 + 4 — bugün kısmi, null/0 dürüstlüğü
+const bugun = await jsonAl(`/dengesizlik-maliyeti/veri?tarih=${BUGUN}&bicim=json`);
+{
+  const d = bugun.j ? bugun.j.donemler : [];
+  const yayim = d.filter(yayimlandi).length;
+  const ilkBos = d.findIndex((x) => !yayimlandi(x));
+  const sonrasiBos = ilkBos === -1 || d.slice(ilkBos).every((x) => !yayimlandi(x));
+  const bosSifir = d.filter((x) => !yayimlandi(x) && [x.smf, x.pozitif, x.negatif, x.maliyetPozitif, x.maliyetNegatif].some((v) => v === 0)).length;
+  let ek = '', iyi = bugun.durum === 200 && d.length > 0 && sonrasiBos && bosSifir === 0;
+  if (proxyVar) {
+    const k = karsilastir(d, await proxyGun(BUGUN));
+    ek = `; proxy: null uyuşmazlığı ${k.nullUyusmaz}, uyuşmayan ${k.uyusmayan} (canlı günde yeni dönem yayımlanmış olabilir)`;
+    iyi = iyi && k.sifirUydurma === 0;
+  }
+  madde(3, `Bugün (${BUGUN}): yayımlanmamış dönemler boş, sırayla yayımlanıyor`, iyi ? GECTI : KALDI, `dönem ${d.length}, yayımlanan ${yayim}, yayımlanmamışta 0 değeri ${bosSifir}${ek}`);
+  if (YEREL && d.length) kontrolListesi.push(`Bugün ${tarihTR(BUGUN)}: tabloda ${yayim}/${d.length} dönem yayımlanmış görünmeli; ilk boş dönem ${ilkBos === -1 ? 'yok' : d[ilkBos].bas.slice(11, 16)} ("—" olmalı, 0 değil).`);
+}
+{
+  const hepsi = [...(dun.j ? dun.j.donemler : []), ...(bugun.j ? bugun.j.donemler : [])];
+  let tutarsiz = 0, turHatasi = 0;
+  for (const x of hepsi) {
+    for (const a of ['ptf', 'smf', 'pozitif', 'negatif', 'maliyetPozitif', 'maliyetNegatif']) if (!(x[a] === null || (typeof x[a] === 'number' && Number.isFinite(x[a])))) turHatasi++;
+    const mN = x.negatif !== null && x.ptf !== null ? Math.round((x.negatif - x.ptf) * 1e6) / 1e6 : null;
+    const mP = x.pozitif !== null && x.ptf !== null ? Math.round((x.ptf - x.pozitif) * 1e6) / 1e6 : null;
+    if ((mN === null) !== (x.maliyetNegatif === null) || (mN !== null && Math.abs(mN - x.maliyetNegatif) > 1e-6)) tutarsiz++;
+    if ((mP === null) !== (x.maliyetPozitif === null) || (mP !== null && Math.abs(mP - x.maliyetPozitif) > 1e-6)) tutarsiz++;
+    if (x.yon !== null && !['acik', 'fazla', 'denge'].includes(x.yon)) turHatasi++;
+  }
+  madde(4, 'Null/0 dürüstlüğü ve türetilmiş maliyet alanları', hepsi.length && !tutarsiz && !turHatasi ? GECTI : KALDI, `dönem ${hepsi.length}, tür hatası ${turHatasi}, maliyet tutarsızlığı ${tutarsiz}`);
+}
+
+// 7 — aylık aralık (5 ve 6 bu veriden)
+const AR_BAS = gunEkle(DUN, -29);
+const aralik = await jsonAl(`/dengesizlik-maliyeti/veri?bas=${AR_BAS}&bit=${DUN}&bicim=json`);
+const arCsv = await al(`/dengesizlik-maliyeti/veri?bas=${AR_BAS}&bit=${DUN}&bicim=csv`, { accept: '*/*' });
+const arXlsx = await al(`/dengesizlik-maliyeti/veri?bas=${AR_BAS}&bit=${DUN}&bicim=xlsx`, { accept: '*/*' });
+const uzun = await al(`/dengesizlik-maliyeti/veri?bas=${gunEkle(DUN, -31)}&bit=${DUN}&bicim=json`);
+const xlsxSatir = (bayt) => {
+  const m = new TextDecoder('latin1').decode(bayt);
+  const a = m.indexOf('<sheetData>'), b = m.indexOf('</sheetData>');
+  return a === -1 || b === -1 ? -1 : (m.slice(a, b).match(/<row /g) || []).length;
+};
+{
+  const d = aralik.j ? aralik.j.donemler : [];
+  const gunler = new Set(d.map((x) => x.bas.slice(0, 10)));
+  const csvSatir = arCsv.durum === 200 ? arCsv.metin.replace(/^﻿/, '').split('\r\n').filter(Boolean).length - 1 : -1;
+  const xs = arXlsx.durum === 200 ? xlsxSatir(arXlsx.bayt) - 1 : -1;
+  const iyi = aralik.durum === 200 && gunler.size === 30 && csvSatir === d.length && xs === d.length && uzun.durum === 400;
+  madde(7, `Aylık aralık (${AR_BAS} – ${DUN}) tek dosya, satırlar tutarlı; 32 gün → 400`, iyi ? GECTI : KALDI, `JSON ${aralik.durum} (${gunler.size} gün, ${d.length} dönem), CSV ${arCsv.durum} (${csvSatir} satır), XLSX ${arXlsx.durum} (${xs} satır), 32 gün ${uzun.durum}`);
+  if (YEREL && d.length) {
+    kontrolListesi.push(`Excel: /dengesizlik-maliyeti/veri?bas=${AR_BAS}&bit=${DUN}&bicim=xlsx ve &bicim=csv dosyalarını Excel'de açın:`);
+    kontrolListesi.push(`  ${d.length} veri satırı, sayılar sayısal hücre (sağa yaslı), ondalık virgül; "Bilgi" sayfası var; ilk satır ${d[0].bas.slice(0, 16)} PTF ${bicim(d[0].ptf)}, son satır ${d[d.length - 1].bas.slice(0, 16)} PTF ${bicim(d[d.length - 1].ptf)}.`);
+  }
+}
+// 5 + 6 — eşik altı ve formül karşılaştırması (yalnız kuralı doğrulanmış günler)
+{
+  const d = aralik.j ? aralik.j.donemler : [];
+  const kurallar = aralik.j ? aralik.j.kurallar : [];
+  let esikAlti = 0, eksiFiyat = 0, dogrulanmamisGun = 0, karsilastirilan = 0, farkli = 0, azamiFark = 0;
+  const gorulenGun = new Set();
+  for (const x of d) {
+    const g = x.bas.slice(0, 10);
+    const k = kuralFor(kurallar, g);
+    if (!k || k.dogrulandi !== true) { if (!gorulenGun.has(g)) { gorulenGun.add(g); dogrulanmamisGun++; } continue; }
+    if (x.dk !== 60 || !yayimlandi(x) || x.ptf === null || x.smf === null || !x.yon) continue;
+    if (Math.min(x.ptf, x.smf) < k.V) { esikAlti++; if (x.pozitif < 0) eksiFiyat++; }
+    const r = birimFiyat({ ptf: x.ptf, smfN: x.smf, smfP: x.smf, yon: x.yon }, k);
+    if (!r) continue;
+    karsilastirilan++;
+    const f = Math.max(Math.abs(r.negatif - x.negatif), Math.abs(r.pozitif - x.pozitif));
+    if (f > azamiFark) azamiFark = f;
+    if (f > 0.01 + 1e-9) farkli++;
+  }
+  if (esikAlti === 0) madde(5, 'Eşik altı dönemlerde pozitif fiyatın işareti', ATLANDI, `aralıkta kuralı doğrulanmış eşik altı dönem yok (doğrulanmamış gün ${dogrulanmamisGun})`);
+  else madde(5, 'Eşik altı dönemlerde pozitif fiyatın işareti', eksiFiyat === esikAlti ? GECTI : KALDI, `eşik altı ${esikAlti} dönem, eksi pozitif fiyat ${eksiFiyat}`);
+  if (!karsilastirilan) madde(6, 'Formül ile yayımlanan fiyat (doğrulanmış günler)', ATLANDI, `karşılaştırılabilir dönem yok (doğrulanmamış gün ${dogrulanmamisGun})`);
+  else madde(6, 'Formül ile yayımlanan fiyat (doğrulanmış günler): en büyük fark ≤ 0,01', farkli === 0 ? GECTI : KALDI, `karşılaştırılan ${karsilastirilan}, 0,01'den büyük fark ${farkli}, en büyük fark ${Math.round(azamiFark * 100) / 100}`);
+}
+
+// 8 — biçimler
+{
+  const tek = await al(`/dengesizlik-maliyeti/veri?tarih=${DUN}&bicim=csv`, { accept: '*/*' });
+  const tx = await al(`/dengesizlik-maliyeti/veri?tarih=${DUN}&bicim=xlsx`, { accept: '*/*' });
+  const satirlar = tek.metin.split('\r\n').filter(Boolean);
+  const bom = tek.bayt[0] === 0xef && tek.bayt[1] === 0xbb && tek.bayt[2] === 0xbf;
+  const sutun = satirlar.length ? satirlar[0].replace(/^﻿/, '').split(';').length : 0;
+  const kaynak = satirlar.slice(1).every((s) => s.endsWith(';EPİAŞ Şeffaflık Platformu'));
+  const virgul = satirlar.slice(1).some((s) => /;\d+,\d+;/.test(s)) && !satirlar.slice(1).some((s) => /;\d+\.\d+;/.test(s));
+  const xm = new TextDecoder('latin1').decode(tx.bayt);
+  const xlsxIyi = tx.bayt[0] === 0x50 && tx.bayt[1] === 0x4b && xm.includes('xl/worksheets/sheet2.xml') && xm.includes('name="Bilgi"');
+  const basliklar = [tek, tx, dun].every((r) => CEKILDI_RE.test(r.basliklar['x-veri-cekildi'] || '') && /^(true|false)$/.test(r.basliklar['x-veri-bayat'] || ''));
+  const iyi = tek.durum === 200 && bom && sutun === 12 && kaynak && virgul && tx.durum === 200 && xlsxIyi && basliklar;
+  madde(8, 'CSV/XLSX biçimi ve X-Veri-* başlıkları', iyi ? GECTI : KALDI, `CSV ${tek.durum} BOM ${bom} sütun ${sutun} kaynak ${kaynak} ondalık virgül ${virgul}; XLSX ${tx.durum} 2 sayfa ${xlsxIyi}; başlıklar ${basliklar}`);
+}
+
+// 9 — önbellek paylaşımı
+{
+  const [a, b] = await Promise.all([al(`/dengesizlik-maliyeti/veri?tarih=${DUN}&bicim=json`), al(`/dengesizlik-maliyeti/veri?tarih=${DUN}&bicim=json`)]);
+  const c = await al(`/dengesizlik-maliyeti/veri?tarih=${DUN}&bicim=csv`, { accept: '*/*' });
+  const u = [a, b, c, dun].map((r) => r.basliklar['x-veri-uretildi'] || '');
+  const iyi = [a, b, c].every((r) => r.durum === 200) && u.every((x) => x && x === u[0]);
+  madde(9, 'Önbellek penceresinde istemciler tek proxy yanıtını paylaşır', iyi ? GECTI : KALDI, `4 istek (iki eşzamanlı + farklı biçim + önceki), farklı X-Veri-Uretildi ${new Set(u).size}`);
+}
+
+// 12 — SSR kanıtı (JS'siz; düz fetch ve Googlebot)
+{
+  const jsonLd = (h) => { try { const m = /<script type="application\/ld\+json" id="dJsonLd">([\s\S]*?)<\/script>/.exec(h); return m ? JSON.parse(m[1])['@graph'] : []; } catch (e) { return []; } };
+  const satirHucre = (h, bas) => { const m = new RegExp(`<tr[^>]*data-bas="${bas.replace(/[+]/g, '\\+')}"[^>]*>([\\s\\S]*?)</tr>`).exec(h); return m ? [...m[1].matchAll(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/g)].map((c) => coz(c[1])) : null; };
+  const kanit = async (tarih, tarihli, ua) => {
+    for (let deneme = 0; deneme < 3; deneme++) {
+      const s = await al(`/dengesizlik-maliyeti${tarihli ? `?tarih=${tarih}` : ''}`, { accept: 'text/html', ua });
+      const j = await jsonAl(`/dengesizlik-maliyeti/veri?tarih=${tarih}&bicim=json`);
+      const sc = (/data-cekildi="([^"]+)"/.exec(s.metin) || [])[1];
+      if (!j.j || sc !== j.j.cekildi) { await new Promise((r) => setTimeout(r, 2000)); continue; }
+      const yay = j.j.donemler.filter(yayimlandi);
+      if (yay.length < 3) return { gecerli: false, neden: `yayımlanmış dönem ${yay.length}` };
+      const sec = [yay[0], yay[Math.floor(yay.length / 2)], yay[yay.length - 1]];
+      let hucre = 0, hucreTam = 0;
+      for (const d of sec) {
+        const c = satirHucre(s.metin, d.bas) || [];
+        for (const [i, v] of [[1, d.ptf], [2, d.smf], [4, d.pozitif], [5, d.negatif], [6, d.maliyetPozitif], [7, d.maliyetNegatif]]) { hucre++; if (c[i] === bicim(v)) hucreTam++; }
+      }
+      const ozetMetni = coz((/<p class="day-sum" id="dOzet">([\s\S]*?)<\/p>/.exec(s.metin) || [])[1] || '');
+      const o = j.j.ozet;
+      const ozetIyi = ozetMetni.startsWith(`${tarihTR(tarih)} dengesizlik özeti`) && [o.pozitifOrt, o.negatifOrt, o.ptfOrt, o.smfOrt, o.maliyetPozitifOrt, o.maliyetNegatifOrt].every((v) => ozetMetni.includes(`${bicim(v)} TL/MWh`))
+        && (o.yayimlanan === o.toplam || ozetMetni.includes(`pozitif dengesizlik fiyatı ${bicim(sec[2].pozitif)} TL/MWh`));
+      const graf = jsonLd(s.metin);
+      const ds = graf.find((n) => n['@type'] === 'Dataset') || {};
+      const wp = graf.find((n) => n['@type'] === 'WebPage') || {};
+      const ldIyi = tarihli ? ds.temporalCoverage === tarih && /tarih=/.test(wp.url || '') : ds.dateModified === j.j.cekildi && wp.dateModified === j.j.cekildi && ds.temporalCoverage === '2026-01-01/..';
+      const ldFiyatsiz = !/\d{1,3}(\.\d{3})*,\d{2}/.test(JSON.stringify(graf.filter((n) => n['@type'] !== 'FAQPage')));
+      return { gecerli: s.durum === 200 && /data-ssr="1"/.test(s.metin) && hucreTam === hucre && ozetIyi && ldIyi && ldFiyatsiz, hucre, hucreTam, ozetIyi, ldIyi, sec, durum: s.durum };
+    }
+    return { gecerli: false, neden: 'sayfa ile JSON aynı çekime ait değil (3 deneme)' };
+  };
+  const kosular = [];
+  for (const [tarih, tarihli] of [[BUGUN, false], [DUN, true]]) for (const ua of [null, GOOGLEBOT]) kosular.push({ tarih, tarihli, ua, k: await kanit(tarih, tarihli, ua) });
+  const hepsi = kosular.every((x) => x.k.gecerli);
+  const ozet = kosular.map((x) => `${x.tarihli ? 'tarihli' : 'tarihsiz'}/${x.ua ? 'Googlebot' : 'düz'}: ${x.k.neden ? x.k.neden : `hücre ${x.k.hucreTam}/${x.k.hucre}, özet ${x.k.ozetIyi}, JSON-LD ${x.k.ldIyi}`}`).join('; ');
+  madde(12, 'SSR kanıtı: JS\'siz HTML\'de 3 yayımlanmış dönem, özet cümlesi, JSON-LD', hepsi ? GECTI : KALDI, ozet);
+  if (YEREL) {
+    const b = kosular[0].k;
+    if (b.sec) {
+      kontrolListesi.push(`SSR (JS kapalı tarayıcıda ${TABAN.replace(/^https?:\/\//, '')}/dengesizlik-maliyeti): şu satırlar görünmeli:`);
+      for (const d of b.sec) kontrolListesi.push(`  ${d.bas.slice(11, 16)}  PTF ${bicim(d.ptf)} · SMF ${bicim(d.smf)} · pozitif ${bicim(d.pozitif)} · negatif ${bicim(d.negatif)}`);
+    }
+  }
+}
+
+// 13 — damga ve dizin
+{
+  const s = await al('/dengesizlik-maliyeti', { accept: 'text/html' });
+  const j = await jsonAl(`/dengesizlik-maliyeti/veri?tarih=${BUGUN}&bicim=json`);
+  const host = new URL(TABAN).hostname.toLowerCase();
+  const uretim = host === 'voltage.com.tr' || host === 'www.voltage.com.tr';
+  const robots = [...s.metin.matchAll(/<meta\s+name="robots"\s+content="([^"]*)"/gi)].map((m) => m[1]);
+  const dizin = uretim
+    ? s.basliklar['x-robots-tag'] === undefined && robots.length === 1 && robots[0].startsWith('index')
+    : s.basliklar['x-robots-tag'] === 'noindex, nofollow' && JSON.stringify(robots) === '["noindex, nofollow"]';
+  const veriBasligi = uretim ? dun.basliklar['x-robots-tag'] === 'noindex' : dun.basliklar['x-robots-tag'] === 'noindex, nofollow';
+  const canonical = /<link rel="canonical" href="https:\/\/voltage\.com\.tr\/dengesizlik-maliyeti">/.test(s.metin);
+  const zaman = (/<span class="live-stamp[^"]*" id="dDamga">[^<]*<time datetime="([^"]+)">/.exec(s.metin) || [])[1];
+  const mod = coz((/<span class="live-mode[^"]*" id="dMod">([\s\S]*?)<\/span>/.exec(s.metin) || [])[1] || '');
+  const damga = !!j.j && zaman === j.j.cekildi && (mod === 'SON SENKRON') === !!j.j.bayat;
+  madde(13, `Damga = cekildi; ${uretim ? 'üretim: dizine açık' : 'önizleme: noindex, nofollow'}; canonical voltage.com.tr`, dizin && veriBasligi && canonical && damga ? GECTI : KALDI, `dizin ${dizin}, veri ucu başlığı ${veriBasligi}, canonical ${canonical}, damga ${damga} (mod ${mod || '-'})`);
+}
+
+// 10 — bütçe (en sonda: eski gün bütçesini bilerek tüketir)
+{
+  const gunler = Array.from({ length: 16 }, (_, i) => gunEkle(DUN, -(40 + i * 9)));
+  const head = await Promise.all(gunler.slice(0, 4).map((g) => al(`/dengesizlik-maliyeti/veri?tarih=${g}&bicim=json`, { yontem: 'HEAD' })));
+  const yanit = await Promise.all(gunler.map((g) => al(`/dengesizlik-maliyeti/veri?tarih=${g}&bicim=json`)));
+  const uretildi = new Set(yanit.filter((r) => r.durum === 200).map((r) => r.basliklar['x-veri-uretildi']).filter(Boolean));
+  const durust = yanit.every((r) => r.durum === 200 || (r.durum === 503 && !!r.basliklar['retry-after']));
+  const headIyi = head.every((r) => r.durum === 200 && (r.basliklar['x-veri-durum'] === 'onbellekte-yok' || CEKILDI_RE.test(r.basliklar['x-veri-cekildi'] || '')));
+  const iyi = uretildi.size <= 12 && durust && headIyi;
+  madde(10, 'Ziyaretçi trafiği bütçeyi aşan proxy çağrısı doğurmaz; HEAD önbellekten', iyi ? GECTI : KALDI, `16 eşzamanlı eski gün: 200 ${yanit.filter((r) => r.durum === 200).length}, 503 ${yanit.filter((r) => r.durum === 503).length}, diğer ${yanit.filter((r) => r.durum !== 200 && r.durum !== 503).length}; farklı proxy yanıtı ${uretildi.size} (≤ 12); HEAD ${head.length} istek uygun ${headIyi}`);
+}
+
+// 11 — EPİAŞ kimliği yok (repo + canlı)
+{
+  const YASAK = [/giris\.epias/i, /cas\/v1/i, /reporting-service/i, /EPIAS_USERNAME/, /EPIAS_PASSWORD/, /\bTGT\b/];
+  const atifsiz = (m) => m.replace(/<a href="https:\/\/seffaflik\.epias\.com\.tr\/[^"]*"[^>]*>/g, '<a>');
+  let dosya = 0, repoBulgu = 0;
+  const gez = (yol) => { for (const ad of readdirSync(new URL(yol, KOK), { withFileTypes: true })) { const y = yol + ad.name; if (ad.isDirectory()) gez(y + '/'); else { dosya++; const m = readFileSync(new URL(y, KOK), 'utf8'); if (YASAK.some((r) => r.test(m))) repoBulgu++; } } };
+  try { gez('functions/'); } catch (e) { repoBulgu++; }
+  const sayfa = readFileSync(new URL('dengesizlik-maliyeti.html', KOK), 'utf8');
+  if (YASAK.some((r) => r.test(atifsiz(sayfa)))) repoBulgu++;
+  const hataSayfasi = await al('/dengesizlik-maliyeti/veri?tarih=abc', { accept: 'text/html' });
+  void hataSayfasi;
+  let canliBulgu = 0;
+  for (const g of gorulen) {
+    const m = atifsiz(g);
+    if (YASAK.some((r) => r.test(m)) || /authorization:|bearer\s/i.test(m) || (ANAHTAR && m.includes(ANAHTAR)) || (PROXY && m.includes(PROXY.replace(/^https?:\/\//, '')))) canliBulgu++;
+  }
+  madde(11, 'Sitede EPİAŞ kimliği ya da proxy belirteci yok (repo + canlı yanıtlar)', !repoBulgu && !canliBulgu && dosya > 0 ? GECTI : KALDI, `repo: ${dosya + 1} dosya, bulgu ${repoBulgu}; canlı: ${gorulen.length} yanıt, bulgu ${canliBulgu}`);
+}
+
+bitir();
+
+function bitir() {
+  sonuclar.sort((a, b) => a.no - b.no);
+  for (const s of sonuclar) console.log(`[${s.durum}] ${String(s.no).padStart(2)} ${s.ad} — ${s.ozet}`);
+  const say = (d) => sonuclar.filter((s) => s.durum === d).length;
+  console.log(`\n${say(GECTI)} geçti, ${say(KALDI)} kaldı, ${say(ATLANDI)} atlandı (${sonuclar.length} madde)`);
+  if (YEREL && kontrolListesi.length) {
+    console.log('\n--- İNSAN DENETİMİ KONTROL LİSTESİ (yalnız --yerel; CI günlüğüne koymayın) ---');
+    for (const k of kontrolListesi) console.log(k);
+  }
+  process.exit(say(KALDI) ? 1 : 0);
+}

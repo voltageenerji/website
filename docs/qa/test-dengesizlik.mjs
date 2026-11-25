@@ -1537,6 +1537,52 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
   ok('C1 veri ucu kurallar: dogrulama alanlari ve belgeleri', j.kurallar.length === 2 && j.kurallar[0].dogrulama === 'bekliyor' && j.kurallar[0].dogrulandi === false && j.kurallar[1].dogrulama === 'birincil' && j.kurallar[1].dogrulandi === true && ['dogrulama', 'tavanDogrulama', 'dogrulandi'].every((a) => typeof j.kuralAlanlari[a] === 'string'));
 }
 
+
+// ============================================================================
+// REVİZYON 3 / D — kabul denetimi betiği (docs/qa/kabul-dengesizlik.mjs) yerel sahte ortamda
+// ============================================================================
+{
+  const { sunucuBaslat } = await import('./dengesizlik-test-sunucu.mjs');
+  const { createServer } = await import('node:http');
+  const { execFile } = await import('node:child_process');
+  // Bugün 11/24 yayımlanmış; her gün 04:00 eşik altı (eksi pozitif fiyat) — UYDURMA test verisi
+  const OZEL = { ptf: 450, smf: 60, pozitif: -106, negatif: 463.5, yon: 'fazla', yonHam: 'Enerji Fazlası' };
+  const S = await sunucuBaslat({ host: 'claude-voltan-orchestrator-a.website-dh5.pages.dev', gun: (g) => sahteGun(g, g === BUGUN ? 11 : 24).map((o, i) => (i === 4 ? { ...o, ...OZEL } : o)) });
+  const P = createServer(async (req, res) => {
+    try {
+      const r = await S.proxy.fetch(SAHTE_ENV.PIYASA_VERI_URL + req.url, { method: 'GET', headers: { Authorization: req.headers.authorization || '', Accept: 'application/json' } });
+      res.writeHead(r.status, { 'Content-Type': 'application/json' }); res.end(Buffer.from(await r.arrayBuffer()));
+    } catch (e) { res.writeHead(500); res.end(); }
+  });
+  await new Promise((coz) => P.listen(0, '127.0.0.1', coz));
+  const kos = (ek = [], env = {}) => new Promise((coz) => execFile(process.execPath, [new URL('./kabul-dengesizlik.mjs', import.meta.url).pathname, ...ek], { cwd: gecici, env: { PATH: process.env.PATH, KABUL_TABAN: S.url, KABUL_ZAMAN_ASIMI_MS: '8000', ...env }, timeout: 120000 }, (hata, cikti) => coz({ kod: hata ? hata.code : 0, cikti: String(cikti) })));
+  const proxyEnv = { KABUL_PROXY_URL: `http://127.0.0.1:${P.address().port}`, KABUL_PROXY_ANAHTAR: SAHTE_ENV.PIYASA_VERI_ANAHTAR };
+  const a = await kos([], proxyEnv);
+  const satir = (no) => a.cikti.split('\n').find((l) => new RegExp(`^\\[[^\\]]+\\] +${no} `).test(l)) || '';
+  ok('D kabul (proxy ile): cikis 0, 13 madde, kalan yok', a.kod === 0 && /\n12 geçti, 0 kaldı, 1 atlandı \(13 madde\)/.test(a.cikti) || (a.kod === 0 && /\n13 geçti, 0 kaldı, 0 atlandı \(13 madde\)/.test(a.cikti)), `-> ${a.kod}\n${a.cikti}`);
+  ok('D kabul: her madde tek satir', [...Array(13)].every((_, i) => satir(i + 1) !== ''));
+  ok('D kabul: proxy karsilastirmasi yapildi (dun birebir)', /proxy: \d+ değer, uyuşmayan 0, null uyuşmazlığı 0, en büyük fark 0/.test(satir(2)));
+  ok('D kabul: esik alti isaret ve formul maddesi gecti', satir(5).startsWith('[GEÇTİ]') && /eksi pozitif fiyat \d+/.test(satir(5)) && satir(6).startsWith('[GEÇTİ]'));
+  ok('D kabul: SSR kaniti 4 kosu (tarihsiz/tarihli x duz/Googlebot)', satir(12).startsWith('[GEÇTİ]') && (satir(12).match(/hücre 18\/18/g) || []).length === 4);
+  ok('D kabul: onizleme hostunda noindex, nofollow denetlendi', satir(13).startsWith('[GEÇTİ]') && satir(13).includes('önizleme'));
+  ok('D kabul: butce maddesi (farkli proxy yaniti <= 12, durust 503)', satir(10).startsWith('[GEÇTİ]') && /503 \d+, diğer 0/.test(satir(10)));
+  ok('D kabul ciktisi CI-guvenli: fiyat, belirtec, proxy adresi, ham satir yok', !/\d{1,3}(\.\d{3})*,\d{2}/.test(a.cikti.replace(/0,01/g, '')) /* esik metni "0,01" fiyat degil */ && !a.cikti.includes(SAHTE_ENV.PIYASA_VERI_ANAHTAR) && !a.cikti.includes('127.0.0.1') && !a.cikti.includes('ornek.invalid') && !/"ptf"|"donemler"|KONTROL LİSTESİ/.test(a.cikti), `-> ${a.cikti}`);
+  const b = await kos([]);
+  ok('D kabul (proxy yok): proxy karsilastirmalari atlanir, yine kalan yok', b.kod === 0 && b.cikti.includes('proxy karşılaştırması: kapalı') && b.cikti.includes('proxy karşılaştırması atlandı'), `-> ${b.kod}\n${b.cikti.slice(-600)}`);
+  const c = await kos(['--yerel'], proxyEnv);
+  ok('D kabul --yerel: insan denetimi listesi kesin degerlerle (Seffaflik ekrani, Excel, SSR)', c.cikti.includes('KONTROL LİSTESİ') && c.cikti.includes('Şeffaflık ekranı') && c.cikti.includes("Excel'de açın") && /PTF \d{1,3}(\.\d{3})*,\d{2}/.test(c.cikti) && !c.cikti.includes(SAHTE_ENV.PIYASA_VERI_ANAHTAR));
+  const d = await kos([], { KABUL_TABAN: '' });
+  ok('D kabul: KABUL_TABAN yoksa cikis 2', d.kod === 2);
+  const e = await kos([], { ...proxyEnv, KABUL_PROXY_ANAHTAR: 'yanlis-belirtec' });
+  ok('D kabul: yanlis proxy belirteci -> proxy karsilastirmasi KALIR (sessiz gecmez), belirtec basilmaz', e.kod === 1 && /\[KALDI\] +2 /.test(e.cikti) && !e.cikti.includes('yanlis-belirtec'));
+  S.ayarla({});
+  S.ayarla({ env: {}, host: 'claude-voltan-orchestrator-a.website-dh5.pages.dev' });
+  const f = await kos([]);
+  ok('D kabul: baglanti yokken madde 1 KALIR, cikis 1', f.kod === 1 && /\[KALDI\] +1 /.test(f.cikti));
+  await S.kapat();
+  await new Promise((coz) => P.close(coz));
+}
+
 console.error = gercekHata;
 console.warn = gercekUyari;
 rmSync(gecici, { recursive: true, force: true });
