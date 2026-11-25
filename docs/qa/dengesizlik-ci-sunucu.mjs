@@ -30,7 +30,8 @@ document.addEventListener('securitypolicyviolation',function(e){h.push('csp:'+e.
 function metin(id){var e=document.getElementById(id);return e?e.textContent.replace(/\\s+/g,' ').trim():null}
 function rapor(ek){var d=document.documentElement,r={yol:location.pathname+location.search,ua:navigator.userAgent,w:innerWidth,h:innerHeight,dpr:devicePixelRatio,
 satir:document.querySelectorAll('#dTablo tr[data-bas]').length,tasma:d.scrollWidth>d.clientWidth,ozet:(metin('dOzet')||'').slice(0,40),mod:metin('dMod'),
-kapKayar:(function(k){return k?k.scrollWidth>k.clientWidth:null})(document.getElementById('dTabloSar')),hata:h.slice(0,10)};
+kapKayar:(function(k){return k?k.scrollWidth>k.clientWidth:null})(document.getElementById('dTabloSar')),hata:h.slice(0,10),
+olcu:['dBicim','sYon','hDonem','hMiktar','dTarih'].map(function(id){var e=document.getElementById(id);if(!e)return id+':-';var b=e.getBoundingClientRect();return id+':'+Math.round(b.height)+'px/'+parseFloat(getComputedStyle(e).fontSize)+'px'}).join(' ')};
 for(var k in ek)r[k]=ek[k];try{fetch('/__qa/rapor',{method:'POST',body:JSON.stringify(r)})}catch(e){}}
 addEventListener('load',function(){setTimeout(function(){
  if(/[?&]qa=hesap/.test(location.search)){var ek={};try{

@@ -18,6 +18,7 @@ env:
 
 jobs:
   linux:
+    if: ${{ false }} # 1. ve 2. koşuda tamamlandı (run 45588821697, 45591049475)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -113,7 +114,7 @@ jobs:
               ios=re.search(r'OS (\d+[_\d]*)',x.get('ua','')); ios=ios.group(1).replace('_','.') if ios else '?'
               ozel=''
               if 'gunTutar' in x: ozel=' gün hesabı doğru: %s · senaryo doğru: %s'%(x.get('gunTutar')=='11.484,50 TL', x.get('senNeg')=='3.604,00 TL/MWh' and x.get('senPoz')=='2.716,00 TL/MWh' and x.get('senTutar')=='36.040,00 TL')
-              print(' iOS %s · %sx%s@%s · satır %s · yatay taşma %s · tablo kabı kayar %s · JS hata %d%s'%(ios,x.get('w'),x.get('h'),x.get('dpr'),x.get('satir'),x.get('tasma'),x.get('kapKayar'),len(x.get('hata',[])),ozel))
+              print(' iOS %s · %sx%s@%s · satır %s · yatay taşma %s · tablo kabı kayar %s · JS hata %d%s · ölçü %s'%(ios,x.get('w'),x.get('h'),x.get('dpr'),x.get('satir'),x.get('tasma'),x.get('kapKayar'),len(x.get('hata',[])),ozel,x.get('olcu')))
           PY
       - name: Playwright WebKit (macOS) — iPhone 15 tanımlayıcısı + masaüstü + tarayıcı paketi
         working-directory: ${{ runner.temp }}
@@ -154,7 +155,7 @@ jobs:
           mkdir -p qa && cd qa && npm init -y >/dev/null
           set +e
           npm install --no-audit --no-fund "@guidepup/guidepup@0.39.0" "@guidepup/setup@0.29.3" "selenium-webdriver@${SELENIUM_SURUM}" > ../npm.log 2>&1; echo "npm çıkış $?"; grep -E 'ERR|error' ../npm.log | head -8 | cut -c1-200
-          ./node_modules/.bin/guidepup --ci > ../setup.log 2>&1; echo "guidepup kurulum çıkış $?"; tail -5 ../setup.log | cut -c1-200
+          ./node_modules/.bin/guidepup setup --ci > ../setup.log 2>&1; echo "guidepup kurulum çıkış $?"; tail -5 ../setup.log | cut -c1-200
           sudo safaridriver --enable; echo "safaridriver $?"
       - name: VoiceOver + Safari
         working-directory: ${{ runner.temp }}
@@ -171,6 +172,7 @@ jobs:
         with: { name: macos-voiceover-cikti, path: '${{ runner.temp }}/cikti', retention-days: 1 }
 
   windows-openxml:
+    if: ${{ false }} # 1. ve 2. koşuda tamamlandı
     runs-on: windows-latest
     timeout-minutes: 10
     steps:
