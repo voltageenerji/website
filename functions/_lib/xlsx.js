@@ -1,6 +1,6 @@
 /**
- * Bağımlılıksız, en küçük XLSX yazıcı (tek sayfa).
- *   xlsxYaz({sayfaAdi, basliklar, satirlar, sutunlar?}) → Uint8Array
+ * Bağımlılıksız, en küçük XLSX yazıcı (bir ya da birkaç sayfa).
+ *   xlsxYaz({sayfaAdi, basliklar, satirlar, sutunlar?, ekSayfalar?}) → Uint8Array
  * - Sıkıştırmasız (stored) ZIP + CRC-32; Workers çalışma zamanında çalışır.
  * - Sayı → sayısal hücre (Excel'de toplanabilir); metin → satır içi metin
  *   (inlineStr); null / undefined / '' → hücre YOK (boş kalır, 0 yazılmaz).
@@ -105,12 +105,11 @@ export function zipYaz(dosyalar) {
 
 const XML_BAS = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
 
-export function xlsxYaz({ sayfaAdi, basliklar, satirlar, sutunlar } = {}) {
+/** Tek sayfanın XML'i. Biçemler: 0 genel · 1 başlık (kalın) · 2 iki ondalık (yerleşik biçim 4: #,##0.00) */
+function sayfaXml({ basliklar, satirlar, sutunlar }) {
   const bas = Array.isArray(basliklar) ? basliklar : [];
   const sat = Array.isArray(satirlar) ? satirlar : [];
   const sut = Array.isArray(sutunlar) ? sutunlar : [];
-
-  // Biçemler: 0 genel · 1 başlık (kalın) · 2 iki ondalık (yerleşik biçim 4: #,##0.00)
   const hucre = (deger, r, c, baslik) => {
     const ref = sutunHarfi(c) + r;
     if (typeof deger === 'number' && Number.isFinite(deger)) {
@@ -119,7 +118,6 @@ export function xlsxYaz({ sayfaAdi, basliklar, satirlar, sutunlar } = {}) {
     if (deger === null || deger === undefined || deger === '' || typeof deger === 'number') return '';
     return `<c r="${ref}" t="inlineStr"${baslik ? ' s="1"' : ''}><is><t xml:space="preserve">${xmlKacis(deger)}</t></is></c>`;
   };
-
   let veri = '';
   let r = 1;
   if (bas.length) veri += `<row r="${r}">${bas.map((b, c) => hucre(String(b), r, c, true)).join('')}</row>`, r++;
@@ -127,17 +125,30 @@ export function xlsxYaz({ sayfaAdi, basliklar, satirlar, sutunlar } = {}) {
     veri += `<row r="${r}">${(Array.isArray(satir) ? satir : []).map((v, c) => hucre(v, r, c, false)).join('')}</row>`;
     r++;
   }
-
   const genislik = Math.max(bas.length, ...sat.map((x) => (Array.isArray(x) ? x.length : 0)), 1);
   let cols = '';
   for (let c = 0; c < genislik; c++) {
     const g = sut[c] && Number.isFinite(sut[c].genislik) ? sut[c].genislik : Math.min(40, Math.max(10, String(bas[c] || '').length + 2));
     cols += `<col min="${c + 1}" max="${c + 1}" width="${g}" customWidth="1"/>`;
   }
-
-  const sayfa = `${XML_BAS}<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">`
+  return `${XML_BAS}<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">`
     + (bas.length ? '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' : '')
     + `<cols>${cols}</cols><sheetData>${veri}</sheetData></worksheet>`;
+}
+
+/**
+ * xlsxYaz({sayfaAdi, basliklar, satirlar, sutunlar?, ekSayfalar?}) → Uint8Array
+ * ekSayfalar: [{sayfaAdi, basliklar, satirlar, sutunlar?}] — ilk sayfadan sonra eklenir.
+ */
+export function xlsxYaz({ sayfaAdi, basliklar, satirlar, sutunlar, ekSayfalar } = {}) {
+  const sayfalar = [{ sayfaAdi, basliklar, satirlar, sutunlar }, ...(Array.isArray(ekSayfalar) ? ekSayfalar : [])];
+  // Sayfa adları benzersiz olmalı (Excel aynı adı kabul etmez).
+  const adlar = [];
+  for (const sf of sayfalar) {
+    let ad = sayfaAdiTemizle(sf.sayfaAdi);
+    for (let n = 2; adlar.some((x) => x.toLocaleLowerCase('tr') === ad.toLocaleLowerCase('tr')); n++) ad = `${sayfaAdiTemizle(sf.sayfaAdi).slice(0, 28)} ${n}`;
+    adlar.push(ad);
+  }
 
   const bicemler = `${XML_BAS}<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">`
     + '<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>'
@@ -153,13 +164,13 @@ export function xlsxYaz({ sayfaAdi, basliklar, satirlar, sutunlar } = {}) {
     + '</styleSheet>';
 
   const kitap = `${XML_BAS}<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">`
-    + `<sheets><sheet name="${xmlKacis(sayfaAdiTemizle(sayfaAdi))}" sheetId="1" r:id="rId1"/></sheets></workbook>`;
+    + `<sheets>${adlar.map((ad, i) => `<sheet name="${xmlKacis(ad)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets></workbook>`;
 
   const turler = `${XML_BAS}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">`
     + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
     + '<Default Extension="xml" ContentType="application/xml"/>'
     + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
-    + '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+    + adlar.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')
     + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
     + '</Types>';
 
@@ -168,8 +179,8 @@ export function xlsxYaz({ sayfaAdi, basliklar, satirlar, sutunlar } = {}) {
     + '</Relationships>';
 
   const kitapIliski = `${XML_BAS}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`
-    + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
-    + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+    + adlar.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')
+    + `<Relationship Id="rId${adlar.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>`
     + '</Relationships>';
 
   const dosya = (ad, metin) => ({ ad, veri: kodlayici.encode(metin) });
@@ -179,6 +190,6 @@ export function xlsxYaz({ sayfaAdi, basliklar, satirlar, sutunlar } = {}) {
     dosya('xl/workbook.xml', kitap),
     dosya('xl/_rels/workbook.xml.rels', kitapIliski),
     dosya('xl/styles.xml', bicemler),
-    dosya('xl/worksheets/sheet1.xml', sayfa),
+    ...sayfalar.map((sf, i) => dosya(`xl/worksheets/sheet${i + 1}.xml`, sayfaXml(sf))),
   ]);
 }

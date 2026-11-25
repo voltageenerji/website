@@ -6,7 +6,7 @@
 import {
   KURALLAR, TAVANLAR, kuralBul, tavanBul, sayi, temiz, yonCoz, birimFiyat, ogelerCikar, donemler,
   ozet, donemlerAyrintili, sayfaBilgisi, gunSinirlari, aralikSinirlari, tarihGecerli, ymdGecerli, gunEkle, gunFarki, gunIzgarasi,
-  yayimlandi, veriVar, donemEtiketi, istanbulBugun, istanbulDakika, ATIF,
+  yayimlandi, veriVar, donemEtiketi, istanbulBugun, istanbulDakika, ATIF, NOT_ORTALAMA, KURAL_DOGRULAMA, kuralDilimleri, formulFarki,
 } from '../../functions/_lib/dengesizlik.js';
 import { sahteGun, sahteEpias, sahteCache, sahteKv, SABIT_AN, SAHTE_ENV } from './dengesizlik-test-verisi.mjs';
 import { gunGetir, aralikGetir, _bellekTemizle, BUTCE, sayaclar } from '../../functions/_lib/epias.js';
@@ -300,6 +300,9 @@ ok('ozet dizi degil', ozet(null).toplam === 0);
 const loglar = [];
 const gercekHata = console.error;
 console.error = (...a) => { loglar.push(a.map(String).join(' ')); };
+const uyarilar = [];
+const gercekUyari = console.warn;
+console.warn = (...a) => { uyarilar.push(a.map(String).join(' ')); };
 
 const BUGUN = '2026-11-24';   // SABIT_AN'ın İstanbul günü
 const DUN = '2026-11-23';
@@ -848,7 +851,12 @@ for r in sh.find('m:sheetData', ns):
         if t == 'inlineStr': row.append([c.get('r'), 's', ''.join(x.text or '' for x in c.iter('{%s}t' % ns['m']))])
         else: row.append([c.get('r'), 'n', c.find('m:v', ns).text, c.get('s')])
     rows.append(row)
-print(json.dumps({'bad': bad, 'names': names, 'rows': rows, 'sheet': wb.find('m:sheets', ns)[0].get('name'), 'stored': all(i.compress_type == 0 for i in z.infolist())}))
+sheets = [x.get('name') for x in wb.find('m:sheets', ns)]
+rows2 = []
+if 'xl/worksheets/sheet2.xml' in names:
+    for r in ET.fromstring(z.read('xl/worksheets/sheet2.xml')).find('m:sheetData', ns):
+        rows2.append([''.join(x.text or '' for x in c.iter('{%s}t' % ns['m'])) for c in r])
+print(json.dumps({'bad': bad, 'names': names, 'rows': rows, 'rows2': rows2, 'sheets': sheets, 'sheet': sheets[0], 'stored': all(i.compress_type == 0 for i in z.infolist())}))
 `;
 const xlsxOku = (bayt) => {
   const yol = join(gecici, 'x.xlsx');
@@ -902,7 +910,9 @@ const ucCtx = (sorgu, ayar = {}, env = SAHTE_ENV, yontem = 'GET') => {
   ok('uc JSON cekildi', j.cekildi === '2026-11-24T14:30:00+03:00');
   ok('uc JSON kural atfi', j.kurallar.length === 1 && j.kurallar[0].V === 100 && j.kurallar[0].AFL === 4500 && /14911/.test(j.kurallar[0].kaynak.V) && /14030/.test(j.kurallar[0].kaynak.katsayi) && /14459/.test(j.kurallar[0].kaynak.tavan));
   ok('uc JSON atif satiri', j.atif.startsWith('Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği') && j.atif.endsWith('24 Kasım 2026 itibarıyla.'));
-  ok('uc JSON not: yayimlandigi haliyle + revize edilebilir', /yayımlandığı hâliyle/.test(j.not) && /revize edilebilir/.test(j.not) && /teklif ya da taahhüt değildir/.test(j.not));
+  ok('uc JSON not: yayimlandigi haliyle + revize + agirliksiz ortalama + tavsiye degil', /yayımlandığı hâliyle/.test(j.not) && /revize edilebilir/.test(j.not) && j.not.includes(NOT_ORTALAMA) && j.not.endsWith('yatırım, ticari karar ya da hukuki tavsiye, teklif ya da taahhüt değildir.') && j.not.includes('mevzuatta tanımlı bir terim değildir') && j.not.includes('kaynağı "EPİAŞ Şeffaflık Platformu" olarak gösterin'));
+  ok('uc JSON basliklari: X-Veri-Cekildi + X-Veri-Bayat', r2.headers.get('X-Veri-Cekildi') === j.cekildi && r2.headers.get('X-Veri-Bayat') === 'false');
+  ok('uc JSON alan aciklamalari yeni adlarla, ANAHTARLAR ayni', /^Pozitif dengesizlik maliyeti \(PTF'ye göre\)/.test(j.alanlar.maliyetPozitif) && /^Negatif dengesizlik maliyeti \(PTF'ye göre\)/.test(j.alanlar.maliyetNegatif) && j.alanlar.maliyetNegatif.endsWith('Voltage Enerji türetimi') && 'maliyetPozitif' in j.donemler[0] && 'maliyetNegatifOrt' in j.ozet && 'pozitifOrt' in j.ozet && 'negatifOrt' in j.ozet);
   ok('uc JSON alan belgeleri donem alanlariyla ayni', JSON.stringify(Object.keys(j.alanlar)) === JSON.stringify(Object.keys(j.donemler[0])));
   ok('uc JSON 24 donem', j.donemler.length === 24 && j.ozet.toplam === 24 && j.ozet.yayimlanan === 24);
   ok('uc JSON donem alanlari', j.donemler[0].bas === '2026-11-23T00:00:00+03:00' && j.donemler[0].bit === '2026-11-23T01:00:00+03:00' && j.donemler[0].dk === 60 && j.donemler[0].ptf === 2000 && j.donemler[0].yon === 'acik');
@@ -932,10 +942,11 @@ const ucCtx = (sorgu, ayar = {}, env = SAHTE_ENV, yontem = 'GET') => {
   ok('uc CSV UTF-8 BOM', bayt[0] === 0xef && bayt[1] === 0xbb && bayt[2] === 0xbf);
   const sat = metin.replace(/^﻿/, '').split('\r\n');
   ok('uc CSV CRLF, 1 baslik + 24 satir', sat.length === 26 && sat[25] === '');
-  ok('uc CSV Turkce baslik, ; ayirici', sat[0].split(';').length === 11 && sat[0].startsWith('Tarih;Dönem başlangıcı;Dönem bitişi;Süre (dk);PTF (TL/MWh);SMF (TL/MWh);Sistem yönü;Pozitif dengesizlik fiyatı (TL/MWh);Negatif dengesizlik fiyatı (TL/MWh);'));
-  ok('uc CSV ilk satir', sat[1] === '2026-11-24;00:00;01:00;60;2000;2300;Enerji açığı;1940;2438;60;438', `-> ${sat[1]}`);
-  ok('uc CSV ondalik VIRGUL, eksi isareti ASCII', sat[2] === '2026-11-24;01:00;02:00;60;2010;60,5;Enerji fazlası;-106;2070,3;2116;60,3', `-> ${sat[2]}`);
-  ok('uc CSV yayimlanmamis hucre BOS (0 degil)', sat[3] === '2026-11-24;02:00;03:00;60;2020;;;;;;', `-> ${sat[3]}`);
+  ok('uc CSV Turkce baslik, ; ayirici, 12 sutun', sat[0].split(';').length === 12 && sat[0] === "Tarih;Dönem başlangıcı;Dönem bitişi;Süre (dk);PTF (TL/MWh);SMF (TL/MWh);Sistem yönü;Pozitif dengesizlik fiyatı (TL/MWh);Negatif dengesizlik fiyatı (TL/MWh);Pozitif dengesizlik maliyeti (PTF'ye göre) (TL/MWh) — Voltage Enerji türetimi;Negatif dengesizlik maliyeti (PTF'ye göre) (TL/MWh) — Voltage Enerji türetimi;Kaynak", `-> ${sat[0]}`);
+  ok('uc CSV ilk satir (son sutun Kaynak)', sat[1] === '2026-11-24;00:00;01:00;60;2000;2300;Enerji açığı;1940;2438;60;438;EPİAŞ Şeffaflık Platformu', `-> ${sat[1]}`);
+  ok('uc CSV ondalik VIRGUL, eksi isareti ASCII', sat[2] === '2026-11-24;01:00;02:00;60;2010;60,5;Enerji fazlası;-106;2070,3;2116;60,3;EPİAŞ Şeffaflık Platformu', `-> ${sat[2]}`);
+  ok('uc CSV yayimlanmamis hucre BOS (0 degil)', sat[3] === '2026-11-24;02:00;03:00;60;2020;;;;;;;EPİAŞ Şeffaflık Platformu', `-> ${sat[3]}`);
+  ok('uc CSV basliklari: X-Veri-Cekildi + X-Veri-Bayat', r2.headers.get('X-Veri-Cekildi') === '2026-11-24T14:30:00+03:00' && r2.headers.get('X-Veri-Bayat') === 'false');
   ok('uc CSV son donem 23:00-24:00', sat[24].startsWith('2026-11-24;23:00;24:00;60;2230;'));
   ok('uc CSV nokta ondalik YOK', !/\d\.\d/.test(sat.slice(1).join('\n').replace(/2026-11-24/g, '')));
 }
@@ -947,8 +958,10 @@ const ucCtx = (sorgu, ayar = {}, env = SAHTE_ENV, yontem = 'GET') => {
   writeFileSync(join(gecici, 'gun.xlsx'), bayt);
   const x = xlsxOku(bayt);
   ok('uc XLSX gecerli ZIP + XML', x.bad === null && x.sheet === '2026-11-23');
-  ok('uc XLSX 1 baslik + 24 satir, 11 sutun', x.rows.length === 25 && x.rows[0].length === 11 && x.rows[1].length === 11);
-  ok('uc XLSX baslik = CSV basligi', x.rows[0][4][2] === 'PTF (TL/MWh)' && x.rows[0][10][2] === "PTF'ye göre maliyet, negatif dengesizlik (TL/MWh)");
+  ok('uc XLSX 1 baslik + 24 satir, 12 sutun', x.rows.length === 25 && x.rows[0].length === 12 && x.rows[1].length === 12);
+  ok('uc XLSX baslik = CSV basligi', x.rows[0][4][2] === 'PTF (TL/MWh)' && x.rows[0][10][2] === "Negatif dengesizlik maliyeti (PTF'ye göre) (TL/MWh) — Voltage Enerji türetimi" && x.rows[0][9][2] === "Pozitif dengesizlik maliyeti (PTF'ye göre) (TL/MWh) — Voltage Enerji türetimi" && x.rows[0][11][2] === 'Kaynak' && x.rows[1][11][2] === 'EPİAŞ Şeffaflık Platformu');
+  ok('uc XLSX ikinci sayfa "Bilgi": atif, not, cekilme zamani, bayat', JSON.stringify(x.sheets) === '["2026-11-23","Bilgi"]' && x.rows2[0].join('|') === 'Alan|Değer' && x.rows2.some((r) => r[0] === 'Atıf' && r[1] === ATIF) && x.rows2.some((r) => r[0] === 'Not' && r[1].includes(NOT_ORTALAMA)) && x.rows2.some((r) => r[0] === "EPİAŞ'tan alındığı an" && r[1] === '2026-11-24T14:30:00+03:00') && x.rows2.some((r) => r[0] === 'Önceki senkrondan mı (bayat)' && r[1] === 'Hayır') && x.rows2.some((r) => r[0] === 'Kaynak' && r[1] === 'EPİAŞ Şeffaflık Platformu'), `-> ${JSON.stringify(x.sheets)} ${JSON.stringify(x.rows2.map((r) => r[0]))}`);
+  ok('uc XLSX basliklari: X-Veri-Cekildi + X-Veri-Bayat', r2.headers.get('X-Veri-Cekildi') === '2026-11-24T14:30:00+03:00' && r2.headers.get('X-Veri-Bayat') === 'false');
   ok('uc XLSX fiyatlar SAYISAL hucre', x.rows[1][4][1] === 'n' && x.rows[1][4][2] === '2000' && x.rows[1][8][1] === 'n' && x.rows[1][8][2] === '2438' && x.rows[1][10][2] === '438');
   ok('uc XLSX sure tam sayi, yon metin', x.rows[1][3][1] === 'n' && x.rows[1][3][2] === '60' && x.rows[1][6][1] === 's' && x.rows[1][6][2] === 'Enerji açığı');
 }
@@ -970,7 +983,8 @@ const ucCtx = (sorgu, ayar = {}, env = SAHTE_ENV, yontem = 'GET') => {
   ok('uc aralik iki kural dilimi bildirir (V 150 ve 100)', j3.kurallar.length === 2 && j3.kurallar[0].V === 150 && j3.kurallar[1].V === 100);
   const c4 = ucCtx('?bas=2026-03-25&bit=2026-04-10');
   const j4 = await (await veriUcu.onRequestGet(c4.ctx)).json();
-  ok('uc aralik tavan degisimi (4/4/2026) ayri bildirilir', j4.kurallar.length === 2 && j4.kurallar[0].AFL === null && j4.kurallar[1].AFL === 4500);
+  ok('uc aralik tavan degisimi (4/4/2026) ayri ve AYIRT EDILIR girdiler', j4.kurallar.length === 2 && j4.kurallar[0].AFL === null && j4.kurallar[1].AFL === 4500 && j4.kurallar[0].bas === '2026-01-01' && j4.kurallar[0].bit === '2026-04-03' && j4.kurallar[1].bas === '2026-04-04' && j4.kurallar[1].bit === '2026-10-31' && j4.kurallar[1].tavanBas === '2026-04-04' && j4.kurallar[0].tavanBas === null);
+  ok('uc JSON kuralAlanlari tavanBas dahil her alani belgeler', JSON.stringify(Object.keys(j4.kuralAlanlari)) === JSON.stringify(Object.keys(j4.kurallar[0])) && /yürürlüğe girdiği gün/.test(j4.kuralAlanlari.tavanBas));
 }
 // 400 yolları
 for (const [sorgu, kod] of [
@@ -979,6 +993,7 @@ for (const [sorgu, kod] of [
   ['?tarih=2026-11-23&bicim=pdf', 'gecersiz-bicim'], ['?bas=2026-11-01', 'gecersiz-tarih'], ['?bit=2026-11-01', 'gecersiz-tarih'],
   ['?bas=2026-11-10&bit=2026-11-01', 'gecersiz-aralik'], ['?bas=2026-10-01&bit=2026-11-24', 'aralik-uzun'], ['?bas=2026-10-24&bit=2026-11-24', 'aralik-uzun'],
   ['?bas=2026-11-20&bit=2026-11-30', 'tarih-aralik-disi'], ['?bas=2025-12-20&bit=2026-01-05', 'tarih-aralik-disi'],
+  ['?tarih=2026-11-23&bas=2026-11-01&bit=2026-11-05', 'celisen-parametre'], ['?tarih=2026-11-23&bit=2026-11-05', 'celisen-parametre'],
 ]) {
   const { ctx, e } = ucCtx(sorgu);
   const r2 = await veriUcu.onRequestGet(ctx);
@@ -1006,7 +1021,12 @@ for (const [ad, ayar, env, sorgu] of [
   e.ilerlet(6 * 60 * 1000); e.ayar.raporDurum = 500;
   const r2 = await veriUcu.onRequestGet({ ...ctx, request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=2026-11-24') });
   const j = await r2.json();
-  ok('uc bayat veri: 200, bayat:true, ilk cekim zamani, 60 sn onbellek', r2.status === 200 && j.bayat === true && j.cekildi === '2026-11-24T14:30:00+03:00' && r2.headers.get('Cache-Control') === 'public, max-age=60');
+  ok('uc bayat veri: 200, bayat:true, ilk cekim zamani, 60 sn onbellek, X-Veri-Bayat', r2.status === 200 && j.bayat === true && j.cekildi === '2026-11-24T14:30:00+03:00' && r2.headers.get('Cache-Control') === 'public, max-age=60' && r2.headers.get('X-Veri-Bayat') === 'true' && r2.headers.get('X-Veri-Cekildi') === '2026-11-24T14:30:00+03:00');
+  for (const b of ['csv', 'xlsx']) {
+    const rb = await veriUcu.onRequestGet({ ...ctx, request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=2026-11-24&bicim=' + b) });
+    ok(`uc bayat ${b}: X-Veri-Bayat true + ilk cekim zamani (dosyada da isaret var)`, rb.status === 200 && rb.headers.get('X-Veri-Bayat') === 'true' && rb.headers.get('X-Veri-Cekildi') === '2026-11-24T14:30:00+03:00');
+    if (b === 'xlsx') ok('uc bayat xlsx: Bilgi sayfasi "Evet"', xlsxOku(new Uint8Array(await rb.arrayBuffer())).rows2.some((r) => r[0] === 'Önceki senkrondan mı (bayat)' && r[1].startsWith('Evet')));
+  }
 }
 { // HEAD yalnız önbellekten; OPTIONS/CORS yok
   const { ctx, e } = ucCtx('?tarih=2026-11-23&bicim=csv', {}, SAHTE_ENV, 'HEAD');
@@ -1041,7 +1061,8 @@ const ornekOf = (h) => coz(/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.ex
   ok('kabuk title <= 60', baslik.length <= 60 && baslik.length > 20, `-> ${baslik.length}`);
   ok('kabuk description <= 155', aciklama.length <= 155 && aciklama.length > 70, `-> ${aciklama.length}`);
   ok('kabuk tek H1', (KABUK.match(/<h1[\s>]/g) || []).length === 1);
-  ok('kabuk H1 = title = og:title', coz(/<h1>([\s\S]*?)<\/h1>/.exec(KABUK)[1]) === baslik && KABUK.includes(`<meta property="og:title" content="${baslik}">`));
+  ok('kabuk title = og:title; H1 ayri ve sabit', baslik === 'Dengesizlik Maliyeti Hesaplama: Dengesizlik Fiyatı ve SMF' && KABUK.includes(`<meta property="og:title" content="${baslik}">`) && coz(/<h1>([\s\S]*?)<\/h1>/.exec(KABUK)[1]) === 'Dengesizlik Maliyeti: Pozitif ve Negatif Dengesizlik Fiyatı');
+  ok('kabuk description = og:description (revizyon metni)', aciklama === 'Bugünün pozitif ve negatif dengesizlik fiyatı, SMF, PTF ve sistem yönü EPİAŞ verisiyle tek tabloda. Formül, k ve l katsayıları, hesaplayıcı, CSV ve Excel.' && KABUK.includes(`<meta property="og:description" content="${aciklama}">`));
   ok('kabuk lang tr', KABUK.includes('<html lang="tr">'));
   ok('kabuk robots index, follow', KABUK.includes('<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">'));
   ok('kabuk canonical', KABUK.includes('<link rel="canonical" href="https://voltage.com.tr/dengesizlik-maliyeti">'));
@@ -1058,19 +1079,20 @@ const ornekOf = (h) => coz(/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.ex
   // Tablo anlamı
   ok('kabuk tablo: caption + scope=col x8', /<caption id="dTabloBaslik">/.test(KABUK) && (/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1].match(/<th scope="col"/g) || []).length === 8);
   ok('kabuk tablo kapsayicisi: region + tabindex + etiket', /<div class="tablo-sar" id="dTabloSar" role="region" aria-labelledby="dTabloBaslik" tabindex="0">/.test(KABUK));
-  ok('kabuk sutun basliklari', ['Dönem', 'PTF', 'SMF', 'Sistem yönü', 'Pozitif dengesizlik fiyatı', 'Negatif dengesizlik fiyatı', "PTF'ye göre maliyet (pozitif)", "PTF'ye göre maliyet (negatif)"].every((b) => KABUK.includes(`>${b}</th>`)));
+  ok('kabuk sutun basliklari (yeni adlar + sr-only birim)', coz(/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1]) === "Dönem PTF (TL/MWh) SMF (TL/MWh) Sistem yönü Pozitif dengesizlik fiyatı (TL/MWh) Negatif dengesizlik fiyatı (TL/MWh) Pozitif dengesizlik maliyeti (PTF'ye göre) (TL/MWh) Negatif dengesizlik maliyeti (PTF'ye göre) (TL/MWh)" && (/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1].match(/<span class="sr-only"> \(TL\/MWh\)<\/span>/g) || []).length === 6, `-> ${coz(/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1])}`);
   // Formlar JS'siz çalışır
   ok('kabuk tarih formu duz GET', /<form method="get" action="\/dengesizlik-maliyeti" id="dTarihForm">/.test(KABUK) && /<input type="date" id="dTarih" name="tarih" min="2026-01-01" required>/.test(KABUK));
   ok('kabuk aralik formu duz GET', /<form method="get" action="\/dengesizlik-maliyeti\/veri" id="dAralikForm">/.test(KABUK) && /name="bas"/.test(KABUK) && /name="bit"/.test(KABUK) && /<select id="dBicim" name="bicim">/.test(KABUK));
-  ok('kabuk indirme baglantilari (CSV, Excel, JSON)', ['csv', 'xlsx', 'json'].every((b) => KABUK.includes(`href="/dengesizlik-maliyeti/veri?bicim=${b}" download>`)));
+  ok('kabuk indirme baglantilari bekleme halinde PASIF + gorunur neden', ['dCsv', 'dXlsx', 'dJson'].every((id) => new RegExp(`<a class="btn-ikincil" id="${id}" rel="nofollow" aria-disabled="true">`).test(KABUK)) && !/id="d(Csv|Xlsx|Json)"[^>]*href=/.test(KABUK) && KABUK.includes('<span class="indir-not" id="dIndirNot">Veri alınamadığı için indirme şu an kapalı</span>'));
+  ok('kabuk onceki/sonraki gun rel=nofollow', /id="dOnceki" rel="nofollow"/.test(KABUK) && /id="dSonraki" rel="nofollow"/.test(KABUK));
   ok('kabuk her girdinin etiketi var', [...KABUK.matchAll(/<(?:input|select)[^>]*\bid="([^"]+)"/g)].every((m) => m[0].includes('type="radio"') || KABUK.includes(`for="${m[1]}"`)));
   ok('kabuk radyo dugmeleri label icinde', (KABUK.match(/<label class="secenek"><input type="radio"/g) || []).length === (KABUK.match(/type="radio"/g) || []).length);
   ok('kabuk sonuc alani aria-live', /<div class="sonuc" id="hSonuc" role="status" aria-live="polite"><\/div>/.test(KABUK));
   ok('kabuk hareket azaltma + gorunur odak', KABUK.includes('prefers-reduced-motion: reduce') && KABUK.includes(':focus-visible'));
   // İçerik kuralları
-  ok('kabuk hesaplayici uyarisi', KABUK.includes('Sonuç tahminidir. Bilgilendirme amaçlıdır; kesin tutar EPİAŞ uzlaştırma bildirimiyle belirlenir. Teklif ya da taahhüt değildir.'));
-  ok('kabuk turetilmis gosterge etiketi', (KABUK.match(/mevzuatta tanımlı bir terim değildir/g) || []).length >= 3);
-  ok('kabuk SMF dort saat + kesinlesme', KABUK.includes('dört saat içinde duyurulur (DUY m.68(1)(e))') && KABUK.includes('nihai uzlaştırma bildirimiyle kesinleşir') && KABUK.includes('geçmişe dönük düzeltme yapılabilir (DUY m.134(1))'));
+  ok('kabuk hesaplayici uyarisi (Hukuk R5)', KABUK.includes(`Sonuç tahminidir ve yalnızca bilgilendirme amaçlıdır; yatırım, ticari karar ya da hukuki tavsiye değildir. Kesin tutar EPİAŞ uzlaştırma bildirimiyle belirlenir. Teklif ya da taahhüt değildir. Sitenin kullanımı <a href="/kullanim-kosullari">Kullanım Koşulları</a>'na tabidir.`));
+  ok('kabuk turetilmis gosterge etiketi', (KABUK.match(/mevzuatta tanımlı bir terim değildir/gi) || []).length >= 4 && KABUK.includes("Birim dengesizlik maliyeti mevzuatta tanımlı bir terim değildir; bu sayfada EPİAŞ'ın yayımladığı fiyatlardan Voltage Enerji tarafından hesaplanır."));
+  ok('kabuk SMF dort saat + kesinlesme (Hukuk R2)', KABUK.includes('dört saat içinde duyurulur (DUY m.68(1)(e))') && KABUK.includes("Ön uzlaştırma bildirimi en geç fatura dönemini izleyen ayın 11'inde, nihai uzlaştırma bildirimi 15'inde (hafta sonuna ya da resmî tatile denk gelirse izleyen ilk iş gününde) duyurulur (DUY m.132/A(1)). Kesin tutar nihai uzlaştırma bildirimiyle belirlenir; itiraz üzerine sonradan geçmişe dönük düzeltme yapılabilir (DUY m.134(1))."));
   ok('kabuk atif satiri föyle birebir', coz(/<blockquote id="dAtif">([\s\S]*?)<\/blockquote>/.exec(KABUK)[1]) === ATIF);
   ok('kabuk resmi kaynak baglantilari', ['https://www.mevzuat.gov.tr/MevzuatMetin/yonetmelik/7.5.12985.pdf', 'https://www.resmigazete.gov.tr/eskiler/2025/12/20251229-1.htm', 'https://www.resmigazete.gov.tr/eskiler/2025/12/20251229-19.pdf', 'https://www.resmigazete.gov.tr/eskiler/2026/10/20261019-2.pdf', 'https://www.resmigazete.gov.tr/eskiler/2026/10/20261019-9.pdf', 'https://www.resmigazete.gov.tr/eskiler/2026/04/20260403-12.pdf', 'https://seffaflik.epias.com.tr/reporting-service/technical/en/index.html', 'https://seffaflik.epias.com.tr/electricity-service/technical/tr/index.html'].every((u) => KABUK.includes(`href="${u}"`)));
   const gorunen = coz(KABUK.slice(KABUK.indexOf('<body'), KABUK.indexOf('<script type="application/json" id="dKurallar">'))).toLocaleLowerCase('tr');
@@ -1086,7 +1108,7 @@ const ornekOf = (h) => coz(/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.ex
 
   // Gömülü kural tablosu = kütüphane (sürüklenme kapısı)
   const gomulu = JSON.parse(/<script type="application\/json" id="dKurallar">([\s\S]*?)<\/script>/.exec(KABUK)[1]);
-  ok('gomulu kural tablosu KURALLAR ile ayni', JSON.stringify(gomulu.kurallar) === JSON.stringify(KURALLAR.map((k) => ({ bas: k.bas, bit: k.bit, V: k.V, B: k.B, tavanCarpani: k.tavanCarpani, k: k.k, l: k.l }))));
+  ok('gomulu kural tablosu KURALLAR ile ayni', JSON.stringify(gomulu.kurallar) === JSON.stringify(KURALLAR.map((k) => ({ bas: k.bas, bit: k.bit, formulGoster: k.formulGoster, V: k.V, B: k.B, tavanCarpani: k.tavanCarpani, k: k.k, l: k.l }))) && gomulu.dogrulama === KURAL_DOGRULAMA && KURAL_DOGRULAMA === '2026-11-24');
   ok('gomulu tavan tablosu TAVANLAR ile ayni', JSON.stringify(gomulu.tavanlar) === JSON.stringify(TAVANLAR.map((t) => ({ bas: t.bas, bit: t.bit, azami: t.azami, asgari: t.asgari }))));
   // Görünen katsayı ve sabit tabloları = kütüphane
   const katsayiTablo = coz(/<table class="kucuk" id="dKatsayi">([\s\S]*?)<\/table>/.exec(KABUK)[1]);
@@ -1108,7 +1130,11 @@ const ornekOf = (h) => coz(/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.ex
   const bc = tur(KABUK, 'BreadcrumbList');
   ok('JSON-LD BreadcrumbList gorunen kirintiyla ayni', bc.itemListElement.length === 2 && bc.itemListElement[1].name === 'Dengesizlik Maliyeti' && /› Dengesizlik Maliyeti<\/nav>/.test(KABUK));
   const ds = tur(KABUK, 'Dataset');
-  ok('JSON-LD Dataset temel alanlar', !!ds.name && !!ds.description && ds.creator['@id'] === org['@id'] && ds.publisher['@id'] === org['@id'] && ds.isBasedOn.name === 'EPİAŞ Şeffaflık Platformu' && !!ds.temporalCoverage);
+  ok('JSON-LD Dataset: creator EPİAŞ, publisher Voltage, isBasedOn rapor', !!ds.name && ds.creator.name === 'Enerji Piyasaları İşletme A.Ş. (EPİAŞ)' && ds.creator.url === 'https://www.epias.com.tr/' && !('@id' in ds.creator) && ds.publisher['@id'] === org['@id'] && ds.isBasedOn['@type'] === 'CreativeWork' && ds.isBasedOn.name === 'EPİAŞ Şeffaflık Platformu: PTF, SMF ve SDF Listeleme raporu' && ds.isBasedOn.publisher.name === ds.creator.name);
+  ok('JSON-LD Dataset ekleri', ds['@id'] === 'https://voltage.com.tr/dengesizlik-maliyeti#dataset' && ds.identifier === ds['@id'] && JSON.stringify(ds.alternateName) === '["PTF, SMF ve dengesizlik fiyatları","Pozitif ve negatif dengesizlik fiyatı serisi"]' && JSON.stringify(ds.keywords) === '["dengesizlik fiyatı","pozitif dengesizlik fiyatı","negatif dengesizlik fiyatı","sistem marjinal fiyatı","SMF","PTF","sistem yönü","dengeleme güç piyasası","EPİAŞ"]' && ds.datePublished === '2026-11-24' && ds.citation === ATIF && !!ds.measurementTechnique && ds.temporalCoverage === '2026-01-01/..');
+  ok('JSON-LD Dataset description basi ve sonu', ds.description.startsWith("1 Ocak 2026'dan bugüne her uzlaştırma dönemi için ") && ds.description.endsWith('Dosyalar parametresiz istendiğinde içinde bulunulan günü verir; başka bir gün için tarih, aralık için bas ve bit parametreleri kullanılır (tek istekte en çok 31 gün).'));
+  ok('JSON-LD @id leri ve baglar', wp['@id'] === 'https://voltage.com.tr/dengesizlik-maliyeti#webpage' && bc['@id'] === 'https://voltage.com.tr/dengesizlik-maliyeti#breadcrumb' && tur(KABUK, 'FAQPage')['@id'] === 'https://voltage.com.tr/dengesizlik-maliyeti#sss' && tur(KABUK, 'WebApplication')['@id'] === 'https://voltage.com.tr/dengesizlik-maliyeti#hesaplayici' && wp.isPartOf['@id'] === 'https://voltage.com.tr/#website' && wp.breadcrumb['@id'] === bc['@id'] && wp.mainEntity['@id'] === ds['@id'] && JSON.stringify(wp.hasPart) === '[{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#hesaplayici"},{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#sss"}]');
+  ok('JSON-LD isPartOf hedefi (#website) ana sayfada gercekten tanimli', /"@id":\s*"https:\/\/voltage\.com\.tr\/#website"/.test(readFileSync(new URL('../../index.html', import.meta.url), 'utf8')) && /"@type":\s*"WebSite"/.test(readFileSync(new URL('../../index.html', import.meta.url), 'utf8')));
   ok('JSON-LD Dataset variableMeasured 7 degisken', ds.variableMeasured.length === 7);
   ok('JSON-LD Dataset distribution CSV/XLSX/JSON', ds.distribution.length === 3 && ['csv', 'xlsx', 'json'].every((b) => ds.distribution.some((x) => x.contentUrl === `https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=${b}`)));
   ok('JSON-LD Dataset license YOK (dogrulanmadi)', !('license' in ds));
@@ -1117,7 +1143,10 @@ const ornekOf = (h) => coz(/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.ex
   // SSS: JSON-LD = görünen metin, kelimesi kelimesine
   const sss = [.../<div id="dSss">([\s\S]*?)<\/div>/.exec(KABUK)[1].matchAll(/<h3>([\s\S]*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/g)].map((m) => [coz(m[1]), coz(m[2])]);
   const faq = tur(KABUK, 'FAQPage').mainEntity;
-  ok('SSS 5-7 soru', sss.length >= 5 && sss.length <= 7 && faq.length === sss.length, `-> ${sss.length}`);
+  ok('SSS 8 soru', sss.length === 8 && faq.length === 8, `-> ${sss.length}`);
+  ok('SSS 1 yaniti = giris paragrafi', sss[0][0] === 'Dengesizlik maliyeti nedir?' && sss[0][1] === coz(/<p class="lede">([\s\S]*?)<\/p>/.exec(KABUK)[1]));
+  ok('SSS SDF sorusu (revizyon metni)', sss[1][0] === 'Sistem dengesizlik fiyatı (SDF) nedir?' && sss[1][1] === 'Sistem dengesizlik fiyatı, uzlaştırma dönemi bazında belirlenen ve piyasa katılımcılarının denge sorumluluklarından kaynaklanan enerji dengesizliklerine uygulanan fiyattır (Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.4). EPİAŞ Şeffaflık Platformu pozitif ve negatif dengesizlik fiyatını "PTF, SMF ve SDF Listeleme" raporunda yayımlar; bu sayfadaki tablo o rapordaki değerleri gösterir.');
+  ok('SSS "pozitif ve negatif dengesizlik ne demek" sorusu YOK (teyitsiz)', !sss.some((x) => /ne demek/i.test(x[0])));
   ok('SSS JSON-LD = gorunen metin (soru)', faq.every((q, i) => q.name === sss[i][0]));
   ok('SSS JSON-LD = gorunen metin (yanit)', faq.every((q, i) => q.acceptedAnswer.text === sss[i][1]));
   ok('JSON-LD yasak ifade / telefon yok', !/en ucuz|tasarruf|garanti|479\s*05\s*10/.test(JSON.stringify(ld).toLocaleLowerCase('tr')));
@@ -1171,16 +1200,19 @@ for (const [ad, ayar] of [['giris 401', { girisDurum: 401 }], ['servis 500', { r
   const oz = ozet(donemler(sahteGun('2026-11-23')));
   ok('SSR tam gun: ozet bandi', idMetni(h, 'dYayim') === '24 / 24' && idMetni(h, 'dPtfOrt') === sayfa.bicim(oz.ptfOrt) && idMetni(h, 'dSmfOrt') === sayfa.bicim(oz.smfOrt) && idMetni(h, 'dMalPoz') === sayfa.bicim(oz.maliyetPozitifOrt) && idMetni(h, 'dMalNeg') === sayfa.bicim(oz.maliyetNegatifOrt));
   ok('SSR tam gun: yon sayilari', idMetni(h, 'dYonAcik') === '8' && idMetni(h, 'dYonFazla') === '8' && idMetni(h, 'dYonDenge') === '8');
-  ok('SSR tam gun: damga ve mod', idMetni(h, 'dMod') === 'EPİAŞ VERİSİ' && idMetni(h, 'dDamga') === "EPİAŞ'TAN ALINDI 24.11 14:30" && h.includes('class="live-stamp" id="dDamga"'));
-  ok('SSR tam gun: tarihli ozet cumlesi', idMetni(h, 'dOzet').startsWith('23.11.2026 dengesizlik özeti (24 dönemin tamamı): ortalama PTF 2.115,00 TL/MWh;') && idMetni(h, 'dOzet').includes('Veri: EPİAŞ Şeffaflık Platformu; ortalamalar Voltage Enerji tarafından bu veriden'));
+  ok('SSR tam gun: damga yilli ve <time> icinde', idMetni(h, 'dMod') === 'EPİAŞ VERİSİ' && h.includes(`<span class="live-stamp" id="dDamga">EPİAŞ'TAN ALINDI <time datetime="2026-11-24T14:30:00+03:00">24.11.2026 14:30</time></span>`));
+  ok('SSR tam gun: tarihli ozet cumlesi (yeni kalip)', idMetni(h, 'dOzet') === `23.11.2026 dengesizlik özeti (24 dönemin tamamı): ortalama pozitif dengesizlik fiyatı ${sayfa.bicim(oz.pozitifOrt)} TL/MWh; ortalama negatif dengesizlik fiyatı ${sayfa.bicim(oz.negatifOrt)} TL/MWh; ortalama PTF 2.115,00 TL/MWh; ortalama SMF ${sayfa.bicim(oz.smfOrt)} TL/MWh. Ortalama pozitif dengesizlik maliyeti (PTF'ye göre) ${sayfa.bicim(oz.maliyetPozitifOrt)} TL/MWh, ortalama negatif dengesizlik maliyeti (PTF'ye göre) ${sayfa.bicim(oz.maliyetNegatifOrt)} TL/MWh. Sistem yönü: 8 dönem enerji açığı, 8 dönem enerji fazlası, 8 dönem dengede. Veri: EPİAŞ Şeffaflık Platformu, 24.11.2026 14:30 (Türkiye saati) itibarıyla; ortalamalar Voltage Enerji tarafından bu veriden, yalnızca dengesizlik fiyatı yayımlanan dönemler üzerinden hesaplanmıştır. ${NOT_ORTALAMA}`, `-> ${idMetni(h, 'dOzet')}`);
+  ok('SSR tam gun: "Son yayimlanan donem" YOK (gun tamam)', !idMetni(h, 'dOzet').includes('Son yayımlanan dönem'));
   ok('SSR tam gun: gun etiketleri ve caption', idMetni(h, 'dGun') === '23.11.2026' && idMetni(h, 'dBantGun') === '23.11.2026' && idMetni(h, 'dTabloBaslik').startsWith('23.11.2026 · dönem bazında'));
   ok('SSR tam gun: body isaretleri', h.includes('<body data-ssr="1" data-cekildi="2026-11-24T14:30:00+03:00" data-tarih="2026-11-23" data-bugun="2026-11-24">'));
   // Tarihli görünüm: noindex + kendine canonical
   ok('SSR tarihli: robots noindex, follow (meta + baslik)', h.includes('<meta name="robots" content="noindex, follow">') && !h.includes('content="index, follow') && y.headers.get('X-Robots-Tag') === 'noindex, follow');
   ok('SSR tarihli: canonical kendisi', h.includes('<link rel="canonical" href="https://voltage.com.tr/dengesizlik-maliyeti?tarih=2026-11-23">') && h.includes('<meta property="og:url" content="https://voltage.com.tr/dengesizlik-maliyeti?tarih=2026-11-23">'));
-  ok('SSR tarihli: title gunlu', h.includes('<title>Dengesizlik Maliyeti 23.11.2026: Dönem Bazında Fiyatlar</title>'));
+  ok('SSR tarihli: title = og:title gunlu', h.includes('<title>Dengesizlik Maliyeti 23.11.2026: Dönem Bazında Fiyatlar</title>') && h.includes('<meta property="og:title" content="Dengesizlik Maliyeti 23.11.2026: Dönem Bazında Fiyatlar">'));
+  ok('SSR tarihli: aciklama gunlu', h.includes('<meta name="description" content="23.11.2026 için dönem bazında PTF, SMF, sistem yönü, pozitif ve negatif dengesizlik fiyatı. Veri: EPİAŞ Şeffaflık Platformu. CSV, Excel ve JSON indirme.">') && h.includes('<meta property="og:description" content="23.11.2026 için dönem bazında PTF, SMF, sistem yönü, pozitif ve negatif dengesizlik fiyatı. Veri: EPİAŞ Şeffaflık Platformu. CSV, Excel ve JSON indirme.">'));
+  ok('SSR tarihli: H1 sonunda gun', h.includes('<h1>Dengesizlik Maliyeti: Pozitif ve Negatif Dengesizlik Fiyatı · 23.11.2026</h1>') && (h.match(/<h1[\s>]/g) || []).length === 1);
   ok('SSR tarihli: alternate baglantilari gunlu', h.includes('href="https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=2026-11-23&amp;bicim=json"') && h.includes('href="https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=2026-11-23&amp;bicim=csv"'));
-  ok('SSR tarihli: indirme baglantilari gunlu', ['csv', 'xlsx', 'json'].every((b) => h.includes(`href="/dengesizlik-maliyeti/veri?tarih=2026-11-23&amp;bicim=${b}" download>`)));
+  ok('SSR tarihli: indirme baglantilari acik, gunlu, nofollow', ['Csv|csv', 'Xlsx|xlsx', 'Json|json'].every((x) => h.includes(`<a class="btn-ikincil" id="d${x.split('|')[0]}" rel="nofollow" href="/dengesizlik-maliyeti/veri?tarih=2026-11-23&amp;bicim=${x.split('|')[1]}" download>`)) && h.includes('<span class="indir-not" id="dIndirNot" hidden>'));
   ok('SSR tarihli: onceki/sonraki gun', h.includes('id="dOnceki" rel="nofollow" href="/dengesizlik-maliyeti?tarih=2026-11-22">') && h.includes('id="dSonraki" rel="nofollow" href="/dengesizlik-maliyeti?tarih=2026-11-24">'));
   ok('SSR tarihli: tarih alanlari', h.includes('id="dTarih" name="tarih" min="2026-01-01" max="2026-11-24" value="2026-11-23" required>') && h.includes('id="dBas" name="bas" min="2026-01-01" max="2026-11-24" value="2026-11-17" required>') && h.includes('id="dBit" name="bit" min="2026-01-01" max="2026-11-24" value="2026-11-23" required>'));
   ok('SSR tarihli (dun): onbellek 60/300', y.headers.get('Cache-Control') === 'public, max-age=60, s-maxage=300, must-revalidate');
@@ -1189,7 +1221,7 @@ for (const [ad, ayar] of [['giris 401', { girisDurum: 401 }], ['servis 500', { r
   ok('SSR JSON-LD ayristirilir, SSS degismedi', JSON.stringify(tur(h, 'FAQPage')) === JSON.stringify(tur(KABUK, 'FAQPage')) && jsonLd(h)['@graph'].length === 6);
   ok('SSR JSON-LD temporalCoverage = gun', ds.temporalCoverage === '2026-11-23');
   ok('SSR JSON-LD distribution gunun adresleri', ['csv', 'xlsx', 'json'].every((b) => ds.distribution.some((x) => x.contentUrl === `https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=2026-11-23&bicim=${b}`)));
-  ok('SSR JSON-LD WebPage url tarihli; dateModified yayin tarihinden geriye cekilmez', wp.url === 'https://voltage.com.tr/dengesizlik-maliyeti?tarih=2026-11-23' && wp.dateModified === '2026-11-24');
+  ok('SSR JSON-LD WebPage url/ad/aciklama tarihli; dateModified = cekim ani', wp.url === 'https://voltage.com.tr/dengesizlik-maliyeti?tarih=2026-11-23' && wp.dateModified === '2026-11-24T14:30:00+03:00' && wp.name === 'Dengesizlik Maliyeti 23.11.2026: Dönem Bazında Fiyatlar' && wp.description.startsWith('23.11.2026 için') && ds.dateModified === '2026-11-24T14:30:00+03:00');
   // Başlıklar: kabuğunkiler korunur, gövdeye bağlı olanlar atılır
   ok('SSR kabuk guvenlik basliklari korunur', y.headers.get('X-Content-Type-Options') === 'nosniff' && y.headers.get('Content-Security-Policy') === "default-src 'self'");
   ok('SSR ETag tasinmaz', y.headers.get('ETag') === null);
@@ -1200,6 +1232,9 @@ for (const [ad, ayar] of [['giris 401', { girisDurum: 401 }], ['servis 500', { r
   const orn = ornekOf(h);
   ok('SSR ornek hesap: son yayimlanan donem', orn.startsWith('Örnek hesap: 23.11.2026, 23:00–24:00'), `-> ${orn.slice(0, 60)}`);
   ok('SSR ornek hesap: girdiler veriden', orn.includes(`PTF ${sayfa.bicim(son.ptf)} TL/MWh; SMF ${sayfa.bicim(son.smf)} TL/MWh; sistem yönü ${{ acik: 'enerji açığı', fazla: 'enerji fazlası', denge: 'dengede' }[son.yon]}`) && orn.includes('V = 100 TL/MWh, B = 100 TL/MWh, AFL = 4.500 TL/MWh.'), `-> ${orn}`);
+  ok('SSR tam gun: fark yoksa † yok, not bos, gunluk yok', !govdeOf(h).includes('†') && h.includes('<p class="note fark-not" id="dFarkNot"></p>') && !uyarilar.some((u) => u.includes('"tarih":"2026-11-23"')));
+  ok('SSR hesaplayici donem secenekleri sunucudan (son yayimlanan secili)', h.includes('<select id="hDonem"><option value="2026-11-23T00:00:00+03:00">00:00–01:00</option>') && h.includes('<option value="2026-11-23T23:00:00+03:00" selected>23:00–24:00</option></select>') && !/<select id="hDonem">[^<]*<option value="">Veri bekleniyor/.test(h));
+  ok('SSR Kasim gunu: tarih uyarisi yok', h.includes('<p class="uyari" id="dKuralUyari" role="status"></p>'));
   ok('SSR ornek hesap: sonuc birimFiyat ile ayni', orn.includes(`= ${sayfa.bicim(bfSon.negatif)} TL/MWh`) && orn.includes(`= ${sayfa.bicim(bfSon.pozitif)} TL/MWh`) && orn.includes(`Negatif: max(100; ${sayfa.bicim(son.ptf)}; ${sayfa.bicim(son.smf)})`) && orn.includes(`Pozitif: min(${sayfa.bicim(son.ptf)}; ${sayfa.bicim(son.smf)})`));
   ok('SSR ornek hesap: EPİAŞ degeriyle yan yana + uyum', orn.includes(`yayımladığı değerler: negatif ${sayfa.bicim(son.negatif)} TL/MWh, pozitif ${sayfa.bicim(son.pozitif)} TL/MWh. Formül sonucu yayımlanan değerlerle aynıdır.`));
 }
@@ -1211,13 +1246,15 @@ for (const [ad, ayar] of [['giris 401', { girisDurum: 401 }], ['servis 500', { r
   ok('SSR kismi: yayimlanmamis hucreler "—", PTF korunur', s.slice(11).every((x) => x[1] !== '—' && x.slice(2).every((c) => c === '—')));
   ok('SSR kismi: uydurma 0,00 YOK', !s.some((x) => x.includes('0,00')));
   ok('SSR kismi: yayimlanmamis satirda veri ozniteligi de yok', /<tr data-bas="2026-11-24T20:00:00\+03:00" data-dk="60" data-ptf="2200"><th/.test(h));
-  ok('SSR kismi: ozet 11 / 24, ortalamalar yalniz yayimlananlardan', idMetni(h, 'dYayim') === '11 / 24' && idMetni(h, 'dPtfOrt') === '2.050,00' && idMetni(h, 'dOzet').startsWith('24.11.2026 dengesizlik özeti (11/24 dönem): ortalama PTF 2.050,00 TL/MWh;'));
+  ok('SSR kismi: ozet 11 / 24, ortalamalar yalniz yayimlananlardan', idMetni(h, 'dYayim') === '11 / 24' && idMetni(h, 'dPtfOrt') === '2.050,00' && idMetni(h, 'dOzet').startsWith('24.11.2026 dengesizlik özeti (11/24 dönem): ortalama pozitif dengesizlik fiyatı ') && idMetni(h, 'dOzet').includes('ortalama PTF 2.050,00 TL/MWh;'));
+  ok('SSR kismi: ozette "Son yayimlanan donem" (gun tamamlanmadi)', idMetni(h, 'dOzet').includes('Son yayımlanan dönem 10:00–11:00: pozitif dengesizlik fiyatı 1.598,00 TL/MWh, negatif dengesizlik fiyatı 2.163,00 TL/MWh, PTF 2.100,00 TL/MWh, SMF 1.700,00 TL/MWh, sistem yönü enerji fazlası. Veri: EPİAŞ Şeffaflık Platformu, 24.11.2026 14:30 (Türkiye saati) itibarıyla;') && idMetni(h, 'dOzet').endsWith(NOT_ORTALAMA));
+  ok('SSR kismi: secenekler yayimlanmamis donemi belirtir, son yayimlanan secili', h.includes('<option value="2026-11-24T10:00:00+03:00" selected>10:00–11:00</option>') && h.includes('<option value="2026-11-24T20:00:00+03:00">20:00–21:00 (yayımlanmadı)</option>'));
   ok('SSR kismi: icinde bulunulan donem isaretli (14:00–15:00)', /<tr class="simdi" data-bas="2026-11-24T14:00:00\+03:00"/.test(h) && (govdeOf(h).match(/class="simdi"/g) || []).length === 1 && h.includes('<span class="sr-only"> (içinde bulunulan dönem)</span>'));
   ok('SSR tarihsiz: robots index, canonical tarihsiz, X-Robots-Tag yok', h.includes('<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">') && h.includes('<link rel="canonical" href="https://voltage.com.tr/dengesizlik-maliyeti">') && y.headers.get('X-Robots-Tag') === null);
-  ok('SSR tarihsiz: title degismez', h.includes('<title>Dengesizlik Maliyeti: Pozitif ve Negatif Dengesizlik Fiyatı</title>'));
+  ok('SSR tarihsiz: title, aciklama, H1 degismez', h.includes('<title>Dengesizlik Maliyeti Hesaplama: Dengesizlik Fiyatı ve SMF</title>') && h.includes('<h1>Dengesizlik Maliyeti: Pozitif ve Negatif Dengesizlik Fiyatı</h1>') && h.includes(`<meta name="description" content="${/<meta name="description" content="([^"]*)">/.exec(KABUK)[1]}">`));
   ok('SSR bugun: sonraki gun baglantisi kapali', h.includes('<a class="btn-ikincil" id="dSonraki" rel="nofollow" aria-disabled="true">') && h.includes('id="dOnceki" rel="nofollow" href="/dengesizlik-maliyeti?tarih=2026-11-23">'));
   ok('SSR bugun: onbellek 60/300', y.headers.get('Cache-Control') === 'public, max-age=60, s-maxage=300, must-revalidate');
-  ok('SSR bugun JSON-LD: dateModified = veri gunu, kapsam = bugun', tur(h, 'WebPage').dateModified === BUGUN && tur(h, 'Dataset').temporalCoverage === BUGUN && tur(h, 'WebPage').url === 'https://voltage.com.tr/dengesizlik-maliyeti');
+  ok('SSR tarihsiz JSON-LD: yalniz dateModified degisir (= cekim ani); kapsam ve adresler SABIT', tur(h, 'WebPage').dateModified === '2026-11-24T14:30:00+03:00' && tur(h, 'Dataset').dateModified === '2026-11-24T14:30:00+03:00' && tur(h, 'Dataset').temporalCoverage === '2026-01-01/..' && JSON.stringify(tur(h, 'Dataset').distribution) === JSON.stringify(tur(KABUK, 'Dataset').distribution) && tur(h, 'WebPage').url === 'https://voltage.com.tr/dengesizlik-maliyeti' && tur(h, 'WebPage').name === tur(KABUK, 'WebPage').name);
   ok('SSR kismi: ornek hesap son YAYIMLANAN donemden (10:00–11:00)', ornekOf(h).startsWith('Örnek hesap: 24.11.2026, 10:00–11:00'));
   ok('SSR kismi: HTML butun', butunluk(h));
 }
@@ -1232,7 +1269,7 @@ for (const [ad, ayar] of [['giris 401', { girisDurum: 401 }], ['servis 500', { r
   let { h } = await al('?tarih=2026-11-23', tek({ ptf: 450, smf: 60, positiveImbalance: -106, negativeImbalance: 463.5, systemStatus: 'Enerji Fazlası' }));
   let orn = ornekOf(h);
   ok('SSR ornek: esik alti dali', orn.includes('Pozitif: min(450,00; 60,00) = 60,00 < V (100) olduğu için (−1) × 100 × (1 + 0,06) = −106,00 TL/MWh') && orn.includes('Negatif: max(100; 450,00; 60,00) × (1 + 0,03) = 463,50 TL/MWh'), `-> ${orn}`);
-  ok('SSR ornek: PTF\'ye gore maliyet satiri', orn.includes("PTF'ye göre maliyet (EPİAŞ fiyatlarıyla): negatif 463,50 − 450,00 = 13,50 TL/MWh; pozitif 450,00 − (−106,00) = 556,00 TL/MWh"), `-> ${orn}`);
+  ok('SSR ornek: birim dengesizlik maliyeti satiri', orn.includes("Birim dengesizlik maliyeti (PTF'ye göre, EPİAŞ fiyatlarıyla): negatif 463,50 − 450,00 = 13,50 TL/MWh; pozitif 450,00 − (−106,00) = 556,00 TL/MWh"), `-> ${orn}`);
   ok('SSR tablo: eksi fiyat gercek eksi isaretiyle', satirlar(h)[5][4] === '−106,00' && satirlar(h)[5][6] === '556,00');
   ok('SSR seyrek veri: 24 satira tamamlanir, digerleri "—"', satirlar(h).length === 24 && satirlar(h)[4].slice(1).every((c) => c === '—'));
   ({ h } = await al('?tarih=2026-11-23', tek({ ptf: 4500, smf: 4500, positiveImbalance: 4365, negativeImbalance: 5008.5, systemStatus: 'Enerji Açığı' })));
@@ -1247,7 +1284,8 @@ for (const [ad, ayar] of [['giris 401', { girisDurum: 401 }], ['servis 500', { r
 { // eski tarih: uzun önbellek; V = 150 kuralı örnekte
   const { y, h } = await al('?tarih=2026-03-10');
   ok('SSR eski gun: onbellek 300/3600', y.headers.get('Cache-Control') === 'public, max-age=300, s-maxage=3600, must-revalidate');
-  ok('SSR eski gun: ornek V = 150, tavan belirtilmez', /V = 150 TL\/MWh, B = 100 TL\/MWh\./.test(ornekOf(h)), `-> ${ornekOf(h)}`);
+  ok('SSR eski gun (Ocak-Ekim): formule dayali icerik YOK, tablo EPİAŞ degerleriyle', h.includes('<div class="ornek" id="dOrnek"></div>') && satirlar(h).length === 24 && !govdeOf(h).includes('†') && h.includes('<p class="note fark-not" id="dFarkNot"></p>'));
+  ok('SSR eski gun: V = 150 notu', idMetni(h, 'dKuralUyari') === 'Bu tarihte V değeri 150 TL/MWh idi; aşağıdaki yöntem bölümü 1 Kasım 2026 ve sonrasında uygulanan değerleri anlatır.');
   const ilk = await al('?tarih=2026-01-01');
   ok('SSR ilk gun: onceki gun baglantisi kapali', ilk.h.includes('<a class="btn-ikincil" id="dOnceki" rel="nofollow" aria-disabled="true">') && ilk.h.includes('id="dBas" name="bas" min="2026-01-01" max="2026-11-24" value="2026-01-01" required>'));
 }
@@ -1263,7 +1301,7 @@ for (const [ad, ayar] of [['giris 401', { girisDurum: 401 }], ['servis 500', { r
   e.ilerlet(7 * 60 * 1000); e.ayar.raporDurum = 500;
   const y = await sayfa.onRequestGet({ ...ctx, request: new Request('https://voltage.com.tr/dengesizlik-maliyeti') });
   const h = await y.text();
-  ok('SSR bayat: SON SENKRON + ilk cekim zamani', idMetni(h, 'dMod') === 'SON SENKRON' && idMetni(h, 'dDamga') === 'SON SENKRON 24.11 14:30' && h.includes('class="live-stamp stale" id="dDamga"') && h.includes('data-bayat="1"'));
+  ok('SSR bayat: SON SENKRON + ilk cekim zamani', idMetni(h, 'dMod') === 'SON SENKRON' && h.includes('<span class="live-stamp stale" id="dDamga">SON SENKRON <time datetime="2026-11-24T14:30:00+03:00">24.11.2026 14:30</time></span>') && h.includes('data-bayat="1"'));
   ok('SSR bayat: veri duruyor, kisa onbellek', satirlar(h).length === 24 && idMetni(h, 'dYayim') === '9 / 24' && y.headers.get('Cache-Control') === 'public, max-age=30, s-maxage=60, must-revalidate');
 }
 // geçersiz tarih: bugünün sayfası + görünür uyarı (HTTP 200), girdi sayfaya yansımaz
@@ -1286,7 +1324,8 @@ for (const kotu of ['abc', '2026-11-25', '2025-12-31', '2026-02-30', '', '%3Cscr
   const sec = { fetch: e.fetch, simdi: e.simdi, cache: null };
   const h = await (await sayfa.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti'), env: SAHTE_ENV, secenek: sec, next: async () => new Response(KABUK, { status: 200 }) })).text();
   ok('2027: tablo EPİAŞ verisiyle basilir', satirlar(h).length === 24 && idMetni(h, 'dGun') === '05.01.2027');
-  ok('2027: ornek hesap YOK (dogrulanmis kural yok)', h.includes('<div class="ornek" id="dOrnek"></div>'));
+  ok('2027: ornek hesap YOK (dogrulanmis kural yok)', h.includes('<div class="ornek" id="dOrnek"></div>') && !govdeOf(h).includes('†'));
+  ok('2027: tablonun yaninda gorunur uyari', idMetni(h, 'dKuralUyari') === "Bu tarih için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; tablo EPİAŞ'ın yayımladığı değerleri gösterir. 110. maddenin 1 Ocak 2027'den itibaren uygulanacak metni bu sayfada henüz doğrulanmamıştır.");
   const j = await (await veriUcu.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=2027-01-05'), env: SAHTE_ENV, secenek: sec })).json();
   ok('2027: veri ucu kural bildirmez (kurallar: [])', Array.isArray(j.kurallar) && j.kurallar.length === 0 && j.donemler.length === 24);
 }
@@ -1329,7 +1368,7 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.EPIAS_PASSW
   const canli = llms.slice(llms.indexOf('## Canlı Veri'), llms.indexOf('## Kurallar'));
   ok('llms.txt: "Canlı Veri" altinda sayfa ve veri ucu', canli.includes('[Dengesizlik Maliyeti](https://voltage.com.tr/dengesizlik-maliyeti)') && canli.includes('`https://voltage.com.tr/dengesizlik-maliyeti/veri`'));
   ok('llms.txt: parametreler ve alanlar belgeli', ['tarih=YYYY-AA-GG', 'bas=YYYY-AA-GG&bit=YYYY-AA-GG', 'bicim=json', '`csv`', '`xlsx`', '`ptf`', '`smf`', '`yon`', '`pozitif`', '`negatif`', '`maliyetPozitif`', '`maliyetNegatif`', '`cekildi`'].every((x) => canli.includes(x)));
-  ok('llms.txt: durustluk kurali + kaynak', canli.includes('Yayımlanmamış değer `null`') && canli.includes('boş dosya üretilmez') && canli.includes('EPİAŞ') && canli.includes('mevzuat terimi değildir'));
+  ok('llms.txt: durustluk kurali + kaynak', canli.includes('Yayımlanmamış değer `null`') && canli.includes('boş dosya üretilmez') && canli.includes('EPİAŞ') && canli.includes('mevzuatta tanımlı bir terim değildir'));
   ok('llms.txt: yasak ifade yok', !/en ucuz|tasarruf %|garanti/.test(canli.toLocaleLowerCase('tr')));
   // llms.txt'te belgelenen alanlar gerçekten uçta var
   const ornekJson = await (await veriUcu.onRequestGet(ucCtx('?tarih=2026-11-23').ctx)).json();
@@ -1357,7 +1396,122 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.EPIAS_PASSW
   ok('kimlik yalniz env\'den okunur', (oku('functions/_lib/epias.js').match(/EPIAS_PASSWORD/g) || []).length >= 2 && !/EPIAS_(USERNAME|PASSWORD)\s*[:=]\s*['"]/.test(oku('functions/_lib/epias.js')) && !/console\.(log|error)\([^)]*(tgt|EPIAS_|govde|metin)/i.test(oku('functions/_lib/epias.js')));
 }
 
+// ============================================================================
+// REVİZYON 1 / B–F — hesaplayıcı işaretlemesi, gösterge adı, SEO, hukuk metinleri
+// ============================================================================
+{
+  // Çapalar: sunucu render'ının aradığı HER dizgi kabukta tam bir kez olmalı (sessiz geçiş yok)
+  for (const [ad, capa] of Object.entries(sayfa.CAPA)) ok(`capa "${ad}" kabukta tam bir kez`, KABUK.split(capa).length - 1 === 1, `-> ${KABUK.split(capa).length - 1} kez`);
+  ok('capa sayisi (yeni capa eklenince bu test de genisler)', Object.keys(sayfa.CAPA).length >= 38);
+
+  // D4 başlıklar
+  const h2 = [...KABUK.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)].map((m) => coz(m[1]));
+  ok('H2 basliklari (revizyon)', JSON.stringify(h2) === JSON.stringify(['Dönem bazında PTF, SMF, pozitif ve negatif dengesizlik fiyatı', 'Dengesizlik maliyeti hesaplama', 'Dengesizlik fiyatı formülü ve hesaplama yöntemi', 'Kapsam ve sınırlar', 'Kaynak ve dayanak', 'Sık sorulan sorular', 'İlgili sayfalar']), `-> ${JSON.stringify(h2)}`);
+  const yontem = /<h2 id="yontem">[\s\S]*?<h2 id="kapsam">/.exec(KABUK)[0];
+  const h3 = [...yontem.matchAll(/<h3>([\s\S]*?)<\/h3>/g)].map((m) => coz(m[1]));
+  ok('yontem H3 basliklari (revizyon)', JSON.stringify(h3) === JSON.stringify(['Negatif dengesizlik fiyatı formülü', 'Pozitif dengesizlik fiyatı formülü', 'k ve l katsayıları (2026)', 'V, B ve azami fiyat limiti (AFL)', "Birim dengesizlik maliyeti (PTF'ye göre)"]), `-> ${JSON.stringify(h3)}`);
+  ok('"SMF nedir" basligi ACILMADI', !/<h[23][^>]*>[^<]*SMF nedir/i.test(KABUK));
+  // D2 giriş
+  ok('giris: iki paragraf (revizyon metni)', KABUK.includes("<p class=\"lede\"><strong>Dengesizlik maliyeti</strong>, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir.") && KABUK.includes("SMF, ilgili dönemi izleyen en geç dört saat içinde piyasa katılımcılarına duyurulduğu için henüz yayımlanmamış dönemler boş kalır. Saatler Türkiye saatiyledir (UTC+03:00); tüm fiyatlar TL/MWh'tir.</p>") && KABUK.includes("Piyasa Takas Fiyatı'nı (PTF), Sistem Marjinal Fiyatı'nı (SMF)"));
+  // C bant
+  const bant = coz(/<section class="live"[\s\S]*?<\/section>/.exec(KABUK)[0]);
+  ok('bant etiketleri (revizyon)', ['Ort. PTF · yayımlanan dönemler', 'Ort. SMF · yayımlanan dönemler', "Ort. pozitif dengesizlik maliyeti · PTF'ye göre", "Ort. negatif dengesizlik maliyeti · PTF'ye göre", 'Kaynak: EPİAŞ Şeffaflık Platformu · Aritmetik (ağırlıksız) ortalama, yalnız yayımlanan dönemler'].every((x) => bant.includes(x)));
+  // C tanımlar
+  ok('birim dengesizlik maliyeti tanimlari (revizyon metni)', yontem.includes("<p>Negatif dengesizlik maliyeti = negatif dengesizlik fiyatı − PTF. Eksik kalan 1 MWh'in, gün öncesi piyasasında PTF'den alınmış olmasına göre ek maliyetidir (TL/MWh).</p>") && yontem.includes("<p>Pozitif dengesizlik maliyeti = PTF − pozitif dengesizlik fiyatı. Fazla kalan 1 MWh'in, PTF'den satılmış olmasına göre gelir kaybıdır (TL/MWh).</p>") && yontem.includes(NOT_ORTALAMA));
+  ok('eski gosterge adi kalmadi', !/PTF'ye göre maliyet \((pozitif|negatif)\)/.test(KABUK) && !KABUK.includes("\"PTF'ye göre maliyet\""));
+  // D5 / D6
+  ok('katsayi tablosu basligi (revizyon)', coz(/<table class="kucuk" id="dKatsayi">\s*<caption>([\s\S]*?)<\/caption>/.exec(KABUK)[1]) === 'k ve l katsayıları · 14030 sayılı Kurul Kararı · 1 Ocak 2026 teslim gününden itibaren · 24.11.2026 itibarıyla');
+  const par = coz(/<table class="kucuk" id="dSabit">([\s\S]*?)<\/table>/.exec(KABUK)[1]);
+  ok('parametre tablosu: "Parametre", B gecerliligi, 14459 RG sayisi', par.startsWith('Parametreler:') && par.includes('ParametreDeğerGeçerlilikDayanak') && par.includes("B100 TL/MWh1 Ocak 2026'dan itibaren") && par.includes('14459 sayılı Kurul Kararı (RG 3/4/2026-33213)') && !/Sabit/.test(par));
+  ok('parametre aciklamasi (revizyon metni)', yontem.includes("<p>V ve B, Kurul Kararıyla belirlenen birim fiyatlardır (DUY m.110(2)). V, negatif dengesizlik fiyatında alt sınır girdisidir; pozitif dengesizlikte eşiktir. B, min(PTF; SMF) V'nin altına indiğinde pozitif dengesizlik fiyatını belirler. AFL, azami fiyat limitidir.</p>"));
+  ok('ATIF ve gorunen atif 14459 RG sayisini tasir', ATIF.includes('14459 sayılı Kurul Kararı (RG 3/4/2026-33213)') && TAVANLAR[0].kaynak.endsWith('(RG 3/4/2026-33213)'));
+  // E hukuk metinleri
+  ok('R1(a) yontem girisi', yontem.includes("<p>Enerji dengesizlik tutarı, Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği'nin (DUY) 110. maddesindeki formüllerle hesaplanır; aşağıdaki birim fiyatlar bu formüllerden okunur. Formüller ve değerler <strong>1 Kasım 2026 teslim gününden itibaren uygulanan ve 24 Kasım 2026 tarihinde yürürlükte olan</strong> metne göredir. Katsayılar ve sabitler Kurul kararıyla değiştirilebilir; değişiklik olduğunda bu sayfa güncellenir.</p>"));
+  ok('D13 PTF rehberi baglantisi; ticari sayfaya baglanti yok', yontem.includes(`<p>SMF'nin ne olduğunu ve PTF'den farkını <a href="/rehber/ptf-nedir">PTF nedir rehberinde</a> anlattık.</p>`) && !/href="\/(sanayi-elektrik-tedariki|\?kaynak|#leadForm|#iletisim)/.test(KABUK));
+  ok('R1(e) 2027 metni dogrulanmadi cumlesi', yontem.includes("31 Aralık 2026'dan sonraki teslim günleri için bu sayfada kural gösterilmez. 110. maddenin 1 Ocak 2027'den itibaren uygulanacak metni bu sayfada henüz doğrulanmamıştır."));
+  ok('A2 "24 Kasim 2026 itibariyla saat basina tek SMF"', yontem.includes("24 Kasım 2026 itibarıyla saat başına tek SMF bulunduğu için ikisi de o saatin SMF'sine eşittir.") && !yontem.includes('Bugün saat başına'));
+  const kapsam = [.../<h2 id="kapsam">[\s\S]*?<\/ul>/.exec(KABUK)[0].matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => coz(m[1]));
+  ok('R5 kapsam ilk madde', kapsam[0] === "Bu sayfa, piyasa katılımcıları ve piyasayı izleyen profesyoneller için hazırlanmış bir bilgi aracıdır. Dengesizlik tutarı, piyasa işletmecisi ile dengeden sorumlu taraf arasında uzlaştırılır (DUY m.110(1)); son tüketicinin faturasına yansıyıp yansımayacağı tedarik sözleşmesine bağlıdır. Bu sayfa, Voltage Enerji'nin müşterilerine uyguladığı ya da uygulayacağı bir fiyatı, bedeli veya sözleşme koşulunu göstermez.");
+  ok('R3 grup ici degerlendirme', kapsam.includes('Dengeden sorumlu gruplarda grup üyesinin dengesizliği, Kurulun belirlediği dengesizlik oranı sınırı içinde grup içinde değerlendirilir; sınırı aşan kısım için tutar, üyenin bireysel dengesizliği üzerinden ayrıca hesaplanır (DUY m.111(5)). Bu sayfadaki tablo ve hesaplayıcı grup içi değerlendirmeyi içermez.'));
+  ok('R4 KÜPST', kapsam.includes("Kesinleşmiş günlük üretim/tüketim programından sapma tutarı (KÜPST) ayrı bir kalemdir (DUY m.110(3)) ve bu sayfadaki fiyatlara dahil değildir. 14907 sayılı Kurul Kararı (RG 19/10/2026-33405), tüketim kapsamında oluşturulan uzlaştırmaya esas veriş-çekiş birimleri için belirlediği katsayı ve toleransların 1 Ocak 2027'den itibaren uygulanmasını öngörür; bu tutarın muhatabı ilgili piyasa katılımcısıdır."));
+  ok('"plan sapma bedeli" ve "netlestirme" ifadesi kalmadi', !/plan(ından)? sapma bedeli/i.test(KABUK) && !/netleştirme/i.test(KABUK));
+  ok('R6(a) kaynak paragrafi', KABUK.includes(`<p>Bu sayfadaki verinin kaynağı <a href="https://seffaflik.epias.com.tr/" rel="noopener">EPİAŞ Şeffaflık Platformu</a>'dur. Tablo düzeni, özet, türetilmiş "birim dengesizlik maliyeti (PTF'ye göre)" göstergesi ve hesaplayıcı Voltage Enerji tarafından hazırlanmıştır. EPİAŞ Şeffaflık Platformu, sunduğu içerik ve verilerin kaynak gösterilmek suretiyle çoğaltılabileceğini ve kullanılabileceğini, bu verilerden doğabilecek kayıp ve zararlardan sorumluluk kabul etmediğini belirtir (24 Kasım 2026 itibarıyla). Bu veriyi kullanırken kaynağı "EPİAŞ Şeffaflık Platformu" olarak gösterin; bu sayfaya da kaynak göstererek atıfta bulunabilirsiniz. Atıf için:</p>`) && !KABUK.includes('sorumluluk kullanan tarafa aittir'));
+  ok('R9 hata bildirimi', KABUK.includes('Veride ya da metinde hata olduğunu düşünüyorsanız <a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a> adresine bildirin; düzeltmeler bu sayfada tarihiyle belirtilir.'));
+  const sssR = [.../<div id="dSss">([\s\S]*?)<\/div>/.exec(KABUK)[1].matchAll(/<h3>([\s\S]*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/g)].map((m) => [coz(m[1]), coz(m[2])]);
+  const yanit = (soru) => sssR.find((x) => x[0] === soru)[1];
+  ok('R1(b) SSS formul yaniti basi ve sonu', yanit('Pozitif ve negatif dengesizlik fiyatı nasıl hesaplanır?').startsWith('24 Kasım 2026 tarihinde yürürlükte olan kurallara göre, 1 Kasım 2026 teslim gününden itibaren negatif dengesizlik birim fiyatı') && yanit('Pozitif ve negatif dengesizlik fiyatı nasıl hesaplanır?').endsWith("AFL 4.500 TL/MWh'tir; bu değerler Kurul kararıyla değiştirilebilir. Bu sayfa 31 Aralık 2026'dan sonraki teslim günleri için kural göstermez."));
+  ok('SSS sistem yonu yaniti (revizyon)', yanit('Sistem yönü neyi değiştirir?').includes('Sistem yönü k ve l katsayılarını belirler. 24 Kasım 2026 itibarıyla, sistem enerji açığı yönündeyken') && yanit('Sistem yönü neyi değiştirir?').includes("Enerji fazlası yönündeyken k 0,03, l 0,06'dır (14030 sayılı Kurul Kararı)."));
+  ok('SSS k/l yaniti (revizyon metni)', yanit('k ve l katsayıları kaçtır?') === "24 Kasım 2026 itibarıyla yürürlükteki değerler şöyledir: sistem enerji açığı yönündeyse k 0,06 ve l 0,03; enerji fazlası yönündeyse k 0,03 ve l 0,06; sistem dengedeyse ikisi de 0,03'tür. k negatif dengesizlikte, l pozitif dengesizlikte kullanılır. Dayanak 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı'dır; değerler 1 Ocak 2026 teslim gününden itibaren uygulanır ve Kurul kararıyla değiştirilebilir. Bu sayfa 31 Aralık 2026 teslim gününe kadar olan dönemi kapsar.");
+  ok('SSS kesinlik yaniti son cumle', yanit('Bu rakamlar kesin mi?').endsWith('Hesaplayıcının sonuçları tahminidir; yatırım, ticari karar ya da hukuki tavsiye, teklif ya da taahhüt değildir.'));
+  // B hesaplayıcı işaretlemesi
+  ok('B6 hesaplayici girisi (KÜPST)', KABUK.includes('dengeden sorumlu grup içi değerlendirmeyi ve kesinleşmiş günlük üretim/tüketim programından sapma tutarını (KÜPST) içermez.</p>'));
+  ok('B9 yon secenekleri tek kalip', KABUK.includes('<span>Negatif (eksik verdim ya da fazla çektim)</span>') && KABUK.includes('<span>Pozitif (fazla verdim ya da az çektim)</span>'));
+  ok('B10 Hesapla dugmeleri JS yokken pasif + noscript notu', (KABUK.match(/<button type="submit" class="btn" disabled>Hesapla<\/button>/g) || []).length === 2 && /<noscript><p[^>]*>Hesaplayıcı JavaScript gerektirir; JavaScript kapalıyken "Hesapla" düğmeleri kapalıdır\./.test(KABUK));
+  ok('B2 kapali notu "Bugun icin"', KABUK.includes('Bugün için doğrulanmış bir dengesizlik fiyatı kuralı bulunmadığından "Kendi senaryom" hesabı kapalıdır.'));
+  ok('F "Tarih araligini indir"', KABUK.includes('>Tarih aralığını indir</span>') && !KABUK.includes('Tarih aralığı indir'));
+  ok('istemci: localStorage/uc kaydi dogrulanmadan innerHTML\'e girmez', KABUK.includes('function donemKur(o){') && KABUK.includes("if(!o || typeof o.bas !== 'string' || !BAS_RE.test(o.bas)") && KABUK.includes('function dogrula(donemler, tarih){'));
+
+  // Kütüphane: kural dilimleri, formül farkı
+  const dl = kuralDilimleri();
+  ok('kuralDilimleri: 3 dilim, bitisik, ayirt edilir', dl.length === 3 && dl.map((x) => `${x.bas}|${x.bit}|${x.V}|${x.AFL}`).join(' ') === '2026-01-01|2026-04-03|150|null 2026-04-04|2026-10-31|150|4500 2026-11-01|2026-12-31|100|4500' && dl.every((x, i) => i === 0 || gunEkle(dl[i - 1].bit, 1) === x.bas));
+  ok('formulGoster yalniz 1 Kasim 2026+ diliminde', kuralBul('2026-10-31').formulGoster === false && kuralBul('2026-11-01').formulGoster === true && kuralBul('2026-12-31').formulGoster === true);
+  const dA = { dk: 60, ptf: 2800, smf: 3400, yon: 'acik', pozitif: 2716, negatif: 3604 };
+  ok('formulFarki: ayni deger -> false; 0,01 icinde -> false; ustunde -> true', formulFarki(dA, K) === false && formulFarki({ ...dA, negatif: 3604.01 }, K) === false && formulFarki({ ...dA, negatif: 3604.02 }, K) === true && formulFarki({ ...dA, pozitif: 2715.9 }, K) === true);
+  ok('formulFarki: Ocak-Ekim, 2027, 15 dk, eksik veri -> false (iddia yok)', formulFarki({ ...dA, negatif: 9999 }, K_OCAK) === false && formulFarki({ ...dA, negatif: 9999 }, null) === false && formulFarki({ ...dA, dk: 15, negatif: 9999 }, K) === false && formulFarki({ ...dA, yon: null, negatif: 9999 }, K) === false && formulFarki({ ...dA, smf: null, negatif: 9999 }, K) === false);
+}
+{ // C: dönem bazında tutarlılık (†) — sunucu render'ı
+  uyarilar.length = 0;
+  const fark = (g) => sahteGun(g).map((o, i) => (i === 5 || i === 9 ? { ...o, negativeImbalance: o.negativeImbalance + 6.25 } : o));
+  let { h } = await al('?tarih=2026-11-23', { gun: fark });
+  ok('† formulden farkli satirlar isaretli (2 donem)', (govdeOf(h).match(/<span class="fark" aria-hidden="true"> †<\/span><span class="sr-only"> \(yayımlanan fiyat formül sonucundan farklı\)<\/span>/g) || []).length === 2 && /data-bas="2026-11-23T05:00:00\+03:00"[^>]*><th scope="row">05:00–06:00<span class="fark"/.test(h) && !/data-bas="2026-11-23T06:00:00\+03:00"[^>]*><th scope="row">06:00–07:00<span class="fark"/.test(h));
+  ok('† tablo alti notu (revizyon metni)', idMetni(h, 'dFarkNot') === "† 2 dönemde EPİAŞ'ın yayımladığı fiyat, bu sayfadaki formül sonucundan farklıdır; tabloda EPİAŞ değeri gösterilir.");
+  ok('† tabloda EPİAŞ degeri gosterilir (formul sonucu degil)', satirlar(h)[5][5] === sayfa.bicim(sahteGun('2026-11-23')[5].negativeImbalance + 6.25));
+  ok('† yapilandirilmis tek satir gunluk: yalniz sayac ve tarih', uyarilar.length === 1 && uyarilar[0] === '{"olay":"dengesizlik-formul-farki","tarih":"2026-11-23","donem":2}');
+  uyarilar.length = 0;
+  ({ h } = await al('?tarih=2026-03-10', { gun: fark }));
+  ok('† Ocak-Ekim gununde karsilastirma YOK', !govdeOf(h).includes('†') && idMetni(h, 'dFarkNot') === '' && uyarilar.length === 0);
+  ({ h } = await al('?tarih=2026-11-23', { gun: (g) => sahteGun(g, 96, 15).map((o) => ({ ...o, negativeImbalance: o.negativeImbalance === null ? null : o.negativeImbalance + 50 })) }));
+  ok('15 dk veride † ve ornek hesap YOK; not gosterilir (SMF_N/SMF_P varsayimi yok)', !govdeOf(h).includes('†') && ornekOf(h) === 'Bu günün verisi 15 dakikalık dönemlerle yayımlanmış; örnek hesap yalnızca saatlik dönemli günlerde gösterilir.' && uyarilar.length === 0);
+  // geçersiz tarih + veri yok: "Bugünün verisi gösteriliyor" DENMEZ
+  const g2 = await al('?tarih=abc', {}, {});
+  ok('gecersiz tarih + veri yok: uyari "Bugunun verisi gosteriliyor" demez', idMetni(g2.h, 'dUyari') === 'Adresteki tarih geçerli değil ya da seçilebilir aralığın dışında. Seçilebilir aralık: 01.01.2026 – 24.11.2026.' && g2.h.includes('<meta name="robots" content="noindex, follow">'));
+  // bekleme hâlinde indirme pasif, dönem seçici bekliyor
+  const b2 = await al('', {}, {});
+  ok('bekleme: indirme pasif + neden gorunur; donem secici "Veri bekleniyor"', b2.h.includes('<a class="btn-ikincil" id="dCsv" rel="nofollow" aria-disabled="true">CSV</a>') && b2.h.includes('<span class="indir-not" id="dIndirNot">Veri alınamadığı için indirme şu an kapalı</span>') && b2.h.includes('<select id="hDonem"><option value="">Veri bekleniyor</option></select>'));
+}
+{ // D11: uç, tarayıcıdan doğrudan açılırsa küçük HTML hata sayfası döner
+  const htmlIstek = (sorgu, env = SAHTE_ENV, ayar = {}) => { const { sec } = yeni(ayar); return veriUcu.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri' + sorgu, { headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' } }), env, secenek: sec }); };
+  let r5 = await htmlIstek('?bas=2026-10-01&bit=2026-11-24&bicim=csv');
+  let t5 = await r5.text();
+  ok('uc HTML hata sayfasi (400): durum ayni, Turkce mesaj, geri baglanti', r5.status === 400 && r5.headers.get('Content-Type') === 'text/html; charset=utf-8' && t5.includes('<h1>Veri indirilemedi</h1>') && t5.includes('Tek istekte en çok 31 gün indirilebilir.') && t5.includes('<a href="/dengesizlik-maliyeti">') && t5.includes('<html lang="tr">') && r5.headers.get('Cache-Control') === 'no-store' && r5.headers.get('X-Robots-Tag') === 'noindex');
+  r5 = await htmlIstek('?tarih=2026-11-23&bicim=xlsx', {});
+  t5 = await r5.text();
+  ok('uc HTML hata sayfasi (503): ham JSON govdesi gosterilmez', r5.status === 503 && t5.includes('Veri bağlantısı henüz yapılandırılmadı.') && !t5.includes('{"hata"') && r5.headers.get('Retry-After') === '60' && r5.headers.get('Content-Disposition') === null);
+  r5 = await htmlIstek('?tarih=%3Cscript%3Ealert(1)%3C/script%3E');
+  t5 = await r5.text();
+  ok('uc HTML hata sayfasi: girdi yansimaz', r5.status === 400 && !t5.includes('alert(1)') && !t5.includes('<script'));
+  r5 = await htmlIstek('?tarih=2026-11-23&bicim=csv');
+  ok('uc Accept text/html + veri var: dosya normal doner', r5.status === 200 && r5.headers.get('Content-Type') === 'text/csv; charset=utf-8');
+  const { sec } = yeni();
+  r5 = await veriUcu.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=abc', { headers: { Accept: '*/*' } }), env: SAHTE_ENV, secenek: sec });
+  ok('uc Accept */* (ajan, curl): hata JSON kalir', r5.status === 400 && r5.headers.get('Content-Type').startsWith('application/json'));
+}
+{ // E / R8: mevcut yasal metinlerde YALNIZ istenen değişiklikler
+  const kok = new URL('../../', import.meta.url);
+  const cerez = readFileSync(new URL('cerez-politikasi.html', kok), 'utf8');
+  const kosul = readFileSync(new URL('kullanim-kosullari.html', kok), 'utf8');
+  ok('R8 cerez politikasi: onbellek anahtari listede', cerez.includes('(<code>voltage-ptf-cache</code>, <code>voltage-ptf-cache-page</code>, <code>voltage-dengesizlik-onbellek</code>)') && cerez.includes('EPİAŞ piyasa verisi (PTF, SMF, sistem yönü, dengesizlik fiyatı)') && !cerez.includes('voltage-serit-durdu'));
+  ok('R8 cerez politikasindaki anahtar = istemcideki anahtar', KABUK.includes("var ONBELLEK = 'voltage-dengesizlik-onbellek';"));
+  ok('R8 kullanim kosullari cumlesi (revizyon metni)', kosul.includes("<li>Sitede gösterilen piyasa verileri (PTF, SMF, sistem yönü, pozitif ve negatif dengesizlik fiyatı) EPİAŞ Şeffaflık Platformu kaynaklıdır ve bilgilendirme amaçlıdır; gecikmeli, eksik veya hatalı olabilir. Sitedeki hesaplayıcıların sonuçları tahminidir. İşlem kararları için EPİAŞ'ın resmî yayınları ve uzlaştırma bildirimleri esas alınmalıdır.</li>"));
+  ok('R8 yasal sayfalardan yeni sayfaya baglanti yok', !cerez.includes('dengesizlik-maliyeti') && !kosul.includes('dengesizlik-maliyeti'));
+  // D12 llms.txt
+  const llms = readFileSync(new URL('llms.txt', kok), 'utf8');
+  ok('D12 llms.txt eki (revizyon metni)', llms.includes("24 Kasım 2026 itibarıyla: k/l enerji açığında 0,06/0,03, enerji fazlasında 0,03/0,06, dengede 0,03/0,03 (Kurul Kararı 14030); V 100 TL/MWh (1 Kasım 2026'dan itibaren, Kurul Kararı 14911), B 100 TL/MWh, azami fiyat limiti 4.500 TL/MWh (Kurul Kararı 14459). Bu değerler Kurul kararıyla değiştirilebilir. Günün ortalama pozitif ve negatif dengesizlik fiyatı sayfadaki tarihli özet cümlesinde ve JSON'da `ozet.pozitifOrt`, `ozet.negatifOrt` alanlarındadır."));
+  ok('D12 llms.txt: CORS ifadesi yok, yeni gosterge adi', !/CORS|Access-Control/i.test(llms) && llms.includes("birim dengesizlik maliyeti (PTF'ye göre)") && !llms.includes("PTF'ye göre maliyet ("));
+}
+
 console.error = gercekHata;
+console.warn = gercekUyari;
 rmSync(gecici, { recursive: true, force: true });
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

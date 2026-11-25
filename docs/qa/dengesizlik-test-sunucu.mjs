@@ -20,7 +20,8 @@ export async function sunucuBaslat(ayar = {}) {
   const sunucu = http.createServer(async (req, res) => {
     try {
       const u = new URL(req.url, 'http://yerel');
-      const istek = new Request('https://voltage.com.tr' + req.url, { method: req.method });
+      // Accept başlığı iletilir: uç, tarayıcıdan doğrudan açılınca HTML hata sayfası döner.
+      const istek = new Request('https://voltage.com.tr' + req.url, { method: req.method, headers: req.headers.accept ? { Accept: req.headers.accept } : {} });
       const ctx = {
         request: istek,
         env: durum.env,
