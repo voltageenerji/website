@@ -917,6 +917,20 @@ ok('butce sabitleri: dakikada 12 rapor (eski gunler en cok 8; 4 bugun/dun icin a
   e.ayar.raporDurum = 500; e.ilerlet(6 * 60 * 60 * 1000 + 1000);
   await dene(); e.ilerlet(61 * 1000);
   ok('K1 basari sayaci sifirlar: yeni hata yine 60 sn sonra denenir (bayat sunulurken)', (await dene()) === 8, `-> ${e.sayac.rapor}`);
+  // BUGÜN ve DÜN: bekleme en çok 5 dk (60 sn → 5 dk; 30 dk adımı yok)
+  for (const G2 of [BUGUN, DUN]) {
+    const o = yeni({ raporDurum: 500 });
+    const d2 = async () => { await gunGetir(SAHTE_ENV, null, G2, o.sec); return o.e.sayac.rapor; };
+    await d2(); o.e.ilerlet(61 * 1000);
+    ok(`K1 ${G2}: 61 sn sonra 2. deneme`, (await d2()) === 2);
+    o.e.ilerlet(61 * 1000); ok(`K1 ${G2}: 2. hatadan 61 sn sonra istek yok (5 dk)`, (await d2()) === 2);
+    o.e.ilerlet(4 * 60 * 1000); ok(`K1 ${G2}: 5 dk dolunca 3. deneme`, (await d2()) === 3);
+    o.e.ilerlet(5 * 60 * 1000 + 1000); ok(`K1 ${G2}: 3. hatadan 5 dk sonra YINE denenir (30 dk adimi yok)`, (await d2()) === 4, `-> ${o.e.sayac.rapor}`);
+    o.e.ilerlet(5 * 60 * 1000 + 1000); ok(`K1 ${G2}: ust sinir 5 dk`, (await d2()) === 5);
+    o.e.ayar.raporDurum = 200; o.e.ilerlet(5 * 60 * 1000 + 1000);
+    const y2 = await gunGetir(SAHTE_ENV, null, G2, o.sec);
+    ok(`K1 ${G2}: servis duzelince en gec 5 dk icinde taze veri`, y2.durum === 'veri' && y2.bayat === undefined);
+  }
   // sürekli hata veren ay aralığı: adım başına en çok bir birim
   const h = yeni({ raporDurum: 500 });
   for (let dk = 0; dk < 40; dk++) { for (let i = 0; i < 5; i++) await aralikGetir(SAHTE_ENV, null, '2026-11-03', '2026-11-09', h.sec); h.e.ilerlet(60 * 1000); }

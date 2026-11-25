@@ -35,7 +35,7 @@
  *      biri güncel sayfayı aç bırakamaz. Aşılınca EPİAŞ'a gidilmez; bayat ya da
  *      bekleme döner.
  *   5. Başarısızlık anahtar bazında BÜYÜYEN aralıkla önbelleğe alınır: 60 sn → 5 dk →
- *      30 dk (başarıda sıfırlanır). Sürekli hata veren bir aralık adım başına en çok
+ *      30 dk (başarıda sıfırlanır); bugünün ve dünün tek gün anahtarlarında üst sınır 5 dk. Sürekli hata veren bir aralık adım başına en çok
  *      bir üst-akış birimi harcar.
  *   6. Sayfalı bir çekim bütçe ya da süre yüzünden yarıda kalırsa tamamlanan sayfalar
  *      kısa süre saklanır; sonraki deneme baştan başlamaz, kaldığı sayfadan sürer.
@@ -65,6 +65,7 @@ const TGT_TTL_S = 100 * 60;        // resmî ömür 2 saat; 100 dk'da yenilenir
 const KISA_TTL_S = 5 * 60;         // bugün / dün: yeni dönemler yayımlanıyor
 const UZUN_TTL_S = 6 * 60 * 60;    // daha eski günler
 const HATA_ADIMLARI_S = [60, 5 * 60, 30 * 60];        // anahtar bazında başarısızlık: büyüyen bekleme
+const HATA_ADIMLARI_ONCELIKLI_S = [60, 5 * 60];      // bugün / dün tek gün anahtarları: üst sınır 5 dk
 const HATA_SAKLAMA_S = 2 * 60 * 60;                  // hata sayacının hatırlanma süresi
 const ENGEL_RED_ADIMLARI_S = [5 * 60, 30 * 60, 2 * 60 * 60]; // giriş reddedildi / rapor kalıcı 401
 const ENGEL_SAKLAMA_S = 4 * 60 * 60;                 // engel adımının hatırlanma süresi
@@ -530,7 +531,10 @@ async function cekVeYaz(env, ctx, s, anahtar, bas, bit, bugun, kayit, eski) {
     console.error('dengesizlik: EPİAŞ verisi alınamadı —', neden);
     // Büyüyen bekleme: art arda başarısızlıkta 60 sn → 5 dk → 30 dk (başarıda sıfırlanır).
     const hataSayisi = (kayit && Number.isFinite(kayit.hataSayisi) ? kayit.hataSayisi : 0) + 1;
-    const bekleS = HATA_ADIMLARI_S[Math.min(hataSayisi, HATA_ADIMLARI_S.length) - 1];
+    // Bugün ve dün (sayfanın ana görünümü, kendi ayrılmış bütçesi var) en çok 5 dk bekler:
+    // kısa bir EPİAŞ kesintisi canlı görünümü düzeldikten sonra yarım saat bayat bırakmasın.
+    const adimlar = oncelikli ? HATA_ADIMLARI_ONCELIKLI_S : HATA_ADIMLARI_S;
+    const bekleS = adimlar[Math.min(hataSayisi, adimlar.length) - 1];
     if (eski) {
       // Dürüstlük merdiveni: daha önce alınmış GERÇEK veri, kendi çekim zamanıyla.
       const deger = { ...eski, bayat: true, neden };
