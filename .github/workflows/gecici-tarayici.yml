@@ -98,6 +98,12 @@ jobs:
           xcrun simctl openurl "$UDID" "$T?tarih=2026-11-23&qa=hesap"; sleep 15; xcrun simctl io "$UDID" screenshot ekran/ios-2-hesaplayici.png
           xcrun simctl openurl "$UDID" "$T?veriyok"; sleep 12; xcrun simctl io "$UDID" screenshot ekran/ios-3-bekleme.png
           xcrun simctl openurl "$UDID" "$T?tarih=2026-11-24#tablo"; sleep 12; xcrun simctl io "$UDID" screenshot ekran/ios-4-tablo.png
+          # Pikselsiz özet (artefakt bu oturumdan indirilemiyor): Vision OCR ile beklenen ifadeler var mı
+          O="$GITHUB_WORKSPACE/docs/qa/ekran-ocr.swift"; HATALI="Cannot Open|Cannot Connect|açılamıyor|bağlanamıyor"
+          swift "$O" ekran/ios-1-gecmis-gun.png "Dengesizlik Maliyeti|Pozitif ve Negatif Dengesizlik|Ana Sayfa" "$HATALI"
+          swift "$O" ekran/ios-2-hesaplayici.png "Dengesizlik maliyeti hesaplama|Kendi senaryom|Negatif dengesizlik" "$HATALI"
+          swift "$O" ekran/ios-3-bekleme.png "Dengesizlik Maliyeti|Ana Sayfa" "$HATALI"
+          swift "$O" ekran/ios-4-tablo.png "Dönem bazında|00:00|Enerji" "$HATALI"
           curl -s http://127.0.0.1:8787/__qa/raporlar > ekran/raporlar.json
           python3 - <<'PY'
           import json,re
@@ -116,10 +122,13 @@ jobs:
           AXE_MODUL: ${{ runner.temp }}/qa/node_modules
         run: |
           set +e; HATA=0
-          kos() { ad="$1"; shift; "$@" > "cikti/$ad.txt" 2>&1; kod=$?; echo "== $ad (çıkış $kod)"; grep -E '^(# |[0-9]+ passed|  FAIL|  NOT)' "cikti/$ad.txt" | sed -E 's/ -> .*$//' | cut -c1-170; [ $kod -eq 0 ] || HATA=1; }
+          kos() { ad="$1"; shift; "$@" > "cikti/$ad.txt" 2>&1; kod=$?; echo "== $ad (çıkış $kod)"; grep -E '^(# |[0-9]+ passed|  FAIL|  NOT)' "cikti/$ad.txt" | sed -E 's/ -> .*$//' | cut -c1-170; grep -E '^(\w*Error|    at )' "cikti/$ad.txt" | head -4 | cut -c1-160; [ $kod -eq 0 ] || HATA=1; }
+          echo "macOS klavye: AppleKeyboardUIMode=$(defaults read -g AppleKeyboardUIMode 2>/dev/null || echo yok) (varsayılan)"
           TARAYICI=webkit CIHAZ="iPhone 15" kos mac-webkit-iphone15 node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-erisilebilirlik.mjs"
-          TARAYICI=webkit kos mac-webkit-erisilebilirlik node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-erisilebilirlik.mjs"
-          TARAYICI=webkit kos mac-webkit-tarayici node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-tarayici.mjs"
+          # Klavyeyle gezen macOS kullanıcısının ayarı: "Tam Klavye Erişimi" (Tab tüm denetimlere ve bağlantılara)
+          defaults write -g AppleKeyboardUIMode -int 3
+          TARAYICI=webkit kos mac-webkit-erisilebilirlik-tam-klavye node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-erisilebilirlik.mjs"
+          TARAYICI=webkit kos mac-webkit-tarayici-tam-klavye node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-tarayici.mjs"
           echo "HATA=$HATA" >> "$GITHUB_ENV"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -143,9 +152,10 @@ jobs:
         working-directory: ${{ runner.temp }}
         run: |
           mkdir -p qa && cd qa && npm init -y >/dev/null
-          npm install --no-audit --no-fund "@guidepup/guidepup@0.39.0" "@guidepup/setup@0.29.3" "selenium-webdriver@${SELENIUM_SURUM}" >/dev/null
-          npx @guidepup/setup --ci > ../setup.log 2>&1; echo "guidepup kurulum çıkış $?"
-          sudo safaridriver --enable
+          set +e
+          npm install --no-audit --no-fund "@guidepup/guidepup@0.39.0" "@guidepup/setup@0.29.3" "selenium-webdriver@${SELENIUM_SURUM}" > ../npm.log 2>&1; echo "npm çıkış $?"; grep -E 'ERR|error' ../npm.log | head -8 | cut -c1-200
+          ./node_modules/.bin/guidepup --ci > ../setup.log 2>&1; echo "guidepup kurulum çıkış $?"; tail -5 ../setup.log | cut -c1-200
+          sudo safaridriver --enable; echo "safaridriver $?"
       - name: VoiceOver + Safari
         working-directory: ${{ runner.temp }}
         env:
@@ -155,7 +165,7 @@ jobs:
           mkdir -p cikti
           nohup node "$GITHUB_WORKSPACE/docs/qa/dengesizlik-ci-sunucu.mjs" > sunucu.log 2>&1 &
           for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8787/dengesizlik-maliyeti?veriyok && break; sleep 1; done
-          node "$GITHUB_WORKSPACE/docs/qa/voiceover-smoke.mjs"
+          node "$GITHUB_WORKSPACE/docs/qa/voiceover-smoke.mjs" 2>&1 | grep -vE '^\s*$' | cut -c1-200
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: macos-voiceover-cikti, path: '${{ runner.temp }}/cikti', retention-days: 1 }

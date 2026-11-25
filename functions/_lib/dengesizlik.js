@@ -117,14 +117,15 @@ export const TAVANLAR = Object.freeze([
 ]);
 
 /**
- * YAYIM İSTİSNALARI: EPİAŞ'ın yayımladığı fiyatların, o gün yürürlükteki formülden BÜTÜNÜYLE
- * farklı olduğu teslim günü aralıkları (EPİAŞ'ın kamuya açık günlük bültenlerinde görülen olgu).
+ * YAYIM İSTİSNALARI: EPİAŞ'ın yayımladığı fiyatların, o gün yürürlükteki formülden saatlerin çoğunda
+ * farklı olduğu teslim günü aralıkları (EPİAŞ'ın kamuya açık günlük bültenlerinde görülen olgu: 1–25 Ocak
+ * 2026'da 600 saatin 589'unda en az bir fiyat farklı).
  * Bu günlerde satır başına "†" ve örnek hesaptaki karşılaştırma gösterilmez; tablonun üstünde
  * tek bir gün düzeyi not gösterilir. Düzeltme gerekirse yalnız bu tablo değişir.
  * Tek dönemlik farklar (ör. 2026-11-03 12:00–13:00) istisna DEĞİLDİR: olağan "†" ile gösterilir.
  */
 export const YAYIM_NOTLARI = Object.freeze({
-  'ocak-2026-eski-kural': "1–25 Ocak 2026 teslim günlerinde EPİAŞ'ın yayımladığı dengesizlik fiyatları, 1 Ocak 2026'dan uygulanan DUY m.110 formülüyle hesaplanan değerlerden farklıdır. Tabloda EPİAŞ'ın yayımladığı değer gösterilir.",
+  'ocak-2026-eski-kural': "1–25 Ocak 2026 teslim günlerinde EPİAŞ'ın yayımladığı dengesizlik fiyatları, saatlerin çoğunda, 1 Ocak 2026'da yürürlüğe giren DUY m.110 metnindeki formülle hesaplanan değerlerle aynı değildir. Bu günlerde uzlaştırmada hangi değerlerin esas alındığı bu sayfada doğrulanmamıştır. Tabloda EPİAŞ'ın yayımladığı değer gösterilir; kesin tutar için EPİAŞ'ın uzlaştırma bildirimleri esas alınır.",
 });
 export const YAYIM_ISTISNALARI = Object.freeze([
   Object.freeze({ bas: '2026-01-01', bit: '2026-01-25', not: 'ocak-2026-eski-kural' }),

@@ -374,8 +374,10 @@ if (CIHAZ) {
     ok(`M ${ad}: sayı alanlarında inputmode=decimal (sayısal klavye)`, girdi.filter((g) => ['hMiktar', 'sPtf'].includes(g.id)).every((g) => g.im === 'decimal'));
     // iOS Safari, yazı boyutu 16 px'ten küçük alana odaklanınca sayfayı yakınlaştırır.
     ok(`M ${ad}: form denetimi yazı boyutu >= 16 px (iOS odakta yakınlaştırmaz)`, girdi.every((g) => g.px >= 16), `-> ${JSON.stringify(girdi)}`);
+    if (!girdi.every((g) => g.px >= 16)) not(`M ${ad}: yazı boyutu (px): ${girdi.map((g) => `${g.id}=${g.px}`).join(', ')}`);
     const hedef = await page.evaluate(() => [...document.querySelectorAll('button, a.btn-ikincil, input, select')].filter((e) => e.getClientRects().length && e.type !== 'radio').map((e) => { const r = e.getBoundingClientRect(); return [e.id || e.tagName, Math.round(r.width), Math.round(r.height)]; }).filter((x) => x[1] < 24 || x[2] < 24));
     ok(`M ${ad}: dokunma hedefleri >= 24x24 (WCAG 2.5.8)`, hedef.length === 0, `-> ${JSON.stringify(hedef)}`);
+    if (hedef.length) not(`M ${ad}: 24x24'ten küçük hedefler (kimlik genişlik×yükseklik): ${hedef.map((x) => `${x[0]} ${x[1]}×${x[2]}`).join(', ')}`);
     const a = await axeKos(page);
     ok(`M ${ad}: axe WCAG A/AA ihlali yok`, a.wcag.length === 0, `-> ${JSON.stringify(a.wcag)}`);
     if (a.ihlal.length) not(`M ${ad}: axe ihlal kuralları: ${a.ihlal.map((x) => `${x.id}${x.wcag ? '(wcag)' : '(bp)'}×${x.dugum}`).join(', ')}`);
