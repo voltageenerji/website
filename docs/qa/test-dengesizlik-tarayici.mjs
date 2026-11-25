@@ -229,18 +229,18 @@ bolum('S3 hesaplayıcı — “Seçili günün verisiyle” (klavye)');
   ok('S3 yayimlanmamis donem: aciklama var, RAKAM YOK', (await metin(page, '#gYok')) === 'Bu dönemin dengesizlik fiyatı EPİAŞ tarafından henüz yayımlanmadı. Hesap yapılmadı.' && (await page.locator('#gTutar').count()) === 0 && !/\d,\d\d/.test(await metin(page, '#hSonuc')));
   // Doğrulama
   await page.selectOption('#hDonem', '2026-11-24T10:00:00+03:00');
-  const NOKTA_MESAJI = 'Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125). Nokta yalnızca binlik ayırıcı olarak kabul edilir.';
-  // Belirsiz nokta: TAHMİN YOK ("0.125" 125 MWh olarak hesaplanmaz)
-  for (const girdi of ['0.125', '1.250', '12.345', '1234.56', '00.125', '0.125,5', '1.25']) {
+  const NOKTA_MESAJI = 'Bu giriş belirsiz. Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125); binleri noktasız yazın (örnek: 2800).';
+  // MİKTAR alanı katıdır: tek gruplu nokta belirsizdir, TAHMİN YOK ("0.125" 125 MWh, "2.800" 2800 MWh olarak hesaplanmaz)
+  for (const girdi of ['0.125', '1.250', '2.800', '12.345', '1234.56', '00.125', '0.125,5', '1.25']) {
     await page.fill('#hMiktar', girdi);
     await page.press('#hMiktar', 'Enter');
     ok(`S3 belirsiz nokta "${girdi}": tahmin yok, acik hata`, (await metin(page, '#hMiktarHata')) === NOKTA_MESAJI && (await page.locator('#hSonuc').innerHTML()) === '' && (await page.getAttribute('#hMiktar', 'aria-invalid')) === 'true');
   }
-  for (const [girdi, yanki] of [['0,125', '0,125 MWh'], ['1.250,5', '1.250,500 MWh'], ['1250', '1.250,000 MWh'], ['1.234.567,5', null], ['12,3456', '12,346 MWh']]) {
+  for (const [girdi, yanki] of [['0,125', '0,125 MWh'], ['1.250,5', '1.250,500 MWh'], ['1250', '1.250,000 MWh'], ['1.234.567,5', null], ['12,3456', '12,346 MWh'], ['2800', '2.800,000 MWh'], ['1.250.000', null]]) {
     await page.fill('#hMiktar', girdi);
     await page.press('#hMiktar', 'Enter');
     if (yanki) ok(`S3 gecerli giris "${girdi}" -> ${yanki}`, (await metin(page, '#gMiktar')) === `${yanki} (pozitif)` && (await metin(page, '#hMiktarHata')) === '');
-    else ok(`S3 "${girdi}": binlik gruplu ama ust sinir asimi`, (await metin(page, '#hMiktarHata')).includes('en çok'));
+    else ok(`S3 "${girdi}": cok gruplu binlik kabul edilir (${girdi === '1.250.000' ? 'sinir asimi mesaji' : 'sinir asimi mesaji'})`, (await metin(page, '#hMiktarHata')).includes('en çok'));
   }
   for (const [girdi, mesaj] of [['abc', 'sayıyla girin'], ['', 'sayıyla girin'], ['0', 'sıfırdan büyük'], ['-3', 'sıfırdan büyük'], ['1,2,3', 'sayıyla girin'], ['5000000', 'en çok']]) {
     await page.fill('#hMiktar', girdi);
@@ -333,9 +333,24 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   x = await senaryo('2000', '', 'acik');
   ok('S4 bos SMF: hata', x.smfHata.includes('sayıyla girin') && x.sonuc === '');
   x = await senaryo('2.800', '3.400,00', 'acik');
-  ok('S4 belirsiz nokta PTF alaninda da tahmin edilmez', x.ptfHata === 'Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125). Nokta yalnızca binlik ayırıcı olarak kabul edilir.' && x.sonuc === '');
-  x = await senaryo('2.800,0', '3.400,00', 'acik');
-  ok('S4 binlik nokta + virgul PTF/SMF alaninda', x.neg === '3.604,00 TL/MWh' && x.poz === '2.716,00 TL/MWh');
+  // FİYAT alanları (PTF, SMF): Türkçe yazımda nokta binlik ayırıcıdır → "2.800" = 2800
+  const FIYAT_NOKTA = 'Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125). Nokta yalnızca binlik ayırıcı olarak kabul edilir.';
+  ok('S4 fiyat alaninda "2.800" binlik okunur (2800), "3.400,00" da', x.neg === '3.604,00 TL/MWh' && x.poz === '2.716,00 TL/MWh' && x.ptfHata === '' && x.smfHata === '');
+  ok('S4 yanki nasil okundugunu birimiyle gosterir', (await metin(page, '#sYanki')) === 'Senaryo: PTF 2.800,00 TL/MWh · SMF 3.400,00 TL/MWh · Enerji açığı · 1,000 MWh');
+  x = await senaryo('2.800,5', '3.400', 'acik');
+  ok('S4 fiyat "2.800,5" -> 2800,5', x.ptfHata === '' && (await metin(page, '#sYanki')).startsWith('Senaryo: PTF 2.800,50 TL/MWh · SMF 3.400,00 TL/MWh') && x.poz === `${bicim(2800.5 * 0.97)} TL/MWh`);
+  for (const kotu of ['0.125', '2800.50', '28.00', '1.25', '0.800', '2.80', '2.8000']) {
+    x = await senaryo(kotu, '3400', 'acik');
+    ok(`S4 fiyat alaninda "${kotu}": tahmin yok, hata`, x.ptfHata === FIYAT_NOKTA && x.sonuc === '');
+    x = await senaryo('2800', kotu, 'acik');
+    ok(`S4 SMF alaninda "${kotu}": tahmin yok, hata`, x.smfHata === FIYAT_NOKTA && x.sonuc === '');
+  }
+  // Aynı formdaki MİKTAR alanı katı kalır
+  await page.fill('#sPtf', '2.800'); await page.fill('#sSmf', '3.400'); await page.selectOption('#sYon', 'acik'); await page.fill('#sMiktar', '2.800');
+  await page.press('#sMiktar', 'Enter');
+  ok('S4 miktar alaninda "2.800" REDDEDILIR (fiyat alaninda kabul edilirken)', (await metin(page, '#sMiktarHata')) === 'Bu giriş belirsiz. Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125); binleri noktasız yazın (örnek: 2800).' && (await metin(page, '#sPtfHata')) === '' && (await page.locator('#hSonuc').innerHTML()) === '');
+  await page.fill('#sMiktar', '1.250,5'); await page.press('#sMiktar', 'Enter');
+  ok('S4 miktar "1.250,5" kabul; fiyatlar binlik okunur', (await metin(page, '#sYanki')) === 'Senaryo: PTF 2.800,00 TL/MWh · SMF 3.400,00 TL/MWh · Enerji açığı · 1.250,500 MWh' && (await metin(page, '#sNegTutar')) === `${bicim(3604 * 1250.5)} TL`);
   x = await senaryo('0', '0', 'denge');
   ok('S4 sifir fiyat gecerli', x.neg === '103,00 TL/MWh' && x.poz === '−103,00 TL/MWh');
   // Mod değişince eski sonuç silinir

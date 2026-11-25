@@ -326,7 +326,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
           <p class="hata" id="hMiktarHata"></p>
         </div>
       </div>
-      <p class="kural-notu">Ondalık ayırıcı virgüldür (örnek: 0,125). Nokta yalnızca binlik ayırıcı olarak kabul edilir.</p>
+      <p class="kural-notu">Miktarda ondalık ayırıcı virgüldür (örnek: 0,125); binleri noktasız yazın (örnek: 2800).</p>
       <fieldset>
         <legend>Dengesizliğinizin yönü</legend>
         <label class="secenek"><input type="radio" name="hYon" value="negatif" checked><span>Negatif (eksik verdim ya da fazla çektim)</span></label>
@@ -438,7 +438,6 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <h2 id="kapsam">Kapsam ve sınırlar</h2>
   <ul class="liste">
     <li>Bu sayfa, piyasa katılımcıları ve piyasayı izleyen profesyoneller için hazırlanmış bir bilgi aracıdır. Dengesizlik tutarı, piyasa işletmecisi ile dengeden sorumlu taraf arasında uzlaştırılır (DUY m.110(1)); son tüketicinin faturasına yansıyıp yansımayacağı tedarik sözleşmesine bağlıdır. Bu sayfa, Voltage Enerji'nin müşterilerine uyguladığı ya da uygulayacağı bir fiyatı, bedeli veya sözleşme koşulunu göstermez.</li>
-    <li>Dengesizlik tutarı, dengeden sorumlu taraf için her uzlaştırma dönemi bazında hesaplanır (DUY m.110(1)).</li>
     <li>Dengeden sorumlu gruplarda grup üyesinin dengesizliği, Kurulun belirlediği dengesizlik oranı sınırı içinde grup içinde değerlendirilir; sınırı aşan kısım için tutar, üyenin bireysel dengesizliği üzerinden ayrıca hesaplanır (DUY m.111(5)). Bu sayfadaki tablo ve hesaplayıcı grup içi değerlendirmeyi içermez.</li>
     <li>Kesinleşmiş günlük üretim/tüketim programından sapma tutarı (KÜPST) ayrı bir kalemdir (DUY m.110(3)) ve bu sayfadaki fiyatlara dahil değildir. 14907 sayılı Kurul Kararı (RG 19/10/2026-33405), tüketim kapsamında oluşturulan uzlaştırmaya esas veriş-çekiş birimleri için belirlediği katsayı ve toleransların 1 Ocak 2027'den itibaren uygulanmasını öngörür; bu tutarın muhatabı ilgili piyasa katılımcısıdır.</li>
     <li>Kurul; kaynak bazlı, depolamalı üretim ve tüketim tesisleri için farklı metodoloji ya da katsayı uygulayabilir (DUY m.110(5)).</li>
@@ -828,14 +827,20 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   var elSonuc = $('hSonuc'), elDonem = $('hDonem');
   var NOKTA = {}; /* belirsiz nokta kullanımı işareti */
   var NOKTA_MESAJI = 'Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125). Nokta yalnızca binlik ayırıcı olarak kabul edilir.';
-  /* Ondalık ayırıcı YALNIZ virgüldür. Nokta yalnız düzgün binlik grubu olarak kabul edilir:
-     ilk grup "0" değil VE (en az iki grup ya da virgülle birlikte). "1.250", "0.125",
-     "12.345", "1234.56" gibi girişlerde TAHMİN YOK → NOKTA. Biçim dışı → null. */
-  function sayiOku(v){
-    var s = String(v === null || v === undefined ? '' : v).replace(/\s| /g, '').replace(/−/g, '-');
+  var MIKTAR_NOKTA_MESAJI = 'Bu giriş belirsiz. Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125); binleri noktasız yazın (örnek: 2800).';
+  /* Ondalık ayırıcı YALNIZ virgüldür; nokta yalnız binlik gruptur (ilk grup "0" değil).
+     ALANA GÖRE:
+       fiyat (PTF, SMF; TL/MWh, olağan değerler dört haneli): "2.800" → 2800, "2.800,50" → 2800,5.
+       miktar (MWh): tek gruplu "1.250" belirsizdir (1000 kat hata pahalıdır) → NOKTA; nokta yalnız
+         en az iki grupla ("1.250.000") ya da virgülle birlikte ("1.250,5") kabul edilir.
+     "0.125", "2800.50", "28.00", "1.25" her iki alanda da NOKTA (tahmin yok). Biçim dışı → null. */
+  function sayiOku(v, fiyat){
+    var s = String(v === null || v === undefined ? '' : v).replace(/\s|\u00a0/g, '').replace(/−/g, '-');
     if(s === '') return null;
     if(/^-?\d+(,\d+)?$/.test(s)) return Number(s.replace(',', '.'));
-    if(/^-?[1-9]\d{0,2}(\.\d{3})+,\d+$/.test(s) || /^-?[1-9]\d{0,2}(\.\d{3}){2,}$/.test(s)) return Number(s.replace(/\./g, '').replace(',', '.'));
+    var binlik = fiyat ? /^-?[1-9]\d{0,2}(\.\d{3})+(,\d+)?$/.test(s)
+      : (/^-?[1-9]\d{0,2}(\.\d{3})+,\d+$/.test(s) || /^-?[1-9]\d{0,2}(\.\d{3}){2,}$/.test(s));
+    if(binlik) return Number(s.replace(/\./g, '').replace(',', '.'));
     if(/^-?[\d.,]+$/.test(s) && s.indexOf('.') !== -1) return NOKTA;
     return null;
   }
@@ -846,8 +851,8 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     return !mesaj;
   }
   function miktarOku(girdiId){
-    var n = sayiOku($(girdiId).value);
-    if(n === NOKTA) { alanHata(girdiId, NOKTA_MESAJI); return null; }
+    var n = sayiOku($(girdiId).value, false);
+    if(n === NOKTA) { alanHata(girdiId, MIKTAR_NOKTA_MESAJI); return null; }
     if(n === null || !isFinite(n)) { alanHata(girdiId, 'Miktarı MWh olarak sayıyla girin. Ondalık için virgül kullanabilirsiniz.'); return null; }
     if(!(n > 0)) { alanHata(girdiId, 'Miktar sıfırdan büyük olmalıdır.'); return null; }
     if(n > 1000000) { alanHata(girdiId, 'Miktar en çok 1.000.000 MWh olabilir.'); return null; }
@@ -855,7 +860,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     return n;
   }
   function fiyatOku(girdiId, ad, kural){
-    var n = sayiOku($(girdiId).value);
+    var n = sayiOku($(girdiId).value, true);
     if(n === NOKTA) { alanHata(girdiId, NOKTA_MESAJI); return null; }
     if(n === null || !isFinite(n)) { alanHata(girdiId, ad + ' değerini TL/MWh olarak sayıyla girin.'); return null; }
     if(n < 0) { alanHata(girdiId, ad + ' sıfırdan küçük olamaz.'); return null; }
@@ -952,7 +957,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     var yon = $('sYon').value;
     var r = birimFiyat(ptf, smf, smf, yon, kural);
     if(!r){ sonucYaz(''); return; }
-    var h = '<div class="sonuc-kutu"><h3>Senaryo: PTF ' + bicim(ptf) + ' · SMF ' + bicim(smf) + ' · ' + YON_ADI[yon] + ' · ' + miktarBicim(q) + ' MWh</h3>'
+    var h = '<div class="sonuc-kutu"><h3 id="sYanki">Senaryo: PTF ' + tlMwh(ptf) + ' · SMF ' + tlMwh(smf) + ' · ' + YON_ADI[yon] + ' · ' + miktarBicim(q) + ' MWh</h3>'
       + (yon === 'denge' && ptf !== smf ? '<p id="sDengeUyari">Sistem dengedeyken SMF, PTF\'ye eşittir (DUY m.109(1)(c)). Girdiğiniz PTF ve SMF farklı; sonuç yalnızca varsayımsal bir senaryodur.</p>' : '')
       + '</div>'
       + '<div class="sonuc-kutu"><h3>Negatif dengesizlik</h3><dl>'
