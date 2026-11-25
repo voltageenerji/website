@@ -998,14 +998,29 @@ async function kaydet(c, durum, gunler, an, once) {
   return { yazilan, atlanan, degisti };
 }
 
+/**
+ * Süreç içi sıra: durum kaydının oku-değiştir-yaz adımları aynı süreçte üst üste binmez (aynı istekteki
+ * paralel çekimler birbirinin özetini silmez). Süreçler / veri merkezleri arası yarış mümkündür; sonucu
+ * yalnız bir günün bir kez daha yazılmasıdır (veri kaybı yok).
+ */
+let durumKuyrugu = Promise.resolve();
+function durumSirali(is) {
+  // Önceki adım asılı kalırsa (KV yanıt vermiyor) kuyruk kilitlenmez: en çok 5 sn beklenir.
+  let zamanlayici;
+  const sinir = new Promise((r) => { zamanlayici = setTimeout(r, 5000); });
+  const p = Promise.race([durumKuyrugu, sinir]).then(() => { clearTimeout(zamanlayici); return is(); });
+  durumKuyrugu = p.catch(() => {});
+  return p;
+}
+
 /** İstek yolunda çekilen günleri kaydeder ve durum kaydını (yeniden okuyup) günceller. */
 function istekKaydedici(c, once) {
-  return async (sonuc) => {
+  return (sonuc) => durumSirali(async () => {
     const durum = await durumOku(c, true);
     if (durum === undefined) { for (const [g, d] of sonuc.gunler) { const oz = await icerikOzeti(d); bellekGunYaz(c, g, { s: 1, tarih: g, cekildi: sonuc.an, ozet: oz, donemler: d }, oz); } return; }
     const k = await kaydet(c, durum, sonuc.gunler, sonuc.an, once);
     if (k.degisti && (await kvYaz(c, KV_DURUM, durum, 0, true))) bellekDurum = { deger: durum, son: c.simdi() + BELLEK_DURUM_MS };
-  };
+  });
 }
 
 /** Günün EPİAŞ'tan son alındığı an: kayıt zamanı ya da (içerik özeti eşleşiyorsa) durumdaki son kontrol. */

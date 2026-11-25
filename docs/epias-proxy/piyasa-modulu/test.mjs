@@ -244,6 +244,14 @@ ok('96 donem (15 dk) aynı koddan', a.donemler.length === 96 && a.donemler.every
   ok('KV baglamasi yok -> 503 gecici, EPİAŞ\'a istek yok', w.durum === 503 && w.j.hata.kod === 'gecici' && o4.e.sayac.rapor === 0);
 }
 
+{ // aynı istekte iki paralel çekim (bugün+dün ve eski dilim): durum kaydında hiçbir günün özeti kaybolmaz
+  const o = ortam();
+  const x = await o.aralik('2026-11-20', BUGUN);
+  await bosalt();
+  const d = JSON.parse(o.kv.depo.get(KV_DURUM));
+  ok('paralel cekimler: durum kaydinda istenen tum gunlerin ozeti var', x.durum === 200 && o.e.sayac.rapor === 2 && ['2026-11-20', '2026-11-21', '2026-11-22', DUN, BUGUN].every((g) => Array.isArray(d.g[g])), `-> ${Object.keys(d.g)}`);
+}
+
 // ============================================================================
 // 4 — KV ÖNCE
 // ============================================================================
