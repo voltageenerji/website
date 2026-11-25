@@ -297,92 +297,6 @@ export function formulFarki(d, kural) {
   return Math.abs(r.negatif - d.negatif) > 0.01 + 1e-9 || Math.abs(r.pozitif - d.pozitif) > 0.01 + 1e-9;
 }
 
-/**
- * EPİAŞ yanıtından kalem listesi. Zarf biçimi DOĞRULANMADI; savunmacı okunur:
- * body.content | body.items | items | content | çıplak dizi (ve body'nin kendisi dizi).
- * Tanınmayan biçim → null (boş liste [] ise [] döner).
- */
-export function ogelerCikar(j) {
-  if (Array.isArray(j)) return j;
-  if (!j || typeof j !== 'object') return null;
-  const b = j.body;
-  if (Array.isArray(b)) return b;
-  if (b && typeof b === 'object') {
-    if (Array.isArray(b.content)) return b.content;
-    if (Array.isArray(b.items)) return b.items;
-  }
-  if (Array.isArray(j.items)) return j.items;
-  if (Array.isArray(j.content)) return j.content;
-  return null;
-}
-
-/**
- * Yanıttaki sayfa bilgisi (resmî belge: yanıt {items[], page{number,size,sort,total}}).
- * → {number, size, total} (sayılar) ya da null. Zarf biçimi doğrulanmadığı için
- * hem j.page hem j.body.page okunur.
- */
-export function sayfaBilgisi(j) {
-  if (!j || typeof j !== 'object' || Array.isArray(j)) return null;
-  const p = (j.page && typeof j.page === 'object' ? j.page : null) || (j.body && typeof j.body === 'object' && !Array.isArray(j.body) && j.body.page && typeof j.body.page === 'object' ? j.body.page : null);
-  if (!p) return null;
-  const total = sayi(p.total);
-  if (total === null) return null;
-  const number = sayi(p.number), size = sayi(p.size);
-  return { number: number === null ? 1 : number, size: size === null ? 0 : size, total };
-}
-
-const ISO = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?\s*(Z|[+-]\d{2}:?\d{2})?)?/;
-
-/** ISO eşleşmesindeki saat bölümü → İstanbul duvar saatiyle gün başından dakika (ofset dönüştürülür). */
-function isoDakika(m) {
-  const hh = +m[4], mm = +m[5];
-  if (hh > 23 || mm > 59) return null;
-  let dk = hh * 60 + mm;
-  const of = m[7];
-  if (of && of !== OFSET && of !== '+0300') {
-    const r = of === 'Z' ? ['+', '00', '00'] : /^([+-])(\d{2}):?(\d{2})$/.exec(of).slice(1);
-    const ofDk = (r[0] === '-' ? -1 : 1) * (+r[1] * 60 + +r[2]);
-    dk = (((dk - ofDk + 180) % 1440) + 1440) % 1440;
-  }
-  return dk;
-}
-
-/** ISO tarih(-saat) eşleşmesi → İstanbul takvim günü; geçersizse null. */
-function isoGun(m) {
-  if (!ymdGecerli(`${m[1]}-${m[2]}-${m[3]}`)) return null;
-  if (m[4] === undefined || !m[7] || m[7] === OFSET || m[7] === '+0300') return `${m[1]}-${m[2]}-${m[3]}`;
-  const of = m[7] === 'Z' ? '+00:00' : (m[7].includes(':') ? m[7] : m[7].slice(0, 3) + ':' + m[7].slice(3));
-  const ms = Date.parse(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6] || '00'}${of}`);
-  return Number.isFinite(ms) ? new Date(ms + OFSET_MS).toISOString().slice(0, 10) : null;
-}
-
-/**
- * Bir kalemin zaman adayları: {gun, dDk, tDk} ya da null.
- *   gun: date alanının (yoksa ISO time/hour alanının) İstanbul günü. time alanı
- *        "1970-01-01T13:00:00+03:00" gibi tarihsiz bir an olabilir; o tarih güne karıştırılmaz.
- *   dDk: date alanının saat bölümü (yoksa null) · tDk: time/hour alanının saati (yoksa null)
- * Hangisinin dönem başlangıcı olduğuna GÜN bazında karar verilir (bkz. donemlerAyrintili).
- */
-function zamanAdaylari(o) {
-  const d = typeof o.date === 'string' ? ISO.exec(o.date.trim()) : null;
-  const alan = [o.time, o.hour].find((x) => typeof x === 'string' && x.trim() !== '');
-  const zs = alan ? alan.trim() : '';
-  const zIso = zs ? ISO.exec(zs) : null;
-  const zSaat = zs && !zIso ? /^(\d{1,2}):(\d{2})/.exec(zs) : null;
-
-  let tDk = null;
-  if (zIso && zIso[4] !== undefined) tDk = isoDakika(zIso);
-  else if (zSaat) { const hh = +zSaat[1], mm = +zSaat[2]; if (hh <= 23 && mm <= 59) tDk = hh * 60 + mm; }
-
-  let gun = d ? isoGun(d) : null;
-  let dDk = null;
-  if (gun && d[4] !== undefined) dDk = isoDakika(d);
-  if (!gun && zIso && zIso[4] !== undefined) gun = isoGun(zIso);
-  if (!gun) return null;
-  if (dDk === null && tDk === null) dDk = 0; // yalnız gün verilmiş: 00:00
-  return { gun, dDk, tDk };
-}
-
 const iki = (n) => String(n).padStart(2, '0');
 
 /** {ymd, dk} → "YYYY-MM-DDTHH:MM:00+03:00" */
@@ -401,8 +315,9 @@ export function donemEtiketi(d) {
   return `${f(b)}–${f(s)}`;
 }
 
-const GECERLI_DK = [5, 10, 15, 20, 30, 60];
+export const GECERLI_DK = Object.freeze([5, 10, 15, 20, 30, 60]);
 const ALANLAR5 = ['ptf', 'smf', 'pozitif', 'negatif', 'yon'];
+const YONLER = ['acik', 'fazla', 'denge'];
 
 function maliyetler(d) {
   d.maliyetNegatif = d.negatif !== null && d.ptf !== null ? temiz(d.negatif - d.ptf) : null;
@@ -412,91 +327,97 @@ function maliyetler(d) {
 
 const ayniDeger = (a, b) => (typeof a === 'number' && typeof b === 'number' ? Math.abs(a - b) < 1e-9 : a === b);
 
+/** Sözleşmenin desteklediği tek sürüm (docs/epias-proxy/PIYASA-VERI-MIMARISI.md §3). */
+export const PIYASA_SURUM = 1;
+/** Tek yanıtta kabul edilen en çok gün (sözleşme sınırı 31; fazlası sözleşme ihlalidir). */
+const AZAMI_YANIT_GUN = 31;
+/** Gelecekteki bir zaman damgasına tanınan saat kayması payı. */
+const SAAT_PAYI_MS = 5 * 60 * 1000;
+
+const BAS_RE = /^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):([0-5]\d):00\+03:00$/;
+const AN_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})$/;
+
 /**
- * Ham EPİAŞ kalemleri → {donemler, cakisma, cokme}.
- *   donemler: sıralı, tekilleştirilmiş dizi
- *     {bas, dk, ptf, smf, pozitif, negatif, yon, maliyetNegatif, maliyetPozitif}
- *   cakisma:  aynı döneme ait kopyaların FARKLI değer taşıdığı dönem sayısı
- *   cokme:    bir günün satırları tek döneme çöktüyse true (tarih/saat biçimi çözülemedi)
- *
- * - DÖNEM BAŞLANGICI: date ve time/hour alanlarından, gün içinde saat bileşeni
- *   DEĞİŞEN alan seçilir (EPİAŞ belgesi ikisini de date-time diye tanımlar; hangisinin
- *   saati taşıdığı doğrulanmadı). Eşitlikte time alanı; ikisi farklıysa ve biri 00:00
- *   ise diğeri.
- * - Aynı başlangıçlı kopyalar birleşir (EPİAŞ bir günün her saatini iki kez
- *   döndürmüştü): boş alan diğer kopyadan tamamlanır. Kopyalar ÇELİŞİYORSA hangisinin
- *   doğru olduğu bilinemez: o dönemin tüm alanları null olur ("—"), sayaç artar.
- * - Boş alanlar null KALIR. Maliyet, iki işleneni de varsa hesaplanır.
- * - dk: aynı gün içindeki ardışık başlangıçların en küçük farkı (varsayılan 60).
+ * ISO-8601 an (ofsetli) → "YYYY-MM-DDTHH:MM:SS+03:00"; geçersizse ya da `simdi`den
+ * belirgin biçimde ilerideyse null.
  */
-export function donemlerAyrintili(hamOgeler) {
-  const bos = { donemler: [], cakisma: 0, cokme: false };
-  if (!Array.isArray(hamOgeler)) return bos;
+export function anCoz(v, simdi) {
+  if (typeof v !== 'string' || !AN_RE.test(v)) return null;
+  const ms = Date.parse(v);
+  if (!Number.isFinite(ms)) return null;
+  if (Number.isFinite(simdi) && ms > simdi + SAAT_PAYI_MS) return null;
+  return istanbulIso(ms);
+}
 
-  // 1) Zaman adayları, gün bazında gruplanır
+/** Sözleşmede fiyat: sonlu sayı ya da null. Başka her şey sözleşme ihlalidir (undefined döner). */
+function fiyatAlani(v) {
+  if (v === null) return null;
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  return undefined;
+}
+
+/**
+ * `GET /piyasa/v1/dengesizlik` yanıtı → doğrulanmış günler. ÜST-AKIŞA GÜVENİLMEZ:
+ * proxy'nin ürettiği JSON burada yeniden doğrulanır ve normalleştirilir.
+ *
+ *   → { hata: null, gunler: Map<ymd, {tarih, cekildi, bayat, donemler}>, uretildi, cakisma }
+ *   → { hata: 'bicim' }   sözleşme ihlali: sürüm yanlış, zorunlu alan yok, alan türü yanlış,
+ *                          dönem başlangıcı/uzunluğu geçersiz, aynı gün iki kez
+ *
+ * - Zorunlu alanlar: surum (=1), uretildi, gunler[]; gün başına tarih, cekildi, bayat, donemler[];
+ *   dönem başına bas, dk ve ptf/smf/pozitif/negatif/yon anahtarları (değer null olabilir).
+ * - `tam`, `kaynak`, `yonHam` okunmaz: tamlık ve yayım durumu dönemlerden yeniden hesaplanır.
+ * - null ASLA 0 olmaz; fiyat yalnız sonlu sayıdır (metin, boolean → sözleşme ihlali).
+ * - bas: "YYYY-MM-DDTHH:MM:00+03:00", tarihi günün tarihi; dk ∈ {5,10,15,20,30,60}, gün içinde
+ *   tek değer ve bas dk'ya bölünür. Dönem sayısı veriden gelir (24, 96, …).
+ * - Aynı başlangıçlı kopyalar birleşir (boş alan diğerinden tamamlanır). Kopyalar ÇELİŞİYORSA
+ *   hangisinin doğru olduğu bilinemez: o dönemin tüm alanları null ("—"), sayaç artar.
+ * - İstenen [bas, bit] dışındaki günler yok sayılır.
+ */
+export function piyasaCoz(j, bas, bit, simdi) {
+  const bicim = { hata: 'bicim' };
+  if (!j || typeof j !== 'object' || Array.isArray(j)) return bicim;
+  if (j.surum !== PIYASA_SURUM) return bicim;
+  const uretildi = anCoz(j.uretildi, simdi);
+  if (!uretildi || !Array.isArray(j.gunler) || j.gunler.length > AZAMI_YANIT_GUN) return bicim;
   const gunler = new Map();
-  for (const o of hamOgeler) {
-    if (!o || typeof o !== 'object') continue;
-    const z = zamanAdaylari(o);
-    if (!z) continue;
-    if (!gunler.has(z.gun)) gunler.set(z.gun, []);
-    gunler.get(z.gun).push({ o, z });
-  }
-
-  const harita = new Map();
-  const cakisan = new Set();
-  let cokme = false;
-  for (const [gun, satirlar] of gunler) {
-    // 2) Bu günde saat bileşeni değişen alan hangisi?
-    const farkliT = new Set(satirlar.map((x) => x.z.tDk).filter((v) => v !== null)).size;
-    const farkliD = new Set(satirlar.map((x) => x.z.dDk).filter((v) => v !== null)).size;
-    const gunAnahtarlari = new Set();
-    for (const { o, z } of satirlar) {
-      let dk;
-      if (z.tDk === null) dk = z.dDk;
-      else if (z.dDk === null) dk = z.tDk;
-      else if (farkliT > farkliD) dk = z.tDk;
-      else if (farkliD > farkliT) dk = z.dDk;
-      else dk = z.tDk !== z.dDk && z.tDk === 0 ? z.dDk : z.tDk;
-      const anahtar = basIso(gun, dk);
-      gunAnahtarlari.add(anahtar);
-      const yeni = { bas: anahtar, dk: 60, ptf: sayi(o.ptf), smf: sayi(o.smf), pozitif: sayi(o.positiveImbalance), negatif: sayi(o.negativeImbalance), yon: yonCoz(o.systemStatus) };
-      const eski = harita.get(anahtar);
-      if (!eski) { harita.set(anahtar, yeni); continue; }
+  const gorulen = new Set();
+  let cakisma = 0;
+  for (const g of j.gunler) {
+    if (!g || typeof g !== 'object' || Array.isArray(g) || !ymdGecerli(g.tarih)) return bicim;
+    const cekildi = anCoz(g.cekildi, simdi);
+    if (!cekildi || typeof g.bayat !== 'boolean' || !Array.isArray(g.donemler) || g.donemler.length > 1440 / 5 * 2) return bicim;
+    if (gorulen.has(g.tarih)) return bicim;
+    gorulen.add(g.tarih);
+    const harita = new Map();
+    const cakisan = new Set();
+    let dk0 = null;
+    for (const d of g.donemler) {
+      if (!d || typeof d !== 'object' || Array.isArray(d)) return bicim;
+      const m = typeof d.bas === 'string' ? BAS_RE.exec(d.bas) : null;
+      if (!m || m[1] !== g.tarih) return bicim;
+      if (!GECERLI_DK.includes(d.dk)) return bicim;
+      if (dk0 === null) dk0 = d.dk; else if (d.dk !== dk0) return bicim;
+      if ((+m[2] * 60 + +m[3]) % d.dk !== 0) return bicim;
+      for (const a of ALANLAR5) if (!Object.prototype.hasOwnProperty.call(d, a)) return bicim;
+      const yeni = { bas: d.bas, dk: d.dk, ptf: fiyatAlani(d.ptf), smf: fiyatAlani(d.smf), pozitif: fiyatAlani(d.pozitif), negatif: fiyatAlani(d.negatif), yon: d.yon };
+      if (ALANLAR5.slice(0, 4).some((a) => yeni[a] === undefined)) return bicim;
+      if (yeni.yon !== null && !YONLER.includes(yeni.yon)) return bicim;
+      const eski = harita.get(d.bas);
+      if (!eski) { harita.set(d.bas, yeni); continue; }
       for (const a of ALANLAR5) {
         if (yeni[a] === null) continue;
         if (eski[a] === null) eski[a] = yeni[a];
-        else if (!ayniDeger(eski[a], yeni[a])) cakisan.add(anahtar);
+        else if (!ayniDeger(eski[a], yeni[a])) cakisan.add(d.bas);
       }
     }
-    // 3) Çok satır tek döneme çöktü ve satırlar birbirini tutmuyor: biçim çözülemedi
-    if (satirlar.length >= 4 && gunAnahtarlari.size === 1 && cakisan.has([...gunAnahtarlari][0])) cokme = true;
+    for (const b of cakisan) { const d = harita.get(b); for (const a of ALANLAR5) d[a] = null; }
+    cakisma += cakisan.size;
+    if (g.tarih < bas || g.tarih > bit) continue;
+    const donemler = [...harita.values()].sort((x, y) => (x.bas < y.bas ? -1 : x.bas > y.bas ? 1 : 0)).map(maliyetler);
+    gunler.set(g.tarih, { tarih: g.tarih, cekildi, bayat: g.bayat, donemler });
   }
-  for (const anahtar of cakisan) {
-    const d = harita.get(anahtar);
-    for (const a of ALANLAR5) d[a] = null; // hangi kopya doğru bilinemez: değer üretilmez
-  }
-  const liste = [...harita.values()].sort((x, y) => (x.bas < y.bas ? -1 : x.bas > y.bas ? 1 : 0));
-
-  // Dönem uzunluğu: gün bazında en küçük ardışık fark
-  const gunDk = new Map();
-  for (let i = 1; i < liste.length; i++) {
-    const g = donemGunu(liste[i]);
-    if (donemGunu(liste[i - 1]) !== g) continue;
-    const fark = donemDakikasi(liste[i]) - donemDakikasi(liste[i - 1]);
-    if (fark > 0 && (!gunDk.has(g) || fark < gunDk.get(g))) gunDk.set(g, fark);
-  }
-  for (const d of liste) {
-    const f = gunDk.get(donemGunu(d));
-    d.dk = GECERLI_DK.includes(f) ? f : 60;
-    maliyetler(d);
-  }
-  return { donemler: liste, cakisma: cakisan.size, cokme };
-}
-
-/** Yalnız dönem dizisi (bkz. donemlerAyrintili). */
-export function donemler(hamOgeler) {
-  return donemlerAyrintili(hamOgeler).donemler;
+  return { hata: null, gunler, uretildi, cakisma };
 }
 
 /** EPİAŞ o dönemin dengesizlik fiyatlarını yayımladı mı? */
@@ -552,20 +473,6 @@ export function ozet(liste) {
     maliyetNegatifOrt: ortalama(y.map((d) => d.maliyetNegatif)),
     yon,
   };
-}
-
-/**
- * Bir günün EPİAŞ istek sınırları (ISO-8601, +03:00).
- * endDate günün son saat başıdır: servis bitişi "gün dahil" de "an dahil" de
- * yorumlasa saatlik serinin tamamı kapsanır (yorum DOĞRULANMADI; dönen satırlar
- * ayrıca istenen güne süzülür).
- */
-export function gunSinirlari(ymd) {
-  return aralikSinirlari(ymd, ymd);
-}
-
-export function aralikSinirlari(bas, bit) {
-  return { startDate: `${bas}T00:00:00${OFSET}`, endDate: `${bit}T23:00:00${OFSET}` };
 }
 
 /** Sistem yönünün görünen adı (EPİAŞ'ın terimleri). */

@@ -1,12 +1,12 @@
 // Test sunucusu: /dengesizlik-maliyeti ve /dengesizlik-maliyeti/veri rotalarını GERÇEK
-// fonksiyon modülleriyle, SAHTE EPİAŞ'la (ağ yok) sunar. wrangler gerekmez.
+// fonksiyon modülleriyle, SAHTE proxy'yle (piyasa/v1; ağ yok) sunar. wrangler gerekmez.
 // !!! Sunulan fiyatlar UYDURMA TEST VERİSİDİR (docs/qa/dengesizlik-test-verisi.mjs).
 import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import * as sayfa from '../../functions/dengesizlik-maliyeti.js';
 import * as veriUcu from '../../functions/dengesizlik-maliyeti/veri.js';
-import { _bellekTemizle } from '../../functions/_lib/epias.js';
-import { sahteEpias, SAHTE_ENV } from './dengesizlik-test-verisi.mjs';
+import { _bellekTemizle } from '../../functions/_lib/piyasa-istemci.js';
+import { sahteProxy, SAHTE_ENV } from './dengesizlik-test-verisi.mjs';
 
 const KABUK = new URL('../../dengesizlik-maliyeti.html', import.meta.url);
 // Sitenin GERÇEK içerik güvenlik politikası (_headers, "/*" kuralı): HTML yanıtlarına eklenir,
@@ -14,21 +14,22 @@ const KABUK = new URL('../../dengesizlik-maliyeti.html', import.meta.url);
 const CSP = (/^\/\*\n(?:[^\n]*\n)*?\s+Content-Security-Policy: ([^\n]+)/m.exec(readFileSync(new URL('../../_headers', import.meta.url), 'utf8')) || [])[1];
 
 /**
- * ayar: sahteEpias ayarları + { env } (varsayılan SAHTE_ENV; {} → kimlik yok).
- * Dönen nesne: { url, port, epias, kapat(), ayarla(yeni) }
+ * ayar: sahteProxy ayarları + { env } (varsayılan SAHTE_ENV; {} → bağlantı yok) + { host }
+ * (isteklerin Host'u; varsayılan voltage.com.tr).
+ * Dönen nesne: { url, port, proxy, kapat(), ayarla(yeni) }
  */
 export async function sunucuBaslat(ayar = {}) {
   _bellekTemizle();
-  const durum = { epias: sahteEpias(ayar), env: ayar.env || SAHTE_ENV };
+  const durum = { proxy: sahteProxy(ayar), env: ayar.env || SAHTE_ENV, host: ayar.host || 'voltage.com.tr' };
   const sunucu = http.createServer(async (req, res) => {
     try {
       const u = new URL(req.url, 'http://yerel');
       // Accept başlığı iletilir: uç, tarayıcıdan doğrudan açılınca HTML hata sayfası döner.
-      const istek = new Request('https://voltage.com.tr' + req.url, { method: req.method, headers: req.headers.accept ? { Accept: req.headers.accept } : {} });
+      const istek = new Request(`https://${durum.host}` + req.url, { method: req.method, headers: req.headers.accept ? { Accept: req.headers.accept } : {} });
       const ctx = {
         request: istek,
         env: durum.env,
-        secenek: { fetch: durum.epias.fetch, simdi: durum.epias.simdi, cache: null },
+        secenek: { fetch: durum.proxy.fetch, simdi: durum.proxy.simdi, cache: null },
         waitUntil() {},
         next: async () => new Response(readFileSync(KABUK, 'utf8'), {
           status: 200,
@@ -55,9 +56,9 @@ export async function sunucuBaslat(ayar = {}) {
   return {
     port,
     url: `http://127.0.0.1:${port}`,
-    get epias() { return durum.epias; },
-    /** EPİAŞ davranışını değiştirir (süreç belleği de sıfırlanır). */
-    ayarla(yeni = {}) { _bellekTemizle(); durum.epias = sahteEpias(yeni); durum.env = yeni.env || SAHTE_ENV; },
+    get proxy() { return durum.proxy; },
+    /** Proxy davranışını değiştirir (süreç belleği de sıfırlanır). */
+    ayarla(yeni = {}) { _bellekTemizle(); durum.proxy = sahteProxy(yeni); durum.env = yeni.env || SAHTE_ENV; durum.host = yeni.host || 'voltage.com.tr'; },
     kapat: () => new Promise((coz) => sunucu.close(coz)),
   };
 }

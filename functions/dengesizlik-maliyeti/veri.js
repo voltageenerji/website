@@ -8,7 +8,7 @@
  *
  * JSON ALANLARI (kararlı; yeniden adlandırılmaz, yalnız ekleme yapılır):
  *   surum, baslik, sayfa, kaynak{ad,rapor,url}, yayinci, birim, saatDilimi,
- *   tarih | bas+bit, cekildi (EPİAŞ'tan alındığı an, ISO-8601 +03:00),
+ *   tarih | bas+bit, cekildi (verinin EPİAŞ'tan alındığı an; proxy'nin bildirdiği, ISO-8601 +03:00),
  *   bayat (true ise güncel veri şu an alınamadı; veri "cekildi" anına aittir),
  *   ozet{toplam,yayimlanan,ptfOrt,smfOrt,pozitifOrt,negatifOrt,maliyetPozitifOrt,maliyetNegatifOrt,yon{acik,fazla,denge}},
  *   kurallar[{bas,bit,V,B,k,l,AFL,asgari,tavanBas,tavanCarpani,kaynak}], kuralAlanlari,
@@ -18,20 +18,23 @@
  *
  * CSV: UTF-8 + BOM, ayırıcı ";", ondalık virgül, CRLF (Türkçe Excel'de doğrudan açılır);
  *      son sütun "Kaynak". XLSX: sayılar sayısal hücre; ikinci sayfa "Bilgi" (atıf, not,
- *      çekilme zamanı, bayat mı). Tüm biçimlerde X-Veri-Cekildi ve X-Veri-Bayat başlıkları.
+ *      çekilme zamanı, bayat mı). Tüm biçimlerde X-Veri-Cekildi ve X-Veri-Bayat başlıkları;
+ *      X-Veri-Uretildi: verinin geldiği proxy yanıtının üretildiği an (önbellekten sunulan iki
+ *      yanıt aynı değeri taşır; kabul denetimi bununla proxy çağrısı paylaşımını ölçer).
  *
  * DÜRÜSTLÜK: veri yoksa 503 döner; boş ama "başarılı" dosya üretilmez. Tarayıcıdan
  * doğrudan açılırsa (Accept: text/html) hata küçük bir HTML sayfası olarak gösterilir.
  * Bilerek /api/ altında DEĞİL: robots.txt /api/ yolunu kapatır, bu uç yapay zekâ
  * ajanlarınca çekilebilir kalmalı. Arama dizinine girmesin diye X-Robots-Tag: noindex.
  * CORS başlığı ve OPTIONS işleyicisi YOK (aynı köken). HEAD yalnız önbellekten
- * yanıtlanır; EPİAŞ'a gitmez.
+ * yanıtlanır; proxy'ye gitmez. Veri functions/_lib/piyasa-istemci.js üzerinden epias-proxy'nin
+ * piyasa/v1 ucundan gelir; bu sitede EPİAŞ kimliği yoktur.
  */
 import {
   kuralDilimleri, ozet, tarihGecerli, ymdGecerli, istanbulBugun, gunEkle, gunFarki, donemGunu, donemDakikasi,
   YON_ADI, ATIF, NOT_ORTALAMA, SAYFA_URL, AZAMI_ARALIK_GUN, ILK_GUN, OFSET,
 } from '../_lib/dengesizlik.js';
-import { gunGetir, aralikGetir } from '../_lib/epias.js';
+import { gunGetir, aralikGetir } from '../_lib/piyasa-istemci.js';
 import { xlsxYaz } from '../_lib/xlsx.js';
 
 // CORS başlığı BİLEREK yok: sayfa aynı kökenden çalışır; başka sitelerin bu ucu
@@ -42,7 +45,7 @@ const ORTAK = {
   'X-Content-Type-Options': 'nosniff',
 };
 
-/** Toplam süre sınırı (giriş + rapor): aşılırsa bayat veri ya da 503. */
+/** Toplam süre sınırı (proxy çağrısı): aşılırsa bayat veri ya da 503. */
 const SURE_MS = 9000;
 
 const KAYNAK_ADI = 'EPİAŞ Şeffaflık Platformu';
@@ -85,7 +88,7 @@ const CSV_BASLIK = [
 ];
 
 const NEDEN_MESAJI = {
-  'kimlik-yok': 'Veri bağlantısı henüz yapılandırılmadı.',
+  'baglanti-yok': 'Veri bağlantısı henüz yapılandırılmadı.',
   bos: 'EPİAŞ bu tarih için henüz veri yayımlamadı.',
   eksik: 'EPİAŞ yanıtı istenen aralığın tamamını kapsamıyor.',
 };
@@ -163,7 +166,7 @@ async function yanit(context, govdesiz) {
     // context.secenek yalnız testlerde vardır (sahte fetch / sabit saat); üretimde tanımsızdır.
     const sec = context.secenek;
     const bugun = istanbulBugun(sec && typeof sec.simdi === 'function' ? sec.simdi() : Date.now());
-    // HEAD yalnız önbellekten yanıtlanır: gövdesiz bir istek EPİAŞ'a gitmez.
+    // HEAD yalnız önbellekten yanıtlanır: gövdesiz bir istek proxy'ye gitmez.
     const cekim = { sureMs: SURE_MS, ...(sec || {}), yalnizOnbellek: govdesiz };
     const bicim = (q.get('bicim') || 'json').toLowerCase();
     if (!['json', 'csv', 'xlsx'].includes(bicim)) {
@@ -202,7 +205,7 @@ async function yanit(context, govdesiz) {
     }
 
     if (govdesiz && sonuc && sonuc.durum !== 'veri' && sonuc.neden === 'onbellek-yok') {
-      // Önbellekte kayıt yok: durum bilinmiyor. EPİAŞ'a gidilmez; asıl sonucu GET verir.
+      // Önbellekte kayıt yok: durum bilinmiyor. Proxy'ye gidilmez; asıl sonucu GET verir.
       const tur = { json: 'application/json; charset=utf-8', csv: 'text/csv; charset=utf-8', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }[bicim];
       return new Response(null, { status: 200, headers: { ...ORTAK, 'Content-Type': tur, 'Cache-Control': 'no-store', 'X-Veri-Durum': 'onbellekte-yok' } });
     }
@@ -215,7 +218,7 @@ async function yanit(context, govdesiz) {
     const son = ust.tarih || ust.bit;
     const azami = sonuc.bayat ? 60 : (son >= gunEkle(bugun, -1) ? 300 : 3600);
     // Tüm biçimlerde: verinin EPİAŞ'tan alındığı an ve bayat olup olmadığı (CSV/XLSX gövdesi dışında da görünür).
-    const onbellek = { 'Cache-Control': `public, max-age=${azami}`, 'X-Veri-Cekildi': String(sonuc.cekildi || ''), 'X-Veri-Bayat': sonuc.bayat ? 'true' : 'false' };
+    const onbellek = { 'Cache-Control': `public, max-age=${azami}`, 'X-Veri-Cekildi': String(sonuc.cekildi || ''), 'X-Veri-Bayat': sonuc.bayat ? 'true' : 'false', 'X-Veri-Uretildi': String(sonuc.uretildi || '') };
 
     if (bicim === 'csv') {
       const metin = '﻿' + [CSV_BASLIK, ...satirlar(sonuc.donemler)].map((r) => r.map(csvAlan).join(';')).join('\r\n') + '\r\n';

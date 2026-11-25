@@ -3,7 +3,7 @@
  *
  * Sayfa, GERÇEK fonksiyon modülleriyle (functions/dengesizlik-maliyeti.js ve
  * functions/dengesizlik-maliyeti/veri.js) küçük bir node http sunucusundan
- * sunulur; EPİAŞ sahtedir (ağ yok). wrangler gerekmez.
+ * sunulur; piyasa verisi proxy'si sahtedir (piyasa/v1; ağ yok). wrangler gerekmez.
  * !!! Buradaki tüm fiyatlar UYDURMA TEST VERİSİDİR.
  *
  * Kapsam: hesaplayıcının iki modu (klavyeyle), formül sürüklenmesi (istemci =
@@ -29,7 +29,7 @@ const ok = (n, c, extra = '') => { if (c) { pass++; } else { fail++; console.log
 const bolum = (ad) => console.log(`# ${ad}`);
 
 // Bugün (24.11.2026) 11 dönem yayımlanmış; 04:00–05:00 eşik altı (eksi pozitif fiyat). Diğer günler tam.
-const OZEL = { ptf: 450, smf: 60, positiveImbalance: -106, negativeImbalance: 463.5, systemStatus: 'Enerji Fazlası' };
+const OZEL = { ptf: 450, smf: 60, pozitif: -106, negatif: 463.5, yon: 'fazla', yonHam: 'Enerji Fazlası' };
 const gunVerisi = (n) => (g) => sahteGun(g, g === '2026-11-24' ? n : 24).map((o, i) => (i === 4 ? { ...o, ...OZEL } : o));
 const S = await sunucuBaslat({ gun: gunVerisi(11) });
 const browser = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });
@@ -44,8 +44,8 @@ async function ac(yol, { w = 1280, h = 900, js = true, an = SABIT_AN, depo = nul
   page.on('request', (r) => { if (r.url().includes('/dengesizlik-maliyeti/veri')) kayit.veriIstek++; });
   await ctx.route(/fonts\.googleapis\.com/, (r) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
   await ctx.route(/fonts\.gstatic\.com/, (r) => r.fulfill({ status: 200, body: '' }));
-  // Tarayıcı EPİAŞ'a ASLA doğrudan gitmemeli (kimlik sunucuda); giderse sayılır ve kesilir.
-  await ctx.route(/(giris|seffaflik)\.epias\.com\.tr|epias-proxy/, (r) => { kayit.epias++; return r.abort(); });
+  // Tarayıcı EPİAŞ'a ya da proxy'ye ASLA doğrudan gitmemeli (belirteç sunucuda); giderse sayılır ve kesilir.
+  await ctx.route(/(giris|seffaflik)\.epias\.com\.tr|epias-proxy|piyasa-veri|\/piyasa\/v1\//, (r) => { kayit.epias++; return r.abort(); });
   if (js) {
     await page.clock.install({ time: new Date(an) });
     await page.addInitScript(() => {
@@ -564,7 +564,7 @@ bolum('S8 31/12/2026 sonrası: formül hesabı kendini kapatır');
 {
   const OCAK = Date.UTC(2027, 0, 5, 9, 0, 0);
   S.ayarla({ gun: (g) => sahteGun(g, 6) });
-  S.epias.an = OCAK;
+  S.proxy.an = OCAK;
   const { page, kayit, kapat } = await ac('/dengesizlik-maliyeti', { an: OCAK });
   ok('S8 2027: tablo EPİAŞ verisiyle calisir', (await metin(page, '#dGun')) === '05.01.2027' && (await page.locator('#dTablo tr[data-bas]').count()) === 24);
   ok('S8 2027: "Kendi senaryom" kapali + durust not', (await page.isDisabled('#hModSenaryo')) && (await page.isVisible('#hKapali')) && (await metin(page, '#hKapali')).startsWith('Bugün için doğrulanmış bir dengesizlik fiyatı kuralı bulunmadığından'));

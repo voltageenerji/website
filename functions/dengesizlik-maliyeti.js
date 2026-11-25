@@ -8,11 +8,11 @@
  * DÜRÜSTLÜK MERDİVENİ
  *   - EPİAŞ'tan şimdi alınan veri → "EPİAŞ VERİSİ" + alındığı an.
  *   - Güncel veri şu an alınamıyor ama daha önce alınmış gerçek veri var → "SON SENKRON"
- *     + o çekimin zamanı (functions/_lib/epias.js, bayat:true).
+ *     + o çekimin zamanı (functions/_lib/piyasa-istemci.js, bayat:true).
  *   - Hiç veri yok → kabuk: "—" ve "EPİAŞ VERİSİ BEKLENİYOR". Uydurma rakam yok.
  *   - Yayımlanmamış dönem "—" kalır; 0 yazılmaz, taşınmaz.
  *   - SSR'da ne olursa olsun sayfa ayakta kalır (hata → statik kabuk).
- *   - EPİAŞ toplam 3,5 sn'den uzun sürerse beklenmez: bayat veri ya da bekleme hâli
+ *   - Proxy toplam 3,5 sn'den uzun sürerse beklenmez: bayat veri ya da bekleme hâli
  *     döner, çekim ctx.waitUntil ile sürer.
  *
  * ?tarih=YYYY-MM-DD  geçmiş gün (2026-01-01 … bugün, Europe/Istanbul). Tarihli
@@ -31,9 +31,9 @@ import {
   kuralBul, birimFiyat, formulFarki, ozet, yayimlandi, donemEtiketi, donemDakikasi, tarihGecerli, istanbulBugun, istanbulDakika,
   gunEkle, YON_ADI, ILK_GUN, SAYFA_URL, VERI_URL, NOT_ORTALAMA,
 } from './_lib/dengesizlik.js';
-import { gunGetir } from './_lib/epias.js';
+import { gunGetir } from './_lib/piyasa-istemci.js';
 
-/** Sunucu render'ının EPİAŞ'ı bekleyeceği en uzun toplam süre. */
+/** Sunucu render'ının proxy'yi bekleyeceği en uzun toplam süre. */
 const SSR_SURE_MS = 3500;
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -418,7 +418,7 @@ export async function onRequestGet(context) {
 
     const kabuk = await shell.clone().text();
     const hazir = kabukHazirla(kabuk, { tarih, bugun, tarihli, gecersiz });
-    // Toplam süre sınırı (giriş + rapor tek sınır): aşılırsa bayat veri ya da bekleme
+    // Toplam süre sınırı (proxy çağrısı): aşılırsa bayat veri ya da bekleme
     // hâli döner; çekim ctx.waitUntil ile sürer ve bir sonraki isteğe hazır olur.
     const sonuc = await gunGetir(context.env, context, tarih, { sureMs: SSR_SURE_MS, ...(sec || {}) });
     // Dürüstlük: gerçek veri yoksa rakamsız kabuk döner ("—" + EPİAŞ VERİSİ BEKLENİYOR)
@@ -441,7 +441,7 @@ export async function onRequestGet(context) {
   }
 }
 
-// HEAD istekleri 405 almasın; SSR yolundan geçmez (gövdesiz yanıt için EPİAŞ'a gidilmez).
+// HEAD istekleri 405 almasın; SSR yolundan geçmez (gövdesiz yanıt için proxy'ye gidilmez).
 export async function onRequestHead(context) {
   const yanit = await context.next();
   try {
