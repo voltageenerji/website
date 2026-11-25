@@ -128,7 +128,7 @@ function yeniButce(dakika) { return { dakika, rapor: 0, raporIstek: 0, giris: 0,
 export function _bellekTemizle() {
   bellekGun.clear(); bellekDurum = null; ucusta.clear(); kucuk.clear();
   biletBellek = null; biletUcus = null; butceBellek = yeniButce(-1); parmakBellek = null; sonUstAkisDurumu = null;
-  logAnahtarlari.clear();
+  logAnahtarlari.clear(); reddedilenBiletler.clear();
   for (const k of Object.keys(sayaclar)) sayaclar[k] = 0;
 }
 
@@ -630,17 +630,29 @@ async function sureli(c, is) {
 }
 function ustAkisNedeni(e) { const m = e && e.message; return m === 'zaman-asimi' ? 'zaman-asimi' : m === 'altistek' ? 'altistek' : 'ag'; }
 
-/** → {tgt} | {hata}. gecersiz: rapor ucunun az önce reddettiği bilet. */
+/** Rapor ucunun reddettiği biletler (süreç başına): önbellek/KV'den yeniden KULLANILMAZ. */
+const reddedilenBiletler = new Set();
+function biletReddedildi(tgt) {
+  if (!tgt) return;
+  if (reddedilenBiletler.size > 32) reddedilenBiletler.clear();
+  reddedilenBiletler.add(tgt);
+  if (biletBellek && biletBellek.tgt === tgt) biletBellek = null;
+}
+
+/**
+ * → {tgt, yeni?} | {hata}. yeni: bilet bu uçuşta yapılan girişle alındı (401 alırsa yenileme
+ * anlamsızdır: hesap/yetki sorunu). gecersiz: rapor ucunun az önce reddettiği bilet.
+ */
 async function biletAl(c, gecersiz) {
-  if (biletBellek && c.simdi() < biletBellek.taze && biletBellek.tgt !== gecersiz) return { tgt: biletBellek.tgt };
-  if (gecersiz && biletBellek && biletBellek.tgt === gecersiz) biletBellek = null;
+  if (gecersiz) biletReddedildi(gecersiz);
+  if (biletBellek && c.simdi() < biletBellek.taze && !reddedilenBiletler.has(biletBellek.tgt)) return { tgt: biletBellek.tgt };
   if (!gecersiz) {
     const k = await katmanOku(c, 'tgt', { kv: true });
     if (k && Number.isFinite(k.taze) && c.simdi() < k.taze) {
       const tgt = await biletCoz(c, k.sifreli);
-      if (tgt) { biletBellek = { tgt, taze: k.taze }; return { tgt }; }
+      if (tgt && !reddedilenBiletler.has(tgt)) { biletBellek = { tgt, taze: k.taze }; return { tgt }; }
     }
-    if (biletBellek && c.simdi() < biletBellek.taze) return { tgt: biletBellek.tgt };
+    if (biletBellek && c.simdi() < biletBellek.taze && !reddedilenBiletler.has(biletBellek.tgt)) return { tgt: biletBellek.tgt };
   }
   if (biletUcus && Date.now() - biletUcus.bas < UCUS_AZAMI_MS) return biletUcus.is;
   const ucus = { bas: Date.now(), is: null };
@@ -679,7 +691,7 @@ async function biletAl(c, gecersiz) {
     try {
       katmanYaz(c, 'tgt', { sifreli: await biletSifrele(c, sonuc.tgt), taze, yazildi: an }, TGT_TTL_S, { kv: true });
     } catch (e) { /* şifreleme yoksa bilet yalnız süreç belleğinde */ }
-    return { tgt: sonuc.tgt };
+    return { tgt: sonuc.tgt, yeni: true };
   })();
   biletUcus = ucus;
   arkaPlan(c, ucus.is);
@@ -727,15 +739,16 @@ async function raporCek(c, anahtar, bas, bit) {
   let yenilendi = false;
   const cagir = async (sayfa) => {
     let x = await istek(b.tgt, sayfa);
-    if (yetkisiz(x) && !yenilendi && !c.epiasPost) {
-      yenilendi = true; // bilet geçersizleşmiş olabilir: BİR kez yenile
+    if (yetkisiz(x) && !yenilendi && !c.epiasPost && !b.yeni) {
+      yenilendi = true; // önbellekteki bilet geçersizleşmiş olabilir: BİR kez yenile
       b = await biletAl(c, b.tgt);
       if (b.hata) return { hata: b.hata, kisaDevre: b.hata === 'butce' || b.hata === 'altistek' };
       x = await istek(b.tgt, sayfa);
     }
     if (yetkisiz(x)) {
-      biletBellek = null;
-      await engelYaz(c, 'servis-yetki', true); // giriş döngüsü yok
+      // Taze girişle alınmış biletle de 401: hesap/yetki sorunu. Giriş döngüsü yok, büyüyen engel.
+      biletReddedildi(b.tgt);
+      await engelYaz(c, 'servis-yetki', true);
       return { hata: 'servis-yetki' };
     }
     if (x.durum) return { hata: 'servis-hata' };
@@ -763,7 +776,7 @@ async function raporCek(c, anahtar, bas, bit) {
   const sonSayfa = sf.number + Math.ceil(sf.total / sf.size) - 1;
   for (let n = sonraki; n <= sonSayfa && ogeler.length < sf.total; n++) {
     const y = await cagir({ number: n, size: sf.size });
-    if (y.hata === 'butce' || y.hata === 'altistek') return { hata: 'eksik', kisaDevre: true }; // tamamlanan sayfalar saklı
+    if (y.hata === 'butce' || y.hata === 'altistek') return { hata: y.hata, kisaDevre: true }; // tamamlanan sayfalar saklı
     if (y.hata === 'servis-yetki' || (y.hata && y.hata.startsWith('giris'))) return y;
     if (y.hata || !y.ogeler.length) return { hata: 'eksik' };
     if (!y.sayfa || y.sayfa.number !== n || y.sayfa.total !== sf.total) { yarimYaz(null, 1); return { hata: 'eksik' }; }
