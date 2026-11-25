@@ -169,6 +169,21 @@ curl -s -H "Authorization: Bearer $PIYASA_OKUMA_ANAHTARI" "$BASE/piyasa/v1/durum
 - `test.mjs` bölüm 15: `ornek-host.js` üç biçimde karşılaştırılır: kancasız, kancalı + `PIYASA_ETKIN` yok/`"0"`, kancalı + açık (KV, belirteç, kimlik). 15 istek denendi (`/health`, `/ptf/today` farklı Origin'lerle, `/ptf/stats`, `/ptf/range` geçerli/geçersiz, bilinmeyen yol, `/piyasax`, OPTIONS, POST, HEAD, Authorization başlıklı). Üç biçimde de durum, tüm başlıklar ve gövde baytları aynı çıktı. Bu sırada EPİAŞ'a ve KV'ye hiç gidilmedi.
 - `olcum/workerd-olc.mjs`: aynı karşılaştırma yerel workerd'de (`wrangler dev`) üç ayrı Worker üzerinde yapıldı. `date` dışındaki başlıklar ve gövde özetleri karşılaştırıldı. Sonuçlar aşağıda.
 
+### Yerel workerd ölçümü (25 Kasım 2026, wrangler 4.168.0, kod 1f7f8a9)
+
+Ortam: yerel KV (`--persist-to`), `--test-scheduled`. Sahte EPİAŞ yerel HTTP sunucusudur ve her rapor 150 ms gecikmeyle yanıtlanır. Gerçek EPİAŞ'a ya da Cloudflare'e istek gitmedi. Saat gerçek saattir (25.11.2026). Gece penceresi ölçüm için `0-24`'e açıldı. Turlar arası 10 dakika yerine 13 saniyeye sıkıştırıldı: tur başına en çok 2 rapor, dakikada ~9.
+
+| Ölçüm | Sonuç |
+|---|---|
+| Mevcut uçlar: kancasız / kancalı + kapalı / kancalı + açık | 14 isteğin 14'ü aynı (durum, `date` dışındaki tüm başlıklar, gövde SHA-256) |
+| Kapalıyken `/piyasa/v1/dengesizlik` (belirteçli) ve `OPTIONS /piyasa/v1/durum` | 404 ve 404. Zamanlanmış tur EPİAŞ'a 0 giriş, 0 rapor gönderdi. |
+| Soğuk KV, 100 eşzamanlı karışık istek (bugün, dün, 2026 günleri, aralıklar) | EPİAŞ'a **1 giriş + 6 rapor** (dakikalık istek payı). 38 × 200, 62 × 503 `butce`. Her 503'te `Retry-After` vardı. |
+| Zamanlanmış doldurma (8 günlük dilim) | 39 tur, 76 rapor, 0 giriş (bilet soğuk yükten). Tur başına en çok 17 G/Ç. Sonunda KV'de 329 gün, eksik 0. Tek bir tur, sıkıştırılmış zaman yüzünden dakikalık bütçeye takıldı (`butce`); sonraki turda devam etti. |
+| Sıcak KV, aynı süreç, 100 eşzamanlı | **0 EPİAŞ isteği**, 100 × 200, bayat 0 |
+| wrangler yeniden başlatıldı (yeni süreç, aynı KV), 100 eşzamanlı | **0 EPİAŞ isteği**, 100 × 200. Süreçte 71 KV okuma, 0 KV yazma. İkinci dalga da 0 EPİAŞ isteği. |
+
+Ölçülmeyenler: gerçek CPU süresi (yerel workerd CPU sınırı uygulamaz; CPU için `olcum/cpu.mjs` node tahminidir), gerçek Cloudflare'de alt istek sayımı, Cache API'nin workers.dev davranışı, çok veri merkezli KV gecikmesi.
+
 ## Açık sorular (sahipte)
 
 1. Proxy hangi EPİAŞ hesabını kullanıyor? Ticaret hesaplarından ayrı, yalnız Şeffaflık için açılmış bir hesap mı? Kimlik hangi env adlarında duruyor?
