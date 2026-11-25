@@ -1169,7 +1169,7 @@ ok('bicim sayi degilse "—" (0 DEGIL)', sayfa.bicim(null) === '—' && sayfa.bi
 ok('bicim yarim kurus yuvarlama', sayfa.bicim(2070.305) === '2.070,31' && sayfa.bicim(1.005) === '1,01');
 ok('tarihTR', sayfa.tarihTR('2026-11-23') === '23.11.2026');
 
-const KABUK_BASLIK = { 'Content-Type': 'text/html; charset=utf-8', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'self'", ETag: '"kabuk-etag"', 'Cache-Control': 'public, max-age=300' };
+const KABUK_BASLIK = { 'Content-Type': 'text/html; charset=utf-8', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'self'", ETag: '"kabuk-etag"', 'Cache-Control': 'public, max-age=300', 'Access-Control-Allow-Origin': '*' };
 const sayfaCtx = (sorgu, ayar = {}, env = SAHTE_ENV) => {
   const { e, sec } = yeni(ayar);
   return { e, ctx: { request: new Request('https://voltage.com.tr/dengesizlik-maliyeti' + sorgu), env, secenek: sec, waitUntil() {}, next: async () => new Response(KABUK, { status: 200, headers: KABUK_BASLIK }) } };
@@ -1233,6 +1233,7 @@ for (const [ad, ayar] of [['giris 401', { girisDurum: 401 }], ['servis 500', { r
   // Başlıklar: kabuğunkiler korunur, gövdeye bağlı olanlar atılır
   ok('SSR kabuk guvenlik basliklari korunur', y.headers.get('X-Content-Type-Options') === 'nosniff' && y.headers.get('Content-Security-Policy') === "default-src 'self'");
   ok('SSR ETag tasinmaz', y.headers.get('ETag') === null);
+  ok('SSR yaniti platformun varsayilan CORS basligini TASIMAZ (R7)', y.headers.get('Access-Control-Allow-Origin') === null);
   ok('SSR tam gun: HTML butun', butunluk(h));
   // Örnek hesap: son tam yayımlanmış dönemden, kodla
   const son = donemler(sahteGun('2026-11-23'))[23];

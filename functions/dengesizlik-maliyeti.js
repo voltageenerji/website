@@ -384,7 +384,9 @@ export function veriBas(html, sonuc, { bugun, simdiDk }) {
 function htmlYanit(html, kabuk, maxAge, sMaxAge, noindex) {
   // Kabuğun başlıkları (CSP, HSTS … — _headers) korunur; gövdeye bağlı olanlar atılır.
   const h = new Headers(kabuk && kabuk.headers ? kabuk.headers : undefined);
-  for (const ad of ['content-length', 'etag', 'last-modified', 'content-encoding', 'accept-ranges', 'cache-control']) h.delete(ad);
+  // Pages, statik varlıklara varsayılan olarak "Access-Control-Allow-Origin: *" ekler; veri taşıyan
+  // sunucu render'ı yanıtı bu başlığı TAŞIMAZ (Hukuk R7: sayfa aynı kökenden çalışır).
+  for (const ad of ['content-length', 'etag', 'last-modified', 'content-encoding', 'accept-ranges', 'cache-control', 'access-control-allow-origin']) h.delete(ad);
   h.set('Content-Type', 'text/html; charset=utf-8');
   h.set('Cache-Control', `public, max-age=${maxAge}, s-maxage=${sMaxAge}, must-revalidate`);
   if (noindex) h.set('X-Robots-Tag', 'noindex, follow');
