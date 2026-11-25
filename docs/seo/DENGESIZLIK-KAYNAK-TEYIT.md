@@ -22,6 +22,34 @@
 - `POST https://seffaflik.epias.com.tr/reporting-service/v1/data/ptf-smf-sdf` ("PTF SMF ve SDF Listeleme Servisi", reporting-service v1.3.28). Gövde: `startDate`, `endDate` (ISO-8601, +03:00). Yanıt alanları: `date`, `time`, `ptf`, `smf`, `positiveImbalance`, `negativeImbalance`, `systemStatus`. `TGT` başlığı zorunlu (giris.epias.com.tr CAS; bilet ömrü 2 saat). Girişsiz istek 401 döner (24.11'de denendi).
 - Sayfada EPİAŞ'ın yayımladığı pozitif/negatif dengesizlik fiyatı gösterilir; formül açıklama ve hesaplayıcı içindir.
 
+## 2026 kural geçmişi — gün gün (25 Kasım 2026; Enerji Piyasası ajanı, birincil kaynak taraması)
+
+Tarama: 1/1/2026–25/11/2026 arasındaki her Resmî Gazete günlük fihristi (329 gün, 7 mükerrer) ve bu sayılardaki 48 EPDK kararı (OCR ile tek tek), ayrıca 20/9–31/12/2025 fihristleri ve 1/12/2025'ten bu yana EPİAŞ duyuruları. m.110'a dokunan 2026 kararları yalnız 14459, 14907 ve 14911. Sınır: EPDK'nın kendi karar listesi güncel değil (14029, 14030, 14907, 14911 orada yok); Resmî Gazete dışında yayım olmadığı bu yolla kanıtlanamaz.
+
+Formül (DUY m.110(1)–(2), RG 29/12/2025-33122 m.17, yürürlük 1/1/2026 — m.23) tavan dalı ve V/B dallarıyla birlikte 2026'nın tamamında geçerlidir; k/l 14030 sayılı Karar (1/1/2026 teslim gününden), B = 100 (m.110(2) başlangıç değeri, değiştiren karar yok).
+
+| Teslim günleri | V | AFL / asgari | Dayanak | Durum |
+|---|---|---|---|---|
+| 2026-01-01 – 2026-04-03 | 150 (m.110(2) başlangıç değeri) | 3.400 / 0 | 27/3/2025 tarihli ve 13423 sayılı Kurul Kararı (RG 5/4/2025-32861; 5/4/2025'ten) | TEYİT EDİLDİ (13423, Resmî Gazete sayfa görüntüsünden okundu) |
+| 2026-04-04 – 2026-10-31 | 150 | 4.500 / 0 | 14459 sayılı Kurul Kararı (RG 3/4/2026-33213) | TEYİT EDİLDİ |
+| 2026-11-01 – 2026-12-31 | 100 | 4.500 / 0 | 14911 sayılı Kurul Kararı (RG 19/10/2026-33405; "takip eden fatura döneminden") | TEYİT EDİLDİ |
+| 2027-01-01 → | — | — | RG 32789 m.13 ile 33122/33405 metni arasındaki ilişki çözülmedi | DOĞRULANMADI |
+
+RG 19/10/2026-33405 m.22 birim fiyatları değiştirmez (yalnız EDTA/EDTB toplamında max/min yeri; yayımı tarihinde yürürlükte). Ekim fatura dönemine nasıl uygulandığı açık.
+
+**Yayımlanan değer ile formül arasındaki farklar (EPİAŞ'ın kamuya açık günlük bültenlerinden, saatlik):**
+- 2026-01-01 – 2026-01-25: yayımlanan pozitif/negatif dengesizlik fiyatları her saatte eski simetrik kurala (×0,97 / ×1,03; V ve tavan dalı yok) karşılık geliyor; 26 Ocak'tan itibaren her saat m.110 formülüyle (14030 katsayıları) eşleşiyor. Uzlaştırmada hangi değerin esas alındığı görülmedi; EPİAŞ'a yazılı soru taslağa eklendi. Sayfada bu günler için gün düzeyinde not gösterilir, tabloda EPİAŞ'ın yayımladığı değer kalır.
+- 2026-11-03 12:00–13:00: yayımlanan pozitif fiyat −106,00; 1/11'den geçerli V = 100 ile formül 94,00 veriyor. Tek saat; sayfada † ile işaretlenir.
+- 24/11/2026: yayımlanan 48 değerin 48'i formülle eşleşiyor. Tavan dalı fazla yönde de çalışıyor (24/11 18:00: 4.500 × 1,05 × 1,03 = 4.866,75).
+
+**KÜPST metni:** mevzuat.gov.tr konsolide PDF'i (s.104) m.110(3)'te 2027 formülünü (ç indisli) 2024 tanımlarıyla birlikte gösteriyor; bugün geçerli metin RG 17/12/2024-32755 m.23'tür: KÜPST = ΣΣΣ (KÜPSM × max(750; NPTF; SMF) × n). 1/1/2027'den RG 32789 m.13 (çeyrek bazında sapma ve SMF; PTF saatlik). 14907 sayılı Kararın tüketim katsayısı (n = 0,01) ve "diğer tüketimler" toleransı (m = 0,30) 1/1/2027'den; Ocak–Ekim 2026'da 14029 yalnız üretim katsayıları içeriyordu.
+
+**KGÜP:** DUY m.4(şş) tanım; m.69(2) (RG 33405 ile değişik, 19/10/2026'dan): "Tüm uzlaştırmaya esas veriş-çekiş birimleri, kesinleşmiş gün öncesi üretim/tüketim programlarını … bildirmekle yükümlüdür"; m.69(1) bildirim D-1 15:30, GİP kapanışından yarım saat sonrasına kadar güncellenebilir.
+
+**DSG oranı (m.111(5)):** 2026 için %5 (13869 sayılı Karar, RG 18/10/2025; görüntüden okundu). 2027 oranı bulunamadı; karar için yasal son gün 1 Aralık.
+
+**Resmî aylık toplamlar:** EPİAŞ aylık raporu (Ocak–Ekim 2026) ve EPDK aylık sektör raporu (Ocak–Eylül 2026) ortalama PTF ve SMF verir; ortalama dengesizlik fiyatı, yön saat sayısı ya da dengesizlik hacmi yayımlanmıyor. Saatlik değerler EPİAŞ günlük bültenlerinde (PDF) var; bu föyün dışında, şirket içi çalışma dosyasında tutulur.
+
 ## Hukuk okuması eki (24 Kasım 2026; Hukuk & Uyum ajanı birincil metinleri yeniden indirip okudu)
 
 - **Sistem dengesizlik fiyatı tanımı (TEYİT EDİLDİ, DUY m.4):** "Sistem dengesizlik fiyatı: Uzlaştırma dönemi bazında belirlenen piyasa katılımcılarının denge sorumluluklarından kaynaklanan enerji dengesizliklerine uygulanan fiyatı" (Orchestrator konsolide metinde ayrıca gördü).
