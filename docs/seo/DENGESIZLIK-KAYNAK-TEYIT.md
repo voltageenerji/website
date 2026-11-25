@@ -54,8 +54,8 @@ Dengeden sorumlu grup içi netleştirme (m.111(5)); kesinleşmiş üretim/tüket
 
 ## Atıf satırı
 
-- **TR:** "Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği (RG 14/4/2009-27200) m.110 (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik); k ve l katsayıları: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122); V değeri: 24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405); azami fiyat limiti: 2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026). Veri: EPİAŞ Şeffaflık Platformu. 24 Kasım 2026 itibarıyla."
-- **EN:** "Basis: Electricity Market Balancing and Settlement Regulation (Official Gazette 14/4/2009, No. 27200), Art. 110 (as amended by OG 29/12/2025 No. 33122 and OG 19/10/2026 No. 33405); coefficients k and l: Board Decision No. 14030 of 11/12/2025 (OG 29/12/2025 No. 33122); value V: Board Decision No. 14911 of 24/9/2026 (OG 19/10/2026 No. 33405); price cap: Board Decision No. 14459 of 2/4/2026 (OG 3/4/2026). Data: EPİAŞ Transparency Platform. As of 24 November 2026."
+- **TR:** "Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği (RG 14/4/2009-27200) m.110 (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik); k ve l katsayıları: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122); V değeri: 24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405); azami fiyat limiti: 2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213). Veri: EPİAŞ Şeffaflık Platformu. 24 Kasım 2026 itibarıyla."
+- **EN:** "Basis: Electricity Market Balancing and Settlement Regulation (Official Gazette 14/4/2009, No. 27200), Art. 110 (as amended by OG 29/12/2025 No. 33122 and OG 19/10/2026 No. 33405); coefficients k and l: Board Decision No. 14030 of 11/12/2025 (OG 29/12/2025 No. 33122); value V: Board Decision No. 14911 of 24/9/2026 (OG 19/10/2026 No. 33405); price cap: Board Decision No. 14459 of 2/4/2026 (OG 3/4/2026 No. 33213). Data: EPİAŞ Transparency Platform. As of 24 November 2026."
 
 ## Birincil kaynak adresleri
 
