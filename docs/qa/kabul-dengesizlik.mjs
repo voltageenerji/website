@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 /**
- * /dengesizlik-maliyeti — GERÇEK VERİ KABUL DENETİMİ (13 madde).
+ * /dengesizlik-maliyeti — GERÇEK VERİ KABUL DENETİMİ (17 madde).
  *
  * Çalıştırma (çalışma dizini bir scratch klasörü olmalı; repo köküne hiçbir şey yazılmaz):
  *   KABUL_TABAN=https://<onizleme>.pages.dev node docs/qa/kabul-dengesizlik.mjs
  *   KABUL_TABAN=… KABUL_PROXY_URL=https://<proxy> KABUL_PROXY_ANAHTAR=<okuma belirteci> node docs/qa/kabul-dengesizlik.mjs
  *   … --yerel     insan denetimi gereken maddeler için TAM DEĞERLİ kontrol listesi basar
+ *   KABUL_BULTEN_CSV=<yol>   EPİAŞ'ın herkese açık günlük bülteninden çıkarılmış saatlik CSV
+ *                  (gun,saat,ptf,smf,yon A/F/D,poz_dengesizlik_fiyati,neg_dengesizlik_fiyati,…);
+ *                  verilirse madde 17 koşar. Dosya repoya konmaz.
+ *   KABUL_TOHUM=<sayı>        madde 17 gün örneklemesinin tohumu (varsayılan 20261125; tekrarlanabilir)
  *
  * ÇIKTI GÜVENLİĞİ (repo herkese açık; CI günlüğü herkese açık):
  *   - Varsayılan çıktı YALNIZ geçti/kaldı/atlandı ve toplamlardır (sayılar, en büyük fark, durum
@@ -32,6 +36,16 @@
  *      sayıları tabloda, özet cümlesinde ortalamalar, JSON-LD'de çekim anı / kapsam
  *   13 Damga ve dizin: damga = cekildi (SON SENKRON iff bayat); önizleme hostunda
  *      X-Robots-Tag + meta "noindex, nofollow", üretimde tarihsiz sayfa dizine açık
+ *   14 Yayımlanmış HER dönemin sistem yönü var: yönü null olan yayımlanmış dönem sayısı 0
+ *      (dün, bugün, 30 günlük aralık ve 2026-11-01)
+ *   15 2026-11-01 (üst akışta çift satır bildirildi): dönem başına TEK satır, çelişki yok (çelişen
+ *      kopya "—" olurdu: tüm dönemler yayımlanmış), sayfada da aynı satır sayısı; proxy varsa ham
+ *      kopya sayısı ve birebir karşılaştırma
+ *   16 Geçmiş derinliği: 2026-01-01 veri döner (tam gün); Kasım öncesi bir gün (2026-10-15) sayfasında
+ *      V = 150 görünür (tablo üstü not ya da o günün örnek hesabı)
+ *   17 EPİAŞ günlük bülteniyle çapraz denetim (KABUL_BULTEN_CSV): ay başına 3 rastgele tamamlanmış gün
+ *      + 2026-11-01 + 2026-01-26; PTF, SMF, yön, pozitif ve negatif dengesizlik fiyatı; site (/veri)
+ *      ve proxy (varsa). Yalnız eşleşen/uyuşmayan sayıları ve en büyük mutlak fark basılır
  *
  * Çıkış kodu: kalan madde varsa 1. Proxy bilgisi verilmezse proxy karşılaştırmaları "atlandı".
  */
@@ -113,6 +127,26 @@ function karsilastir(site, proxyDonemleri) {
   return { karsilastirilan, uyusmayan, azamiFark, nullUyusmaz, sifirUydurma };
 }
 
+/** Bülten CSV'si → Map<gun, Map<saat, {ptf, smf, yon, poz, neg}>>. Boş alan null; yön A/F/D → acik/fazla/denge. */
+function bultenOku(metin) {
+  const satirlar = metin.replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean);
+  const alanlar = (s) => { const out = []; let a = '', t = false; for (let i = 0; i < s.length; i++) { const c = s[i]; if (t) { if (c === '"' && s[i + 1] === '"') { a += '"'; i++; } else if (c === '"') t = false; else a += c; } else if (c === '"') t = true; else if (c === ',') { out.push(a); a = ''; } else a += c; } out.push(a); return out; };
+  const bas = alanlar(satirlar[0]);
+  const i = (ad) => bas.indexOf(ad);
+  const [iG, iS, iP, iM, iY, iPoz, iNeg] = ['gun', 'saat', 'ptf', 'smf', 'yon', 'poz_dengesizlik_fiyati', 'neg_dengesizlik_fiyati'].map(i);
+  if ([iG, iS, iP, iM, iY, iPoz, iNeg].some((x) => x < 0)) return null;
+  const sayi = (v) => (v === undefined || v.trim() === '' ? null : Number.isFinite(Number(v)) ? Number(v) : null);
+  const YONB = { A: 'acik', F: 'fazla', D: 'denge' };
+  const m = new Map();
+  for (const s of satirlar.slice(1)) {
+    const a = alanlar(s);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(a[iG] || '')) continue;
+    if (!m.has(a[iG])) m.set(a[iG], new Map());
+    m.get(a[iG]).set(Number(a[iS]), { ptf: sayi(a[iP]), smf: sayi(a[iM]), yon: YONB[(a[iY] || '').trim()] || null, poz: sayi(a[iPoz]), neg: sayi(a[iNeg]) });
+  }
+  return m;
+}
+
 const kuralFor = (kurallar, ymd) => (Array.isArray(kurallar) ? kurallar.find((k) => ymd >= k.bas && ymd <= k.bit) : null) || null;
 
 // ----------------------------------------------------------------------- akış --
@@ -127,7 +161,7 @@ const BUGUN = ilk.j && typeof ilk.j.tarih === 'string' ? ilk.j.tarih : null;
   madde(1, 'İlk istek 200 + X-Veri-Cekildi/Bayat/Uretildi', iyi ? GECTI : KALDI, `durum ${ilk.durum}, dönem ${ilk.j && ilk.j.donemler ? ilk.j.donemler.length : 0}, bayat ${h['x-veri-bayat'] || '-'}`);
 }
 if (!BUGUN) {
-  for (let no = 2; no <= 13; no++) madde(no, '(ilk istek başarısız; sonraki maddeler koşulamadı)', KALDI, `durum ${ilk.durum}`);
+  for (let no = 2; no <= 17; no++) madde(no, '(ilk istek başarısız; sonraki maddeler koşulamadı)', KALDI, `durum ${ilk.durum}`);
   bitir();
 }
 const DUN = gunEkle(BUGUN, -1);
@@ -319,6 +353,157 @@ const xlsxSatir = (bayt) => {
   const mod = coz((/<span class="live-mode[^"]*" id="dMod">([\s\S]*?)<\/span>/.exec(s.metin) || [])[1] || '');
   const damga = !!j.j && zaman === j.j.cekildi && (mod === 'SON SENKRON') === !!j.j.bayat;
   madde(13, `Damga = cekildi; ${uretim ? 'üretim: dizine açık' : 'önizleme: noindex, nofollow'}; canonical voltage.com.tr`, dizin && veriBasligi && canonical && damga ? GECTI : KALDI, `dizin ${dizin}, veri ucu başlığı ${veriBasligi}, canonical ${canonical}, damga ${damga} (mod ${mod || '-'})`);
+}
+
+// 14–17 için: 503 + Retry-After gelirse (site bütçesi) bir kez bekleyip yeniden dene
+const BEKLE_AZAMI_MS = process.env.KABUL_YENIDEN_BEKLE_AZAMI_MS !== undefined ? Number(process.env.KABUL_YENIDEN_BEKLE_AZAMI_MS) : 65000;
+async function jsonAlSabirli(yol, sec) {
+  let r = await jsonAl(yol, sec);
+  if (r.durum === 503 && r.basliklar['retry-after']) {
+    await new Promise((coz) => setTimeout(coz, Math.min(BEKLE_AZAMI_MS, (Number(r.basliklar['retry-after']) || 60) * 1000 + 2000)));
+    r = await jsonAl(yol, sec);
+  }
+  return r;
+}
+const KASIM1 = '2026-11-01';
+const kasim1 = KASIM1 < BUGUN ? await jsonAlSabirli(`/dengesizlik-maliyeti/veri?tarih=${KASIM1}&bicim=json`) : null;
+
+// 14 — her yayımlanmış dönemin yönü var
+{
+  const kaynaklar = [dun, bugun, aralik, kasim1].filter((r) => r && r.j && Array.isArray(r.j.donemler));
+  const gorulenBas = new Set();
+  let yayim = 0, yonsuz = 0, yonsuzYayimsiz = 0;
+  for (const r of kaynaklar) for (const x of r.j.donemler) {
+    if (gorulenBas.has(x.bas)) continue;
+    gorulenBas.add(x.bas);
+    if (yayimlandi(x)) { yayim++; if (x.yon === null || x.yon === undefined) yonsuz++; } else if (x.yon !== null) yonsuzYayimsiz++;
+  }
+  madde(14, 'Yayımlanmış her dönemin sistem yönü var (null sayımı)', yayim > 0 && yonsuz === 0 ? GECTI : KALDI, `yayımlanmış dönem ${yayim}, yönü null ${yonsuz}; yayımlanmamış ama yönü dolu ${yonsuzYayimsiz}`);
+  if (YEREL && yonsuz) {
+    kontrolListesi.push('Yönü null olan yayımlanmış dönemler:');
+    for (const r of kaynaklar) for (const x of r.j.donemler) if (yayimlandi(x) && x.yon == null) kontrolListesi.push(`  ${x.bas}`);
+  }
+}
+
+// 15 — 2026-11-01: dönem başına tek satır, çelişki yok
+if (!kasim1) madde(15, `${KASIM1}: dönem başına tek satır`, ATLANDI, 'bugün 2026-11-01 ya da öncesi');
+else {
+  const d = kasim1.j ? kasim1.j.donemler : [];
+  const dk = d.length ? d[0].dk : null;
+  const tekil = new Set(d.map((x) => x.bas)).size;
+  const bitisik = d.every((x, i) => x.dk === dk && (i === 0 || Date.parse(x.bas) - Date.parse(d[i - 1].bas) === dk * 60000));
+  const yay = d.filter(yayimlandi).length;
+  const s15 = await al(`/dengesizlik-maliyeti?tarih=${KASIM1}`, { accept: 'text/html' });
+  const govde15 = (/<tbody id="dTablo">([\s\S]*?)<\/tbody>/.exec(s15.metin) || [])[1] || '';
+  const sayfaSatir = (govde15.match(/<tr[^>]*data-bas="/g) || []).length;
+  const tumuBos = [...govde15.matchAll(/<tr[^>]*data-bas="[^"]*"[^>]*>([\s\S]*?)<\/tr>/g)].filter((m) => (m[1].match(/<td class="(yon )?bos">—<\/td>/g) || []).length === 7).length;
+  let ek = '', iyi = kasim1.durum === 200 && dk && d.length === 1440 / dk && tekil === d.length && bitisik && yay === d.length && sayfaSatir === d.length && tumuBos === 0;
+  if (proxyVar) {
+    const pr = await jsonAl(`/piyasa/v1/dengesizlik?tarih=${KASIM1}`, { proxy: true });
+    const g = pr.j && Array.isArray(pr.j.gunler) ? pr.j.gunler.find((x) => x && x.tarih === KASIM1) : null;
+    const ham = g && Array.isArray(g.donemler) ? g.donemler : [];
+    const k = karsilastir(d, ham);
+    ek = `; proxy: ham satır ${ham.length}, tekil ${new Set(ham.map((x) => x.bas)).size}, uyuşmayan ${k.uyusmayan}, null uyuşmazlığı ${k.nullUyusmaz}`;
+    iyi = iyi && ham.length > 0 && k.uyusmayan === 0 && k.nullUyusmaz === 0;
+  } else ek = '; proxy karşılaştırması atlandı';
+  madde(15, `${KASIM1}: dönem başına tek satır, çelişki yok (sayfa ve /veri)`, iyi ? GECTI : KALDI, `durum ${kasim1.durum}, dönem ${d.length} (${dk} dk), tekil ${tekil}, bitişik ${bitisik}, yayımlanan ${yay}; sayfa ${s15.durum} satır ${sayfaSatir}, tümü "—" satır ${tumuBos}${ek}`);
+}
+
+// 16 — geçmiş derinliği
+{
+  const ILK = '2026-01-01', ONCE = '2026-10-15';
+  const o = await jsonAlSabirli(`/dengesizlik-maliyeti/veri?tarih=${ILK}&bicim=json`);
+  const d = o.j ? o.j.donemler : [];
+  const dk = d.length ? d[0].dk : null;
+  const yay = d.filter(yayimlandi).length;
+  const s16 = await al(`/dengesizlik-maliyeti?tarih=${ONCE}`, { accept: 'text/html' });
+  const not = coz((/<p class="uyari" id="dKuralUyari"[^>]*>([\s\S]*?)<\/p>/.exec(s16.metin) || [])[1] || '');
+  const ornek = coz((/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.exec(s16.metin) || [])[1] || '');
+  // Kural tablosu değişebilir: V = 150 tablo üstü notta ("Bu tarihte V değeri 150 TL/MWh idi") ya da o günün örnek hesabında ("V = 150 TL/MWh") görünmeli
+  const v150 = /V değeri 150 TL\/MWh/.test(not) || /V = 150 TL\/MWh/.test(ornek);
+  const v100Yok = !/V değeri 100 TL\/MWh/.test(not) && !/V = 100 TL\/MWh/.test(ornek);
+  const iyi = o.durum === 200 && dk && d.length === 1440 / dk && yay === d.length && s16.durum === 200 && /data-ssr="1"/.test(s16.metin) && v150 && v100Yok;
+  madde(16, `Geçmiş derinliği: ${ILK} veri; Kasım öncesi gün (${ONCE}) V = 150`, iyi ? GECTI : KALDI, `${ILK}: durum ${o.durum}, dönem ${d.length}, yayımlanan ${yay}; ${ONCE}: sayfa ${s16.durum}, sunucu verisi ${/data-ssr="1"/.test(s16.metin)}, V = 150 görünür ${v150} (${/V değeri 150/.test(not) ? 'tablo üstü not' : /V = 150/.test(ornek) ? 'örnek hesap' : 'yok'}), V = 100 yok ${v100Yok}`);
+}
+
+// 17 — EPİAŞ günlük bülteniyle çapraz denetim (isteğe bağlı)
+{
+  const yol = process.env.KABUL_BULTEN_CSV || '';
+  if (!yol) madde(17, 'EPİAŞ günlük bülteniyle çapraz denetim', ATLANDI, 'KABUL_BULTEN_CSV verilmedi');
+  else {
+    let bulten = null;
+    try { bulten = bultenOku(readFileSync(yol, 'utf8')); } catch (e) { bulten = null; }
+    if (!bulten || !bulten.size) madde(17, 'EPİAŞ günlük bülteniyle çapraz denetim', KALDI, 'bülten dosyası okunamadı ya da boş');
+    else {
+      // Örneklem: ay başına 3 rastgele tamamlanmış gün (tohumlu) + sabit günler
+      let tohum = Number(process.env.KABUL_TOHUM) || 20261125;
+      const rnd = () => { tohum = (tohum * 1664525 + 1013904223) % 4294967296; return tohum / 4294967296; };
+      const adaylar = [...bulten.keys()].filter((g) => g >= '2026-01-01' && g <= DUN).sort();
+      const aylar = new Map();
+      for (const g of adaylar) { const a = g.slice(0, 7); if (!aylar.has(a)) aylar.set(a, []); aylar.get(a).push(g); }
+      const ornek = new Set(['2026-11-01', '2026-01-26'].filter((g) => bulten.has(g) && g <= DUN));
+      for (const [, gunler] of aylar) { const kopya = [...gunler]; for (let i = 0; i < 3 && kopya.length; i++) ornek.add(kopya.splice(Math.floor(rnd() * kopya.length), 1)[0]); }
+      const secilen = [...ornek].sort();
+      // Ay başına tek aralık isteği (en çok 31 gün): site bütçesini korur
+      const ayGrup = new Map();
+      for (const g of secilen) { const a = g.slice(0, 7); if (!ayGrup.has(a)) ayGrup.set(a, []); ayGrup.get(a).push(g); }
+      const site = new Map(), prx = new Map();
+      let istek = 0, basarisiz = 0;
+      for (const [, gunler] of ayGrup) {
+        const b = gunler[0], s = gunler[gunler.length - 1];
+        const r = await jsonAlSabirli(`/dengesizlik-maliyeti/veri?bas=${b}&bit=${s}&bicim=json`);
+        istek++;
+        if (!r.j) { basarisiz++; continue; }
+        for (const x of r.j.donemler) { const g = x.bas.slice(0, 10); if (gunler.includes(g)) { if (!site.has(g)) site.set(g, []); site.get(g).push(x); } }
+        if (proxyVar) {
+          const p = await jsonAl(`/piyasa/v1/dengesizlik?bas=${b}&bit=${s}`, { proxy: true });
+          for (const gun of (p.j && Array.isArray(p.j.gunler) ? p.j.gunler : [])) if (gunler.includes(gun.tarih)) prx.set(gun.tarih, gun.donemler || []);
+        }
+      }
+      const kiyas = (kaynak) => {
+        let gun = 0, saat = 0, deger = 0, esit = 0, uyusmayan = 0, nullUyusmaz = 0, yonUyusmaz = 0, azami = 0, saatlikDegil = 0;
+        const ornekler = [];
+        for (const g of secilen) {
+          const satirlar = kaynak.get(g);
+          if (!satirlar || !satirlar.length) continue;
+          gun++;
+          const b = bulten.get(g);
+          const gorulen = new Set();
+          for (const x of satirlar) {
+            if (x.dk !== 60) { saatlikDegil++; continue; }
+            const h = Number(x.bas.slice(11, 13));
+            if (gorulen.has(h)) continue;
+            gorulen.add(h);
+            const y = b.get(h);
+            if (!y) continue;
+            saat++;
+            for (const [a, ba] of [['ptf', 'ptf'], ['smf', 'smf'], ['pozitif', 'poz'], ['negatif', 'neg']]) {
+              deger++;
+              const sv = x[a], bv = y[ba];
+              if ((sv === null || sv === undefined) !== (bv === null)) { nullUyusmaz++; if (ornekler.length < 10) ornekler.push(`${g} ${String(h).padStart(2, '0')}:00 ${a} site ${sv} bülten ${bv}`); continue; }
+              if (sv === null || sv === undefined) { esit++; continue; }
+              const f = Math.abs(sv - bv);
+              if (f > azami) azami = f;
+              if (f <= 0.005 + 1e-9) esit++; else { uyusmayan++; if (ornekler.length < 10) ornekler.push(`${g} ${String(h).padStart(2, '0')}:00 ${a} site ${sv} bülten ${bv}`); }
+            }
+            deger++;
+            if ((x.yon || null) === y.yon) esit++; else { yonUyusmaz++; if (ornekler.length < 10) ornekler.push(`${g} ${String(h).padStart(2, '0')}:00 yön site ${x.yon} bülten ${y.yon}`); }
+          }
+        }
+        return { gun, saat, deger, esit, uyusmayan, nullUyusmaz, yonUyusmaz, azami: Math.round(azami * 1000) / 1000, saatlikDegil, ornekler };
+      };
+      const ks = kiyas(site);
+      const kp = proxyVar ? kiyas(prx) : null;
+      const iyiK = (k) => k.gun > 0 && k.uyusmayan === 0 && k.nullUyusmaz === 0 && k.yonUyusmaz === 0;
+      const iyi = basarisiz === 0 && ks.gun === secilen.length && iyiK(ks) && (!kp || (kp.gun === secilen.length && iyiK(kp)));
+      const yaz = (k) => `${k.gun} gün, ${k.saat} saat, ${k.deger} değer: eşleşen ${k.esit}, uyuşmayan ${k.uyusmayan}, null uyuşmazlığı ${k.nullUyusmaz}, yön uyuşmazlığı ${k.yonUyusmaz}, en büyük fark ${k.azami}${k.saatlikDegil ? `, saatlik olmayan ${k.saatlikDegil}` : ''}`;
+      madde(17, 'EPİAŞ günlük bülteniyle çapraz denetim (PTF, SMF, yön, pozitif, negatif)', iyi ? GECTI : KALDI, `örneklem ${secilen.length} gün (${ayGrup.size} ay; bültende ${bulten.size} gün), ${istek} aralık isteği, başarısız ${basarisiz}; site: ${yaz(ks)}${kp ? `; proxy: ${yaz(kp)}` : '; proxy karşılaştırması atlandı'}`);
+      if (YEREL) {
+        kontrolListesi.push(`Bülten çapraz denetimi örneklemi: ${secilen.join(', ')}`);
+        for (const x of [...ks.ornekler, ...(kp ? kp.ornekler.map((o) => 'proxy ' + o) : [])]) kontrolListesi.push(`  uyuşmazlık: ${x}`);
+      }
+    }
+  }
 }
 
 // 10 — bütçe (en sonda: eski gün bütçesini bilerek tüketir)

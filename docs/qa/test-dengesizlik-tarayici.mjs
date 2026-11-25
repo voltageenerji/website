@@ -20,19 +20,25 @@ import { sahteGun, SABIT_AN } from './dengesizlik-test-verisi.mjs';
 import { birimFiyat, kuralBul } from '../../functions/_lib/dengesizlik.js';
 import { bicim, senaryoNotu } from '../../functions/dengesizlik-maliyeti.js';
 
-const require = createRequire('/opt/node-tools/node_modules/');
-const { chromium } = require('playwright');
-const CHROME = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium';
+// Motor seçimi (varsayılan Chromium; davranış değişmez):
+//   TARAYICI=chromium|firefox|webkit · PLAYWRIGHT_MODUL=<playwright'ın kurulu olduğu node_modules dizini>
+//   QA_CI_GUNLUK=1 → KALDI satırlarında yalnız denetim adı basılır (ayrıntı/sayfa metni yok; herkese açık CI günlüğü)
+const require = createRequire(process.env.PLAYWRIGHT_MODUL || '/opt/node-tools/node_modules/');
+const pw = require('playwright');
+const MOTOR = process.env.TARAYICI || 'chromium';
+const CHROME = process.env.CHROMIUM_PATH || (process.env.PLAYWRIGHT_MODUL ? null : '/opt/pw-browsers/chromium');
+const CI_GUNLUK = process.env.QA_CI_GUNLUK === '1';
 
 let pass = 0, fail = 0;
-const ok = (n, c, extra = '') => { if (c) { pass++; } else { fail++; console.log(`  FAIL ${n} ${extra}`); } };
+const ok = (n, c, extra = '') => { if (c) { pass++; } else { fail++; console.log(`  FAIL ${n}${CI_GUNLUK ? '' : ' ' + extra}`); } };
 const bolum = (ad) => console.log(`# ${ad}`);
 
 // Bugün (24.11.2026) 11 dönem yayımlanmış; 04:00–05:00 eşik altı (eksi pozitif fiyat). Diğer günler tam.
 const OZEL = { ptf: 450, smf: 60, pozitif: -106, negatif: 463.5, yon: 'fazla', yonHam: 'Enerji Fazlası' };
 const gunVerisi = (n) => (g) => sahteGun(g, g === '2026-11-24' ? n : 24).map((o, i) => (i === 4 ? { ...o, ...OZEL } : o));
 const S = await sunucuBaslat({ gun: gunVerisi(11) });
-const browser = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });
+const browser = await pw[MOTOR].launch(MOTOR === 'chromium' ? { ...(CHROME ? { executablePath: CHROME } : {}), args: ['--no-sandbox'] } : {});
+console.log(`# motor: ${MOTOR} ${browser.version()}`);
 
 /** Yeni sayfa: sabit saat (24.11.2026 14:30 İstanbul), yazı tipleri boş CSS, EPİAŞ hostlarına istek = hata. */
 async function ac(yol, { w = 1280, h = 900, js = true, an = SABIT_AN, depo = null } = {}) {
@@ -641,5 +647,5 @@ bolum('S9 JavaScript kapalı: veri, yöntem ve formlar okunur/çalışır');
 
 await browser.close();
 await S.kapat();
-console.log(`\n${pass} passed, ${fail} failed`);
+console.log(`\n${pass} passed, ${fail} failed (${MOTOR})`);
 process.exit(fail ? 1 : 0);

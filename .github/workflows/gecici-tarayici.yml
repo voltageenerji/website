@@ -1,0 +1,182 @@
+# GEÇİCİ QA iş akışı — /dengesizlik-maliyeti: Firefox/WebKit/Safari/iOS/VoiceOver/Open XML denetimleri.
+# İş bitince bu dosya bir commit ile SİLİNİR (CLAUDE.md kural 6). Sayfa, sahte proxy'li yerel test
+# sunucusundan sunulur; tüm fiyatlar UYDURMA TEST VERİSİDİR. Günlüğe yalnız denetim adları, geçti/kaldı
+# sayıları ve toplamlar basılır (sayfa gövdesi yok). Ayrıntılı çıktılar 1 günlük artefaktta.
+name: gecici-tarayici
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: ['.github/workflows/gecici-tarayici.yml']
+permissions: {}
+concurrency:
+  group: gecici-tarayici
+  cancel-in-progress: true
+env:
+  PW_SURUM: 1.64.1
+  AXE_SURUM: 4.14.0
+  SELENIUM_SURUM: 4.52.0
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Kaynak (anonim, bu commit)
+        run: |
+          git init -q . && git fetch -q --depth 1 "https://github.com/${GITHUB_REPOSITORY}" "${GITHUB_SHA}" && git checkout -q FETCH_HEAD
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Playwright + axe (geçici dizinde)
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir -p qa && cd qa && npm init -y >/dev/null
+          npm install --no-audit --no-fund "playwright@${PW_SURUM}" "axe-core@${AXE_SURUM}" >/dev/null
+          npx playwright install --with-deps chromium firefox webkit >/dev/null
+      - name: Motorlar (Chromium, Firefox, WebKit)
+        working-directory: ${{ runner.temp }}
+        env:
+          PLAYWRIGHT_MODUL: ${{ runner.temp }}/qa/node_modules
+          AXE_MODUL: ${{ runner.temp }}/qa/node_modules
+        run: |
+          set +e; mkdir -p cikti; HATA=0
+          kos() { ad="$1"; shift; "$@" > "cikti/$ad.txt" 2>&1; kod=$?; echo "== $ad (çıkış $kod)"; grep -E '^(# |[0-9]+ passed|  FAIL|  NOT)' "cikti/$ad.txt" | sed -E 's/ -> .*$//' | cut -c1-170; [ $kod -eq 0 ] || HATA=1; }
+          for M in chromium firefox webkit; do
+            TARAYICI=$M kos "tarayici-$M" node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-tarayici.mjs"
+            TARAYICI=$M kos "erisilebilirlik-$M" node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-erisilebilirlik.mjs"
+            TARAYICI=$M kos "ssr-$M" node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-ssr-kanit.mjs"
+          done
+          echo "HATA=$HATA" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: linux-cikti, path: '${{ runner.temp }}/cikti', retention-days: 1 }
+      - name: Sonuç
+        run: '[ "$HATA" = "0" ] || { echo "en az bir koşu kaldı"; exit 1; }'
+
+  macos-safari:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: Kaynak (anonim, bu commit)
+        run: |
+          git init -q . && git fetch -q --depth 1 "https://github.com/${GITHUB_REPOSITORY}" "${GITHUB_SHA}" && git checkout -q FETCH_HEAD
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Bağımlılıklar + iPhone simülatörünü önyükle (arka planda)
+        working-directory: ${{ runner.temp }}
+        run: |
+          sw_vers | tr '\n' ' '; echo; xcodebuild -version | head -1
+          UDID=$(xcrun simctl list devices available --json | python3 -c 'import json,sys;d=json.load(sys.stdin)["devices"];import re;c=[(k,x) for k,v in d.items() if "iOS" in k for x in v if re.match(r"iPhone \d+( Pro)?$",x["name"])];c.sort(key=lambda t:(t[0],t[1]["name"].endswith("Pro")==False,t[1]["name"]));k,x=c[-1];print(x["udid"])')
+          xcrun simctl list devices available --json | python3 -c 'import json,sys;d=json.load(sys.stdin)["devices"];[print("simülatör:",x["name"],k.split(".")[-1]) for k,v in d.items() for x in v if x["udid"]=="'"$UDID"'"]'
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID" &
+          mkdir -p qa && cd qa && npm init -y >/dev/null
+          npm install --no-audit --no-fund "playwright@${PW_SURUM}" "axe-core@${AXE_SURUM}" "selenium-webdriver@${SELENIUM_SURUM}" >/dev/null
+          npx playwright install webkit >/dev/null
+      - name: Test sunucusu (127.0.0.1:8787, sahte proxy)
+        working-directory: ${{ runner.temp }}
+        run: |
+          nohup node "$GITHUB_WORKSPACE/docs/qa/dengesizlik-ci-sunucu.mjs" > sunucu.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8787/dengesizlik-maliyeti?veriyok && break; sleep 1; done
+          curl -s -o /dev/null -w 'sunucu: %{http_code}\n' http://127.0.0.1:8787/dengesizlik-maliyeti?tarih=2026-11-23
+      - name: Gerçek Safari (safaridriver + WebDriver)
+        working-directory: ${{ runner.temp }}
+        env: { SELENIUM_MODUL: '${{ runner.temp }}/qa/node_modules' }
+        run: |
+          set +e
+          sudo safaridriver --enable
+          mkdir -p cikti
+          node "$GITHUB_WORKSPACE/docs/qa/safari-smoke.mjs" > cikti/safari.txt 2>&1; kod=$?
+          grep -E '^(# |[0-9]+ passed|  FAIL|  dar)' cikti/safari.txt; echo "safari çıkış $kod"; echo "S_SAFARI=$kod" >> "$GITHUB_ENV"
+      - name: iOS Simülatörü (Mobile Safari) — ekran görüntüleri + DOM raporu
+        working-directory: ${{ runner.temp }}
+        run: |
+          set +e; mkdir -p ekran
+          xcrun simctl bootstatus "$UDID" -b > /dev/null
+          xcrun simctl status_bar "$UDID" override --time 14:30 2>/dev/null || true
+          T=http://127.0.0.1:8787/dengesizlik-maliyeti
+          xcrun simctl openurl "$UDID" "$T?tarih=2026-11-23"; sleep 25; xcrun simctl io "$UDID" screenshot ekran/ios-1-gecmis-gun.png
+          xcrun simctl openurl "$UDID" "$T?tarih=2026-11-23&qa=hesap"; sleep 15; xcrun simctl io "$UDID" screenshot ekran/ios-2-hesaplayici.png
+          xcrun simctl openurl "$UDID" "$T?veriyok"; sleep 12; xcrun simctl io "$UDID" screenshot ekran/ios-3-bekleme.png
+          xcrun simctl openurl "$UDID" "$T?tarih=2026-11-24#tablo"; sleep 12; xcrun simctl io "$UDID" screenshot ekran/ios-4-tablo.png
+          curl -s http://127.0.0.1:8787/__qa/raporlar > ekran/raporlar.json
+          python3 - <<'PY'
+          import json,re
+          r=json.load(open('ekran/raporlar.json'))
+          print('Mobile Safari rapor sayısı:',len(r))
+          for x in r:
+              ios=re.search(r'OS (\d+[_\d]*)',x.get('ua','')); ios=ios.group(1).replace('_','.') if ios else '?'
+              ozel=''
+              if 'gunTutar' in x: ozel=' gün hesabı doğru: %s · senaryo doğru: %s'%(x.get('gunTutar')=='11.484,50 TL', x.get('senNeg')=='3.604,00 TL/MWh' and x.get('senPoz')=='2.716,00 TL/MWh' and x.get('senTutar')=='36.040,00 TL')
+              print(' iOS %s · %sx%s@%s · satır %s · yatay taşma %s · tablo kabı kayar %s · JS hata %d%s'%(ios,x.get('w'),x.get('h'),x.get('dpr'),x.get('satir'),x.get('tasma'),x.get('kapKayar'),len(x.get('hata',[])),ozel))
+          PY
+      - name: Playwright WebKit (macOS) — iPhone 15 tanımlayıcısı + masaüstü + tarayıcı paketi
+        working-directory: ${{ runner.temp }}
+        env:
+          PLAYWRIGHT_MODUL: ${{ runner.temp }}/qa/node_modules
+          AXE_MODUL: ${{ runner.temp }}/qa/node_modules
+        run: |
+          set +e; HATA=0
+          kos() { ad="$1"; shift; "$@" > "cikti/$ad.txt" 2>&1; kod=$?; echo "== $ad (çıkış $kod)"; grep -E '^(# |[0-9]+ passed|  FAIL|  NOT)' "cikti/$ad.txt" | sed -E 's/ -> .*$//' | cut -c1-170; [ $kod -eq 0 ] || HATA=1; }
+          TARAYICI=webkit CIHAZ="iPhone 15" kos mac-webkit-iphone15 node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-erisilebilirlik.mjs"
+          TARAYICI=webkit kos mac-webkit-erisilebilirlik node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-erisilebilirlik.mjs"
+          TARAYICI=webkit kos mac-webkit-tarayici node "$GITHUB_WORKSPACE/docs/qa/test-dengesizlik-tarayici.mjs"
+          echo "HATA=$HATA" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macos-safari-cikti
+          path: |
+            ${{ runner.temp }}/cikti
+            ${{ runner.temp }}/ekran
+          retention-days: 1
+
+  macos-voiceover:
+    runs-on: macos-latest
+    timeout-minutes: 12
+    steps:
+      - name: Kaynak (anonim, bu commit)
+        run: |
+          git init -q . && git fetch -q --depth 1 "https://github.com/${GITHUB_REPOSITORY}" "${GITHUB_SHA}" && git checkout -q FETCH_HEAD
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: guidepup + selenium (geçici dizinde), VoiceOver otomasyonu, safaridriver
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir -p qa && cd qa && npm init -y >/dev/null
+          npm install --no-audit --no-fund "@guidepup/guidepup@0.39.0" "@guidepup/setup@0.29.3" "selenium-webdriver@${SELENIUM_SURUM}" >/dev/null
+          npx @guidepup/setup --ci > ../setup.log 2>&1; echo "guidepup kurulum çıkış $?"
+          sudo safaridriver --enable
+      - name: VoiceOver + Safari
+        working-directory: ${{ runner.temp }}
+        env:
+          QA_MODUL: ${{ runner.temp }}/qa/node_modules
+          QA_KONUSMA_DOSYASI: ${{ runner.temp }}/cikti/konusma.json
+        run: |
+          mkdir -p cikti
+          nohup node "$GITHUB_WORKSPACE/docs/qa/dengesizlik-ci-sunucu.mjs" > sunucu.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8787/dengesizlik-maliyeti?veriyok && break; sleep 1; done
+          node "$GITHUB_WORKSPACE/docs/qa/voiceover-smoke.mjs"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: macos-voiceover-cikti, path: '${{ runner.temp }}/cikti', retention-days: 1 }
+
+  windows-openxml:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Kaynak (anonim, bu commit)
+        shell: bash
+        run: |
+          git init -q . && git fetch -q --depth 1 "https://github.com/${GITHUB_REPOSITORY}" "${GITHUB_SHA}" && git checkout -q FETCH_HEAD
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: XLSX üret (TEST VERİSİ) ve Open XML SDK ile doğrula
+        shell: pwsh
+        working-directory: ${{ runner.temp }}
+        run: |
+          dotnet --version
+          node "$env:GITHUB_WORKSPACE\docs\qa\dengesizlik-dosya-uret.mjs" "$env:RUNNER_TEMP\dosyalar"
+          Copy-Item "$env:GITHUB_WORKSPACE\docs\qa\openxml-dogrula" "$env:RUNNER_TEMP\oxd" -Recurse
+          $xlsx = (Get-ChildItem "$env:RUNNER_TEMP\dosyalar\*.xlsx").FullName
+          dotnet run --project "$env:RUNNER_TEMP\oxd" -c Release -- $xlsx
+          exit $LASTEXITCODE
