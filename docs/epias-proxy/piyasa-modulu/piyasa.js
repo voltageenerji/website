@@ -28,8 +28,9 @@
  * YÜK POLİTİKASI (§4)
  *   - KV önce: her gün ayrı kayıt (piyasa:v1:gun:YYYY-MM-DD). Ziyaretçi isteği önce KV'yi okur.
  *   - Zamanlanmış görev (10 dk): bugün + dün TEK istekle tazelenir. Gece penceresinde (varsayılan
- *     03:00–04:59 İstanbul) her turda EN ÇOK BİR bakım işi: eksik 2026 günlerini ay ay doldurma →
- *     2–45 gün önceki ayları günde bir yeniden denetleme → daha eski ayları haftada bir doğrulama.
+ *     02:00–05:59 İstanbul) her turda EN ÇOK BİR bakım işi: eksik 2026 günlerini ay ay doldurma →
+ *     2–45 gün önceki günleri günde bir yeniden denetleme → daha eski günleri haftada bir doğrulama.
+ *     Her iş tek "dilim"dir (ay içinde sabit gün parçası, varsayılan 8 gün; PIYASA_DILIM_GUN).
  *   - İstek yolunda EPİAŞ'a yalnız (a) KV'de olmayan gün için, (b) bugün/dün kaydı 15 dk'dan eski
  *     (zamanlanmış görev en az bir tur kaçırdı) ise gidilir; ikisi de tek-uçuş + dakikalık bütçe
  *     (zamanlanmış göreve 4 ayrılmış) + anahtar bazında büyüyen bekleme içinde.
@@ -87,7 +88,16 @@ export const ISTEK_TAZELEME_MS = 15 * 60 * 1000;
 const DOGRULAMA_ARALIGI_MS = 7 * 24 * 60 * 60 * 1000;
 const YOK_TEKRAR_MS = 7 * 24 * 60 * 60 * 1000;        // EPİAŞ'ın veri döndürmediği gün en erken 7 gün sonra yeniden denenir
 const CRON_ASGARI_MS = 5 * 60 * 1000;                 // iki zamanlanmış tur arası en kısa süre (çift tetiklemeye karşı)
-const GECE_VARSAYILAN = [3, 5];                       // İstanbul saati [başlangıç, bitiş)
+const GECE_VARSAYILAN = [2, 6];                       // İstanbul saati [başlangıç, bitiş): 24 tur
+/**
+ * Dilim: bir takvim ayının içindeki sabit gün parçası (ay ay ilerlenir, her çağrı tek dilim normalleştirir).
+ * Varsayılan 8 gün (ay = 4 parça, en çok 8 gün): ücretsiz planın 10 ms CPU sınırı varsayımı. node ölçümü
+ * (olcum/cpu.mjs): 31 günlük ay normalleştiren gece turu medyan ~9 ms, p90 ~15–17 ms → sınırı aşar.
+ * Ücretli planda PIYASA_DILIM_GUN=31 → ay başına tek istek.
+ */
+const DILIM_GUN_VARSAYILAN = 8;
+/** İstek yolunda bir çağrının en çok kaç eksik dilimi EPİAŞ'tan tamamlayabileceği (CPU ve G/Ç sınırı). */
+const ISTEK_AZAMI_DILIM = 2;
 /** Çağrı başına G/Ç tavanı (fetch + KV + Cache API). Ücretsiz plan alt istek sınırı 50. */
 export const AZAMI_ALT_ISTEK = 45;
 const ISTEGE_BAGLI_PAY = 4;                           // isteğe bağlı (önbellek) işlemleri bu kadar boş yer bırakır
@@ -170,9 +180,28 @@ export function istanbulIso(ms) { return new Date(ms + OFSET_MS).toISOString().s
 function istanbulSaat(ms) { return new Date(ms + OFSET_MS).getUTCHours(); }
 function gunBasiMs(ymd) { return Date.parse(`${ymd}T00:00:00${OFSET}`); }
 function aySonu(ymd) { const [y, m] = ymd.split('-').map(Number); return new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10); }
-function sonrakiAy(ay) { const [y, m] = ay.split('-').map(Number); return new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 7); }
 const enKucuk = (a, b) => (a < b ? a : b);
 const enBuyuk = (a, b) => (a > b ? a : b);
+
+/** PIYASA_DILIM_GUN (1–31) ya da varsayılan. */
+function dilimGunu(env) {
+  const v = env && /^\d{1,2}$/.test(String(env.PIYASA_DILIM_GUN || '')) ? +env.PIYASA_DILIM_GUN : NaN;
+  return v >= 1 && v <= 31 ? v : DILIM_GUN_VARSAYILAN;
+}
+/**
+ * g gününü içeren dilim. Ay, round(uzunluk / n) parçaya bölünür; artan günler son parçaya eklenir
+ * (n=8: 31 gün → 1–8, 9–16, 17–24, 25–31; n=10: 28 gün → 1–10, 11–20, 21–28). → {bas, bit (sinir ile kırpılmış), son}
+ */
+export function dilimBul(g, n, sinir) {
+  const ayBasi = `${g.slice(0, 7)}-01`, aySon = aySonu(g);
+  const uzunluk = +aySon.slice(8, 10), gun = +g.slice(8, 10);
+  const adet = Math.max(1, Math.round(uzunluk / n)); // son parça en çok ~1,5 × n gün (Şubat, n=10 → 1–10, 11–20, 21–28)
+  const k = Math.min(Math.floor((gun - 1) / n), adet - 1);
+  const basGun = 1 + k * n, sonGun = k === adet - 1 ? uzunluk : (k + 1) * n;
+  const bas = enBuyuk(gunEkle(ayBasi, basGun - 1), ILK_GUN);
+  const son = gunEkle(ayBasi, sonGun - 1);
+  return { bas, bit: sinir && son > sinir ? sinir : son, son };
+}
 
 export function aralikSinirlari(bas, bit) {
   // endDate günün son saat başıdır (yorum DOĞRULANMADI; dönen satırlar ayrıca istenen güne süzülür).
@@ -859,11 +888,15 @@ async function cekIc(c, anahtar, bas, bit, sec) {
 
 // ================================================================ KV kayıtları ==
 
-function bosDurum() { return { s: 1, g: {}, ay: {}, yok: {}, cron: null }; }
+/**
+ * Durum kaydı (tek KV anahtarı): g = gün → [içerik özeti, son kontrol ms, yayımlanan dönem sayısı];
+ * dl = dilim başlangıcı → son tam denetim ms; yok = EPİAŞ'ın veri döndürmediği gün → son deneme ms; cron.
+ */
+function bosDurum() { return { s: 1, g: {}, dl: {}, yok: {}, cron: null }; }
 const nesne = (x) => (x && typeof x === 'object' && !Array.isArray(x) ? x : {});
 function durumNormal(d) {
   if (!d || typeof d !== 'object' || d.s !== 1 || !d.g || typeof d.g !== 'object') return bosDurum();
-  return { s: 1, g: nesne(d.g), ay: nesne(d.ay), yok: nesne(d.yok), cron: d.cron && typeof d.cron === 'object' ? d.cron : null };
+  return { s: 1, g: nesne(d.g), dl: nesne(d.dl), yok: nesne(d.yok), cron: d.cron && typeof d.cron === 'object' ? d.cron : null };
 }
 /** Durum kaydı: bellek (30 sn) → KV. undefined → okunamadı. */
 async function durumOku(c, taze) {
@@ -876,12 +909,15 @@ async function durumOku(c, taze) {
   return d;
 }
 
-async function icerikOzeti(donemler) {
-  const b = await crypto.subtle.digest('SHA-256', kodlayici.encode(JSON.stringify(donemler)));
+/** İçerik özeti: dönem dizisinin JSON metninin SHA-256'sının ilk 64 biti (metin bir kez üretilir). */
+async function metinOzeti(metin) {
+  const b = await crypto.subtle.digest('SHA-256', kodlayici.encode(metin));
   return hex(new Uint8Array(b).slice(0, 8));
 }
+const icerikOzeti = (donemler) => metinOzeti(JSON.stringify(donemler));
+/** Gün kaydı: {s:1, tarih, cekildi (ms), ozet, donemler}. Özet kayıtla saklanır: okumada yeniden hesaplanmaz. */
 function gunKaydiGecerli(k, g) {
-  return !!k && k.s === 1 && k.tarih === g && Number.isFinite(k.cekildi) && Array.isArray(k.donemler) && k.donemler.length > 0;
+  return !!k && k.s === 1 && k.tarih === g && Number.isFinite(k.cekildi) && typeof k.ozet === 'string' && Array.isArray(k.donemler) && k.donemler.length > 0;
 }
 function bellekGunYaz(c, g, kayit, ozet) {
   if (bellekGun.size >= BELLEK_SINIRI && !bellekGun.has(g)) bellekGun.delete(bellekGun.keys().next().value);
@@ -922,9 +958,8 @@ async function gunleriOku(c, gunler, durum) {
     if (v === undefined) return undefined; // okunamadı: EPİAŞ'a gidilmez, 503 gecici
     if (v === null) { out.set(g, null); continue; }
     if (!gunKaydiGecerli(v, g)) { sayaclar.bozukKayit++; out.set(g, null); continue; }
-    const ozet = await icerikOzeti(v.donemler);
-    bellekGunYaz(c, g, v, ozet);
-    out.set(g, { kayit: v, ozet });
+    bellekGunYaz(c, g, v, v.ozet);
+    out.set(g, { kayit: v, ozet: v.ozet });
   }
   return out;
 }
@@ -940,19 +975,20 @@ async function kaydet(c, durum, gunler, an, once) {
   let atlanan = 0, degisti = false;
   for (const g of sira) {
     const donemler = gunler.get(g);
-    const ozet = await icerikOzeti(donemler);
-    const kayit = { s: 1, tarih: g, cekildi: an, donemler };
+    const metin = JSON.stringify(donemler);
+    const ozet = await metinOzeti(metin);
+    const kayit = { s: 1, tarih: g, cekildi: an, ozet, donemler };
     const yayim = yayimSayisi(donemler);
     const onceki = Array.isArray(durum.g[g]) ? durum.g[g] : null;
     bellekGunYaz(c, g, kayit, ozet);
     if (onceki && onceki[0] === ozet) { durum.g[g] = [ozet, an, yayim]; degisti = true; continue; }
     if (onceki && Number.isFinite(onceki[2]) && yayim < onceki[2]) { sayaclar.yayimAzaldi++; log('yayim-azaldi', g, onceki[2], yayim); }
     if (!ioVar(c, 1)) { atlanan++; continue; }
-    yazilacak.push({ g, kayit, ozet, yayim });
+    yazilacak.push({ g, ozet, yayim, deger: `{"s":1,"tarih":"${g}","cekildi":${an},"ozet":"${ozet}","donemler":${metin}}` });
     c.io.n++; // G/Ç birimi şimdi ayrılır; yazım aşağıda paralel
   }
   const sonuclar = await Promise.all(yazilacak.map(async (y) => {
-    try { sayaclar.kvYazma++; await c.kv.put(kvGunAnahtari(y.g), JSON.stringify(y.kayit)); return true; } catch (e) { sayaclar.kvHata++; return false; }
+    try { sayaclar.kvYazma++; await c.kv.put(kvGunAnahtari(y.g), y.deger); return true; } catch (e) { sayaclar.kvHata++; return false; }
   }));
   let yazilan = 0;
   yazilacak.forEach((y, i) => {
@@ -966,7 +1002,7 @@ async function kaydet(c, durum, gunler, an, once) {
 function istekKaydedici(c, once) {
   return async (sonuc) => {
     const durum = await durumOku(c, true);
-    if (durum === undefined) { for (const [g, d] of sonuc.gunler) bellekGunYaz(c, g, { s: 1, tarih: g, cekildi: sonuc.an, donemler: d }, await icerikOzeti(d)); return; }
+    if (durum === undefined) { for (const [g, d] of sonuc.gunler) { const oz = await icerikOzeti(d); bellekGunYaz(c, g, { s: 1, tarih: g, cekildi: sonuc.an, ozet: oz, donemler: d }, oz); } return; }
     const k = await kaydet(c, durum, sonuc.gunler, sonuc.an, once);
     if (k.degisti && (await kvYaz(c, KV_DURUM, durum, 0, true))) bellekDurum = { deger: durum, son: c.simdi() + BELLEK_DURUM_MS };
   };
@@ -1083,16 +1119,24 @@ async function dengesizlik(c, params) {
       }));
     }
   }
-  // (a) daha eski eksik günler: takvim ayı dilimi başına tek istek (ay sonu ya da bugün−2 ile sınırlı).
-  const aylar = new Map();
-  for (const g of p.gunler) if (g < dun && !kayitlar.get(g)) { const ay = g.slice(0, 7); if (!aylar.has(ay)) aylar.set(ay, []); aylar.get(ay).push(g); }
-  for (const [ay, liste] of aylar) {
-    const mBas = enBuyuk(`${ay}-01`, ILK_GUN), mBit = enKucuk(aySonu(`${ay}-01`), sinir);
-    isler.push(cek(c, `ay/${ay}/${mBit}`, mBas, mBit, { istek: true, kaydet: istekKaydedici(c, liste) }).then((r) => {
-      if (r.tamam) { for (const g of liste) if (r.gunler.has(g)) kayitlar.set(g, girdi(r, g)); }
+  // (a) daha eski eksik günler: dilim başına tek istek (ay içinde sabit parça; bugün−2 ile kırpılır).
+  // Bir çağrı en çok ISTEK_AZAMI_DILIM dilim tamamlar (CPU / G/Ç); kalanı sonraki isteğe ya da gece bakımına kalır.
+  const n = dilimGunu(c.env);
+  const dilimler = new Map();
+  for (const g of p.gunler) {
+    if (g >= dun || kayitlar.get(g)) continue;
+    const d = dilimBul(g, n, sinir);
+    if (!dilimler.has(d.bas)) dilimler.set(d.bas, { ...d, liste: [] });
+    dilimler.get(d.bas).liste.push(g);
+  }
+  let dilimSiniri = false;
+  for (const d of [...dilimler.values()].slice(0, ISTEK_AZAMI_DILIM)) {
+    isler.push(cek(c, `dilim/${d.bas}/${d.bit}`, d.bas, d.bit, { istek: true, kaydet: istekKaydedici(c, d.liste) }).then((r) => {
+      if (r.tamam) { for (const g of d.liste) if (r.gunler.has(g)) kayitlar.set(g, girdi(r, g)); }
       else hatalar.push(r);
     }));
   }
+  if (dilimler.size > ISTEK_AZAMI_DILIM) dilimSiniri = true;
   if (isler.length) {
     await Promise.all(isler);
     if (bellekDurum && bellekDurum.deger) durum = bellekDurum.deger;
@@ -1102,6 +1146,8 @@ async function dengesizlik(c, params) {
   if (eksik.length) {
     const h = hatalar.find((x) => x.neden === 'butce') || hatalar[0];
     if (h) return h.neden === 'butce' ? hata503('butce', MESAJ_503.butce, h.retryS) : hata503('gecici', MESAJ_503.gecici, h.retryS);
+    // Çağrı başına dilim sınırı: tamamlanan dilimler KV'de; kalanı bir sonraki istekte.
+    if (dilimSiniri) return hata503('butce', MESAJ_503.butce, 2);
     return hata503('veri-yok', MESAJ_503['veri-yok'], eksik.some((g) => g >= dun) ? 600 : 3600);
   }
   const uretAn = c.simdi();
@@ -1133,7 +1179,7 @@ async function durumYaniti(c) {
   return yanit(200, {
     surum: SURUM,
     uretildi: istanbulIso(an),
-    kv: { gunSayisi: Object.keys(durum.g).length, eksikGun, veriYokIsaretli: Object.keys(durum.yok).length, denetlenenAy: Object.keys(durum.ay).length },
+    kv: { gunSayisi: Object.keys(durum.g).length, eksikGun, veriYokIsaretli: Object.keys(durum.yok).length, denetlenenDilim: Object.keys(durum.dl).length, dilimGun: dilimGunu(c.env) },
     zamanli: {
       son: Number.isFinite(cr.son) ? istanbulIso(cr.son) : null,
       sonuc: typeof cr.sonuc === 'string' ? cr.sonuc : null,
@@ -1192,34 +1238,37 @@ function geceSaatleri(env) {
 }
 
 /**
- * Gece bakım işi seçimi (öncelik sırası):
- *   doldurma  — ILK_GUN … bugün−2 arasında KV'de olmayan ilk günün takvim ayı
- *   uzlastirma — [bugün−45, bugün−2] ile kesişen ve bu gece denetlenmemiş ay
- *   dogrulama — daha eski aylardan son denetimi ≥ 7 gün olan en eskisi
+ * Gece bakım işi seçimi (öncelik sırası; her iş TEK dilim):
+ *   doldurma   — ILK_GUN … bugün−2 arasında KV'de olmayan ilk günün dilimi (ay ay ilerler)
+ *   uzlastirma — [bugün−45, bugün−2] ile kesişen ve bu gece tam denetlenmemiş dilim
+ *   dogrulama  — daha eski dilimlerden son denetimi ≥ 7 gün olan en eskisi
+ * n: dilim uzunluğu (gün). → {tur, bas, bit, anahtar} | null
  */
-export function bakimSec(durum, bugun, an) {
+export function bakimSec(durum, bugun, an, n = DILIM_GUN_VARSAYILAN) {
   const sinir = gunEkle(bugun, -2);
   if (sinir < ILK_GUN) return null;
-  const ayIsi = (tur, ay) => {
-    const bas = enBuyuk(`${ay}-01`, ILK_GUN), bit = enKucuk(aySonu(`${ay}-01`), sinir);
-    return { tur, ay, bas, bit, anahtar: `ay/${ay}/${bit}` };
-  };
+  const is = (tur, d) => ({ tur, bas: d.bas, bit: d.bit, anahtar: `dilim/${d.bas}/${d.bit}` });
   for (let g = ILK_GUN; g <= sinir; g = gunEkle(g, 1)) {
     if (durum.g[g]) continue;
     if (Number.isFinite(durum.yok[g]) && an - durum.yok[g] < YOK_TEKRAR_MS) continue;
-    return ayIsi('doldurma', g.slice(0, 7));
+    return is('doldurma', dilimBul(g, n, sinir));
   }
   const pBas = enBuyuk(gunEkle(bugun, -UZLASTIRMA_GUN), ILK_GUN);
   const geceBasi = gunBasiMs(bugun);
-  for (let ay = pBas.slice(0, 7); ay <= sinir.slice(0, 7); ay = sonrakiAy(ay)) {
-    if ((durum.ay[ay] || 0) < geceBasi) return ayIsi('uzlastirma', ay);
+  const ilkUzlastirma = dilimBul(pBas, n, sinir).bas;
+  for (let g = ilkUzlastirma; g <= sinir;) {
+    const d = dilimBul(g, n, sinir);
+    if ((durum.dl[d.bas] || 0) < geceBasi) return is('uzlastirma', d);
+    g = gunEkle(d.son, 1);
   }
   let aday = null;
-  for (let ay = ILK_GUN.slice(0, 7); ay < pBas.slice(0, 7); ay = sonrakiAy(ay)) {
-    const t = durum.ay[ay] || 0;
-    if (an - t >= DOGRULAMA_ARALIGI_MS && (!aday || t < aday.t)) aday = { ay, t };
+  for (let g = ILK_GUN; g < ilkUzlastirma;) {
+    const d = dilimBul(g, n, sinir);
+    const t = durum.dl[d.bas] || 0;
+    if (an - t >= DOGRULAMA_ARALIGI_MS && (!aday || t < aday.t)) aday = { d, t };
+    g = gunEkle(d.son, 1);
   }
-  return aday ? ayIsi('dogrulama', aday.ay) : null;
+  return aday ? is('dogrulama', aday.d) : null;
 }
 
 async function zamanliCalis(c) {
@@ -1240,7 +1289,7 @@ async function zamanliCalis(c) {
   const [gBas, gBit] = geceSaatleri(c.env);
   const saat = istanbulSaat(an);
   if (saat >= gBas && saat < gBit) {
-    const is = bakimSec(durum, bugun, an);
+    const is = bakimSec(durum, bugun, an, dilimGunu(c.env));
     if (is) {
       if (!ioVar(c, 10)) bakim = `${is.tur}:altistek`;
       else {
@@ -1251,7 +1300,7 @@ async function zamanliCalis(c) {
             if (rr.gunler.has(g)) delete durum.yok[g];
             else if (!durum.g[g]) durum.yok[g] = an;
           }
-          if (!k.atlanan) durum.ay[is.ay] = an;
+          if (!k.atlanan) durum.dl[is.bas] = an;
           bakim = k.atlanan ? `${is.tur}:kismi` : is.tur;
         } else bakim = `${is.tur}:${rr.neden}`;
       }

@@ -3,7 +3,7 @@
 // !!! Tüm fiyatlar UYDURMA test verisidir (test-verisi.mjs).
 import {
   piyasaIstegi, piyasaZamanli, _bellekTemizle, sayaclar, BUTCE, PENCERE, AZAMI_ALT_ISTEK, KV_DURUM, kvGunAnahtari,
-  donemlerAyrintili, ogelerCikar, sayfaBilgisi, gunIzgarasi, veriVar, sayi, yonCoz, belirtecEsit, bakimSec, ILK_GUN, _ic,
+  donemlerAyrintili, ogelerCikar, sayfaBilgisi, gunIzgarasi, veriVar, sayi, yonCoz, belirtecEsit, bakimSec, dilimBul, ILK_GUN, _ic,
 } from './piyasa.js';
 import host, { mevcutFetch, mevcutZamanliSayaci } from './ornek-host.js';
 import { SABIT_AN, ANAHTAR_1, ANAHTAR_2, SAHTE_ENV, sahteGun, sahteEpias, sahteCache, sahteKv, gunEkle } from './test-verisi.mjs';
@@ -203,7 +203,9 @@ ok('96 donem (15 dk) aynı koddan', a.donemler.length === 96 && a.donemler.every
     ok(`400 ${ad}`, x.durum === 400 && x.j.hata.kod === 'parametre' && typeof x.j.hata.mesaj === 'string' && x.r.headers.get('Cache-Control') === 'no-store');
   }
   ok('400 yollarinda EPİAŞ istegi yok', o.e.sayac.rapor === 0 && o.e.sayac.giris === 0);
-  ok('31 gun kabul', (await o.aralik('2026-10-25', '2026-11-24')).durum === 200);
+  let otuzbir = null;
+  for (let i = 0; i < 4 && (!otuzbir || otuzbir.durum !== 200); i++) otuzbir = await o.aralik('2026-10-25', '2026-11-24');
+  ok('31 gun kabul (eksik dilimler en cok 2 istekte tamamlanir)', otuzbir.durum === 200 && otuzbir.j.gunler.length === 31);
   ok('ILK_GUN kabul', (await o.gun(ILK_GUN)).durum === 200);
   ok('bilinmeyen yol -> 404 (kimlikli)', (await o.iste('/piyasa/v1/yok')).durum === 404 && (await o.iste('/piyasa/v2/dengesizlik?tarih=' + DUN)).durum === 404 && (await o.iste('/piyasa/v1/dengesizlik/')).durum === 404);
 }
@@ -247,7 +249,7 @@ ok('96 donem (15 dk) aynı koddan', a.donemler.length === 96 && a.donemler.every
 // ============================================================================
 {
   const o = ortam({ env: { PIYASA_GECE: '0-24', PIYASA_CRON_ASGARI_SN: '0' } });
-  for (let i = 0; i < 14; i++) { await o.cron(); o.e.ilerlet(10 * DK); }
+  for (let i = 0; i < 50; i++) { await o.cron(); o.e.ilerlet(10 * DK); }
   const dolu = kvGunleri(o.kv);
   ok('gece bakimi 2026-01-01 … bugun tum gunleri KV\'ye doldurdu', dolu.length === 328 && dolu[0] === ILK_GUN && dolu.at(-1) === BUGUN, `-> ${dolu.length}`);
   const once = { r: o.e.sayac.rapor, g: o.e.sayac.giris };
@@ -311,7 +313,7 @@ ok('96 donem (15 dk) aynı koddan', a.donemler.length === 96 && a.donemler.every
   await o.cron('*/10 * * * *');
   ok('PIYASA_CRON tanimli: kendi ifadesi islenir', o.e.sayac.rapor === sayi0 + 2);
   const d = JSON.parse(o.kv.depo.get(KV_DURUM));
-  ok('durum kaydi: son tur, sonuc, ust-akis kodu (deger yok)', d.cron.sonuc === 'tamam' && d.cron.ustAkis === 200 && Number.isFinite(d.cron.son) && !/donemler|ptf|smf|pozitif|negatif/.test(JSON.stringify(d)) && Object.keys(d).join() === 's,g,ay,yok,cron');
+  ok('durum kaydi: son tur, sonuc, ust-akis kodu (deger yok)', d.cron.sonuc === 'tamam' && d.cron.ustAkis === 200 && Number.isFinite(d.cron.son) && !/donemler|ptf|smf|pozitif|negatif/.test(JSON.stringify(d)) && Object.keys(d).join() === 's,g,dl,yok,cron');
 }
 
 // ============================================================================
@@ -321,7 +323,7 @@ async function geceSimulasyonu(ayar, gece) {
   const o = ortam({ an: istAn(BUGUN, 0, 3), ...ayar });
   let enCokIo = 0, enCokFetch = 0, tur = 0;
   const hedefSon = gunEkle(BUGUN, gece);
-  while (o.e.an < istAn(hedefSon, 5, 0)) {
+  while (o.e.an < istAn(hedefSon, 6, 0)) {
     o.yeniSurec(); // en kötü durum: her tur soğuk süreç (bilet KV'den, bütçe sıfır)
     o.olc.n = 0;
     const f0 = o.e.sayac.rapor + o.e.sayac.giris;
@@ -333,17 +335,29 @@ async function geceSimulasyonu(ayar, gece) {
   }
   return { o, enCokIo, enCokFetch, tur };
 }
-{
-  const { o, enCokIo, tur } = await geceSimulasyonu({}, 0);
+ok('dilimBul: 10 gun, artan gunler son parcaya (Subat 3 parca)', JSON.stringify(dilimBul('2026-01-25', 10)) === '{"bas":"2026-01-21","bit":"2026-01-31","son":"2026-01-31"}' && dilimBul('2026-01-10', 10).bas === '2026-01-01' && dilimBul('2026-01-11', 10).bas === '2026-01-11' && dilimBul('2026-02-28', 10).bas === '2026-02-21' && dilimBul('2026-02-28', 10).bit === '2026-02-28');
+ok('dilimBul: 31 gun = takvim ayi; sinir ile kirpilir', JSON.stringify(dilimBul('2026-11-05', 31, '2026-11-22')) === '{"bas":"2026-11-01","bit":"2026-11-22","son":"2026-11-30"}' && dilimBul('2026-02-14', 31).bit === '2026-02-28');
+{ // ay ay (PIYASA_DILIM_GUN=31; ücretli plan ayarı): tek gecede, ay başına tek istek
+  const { o, enCokIo, tur } = await geceSimulasyonu({ env: { PIYASA_DILIM_GUN: '31' } }, 0);
   const d = JSON.parse(o.kv.depo.get(KV_DURUM));
   const dolu = kvGunleri(o.kv);
-  ok('ilk gece (sayfasiz yanit): 03:00–04:59 penceresinde tum 2026 gunleri doldu', dolu.length === 328, `-> ${dolu.length}`);
+  ok('ilk gece (31 gunluk dilim): 02:00–05:59 penceresinde tum 2026 gunleri doldu', dolu.length === 328, `-> ${dolu.length}`);
   ok('her turda olculen G/C (fetch+KV+Cache) <= 45 (ucretsiz plan 50)', enCokIo <= AZAMI_ALT_ISTEK, `-> ${enCokIo}`);
-  const gece = o.e.istekler.filter((i) => i.url.includes('ptf-smf-sdf') && istAn(BUGUN, 3) <= i.an && i.an < istAn(BUGUN, 5));
-  ok('doldurma ay ay: gece rapor istekleri = 11 ay + 12 tur x (dun+bugun)', gece.length === 11 + 12, `-> ${gece.length}`);
-  ok('doldurma istekleri takvim ayi sinirinda', gece.filter((i) => JSON.parse(i.body).startDate.slice(0, 10) !== DUN).every((i) => JSON.parse(i.body).startDate.slice(8, 10) === '01'));
-  ok('durum: tum gunlerin ozeti var, aylar denetlenmis', Object.keys(d.g).length === 328 && Object.keys(d.ay).length >= 10);
-  gercekLog(`  bilgi: ilk gece ${tur} tur, en cok G/C/tur ${enCokIo}, KV yazma ${o.kv.yazim}`);
+  const gece = o.e.istekler.filter((i) => i.url.includes('ptf-smf-sdf') && istAn(BUGUN, 2) <= i.an && i.an < istAn(BUGUN, 6) && JSON.parse(i.body).startDate.slice(0, 10) !== DUN);
+  ok('doldurma ay ay: 11 ay istegi, takvim ayi sinirinda', gece.slice(0, 11).every((i) => JSON.parse(i.body).startDate.slice(8, 10) === '01') && gece.slice(0, 11).map((i) => JSON.parse(i.body).startDate.slice(0, 7)).join() === '2026-01,2026-02,2026-03,2026-04,2026-05,2026-06,2026-07,2026-08,2026-09,2026-10,2026-11', `-> ${gece.map((i) => JSON.parse(i.body).startDate.slice(0, 10))}`);
+  ok('durum: tum gunlerin ozeti var, dilimler denetlenmis', Object.keys(d.g).length === 328 && Object.keys(d.dl).length >= 10 && Object.keys(d).join() === 's,g,dl,yok,cron');
+  gercekLog(`  bilgi: ilk gece (31 gun) ${tur} tur, en cok G/C/tur ${enCokIo}, KV yazma ${o.kv.yazim}`);
+}
+ok('dilimBul: 8 gun (varsayilan) -> ay 4 parca, en cok 8 gun', ['2026-01-01', '2026-01-09', '2026-01-17', '2026-01-25'].every((g) => dilimBul(g, 8).bas === g) && dilimBul('2026-01-31', 8).bas === '2026-01-25' && dilimBul('2026-02-28', 8).bas === '2026-02-25' && dilimBul('2026-04-30', 8).bas === '2026-04-25');
+{ // varsayılan 8 günlük dilim (ücretsiz plan CPU varsayımı): iki gecede tamamlanır, her istek <= 8 gün
+  const { o, enCokIo } = await geceSimulasyonu({}, 1);
+  const dolu = kvGunleri(o.kv);
+  const bakimIstekleri = o.e.istekler.filter((i) => i.url.includes('ptf-smf-sdf')).map((i) => JSON.parse(i.body)).filter((b) => b.startDate.slice(0, 10) < '2026-11-23');
+  ok('8 gunluk dilim: iki gecede 2026-01-01 … bugun tum gunler doldu', dolu.length === 329 && dolu[0] === ILK_GUN, `-> ${dolu.length}`);
+  ok('8 gunluk dilim: her bakim istegi en cok 8 gun, ay sinirini asmaz', bakimIstekleri.length > 40 && bakimIstekleri.every((b) => { const g1 = b.startDate.slice(0, 10), g2 = b.endDate.slice(0, 10); return g1.slice(0, 7) === g2.slice(0, 7) && (Date.parse(g2) - Date.parse(g1)) / GUN + 1 <= 8; }));
+  ok('8 gunluk dilim: her turda G/C <= 45', enCokIo <= AZAMI_ALT_ISTEK, `-> ${enCokIo}`);
+  const ilkGece = o.e.istekler.filter((i) => i.url.includes('ptf-smf-sdf') && i.an < istAn(BUGUN, 6)).length;
+  gercekLog(`  bilgi: 8 gunluk dilimle ilk gece ${ilkGece} rapor istegi (dun+bugun dahil), en cok G/C/tur ${enCokIo}`);
 }
 { // sayfalı yanıt (100 kalem/sayfa → ay başına 8 sayfa): sınır içinde kalır, birkaç gecede tamamlanır
   const { o, enCokIo, enCokFetch } = await geceSimulasyonu({ sayfaBoyu: 100 }, 3);
@@ -356,13 +370,13 @@ async function geceSimulasyonu(ayar, gece) {
   gercekLog(`  bilgi: sayfali doldurma en cok G/C/tur ${enCokIo}, en cok ust-akis/tur ${enCokFetch}`);
 }
 { // ikinci gece: uzlaştırma penceresi yeniden denetlenir; yalnız değişen gün yazılır; eski aylar haftada bir
-  const { o } = await geceSimulasyonu({}, 0);
+  const { o } = await geceSimulasyonu({ env: { PIYASA_DILIM_GUN: '31' } }, 0);
   const degisen = '2026-10-28';
   o.e.ayar.gun = (g) => sahteGun(g, 1e9, 60, g === degisen ? 1 : 0);
   // ertesi gün (25.11) gündüz, sonra gece
   const yazilanOnce = o.kv.yazilanlar.length;
   const raporOnce = o.e.istekler.length;
-  while (o.e.an < istAn('2026-11-25', 5, 0)) { await o.cron(); o.e.ilerlet(10 * DK); }
+  while (o.e.an < istAn('2026-11-25', 6, 0)) { await o.cron(); o.e.ilerlet(10 * DK); }
   const gunYazimlari = o.kv.yazilanlar.slice(yazilanOnce).filter((k) => k.startsWith('piyasa:v1:gun:'));
   const ikinciGece = o.e.istekler.slice(raporOnce).filter((i) => i.url.includes('ptf-smf-sdf') && JSON.parse(i.body).startDate.slice(0, 10) !== '2026-11-24' && JSON.parse(i.body).startDate.slice(0, 10) !== '2026-11-23');
   ok('2. gece: uzlastirma penceresi (bugun-45 … bugun-2) ay dilimleriyle denetlendi (Ekim + Kasim)', ikinciGece.map((i) => JSON.parse(i.body).startDate.slice(0, 7)).join() === '2026-10,2026-11', `-> ${ikinciGece.map((i) => i.body.slice(14, 24))}`);
@@ -370,15 +384,15 @@ async function geceSimulasyonu(ayar, gece) {
   // 8 gün sonra eski aylar doğrulanır
   o.e.an = istAn('2026-12-02', 2, 55);
   const r2 = o.e.istekler.length;
-  while (o.e.an < istAn('2026-12-02', 5, 0)) { await o.cron(); o.e.ilerlet(10 * DK); }
+  while (o.e.an < istAn('2026-12-02', 6, 0)) { await o.cron(); o.e.ilerlet(10 * DK); }
   const dogrulama = o.e.istekler.slice(r2).filter((i) => i.url.includes('ptf-smf-sdf')).map((i) => JSON.parse(i.body).startDate.slice(0, 7));
   ok('haftalik dogrulama: 45 gunden eski aylar yeniden cekildi', ['2026-01', '2026-05', '2026-09'].every((m) => dogrulama.includes(m)), `-> ${dogrulama}`);
 }
 { // EPİAŞ'ın veri döndürmediği gün: işaretlenir, 7 gün yeniden denenmez, diğer işleri aç bırakmaz
-  const { o } = await geceSimulasyonu({ gun: (g) => (g === '2026-02-14' ? [] : sahteGun(g)) }, 0);
+  const { o } = await geceSimulasyonu({ gun: (g) => (g === '2026-02-14' ? [] : sahteGun(g)), env: { PIYASA_DILIM_GUN: '31' } }, 0);
   const d = JSON.parse(o.kv.depo.get(KV_DURUM));
   ok('veri olmayan gun: yok isaretli, digerleri dolu', Number.isFinite(d.yok['2026-02-14']) && kvGunleri(o.kv).length === 327);
-  const dd = { g: {}, ay: {}, yok: { '2026-02-14': istAn(BUGUN, 3) } };
+  const dd = { g: {}, dl: {}, yok: { '2026-02-14': istAn(BUGUN, 3) } };
   for (let g = ILK_GUN; g <= '2026-11-22'; g = gunEkle(g, 1)) if (g !== '2026-02-14') dd.g[g] = ['x', 0, 24];
   ok('bakimSec: yok isaretli gun doldurmayi tikamaz (uzlastirmaya gecer)', bakimSec(dd, BUGUN, istAn(BUGUN, 4)).tur === 'uzlastirma');
   ok('bakimSec: 7 gun sonra yeniden doldurma denenir', bakimSec(dd, '2026-12-02', istAn('2026-12-02', 4)).tur === 'doldurma');
@@ -407,6 +421,20 @@ ok('butce sabitleri: dakikada 10 rapor (4 zamanli icin ayrili) + 1 giris', BUTCE
   o.yeniSurec();
   const x = await o.gun('2026-07-15');
   ok('yeni surec ayni dakikada: paylasilan sayac dolu -> 503 butce', x.durum === 503 && x.j.hata.kod === 'butce' && o.e.sayac.rapor === 6);
+}
+
+{ // istek başına en çok 2 eksik dilim: kalanı sonraki isteğe
+  const o = ortam();
+  const x = await o.aralik('2026-10-05', '2026-11-04');
+  ok('31 gun, 5 eksik dilim: ilk istek 2 dilim tamamlar, 503 butce Retry-After 2', x.durum === 503 && x.j.hata.kod === 'butce' && x.r.headers.get('Retry-After') === '2' && o.e.sayac.rapor === 2, `-> ${x.durum} ${o.e.sayac.rapor}`);
+  const y = await o.aralik('2026-10-05', '2026-11-04');
+  ok('ikinci istek 2 dilim daha: hala 503', y.durum === 503 && o.e.sayac.rapor === 4);
+  const y2 = await o.aralik('2026-10-05', '2026-11-04');
+  ok('ucuncu istek son dilimi tamamlar: 200, 31 gun', y2.durum === 200 && y2.j.gunler.length === 31 && o.e.sayac.rapor === 5);
+  const z = await o.aralik('2026-10-05', '2026-11-04');
+  ok('dorduncu istek: KV/bellekten, EPİAŞ yok', z.durum === 200 && o.e.sayac.rapor === 5);
+  const istenen = o.e.istekler.filter((i) => i.url.includes('ptf-smf-sdf')).map((i) => JSON.parse(i.body).startDate.slice(0, 10) + '..' + JSON.parse(i.body).endDate.slice(0, 10));
+  ok('istek yolu dilimleri: 8 gunluk sabit parcalar', istenen.join() === '2026-10-01..2026-10-08,2026-10-09..2026-10-16,2026-10-17..2026-10-24,2026-10-25..2026-10-31,2026-11-01..2026-11-08', `-> ${istenen}`);
 }
 
 // ============================================================================
@@ -502,7 +530,7 @@ ok('butce sabitleri: dakikada 10 rapor (4 zamanli icin ayrili) + 1 giris', BUTCE
 // 9 — SAYFALAMA (kaldığı yerden sürme)
 // ============================================================================
 {
-  const o = ortam({ sayfaBoyu: 100 });
+  const o = ortam({ sayfaBoyu: 100, env: { PIYASA_DILIM_GUN: '31' } });
   const sayfalar = () => o.e.istekler.filter((i) => i.url.includes('ptf-smf-sdf')).map((i) => (JSON.parse(i.body).page || { number: 1 }).number);
   const x = await o.gun('2026-03-10');
   ok('31 gunluk ay / 100 kalem: 6 sayfa sonra istek butcesi biter -> 503 butce', x.durum === 503 && x.j.hata.kod === 'butce' && JSON.stringify(sayfalar()) === '[1,2,3,4,5,6]', `-> ${x.durum} ${JSON.stringify(sayfalar())}`);
@@ -675,8 +703,12 @@ for (const zarf of ['body.content', 'body.items', 'items', 'content', 'dizi', 'b
   // Önce ilk gece (doldurma) — sonra kararlı bir gün ölçülür.
   while (o.e.an < istAn('2026-11-25', 0, 0)) { await o.cron(); o.e.ilerlet(10 * DK); }
   const ilkGunYazma = o.kv.yazim, ilkGunRapor = o.e.sayac.rapor, ilkGunGiris = o.e.sayac.giris;
+  while (o.e.an < istAn('2026-11-26', 0, 0)) { await o.cron(); o.e.ilerlet(10 * DK); }
+  const ikinciGunYazma = o.kv.yazim - ilkGunYazma;
+  ok('ikinci gun (10 gunluk dilimle doldurmanin kalani) KV yazma < 1000', ikinciGunYazma < 1000, `-> ${ikinciGunYazma}`);
+  ok('ikinci gun sonunda tum gunler KV\'de', kvGunleri(o.kv).length === 329 && kvGunleri(o.kv).at(-1) === '2026-11-25', `-> ${kvGunleri(o.kv).length}`);
   e0 = { y: o.kv.yazim, r: o.e.sayac.rapor, g: o.e.sayac.giris, ok: o.kv.okuma + o.kv.topluOkuma };
-  while (o.e.an < istAn('2026-11-26', 0, 0)) {
+  while (o.e.an < istAn('2026-11-27', 0, 0)) {
     await o.cron();
     for (let i = 0; i < 10; i++) { o.e.ilerlet(DK); await o.aralik('2026-11-20', istanbulBugunT(o.e.an)); if (i % 2 === 0) o.yeniSurec(); }
   }
@@ -684,7 +716,7 @@ for (const zarf of ['body.content', 'body.items', 'items', 'content', 'dizi', 'b
   ok('ilk gun (doldurma dahil) KV yazma < 1000', ilkGunYazma < 1000, `-> ${ilkGunYazma}`);
   ok('kararli gun KV yazma < 1000 (ucretsiz kota)', gunlukYazma < 1000, `-> ${gunlukYazma}`);
   ok('kararli gun EPİAŞ istegi ~144 + gece denetimi', gunlukRapor >= 144 && gunlukRapor <= 144 + 12, `-> ${gunlukRapor}`);
-  gercekLog(`  bilgi: ilk gun KV yazma ${ilkGunYazma}, rapor ${ilkGunRapor}, giris ${ilkGunGiris}`);
+  gercekLog(`  bilgi: ilk gun KV yazma ${ilkGunYazma}, rapor ${ilkGunRapor}, giris ${ilkGunGiris}; ikinci gun KV yazma ${ikinciGunYazma}`);
   gercekLog(`  bilgi: kararli gun KV yazma ${gunlukYazma}, rapor ${gunlukRapor}, giris ${gunlukGiris}, KV okuma ${gunlukOkuma} (dakikada 1 ziyaretci istegi, isteklerin yarisi soguk surec)`);
 }
 function istanbulBugunT(ms) { return new Date(ms + 3 * SA).toISOString().slice(0, 10); }
