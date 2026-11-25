@@ -12,9 +12,8 @@
  *   bayat (true ise güncel veri şu an alınamadı; veri "cekildi" anına aittir),
  *   ozet{toplam,yayimlanan,ptfOrt,smfOrt,pozitifOrt,negatifOrt,maliyetPozitifOrt,maliyetNegatifOrt,yon{acik,fazla,denge}},
  *   kurallar[{bas,bit,V,B,k,l,AFL,asgari,tavanBas,tavanCarpani,kaynak,dogrulama,tavanDogrulama,dogrulandi}], kuralAlanlari,
- *   yayimNotlari[{bas,bit,not}] (EPİAŞ'ın yayımladığı fiyatların o günün formülünden saatlerin çoğunda
- *   farklı olduğu — 1–25 Ocak 2026: 600 saatin 589'unda en az bir fiyat farklı — istenen tarihlerle kesişen
- *   aralıklar; yoksa []; XLSX "Bilgi" sayfasında "Yayım notu" satırı), atif, alanlar, not,
+ *   yayimNotlari[{bas,bit,not}] (EPİAŞ'ın yayımladığı fiyatların o günün formülünden bütünüyle farklı
+ *   olduğu, istenen tarihlerle kesişen aralıklar; yoksa []), atif, alanlar, not,
  *   donemler[{bas,bit,dk,ptf,smf,yon,pozitif,negatif,maliyetPozitif,maliyetNegatif}]
  * Yayımlanmamış değer null'dır (0 değildir).
  *
@@ -142,12 +141,6 @@ function bitisIso(d) {
   return son >= 1440 ? `${gunEkle(gun, 1)}T${saat(son - 1440)}:00${OFSET}` : `${gun}T${saat(son)}:00${OFSET}`;
 }
 
-/** İstenen tarihlerle kesişen yayım istisnaları (JSON yayimNotlari, XLSX "Bilgi" sayfası). */
-function yayimNotlari(ust) {
-  const bas = ust.tarih || ust.bas, bit = ust.tarih || ust.bit;
-  return YAYIM_ISTISNALARI.filter((x) => x.bit >= bas && x.bas <= bit).map((x) => ({ bas: x.bas, bit: x.bit, not: YAYIM_NOTLARI[x.not] }));
-}
-
 /** İstenen tarihlerle kesişen kural dilimleri (her girdinin bas/bit'i kendi geçerlilik aralığı). */
 function kurallarAralik(bas, bit) {
   return kuralDilimleri().filter((k) => k.bit >= bas && k.bas <= bit);
@@ -256,7 +249,6 @@ async function yanit(context, govdesiz) {
             [ust.tarih ? 'Tarih' : 'Tarih aralığı', ust.tarih || `${ust.bas} – ${ust.bit}`],
             ['Atıf', ATIF],
             ['Not', NOT],
-            ...yayimNotlari(ust).map((x) => ['Yayım notu', x.not]),
             ['Sayfa', SAYFA_URL],
           ],
           sutunlar: [{ genislik: 30 }, { genislik: 120 }],
@@ -285,7 +277,7 @@ async function yanit(context, govdesiz) {
       ozet: ozet(sonuc.donemler),
       kurallar: kurallarAralik(ust.tarih || ust.bas, ust.tarih || ust.bit),
       kuralAlanlari: KURAL_ALANLARI,
-      yayimNotlari: yayimNotlari(ust),
+      yayimNotlari: YAYIM_ISTISNALARI.filter((x) => x.bit >= (ust.tarih || ust.bas) && x.bas <= (ust.tarih || ust.bit)).map((x) => ({ bas: x.bas, bit: x.bit, not: YAYIM_NOTLARI[x.not] })),
       atif: ATIF,
       alanlar: ALANLAR,
       not: NOT,

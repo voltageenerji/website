@@ -33,7 +33,7 @@
  * gösterilir. Diğer günlerde tablo yalnız EPİAŞ değerlerini gösterir.
  */
 import {
-  kuralBul, kuralDilimleri, dogrulanmisAraliklar, yayimIstisnasi, KURALLAR, birimFiyat, formulFarki, ozet, yayimlandi, donemEtiketi, donemDakikasi, tarihGecerli, istanbulBugun, istanbulDakika,
+  kuralBul, dogrulanmisAraliklar, yayimIstisnasi, KURALLAR, birimFiyat, formulFarki, ozet, yayimlandi, donemEtiketi, donemDakikasi, tarihGecerli, istanbulBugun, istanbulDakika,
   gunEkle, YON_ADI, ILK_GUN, SAYFA_URL, VERI_URL, NOT_ORTALAMA,
 } from './_lib/dengesizlik.js';
 import { gunGetir } from './_lib/piyasa-istemci.js';
@@ -198,7 +198,7 @@ export function kuralUyarisi(tarih) {
   if (kural.V !== ref.V) fark.push(`V değeri ${sabit(kural.V)} TL/MWh`);
   if (kural.AFL !== null && kural.AFL !== ref.AFL) fark.push(`azami fiyat limiti ${sabit(kural.AFL)} TL/MWh`);
   const parca = [];
-  if (fark.length) parca.push(`Bu teslim gününde ${fark.join(', ')} idi; aşağıdaki yöntem bölümü 1 Kasım 2026 teslim gününden itibaren uygulanan değerleri anlatır.`);
+  if (fark.length) parca.push(`Bu tarihte ${fark.join(', ')} idi; aşağıdaki yöntem bölümü 1 Kasım 2026 ve sonrasında uygulanan değerleri anlatır.`);
   const ist = yayimIstisnasi(tarih);
   if (ist) parca.push(ist.metin);
   return parca.join(' ');
@@ -215,15 +215,11 @@ export function senaryoNotu(ymd) {
   const kural = kuralBul(ymd);
   if (!kural) return { acik: false, metin: `${t} teslim günü için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; bu tarih için hesap yapılmaz.${ek}` };
   if (!kural.formulGoster) return { acik: false, metin: `${t} teslim gününde uygulanan kural ve değerler bu sayfada henüz birincil kaynaklardan doğrulanmadı; bu tarih için hesap yapılmaz.${ek}` };
-  // Geçerlilik aralığı V VE AFL'nin birlikte sabit kaldığı dilimdir (kuralDilimleri; ör. 01.01–03.04.2026).
-  const dilim = kuralDilimleri().find((x) => ymd >= x.bas && ymd <= x.bit);
-  const ist = yayimIstisnasi(ymd);
   return {
     acik: true,
-    metin: `Hesapta kullanılan değerler (${t} teslim günü; ${tarihTR(dilim.bas)} – ${tarihTR(dilim.bit)} teslim günleri için geçerli; ${tarihTR(kural.dogrulamaTarihi)} itibarıyla birincil kaynaklardan doğrulandı): `
+    metin: `Uygulanan kural (${t} teslim günü; ${tarihTR(kural.dogrulamaTarihi)} itibarıyla doğrulanan; ${tarihTR(kural.bas)} – ${tarihTR(kural.bit)} teslim günleri için kullanılır): `
       + `V = ${sabit(kural.V)} TL/MWh, B = ${sabit(kural.B)} TL/MWh, AFL = ${sabit(kural.AFL)} TL/MWh. `
-      + `Dayanak: formül ${kural.kaynak.formul}; k ve l ${kural.kaynak.katsayi}; V ${kural.kaynak.V}; B ${kural.kaynak.B}; AFL ${kural.kaynak.tavan}.`
-      + (ist ? ` ${ist.metin}` : ''),
+      + `Dayanak: formül ${kural.kaynak.formul}; k ve l ${kural.kaynak.katsayi}; V ${kural.kaynak.V}; B ${kural.kaynak.B}; AFL ${kural.kaynak.tavan}.`,
   };
 }
 
@@ -269,7 +265,7 @@ export function ornekHtml(tarih, donemler) {
   const uyum = ist ? ist.metin : !formulFarki(d, kural)
     ? 'Formül sonucu yayımlanan değerlerle aynıdır.'
     : `Formül sonucu ile yayımlanan değer arasında fark vardır (negatif ${bicim(fN)} TL/MWh, pozitif ${bicim(fP)} TL/MWh). Tabloda EPİAŞ'ın yayımladığı değer gösterilir.`;
-  return `<h3>Örnek hesap${ist ? ' (yönetmelik metnine göre)' : ''}: ${tarihTR(tarih)}, ${donemEtiketi(d)}</h3>`
+  return `<h3>Örnek hesap: ${tarihTR(tarih)}, ${donemEtiketi(d)}</h3>`
     + `<p>EPİAŞ verisi: PTF ${p} TL/MWh; SMF ${s} TL/MWh; sistem yönü ${YON_KUCUK[d.yon]}. Bu yönde k = ${katsayi(r.k)} ve l = ${katsayi(r.l)}; V = ${sabit(r.V)} TL/MWh, B = ${sabit(r.B)} TL/MWh`
     + (r.AFL !== null ? `, AFL = ${sabit(r.AFL)} TL/MWh.` : '.') + '</p>'
     + `<p class="hesap-satiri">${neg}</p><p class="hesap-satiri">${poz}</p>`
