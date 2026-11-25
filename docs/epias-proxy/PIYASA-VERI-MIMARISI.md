@@ -16,17 +16,9 @@
 
 CORS yalnız `https://voltage.com.tr`. SMF, sistem yönü ve dengesizlik fiyatı **yok**.
 
-**Bilinen tüketiciler (değişmemeli):**
+**Bilinen tüketiciler (değişmemeli):** website ana sayfa şeridi ve kartı (tarayıcı; `/ptf/today`, `/ptf/stats`), website `/canli-ptf` sunucu çizimi (aynı uçlar) ve şirket içi sistemler (ayrıntısı özel depoda; bu halka açık belgeye yazılmaz). Mevcut uçların yanıtı bayt bayt aynı kalmalıdır.
 
-| Tüketici | Uç | Ne için | Etki alanı |
-|---|---|---|---|
-| website ana sayfa şeridi ve kart (tarayıcı) | `/ptf/today`, `/ptf/stats` | canlı PTF | kamuya açık |
-| website `/canli-ptf` sunucu çizimi | `/ptf/today`, `/ptf/stats` | SEO sayfası | kamuya açık |
-| Voltan OS `lib/piyasa.ts` `ptfOnerisi` | `/ptf/stats` | **teklif referans PTF'si** (ay başından ortalama) | ticari |
-| Voltan OS `lib/piyasa.ts` `ptfAyi` | `/ptf/stats` | **bayi hakedişi** aylık PTF kaydı | finansal |
-| Voltan OS `lib/tahmin-gop.ts` `ptfBugunSaatlik` | `/ptf/today` | **GÖP tahmini** profil katsayıları | ticaret |
-
-Ticaret sistemleri (gip-bot, Voltan OS GÖP/EPYS/teminat istemcileri) kendi EPİAŞ hesaplarıyla CAS'a ayrıca bağlanır; proxy'nin hangi hesabı kullandığı sahipte (açık soru).
+Ticaret sistemleri EPİAŞ'a kendi hesaplarıyla ayrıca bağlanır; proxy'nin hangi hesabı kullandığı sahipte (açık soru).
 
 ## 2. Hedef mimari
 
