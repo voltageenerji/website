@@ -22,6 +22,11 @@
  *                    içinde kalır; adresteki değer sayfaya ASLA yansıtılmaz.)
  * ?veriyok           QA kancası: SSR atlanır, istemci de veri çekmez.
  *
+ * ÖNİZLEME: host voltage.com.tr ya da www.voltage.com.tr değilse (pages.dev önizlemeleri,
+ * yerel geliştirme) her yanıt — GET ve HEAD, veri olsun olmasın, hata kabuğu dahil —
+ * "X-Robots-Tag: noindex, nofollow" ve aynı değerli robots meta etiketi taşır
+ * (functions/_lib/onizleme.js). _headers kuralları Function yanıtlarına uygulanmaz.
+ *
  * FORMÜLE DAYALI GÜN İÇERİĞİ (örnek hesap, "†" formül karşılaştırması) yalnız
  * kural tablosunda formulGoster:true olan teslim günlerinde (2026-11-01 … 2026-12-31)
  * ve saatlik (dk = 60) veride gösterilir. Daha eski günlerde tablo yalnız EPİAŞ
@@ -32,6 +37,7 @@ import {
   gunEkle, YON_ADI, ILK_GUN, SAYFA_URL, VERI_URL, NOT_ORTALAMA,
 } from './_lib/dengesizlik.js';
 import { gunGetir } from './_lib/piyasa-istemci.js';
+import { onizlemeKoru } from './_lib/onizleme.js';
 
 /** Sunucu render'ının proxy'yi bekleyeceği en uzun toplam süre. */
 const SSR_SURE_MS = 3500;
@@ -393,7 +399,7 @@ function htmlYanit(html, kabuk, maxAge, sMaxAge, noindex) {
   return new Response(html, { status: 200, headers: h });
 }
 
-export async function onRequestGet(context) {
+async function sayfaYanit(context) {
   const { request } = context;
   let shell = null;
   try {
@@ -442,7 +448,7 @@ export async function onRequestGet(context) {
 }
 
 // HEAD istekleri 405 almasın; SSR yolundan geçmez (gövdesiz yanıt için proxy'ye gidilmez).
-export async function onRequestHead(context) {
+async function basYanit(context) {
   const yanit = await context.next();
   try {
     // Tarihli (ve geçersiz tarihli) görünüm GET'te noindex'tir; HEAD de aynı başlığı taşır.
@@ -453,4 +459,12 @@ export async function onRequestHead(context) {
     }
   } catch (e) { /* başlık eklenemediyse varlık yanıtı aynen döner */ }
   return yanit;
+}
+
+export async function onRequestGet(context) {
+  return onizlemeKoru(context && context.request, await sayfaYanit(context));
+}
+
+export async function onRequestHead(context) {
+  return onizlemeKoru(context && context.request, await basYanit(context));
 }

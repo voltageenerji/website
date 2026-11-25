@@ -36,6 +36,7 @@ import {
 } from '../_lib/dengesizlik.js';
 import { gunGetir, aralikGetir } from '../_lib/piyasa-istemci.js';
 import { xlsxYaz } from '../_lib/xlsx.js';
+import { onizlemeKoru } from '../_lib/onizleme.js';
 
 // CORS başlığı BİLEREK yok: sayfa aynı kökenden çalışır; başka sitelerin bu ucu
 // ziyaretçi tarayıcısından çağırması istenmez (Hukuk R7). Sunucudan sunucuya
@@ -289,5 +290,6 @@ async function yanit(context, govdesiz) {
   }
 }
 
-export async function onRequestGet(context) { return yanit(context, false); }
-export async function onRequestHead(context) { return yanit(context, true); }
+// Önizleme hostlarında (voltage.com.tr dışı) X-Robots-Tag: noindex, nofollow; HTML hata sayfasında robots meta da.
+export async function onRequestGet(context) { return onizlemeKoru(context && context.request, await yanit(context, false)); }
+export async function onRequestHead(context) { return onizlemeKoru(context && context.request, await yanit(context, true)); }

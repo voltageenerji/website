@@ -13,6 +13,7 @@ import { gunGetir, aralikGetir, _bellekTemizle, BUTCE, sayaclar, baglantiBul, _A
 import { xlsxYaz, crc32, sutunHarfi } from '../../functions/_lib/xlsx.js';
 import * as veriUcu from '../../functions/dengesizlik-maliyeti/veri.js';
 import * as sayfa from '../../functions/dengesizlik-maliyeti.js';
+import { uretimMi, robotsMetaOnizleme } from '../../functions/_lib/onizleme.js';
 import { readFileSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { writeFileSync, mkdtempSync, rmSync } from 'node:fs';
@@ -1207,9 +1208,86 @@ for (const kotu of ['abc', '2026-11-25', '2025-12-31', '2026-02-30', '', '%3Cscr
   y = await sayfa.onRequestGet({ ...temel, next: async () => new Response('<html><body>bambaska kabuk</body></html>', { status: 200 }) });
   ok('capalar yoksa HTML bozulmaz', y.status === 200 && (await y.text()).includes('bambaska kabuk'));
   y = await sayfa.onRequestGet({ ...temel, request: { url: 'gecersiz url' } });
-  ok('bozuk istek -> kabuk (cokme yok)', y.status === 200 && (await y.text()) === KABUK);
+  ok('bozuk istek -> kabuk (cokme yok); host cozulemedigi icin onizleme sayilir (noindex, nofollow)', y.status === 200 && (await y.text()) === robotsMetaOnizleme(KABUK) && y.headers.get('X-Robots-Tag') === 'noindex, nofollow');
   y = await sayfa.onRequestHead({ ...temel, next: async () => new Response(null, { status: 200, headers: { 'X-Kaynak': 'varlik' } }) });
   ok('HEAD varlik hattindan gecer (SSR yok)', y.status === 200 && y.headers.get('X-Kaynak') === 'varlik');
+}
+// ============================================================================
+// REVİZYON 3 / B — önizleme hostları dizine girmez (Function yanıtları; _headers bunlara uygulanmaz)
+// ============================================================================
+{
+  const ONIZ = ['claude-voltan-orchestrator-a.website-dh5.pages.dev', 'website-dh5.pages.dev', '06f702c0.website-dh5.pages.dev', 'localhost:8788', '127.0.0.1:5173', 'voltage.com.tr.ornek.invalid', 'xvoltage.com.tr'];
+  const URETIM = ['voltage.com.tr', 'www.voltage.com.tr', 'VOLTAGE.COM.TR'];
+  const robotsMetalari = (h) => [...h.matchAll(/<meta\s+name="robots"\s+content="([^"]*)"/gi)].map((m) => m[1]);
+  const sCtx = (host, sorgu, ayar = {}, yontem = 'GET', env = SAHTE_ENV) => {
+    const { e, sec } = yeni(ayar);
+    return { e, ctx: { request: new Request(`https://${host}/dengesizlik-maliyeti${sorgu}`, { method: yontem }), env, secenek: sec, waitUntil() {}, next: async () => new Response(yontem === 'HEAD' ? null : KABUK, { status: 200, headers: KABUK_BASLIK }) } };
+  };
+  const vCtx = (host, sorgu, ayar = {}, yontem = 'GET', basliklar = {}) => {
+    const { e, sec } = yeni(ayar);
+    return { e, ctx: { request: new Request(`https://${host}/dengesizlik-maliyeti/veri${sorgu}`, { method: yontem, headers: basliklar }), env: SAHTE_ENV, secenek: sec, waitUntil() {} } };
+  };
+  for (const host of ONIZ) {
+    for (const [ad, sorgu, ayar, env] of [['veri var', '', {}, SAHTE_ENV], ['tarihli', '?tarih=2026-11-20', {}, SAHTE_ENV], ['veri yok', '', {}, {}], ['gecersiz tarih', '?tarih=abc', {}, SAHTE_ENV], ['?veriyok', '?veriyok', {}, SAHTE_ENV]]) {
+      const { ctx } = sCtx(host, sorgu, ayar, 'GET', env);
+      const y = await sayfa.onRequestGet(ctx);
+      const h = await y.text();
+      ok(`B onizleme ${host} sayfa (${ad}): X-Robots-Tag noindex, nofollow`, y.status === 200 && y.headers.get('X-Robots-Tag') === 'noindex, nofollow', `-> ${y.headers.get('X-Robots-Tag')}`);
+      ok(`B onizleme ${host} sayfa (${ad}): tek robots meta = noindex, nofollow; canonical voltage.com.tr`, JSON.stringify(robotsMetalari(h)) === '["noindex, nofollow"]' && /<link rel="canonical" href="https:\/\/voltage\.com\.tr\/dengesizlik-maliyeti(\?tarih=2026-11-20)?">/.test(h), `-> ${robotsMetalari(h)}`);
+    }
+    for (const sorgu of ['', '?tarih=2026-11-20']) {
+      const y = await sayfa.onRequestHead(sCtx(host, sorgu, {}, 'HEAD').ctx);
+      ok(`B onizleme ${host} HEAD sayfa ${sorgu || '(tarihsiz)'}: noindex, nofollow`, y.status === 200 && y.headers.get('X-Robots-Tag') === 'noindex, nofollow');
+    }
+    for (const sorgu of ['?tarih=2026-11-23', '?tarih=2026-11-23&bicim=csv', '?tarih=2026-11-23&bicim=xlsx', '?tarih=abc', '?bas=2026-11-01&bit=2026-12-31']) {
+      const y = await veriUcu.onRequestGet(vCtx(host, sorgu).ctx);
+      ok(`B onizleme ${host} veri ${sorgu}: noindex, nofollow`, y.headers.get('X-Robots-Tag') === 'noindex, nofollow', `-> ${y.status} ${y.headers.get('X-Robots-Tag')}`);
+    }
+    const yh = await veriUcu.onRequestGet(vCtx(host, '?tarih=abc', {}, 'GET', { Accept: 'text/html' }).ctx);
+    const hh = await yh.text();
+    ok(`B onizleme ${host} veri HTML hata sayfasi: baslik + meta noindex, nofollow`, yh.status === 400 && yh.headers.get('X-Robots-Tag') === 'noindex, nofollow' && JSON.stringify(robotsMetalari(hh)) === '["noindex, nofollow"]');
+    const y503 = await veriUcu.onRequestGet(vCtx(host, '?tarih=2026-11-23', { durum: 503, hataKod: 'veri-yok' }, 'GET', { Accept: 'text/html' }).ctx);
+    ok(`B onizleme ${host} veri 503 HTML: noindex, nofollow`, y503.status === 503 && y503.headers.get('X-Robots-Tag') === 'noindex, nofollow' && robotsMetalari(await y503.text())[0] === 'noindex, nofollow');
+    const vh = await veriUcu.onRequestHead(vCtx(host, '?tarih=2026-11-23&bicim=csv', {}, 'HEAD').ctx);
+    ok(`B onizleme ${host} HEAD veri: noindex, nofollow`, vh.status === 200 && vh.headers.get('X-Robots-Tag') === 'noindex, nofollow');
+  }
+  for (const host of URETIM) {
+    let y = await sayfa.onRequestGet(sCtx(host, '').ctx);
+    let h = await y.text();
+    ok(`B uretim ${host} sayfa: dizine acik (robots index, X-Robots-Tag yok)`, y.headers.get('X-Robots-Tag') === null && JSON.stringify(robotsMetalari(h)) === '["index, follow, max-snippet:-1, max-image-preview:large"]' && h.includes('data-ssr="1"'));
+    y = await sayfa.onRequestGet(sCtx(host, '?tarih=2026-11-20').ctx);
+    h = await y.text();
+    ok(`B uretim ${host} tarihli: noindex, follow (degismedi)`, y.headers.get('X-Robots-Tag') === 'noindex, follow' && JSON.stringify(robotsMetalari(h)) === '["noindex, follow"]');
+    y = await veriUcu.onRequestGet(vCtx(host, '?tarih=2026-11-23').ctx);
+    ok(`B uretim ${host} veri: X-Robots-Tag noindex (degismedi)`, y.headers.get('X-Robots-Tag') === 'noindex');
+    y = await sayfa.onRequestHead(sCtx(host, '', {}, 'HEAD').ctx);
+    ok(`B uretim ${host} HEAD sayfa: X-Robots-Tag yok`, y.headers.get('X-Robots-Tag') === null);
+  }
+  ok('B uretimMi: cozumlenemeyen adres onizleme sayilir', uretimMi({ url: 'https://voltage.com.tr/x' }) && !uretimMi({ url: 'gecersiz' }) && !uretimMi(null) && !uretimMi({ url: 'https://voltage.com.tr.evil.invalid/' }));
+  ok('B robotsMetaOnizleme: meta yoksa head basina eklenir', robotsMetaOnizleme('<html><head><title>x</title></head></html>').includes('<head>\n<meta name="robots" content="noindex, nofollow">'));
+  // _headers: Cloudflare'in belgelediği pages.dev kalıpları, yalnız pages.dev'i etkiler
+  const bas = readFileSync(new URL('../../_headers', import.meta.url), 'utf8');
+  ok('B _headers: https://:project.pages.dev/* -> X-Robots-Tag: noindex', /\nhttps:\/\/:project\.pages\.dev\/\*\n  X-Robots-Tag: noindex\n/.test(bas));
+  ok('B _headers: https://:version.:project.pages.dev/* -> X-Robots-Tag: noindex', /\nhttps:\/\/:version\.:project\.pages\.dev\/\*\n  X-Robots-Tag: noindex\n/.test(bas));
+  ok('B _headers: yorum yalniz pages.dev ve uretime yayinla ulasma', /YALNIZ \*\.pages\.dev/.test(bas) && /voltage\.com\.tr ETKİLENMEZ/.test(bas) && /yayınla \(main\)/.test(bas));
+  ok('B _headers: voltage.com.tr icin X-Robots-Tag kurali YOK', !/^https:\/\/(www\.)?voltage\.com\.tr/m.test(bas) && (bas.match(/^https:\/\//gm) || []).length === 2);
+}
+{ // R3-A: belirteç hiçbir yanıtta (gövde, başlık), hata metninde görünmez
+  const kontrol = [];
+  for (const ayar of [{}, { anahtar: 'baska-belirtec' }, { durum: 503, hataKod: 'butce' }, { durum: 500 }, { govde: 'x' }, { asili: true, zamanAsimiMs: 20 }, { duzenle: (j) => ({ ...j, surum: 9 }) }]) {
+    for (const sorgu of ['?tarih=2026-11-23', '?tarih=2026-11-23&bicim=csv', '?bas=2026-11-01&bit=2026-11-05&bicim=xlsx', '?tarih=x']) {
+      for (const accept of ['application/json', 'text/html']) {
+        const { e, sec } = yeni(ayar);
+        const y = await veriUcu.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri' + sorgu, { headers: { Accept: accept } }), env: SAHTE_ENV, secenek: sec, waitUntil() {} });
+        let b = ''; y.headers.forEach((v, k) => { b += `${k}: ${v}\n`; });
+        kontrol.push(b + new TextDecoder().decode(await y.arrayBuffer()));
+      }
+    }
+    const { sec } = yeni(ayar);
+    const y = await sayfa.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti'), env: SAHTE_ENV, secenek: sec, waitUntil() {}, next: async () => new Response(KABUK, { status: 200, headers: KABUK_BASLIK }) });
+    kontrol.push(await y.text());
+  }
+  ok(`belirtec ${kontrol.length} yanitin hicbirinde yok (govde + baslik)`, kontrol.length === 63 && !kontrol.some((k) => k.includes(BELIRTEC) || /Bearer/i.test(k) || k.includes('piyasa-veri.ornek.invalid')));
 }
 ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI_ANAHTAR) || /Bearer/i.test(l)));
 

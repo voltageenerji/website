@@ -8,6 +8,19 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://epias-proxy.emirhantan-ku.workers.dev https://static.cloudflareinsights.com https://cloudflareinsights.com; frame-ancestors 'self';
 
+# Önizleme adresleri arama dizinine girmesin (Cloudflare Pages belgesindeki kalıp:
+# https://developers.cloudflare.com/pages/configuration/headers/).
+# YALNIZ *.pages.dev adresleri (projenin pages.dev adresi, dal ve sürüm önizlemeleri) bu
+# kurallarla eşleşir; üretim alan adı voltage.com.tr ETKİLENMEZ. Bu dosya üretime yalnız
+# yayınla (main) ulaşır; o güne kadar yalnız çalışma dalının önizleme dağıtımında geçerlidir.
+# _headers Pages Function yanıtlarına UYGULANMAZ: Function'lı /dengesizlik-maliyeti ve
+# /dengesizlik-maliyeti/veri aynı başlığı kendileri ekler (functions/_lib/onizleme.js).
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex
+
 # HTML — kısa cache, revalidate
 /*.html
   Cache-Control: public, max-age=300, must-revalidate
