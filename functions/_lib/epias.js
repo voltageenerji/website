@@ -62,6 +62,10 @@ const KV_YENILE_MS = 12 * 60 * 60 * 1000;
 const ANAHTAR_KOKU = 'https://dengesizlik-onbellek.invalid/v1/';
 const BELLEK_SINIRI = 512;         // seçilebilir gün + ay dilimi sayısından (~340) büyük
 const AZAMI_SAYFA = 12;            // sayfalı yanıtta izlenecek en çok sayfa
+// Paylaşılan (tek-uçuş) bir işe katılmanın azami yaşı. Workers'ta bir isteğin başlattığı
+// G/Ç, o istek iptal olursa (istemci bağlantıyı keserse) hiç tamamlanmayabilir; bu süreden
+// eski bir uçuş "asılı" sayılır ve yenisi başlatılır (kalıcı kilitlenme olmaz).
+const UCUS_AZAMI_MS = 20000;
 
 /** Dakikalık üst-akış bütçesi (tüm anahtarlar için ortak). */
 export const BUTCE = Object.freeze({ rapor: 12, giris: 2 });
@@ -69,7 +73,7 @@ export const BUTCE = Object.freeze({ rapor: 12, giris: 2 });
 const bellek = new Map();   // anahtar → {kayit, son}
 const ucusta = new Map();   // anahtar → sürmekte olan çekim (aynı süreçte tek istek)
 let biletBellek = null;     // {tgt, taze} — yalnız süreç belleğinde düz metin
-let biletUcus = null;       // sürmekte olan giriş (tek-uçuş)
+let biletUcus = null;       // sürmekte olan giriş (tek-uçuş): {is, bas}
 let butceBellek = { dakika: -1, rapor: 0, giris: 0 };
 let butceLogDakika = -1;
 /** İç sayaçlar (değer taşımaz; test ve teşhis için). */
@@ -283,9 +287,10 @@ async function biletAl(env, ctx, s, gecersiz) {
     // Biz beklerken başka bir istek girişi tamamlamış olabilir.
     if (biletBellek && s.simdi() < biletBellek.taze) return { tgt: biletBellek.tgt };
   }
-  // Tek-uçuş: eşzamanlı istekler aynı girişi bekler.
-  if (biletUcus) return biletUcus;
-  biletUcus = (async () => {
+  // Tek-uçuş: eşzamanlı istekler aynı girişi bekler (asılı kalmış eski uçuş hariç).
+  if (biletUcus && Date.now() - biletUcus.bas < UCUS_AZAMI_MS) return biletUcus.is;
+  const ucus = { bas: Date.now(), is: null };
+  ucus.is = (async () => {
     if (!(await butceAl(ctx, s, 'giris'))) return { hata: 'butce' };
     let sonuc;
     try {
@@ -320,7 +325,10 @@ async function biletAl(env, ctx, s, gecersiz) {
     } catch (e) { /* şifreleme yoksa bilet yalnız süreç belleğinde kalır */ }
     return { tgt: sonuc.tgt };
   })();
-  try { return await biletUcus; } finally { biletUcus = null; }
+  biletUcus = ucus;
+  // Başlatan istek erken dönse ya da istemci bağlantıyı kesse de giriş tamamlansın.
+  arkaPlan(ctx, ucus.is);
+  try { return await ucus.is; } finally { if (biletUcus === ucus) biletUcus = null; }
 }
 
 // -------------------------------------------------------------------- rapor --
@@ -459,19 +467,22 @@ async function parcaGetir(env, ctx, s, anahtar, bas, bit, bugun) {
   const yedek = (neden) => (eski ? { ...eski, bayat: true, neden } : { durum: 'yok', neden });
   if (s.yalnizOnbellek) return yedek('onbellek-yok');
 
-  let is = ucusta.get(anahtar);
-  if (!is) {
-    is = cekVeYaz(env, ctx, s, anahtar, bas, bit, bugun, kayit, eski);
-    ucusta.set(anahtar, is);
-    is.then(() => { if (ucusta.get(anahtar) === is) ucusta.delete(anahtar); });
+  let ucus = ucusta.get(anahtar);
+  if (!ucus || Date.now() - ucus.bas >= UCUS_AZAMI_MS) {
+    ucus = { bas: Date.now(), is: cekVeYaz(env, ctx, s, anahtar, bas, bit, bugun, kayit, eski) };
+    ucusta.set(anahtar, ucus);
+    const bu = ucus;
+    bu.is.then(() => { if (ucusta.get(anahtar) === bu) ucusta.delete(anahtar); });
+    // Başlatan istek erken dönse ya da istemci bağlantıyı kesse de çekim tamamlanıp önbelleğe yazılsın.
+    arkaPlan(ctx, bu.is);
   }
+  const is = ucus.is;
   if (!s.sureMs) return is;
   // Toplam süre sınırı: aşılırsa bayat/bekleme döner, çekim arka planda sürer.
   let zamanlayici;
   const sonuc = await Promise.race([is, new Promise((coz) => { zamanlayici = setTimeout(() => coz(SURE_DOLDU), s.sureMs); })]);
   clearTimeout(zamanlayici);
   if (sonuc !== SURE_DOLDU) return sonuc;
-  arkaPlan(ctx, is);
   return yedek('sure');
 }
 
