@@ -76,7 +76,8 @@ try {
   kayit('V4 Hesapla düğmesiyle → odak alana, hata okundu', /sayıyla girin/i.test(l));
   kayit('konuşma öbeği sayısı', dokum.map(([, x]) => (x ? x.split(' | ').length : 0)).join('/'));
 } catch (err) {
-  kayit('HATA', err && err.name);
+  // Hata iletisi sayfa metni taşımaz (guidepup/WebDriver iletisi); kısaltılarak basılır
+  kayit('HATA', `${err && err.name}: ${String(err && err.message).split('\n')[0].slice(0, 160)}`);
   process.exitCode = 1;
 } finally {
   if (vo) { try { await voiceOver.stop(); } catch (e) { /* */ } }

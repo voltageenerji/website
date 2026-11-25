@@ -87,8 +87,9 @@ jobs:
           sudo safaridriver --enable
           mkdir -p cikti
           node "$GITHUB_WORKSPACE/docs/qa/safari-smoke.mjs" > cikti/safari.txt 2>&1; kod=$?
-          grep -E '^(# |[0-9]+ passed|  FAIL|  dar)' cikti/safari.txt; echo "safari çıkış $kod"; echo "S_SAFARI=$kod" >> "$GITHUB_ENV"
+          grep -E '^(# |[0-9]+ passed|  FAIL|  dar)' cikti/safari.txt; node "$GITHUB_WORKSPACE/docs/qa/safari-smoke.mjs" 2>&1 | grep -E '^(# |[0-9]+ passed|  FAIL)'; echo "safari çıkış $kod"; echo "S_SAFARI=$kod" >> "$GITHUB_ENV"
       - name: iOS Simülatörü (Mobile Safari) — ekran görüntüleri + DOM raporu
+        if: ${{ false }} # 2. ve 3. koşuda tamamlandı
         working-directory: ${{ runner.temp }}
         run: |
           set +e; mkdir -p ekran
@@ -117,6 +118,7 @@ jobs:
               print(' iOS %s · %sx%s@%s · satır %s · yatay taşma %s · tablo kabı kayar %s · JS hata %d%s · ölçü %s'%(ios,x.get('w'),x.get('h'),x.get('dpr'),x.get('satir'),x.get('tasma'),x.get('kapKayar'),len(x.get('hata',[])),ozel,x.get('olcu')))
           PY
       - name: Playwright WebKit (macOS) — iPhone 15 tanımlayıcısı + masaüstü + tarayıcı paketi
+        if: ${{ false }} # 1.–3. koşuda tamamlandı
         working-directory: ${{ runner.temp }}
         env:
           PLAYWRIGHT_MODUL: ${{ runner.temp }}/qa/node_modules
