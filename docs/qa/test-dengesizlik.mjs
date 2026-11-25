@@ -578,17 +578,18 @@ for (const zarf of ['body.content', 'body.items', 'items', 'content', 'dizi', 'b
 // ============================================================================
 const TUM_GUNLER = []; for (let g = '2026-01-01'; g <= BUGUN; g = gunEkle(g, 1)) TUM_GUNLER.push(g);
 ok('secilebilir gun sayisi 328', TUM_GUNLER.length === 328);
-ok('butce sabitleri: dakikada 12 rapor + 2 giris', BUTCE.rapor === 12 && BUTCE.giris === 2);
+ok('butce sabitleri: dakikada 12 rapor (eski gunler en cok 8; 4 bugun/dun icin ayrili) + 2 giris', BUTCE.rapor === 12 && BUTCE.raporEski === 8 && BUTCE.giris === 2);
 
 { // A1 tek-uçuş: 50 eşzamanlı FARKLI gün (soğuk) → 1 giriş
   const { e, sec } = yeni();
   const sonuc = await Promise.all(TUM_GUNLER.slice(-50).map((g) => gunGetir(SAHTE_ENV, null, g, sec)));
   ok('A1 50 eszamanli farkli gun -> 1 GIRIS (tek-ucus)', e.sayac.giris === 1, `-> ${e.sayac.giris}`);
-  ok('A3 ayni dakikada en cok 12 rapor istegi', e.sayac.rapor === BUTCE.rapor, `-> ${e.sayac.rapor}`);
-  ok('A3 butce asilinca: veri yok / neden butce (uydurma yok)', sonuc.filter((x) => x.durum === 'veri').length === 12 && sonuc.filter((x) => x.durum === 'yok' && x.neden === 'butce').length === 38);
+  ok('A3 ayni dakikada: eski gunler 8 + bugun + dun = 10 rapor istegi', e.sayac.rapor === BUTCE.raporEski + 2 && e.sayac.rapor <= BUTCE.rapor, `-> ${e.sayac.rapor}`);
+  ok('K1 eszamanli taramada bugun ve dun VERI alir (ayrilmis pay)', sonuc.at(-1).durum === 'veri' && sonuc.at(-2).durum === 'veri');
+  ok('A3 butce asilinca: veri yok / neden butce (uydurma yok)', sonuc.filter((x) => x.durum === 'veri').length === 10 && sonuc.filter((x) => x.durum === 'yok' && x.neden === 'butce').length === 40);
   e.ilerlet(60 * 1000);
   const x = await gunGetir(SAHTE_ENV, null, TUM_GUNLER[5], sec);
-  ok('A3 sonraki dakikada butce yenilenir', x.durum === 'veri' && e.sayac.rapor === 13 && e.sayac.giris === 1);
+  ok('A3 sonraki dakikada butce yenilenir', x.durum === 'veri' && e.sayac.rapor === 11 && e.sayac.giris === 1);
 }
 { // A1 aynı gün 50 eşzamanlı → 1 giriş + 1 rapor
   const { e, sec } = yeni();
@@ -607,9 +608,48 @@ ok('butce sabitleri: dakikada 12 rapor + 2 giris', BUTCE.rapor === 12 && BUTCE.g
   e.ilerlet(5 * 60 * 1000);
   for (const g of TUM_GUNLER) await gunGetir(SAHTE_ENV, null, g, sec);
   ok('A2 5 dk sonra supurme: yine yalniz 1 deneme', e.sayac.giris === 2, `-> ${e.sayac.giris}`);
-  e.ayar.girisDurum = 201; e.ilerlet(5 * 60 * 1000 + 1000);
-  const x = await gunGetir(SAHTE_ENV, null, DUN, sec);
-  ok('A2 parola duzelince engel suresi dolunca veri gelir', x.durum === 'veri' && e.sayac.giris === 3);
+  // K3: reddedilen giriş BÜYÜYEN aralıkla denenir: 5 dk → 30 dk → 2 sa (üst sınır)
+  const dene = async () => { await gunGetir(SAHTE_ENV, null, TUM_GUNLER[Math.floor(e.simdi() / 60000) % 300], sec); return e.sayac.giris; };
+  e.ilerlet(5 * 60 * 1000 + 1000);
+  ok('K3 2. retten sonra 5 dk: yeni deneme YOK (aralik 30 dk)', (await dene()) === 2, `-> ${e.sayac.giris}`);
+  e.ilerlet(25 * 60 * 1000);
+  ok('K3 30 dk dolunca 3. deneme', (await dene()) === 3, `-> ${e.sayac.giris}`);
+  e.ilerlet(30 * 60 * 1000 + 1000);
+  ok('K3 3. retten sonra 30 dk: yeni deneme YOK (aralik 2 sa)', (await dene()) === 3, `-> ${e.sayac.giris}`);
+  e.ilerlet(90 * 60 * 1000);
+  ok('K3 2 sa dolunca 4. deneme', (await dene()) === 4, `-> ${e.sayac.giris}`);
+  e.ilerlet(2 * 60 * 60 * 1000 + 1000);
+  ok('K3 ust sinir 2 sa: 5. deneme 2 sa sonra (daha uzun degil)', (await dene()) === 5, `-> ${e.sayac.giris}`);
+  e.ilerlet(60 * 60 * 1000);
+  ok('K3 ust sinirda 1 sa sonra deneme yok', (await dene()) === 5);
+  // Sahibi parolayı düzeltti: kimlik parmak izi değişir → engel beklenmeden HEMEN denenir
+  e.ayar.girisDurum = 201;
+  const yeniEnv = { ...SAHTE_ENV, EPIAS_PASSWORD: 'duzeltilmis-test-parolasi' };
+  let x = await gunGetir(yeniEnv, null, DUN, sec);
+  ok('K3 parola degisince engel beklenmez: hemen giris, veri gelir', x.durum === 'veri' && e.sayac.giris === 6, `-> ${x.durum} ${x.neden || ''} ${e.sayac.giris}`);
+  // Başarılı giriş sayacı sıfırlar: sonraki ret yeniden 5 dk'dan başlar
+  e.ilerlet(101 * 60 * 1000); // bilet eskidi
+  e.ayar.girisDurum = 401;
+  await gunGetir(yeniEnv, null, TUM_GUNLER[10], sec);
+  ok('K3 basarili giristen sonraki ilk ret', e.sayac.giris === 7);
+  e.ilerlet(5 * 60 * 1000 + 1000);
+  await gunGetir(yeniEnv, null, TUM_GUNLER[11], sec);
+  ok('K3 basarili giris adimi sifirlar: sonraki ret yine 5 dk sonra denenir', e.sayac.giris === 8, `-> ${e.sayac.giris}`);
+}
+{ // K3 parmak izi: eski (yanlış) kimliğin engeli yeni kimliği durdurmaz; Cache API üzerinden de
+  const cache = sahteCache();
+  const { e, sec } = yeni({ girisDurum: 401, cache });
+  await gunGetir(SAHTE_ENV, null, DUN, sec);
+  await bosalt();
+  _bellekTemizle();
+  await gunGetir(SAHTE_ENV, null, TUM_GUNLER[3], sec);
+  ok('K3 ayni kimlik, yeni surec: engel gecerli (giris yok)', e.sayac.giris === 1);
+  _bellekTemizle();
+  e.ayar.girisDurum = 201;
+  const x = await gunGetir({ ...SAHTE_ENV, EPIAS_USERNAME: 'duzeltilmis-kullanici@ornek.invalid' }, null, TUM_GUNLER[4], sec);
+  ok('K3 kullanici adi duzeltilince de hemen denenir', x.durum === 'veri' && e.sayac.giris === 2);
+  await bosalt();
+  ok('K3 engel kaydinda parola/kullanici duz metin yok, parmak izi var', ![...cache.depo.values()].some((v) => v.includes(SAHTE_ENV.EPIAS_PASSWORD) || v.includes('duzeltilmis-kullanici')) && /"parmak":"[A-Za-z0-9+/=]{8,}"/.test(cache.depo.get('https://dengesizlik-onbellek.invalid/v1/engel')));
 }
 { // A2 ağ hatası / zaman aşımı: 60 sn paylaşılan engel
   let { e, sec } = yeni({ girisFirlat: true });
@@ -653,30 +693,32 @@ ok('butce sabitleri: dakikada 12 rapor + 2 giris', BUTCE.rapor === 12 && BUTCE.g
   await gunGetir(SAHTE_ENV, null, DUN, sec);
   e.ayar.biletGecersiz = e.sonBilet;
   e.ilerlet(60 * 1000);
-  const r3 = await Promise.all(TUM_GUNLER.slice(0, 6).map((g) => gunGetir(SAHTE_ENV, null, g, sec)));
-  ok('A6 eskimis bilet + 6 eszamanli istek: 1 yenileme, hepsi veri', e.sayac.giris === 2 && r3.every((x) => x.durum === 'veri'), `-> ${e.sayac.giris} giris`);
+  const r3 = await Promise.all(TUM_GUNLER.slice(0, 4).map((g) => gunGetir(SAHTE_ENV, null, g, sec)));
+  ok('A6 eskimis bilet + 4 eszamanli istek: 1 yenileme, hepsi veri', e.sayac.giris === 2 && r3.every((x) => x.durum === 'veri'), `-> ${e.sayac.giris} giris`);
 }
 { // A3 bütçe Cache API sayacıyla süreçler arasında paylaşılır; bayat veri korunur
   const cache = sahteCache();
   const { e, sec } = yeni({ cache });
-  for (const g of TUM_GUNLER.slice(0, 12)) await gunGetir(SAHTE_ENV, null, g, sec);
+  for (const g of TUM_GUNLER.slice(0, 8)) await gunGetir(SAHTE_ENV, null, g, sec);
   await bosalt();
   _bellekTemizle();
   const x = await gunGetir(SAHTE_ENV, null, TUM_GUNLER[40], sec);
-  ok('A3 butce yeni surecte de dolu (Cache API sayaci)', x.durum === 'yok' && x.neden === 'butce' && e.sayac.rapor === 12, `-> ${x.neden} ${e.sayac.rapor}`);
+  ok('A3 eski gun butcesi yeni surecte de dolu (Cache API sayaci)', x.durum === 'yok' && x.neden === 'butce' && e.sayac.rapor === 8, `-> ${x.neden} ${e.sayac.rapor}`);
   ok('A3 butce asimi sayaci', sayaclar.butceAsimi >= 1);
-  // bugünün verisi var, tazeliği doldu, bütçe dolu → bayat sunulur
+  // eski bir günün verisi var, tazeliği doldu, eski gün bütçesi dolu → bayat sunulur
   e.ilerlet(60 * 1000);
-  await gunGetir(SAHTE_ENV, null, BUGUN, sec);
-  e.ilerlet(6 * 60 * 1000);
-  for (const g of TUM_GUNLER.slice(60, 72)) await gunGetir(SAHTE_ENV, null, g, sec);
+  await gunGetir(SAHTE_ENV, null, TUM_GUNLER[100], sec);
+  e.ilerlet(6 * 60 * 60 * 1000 + 60 * 1000);
+  for (const g of TUM_GUNLER.slice(60, 68)) await gunGetir(SAHTE_ENV, null, g, sec);
   const once = e.sayac.rapor;
-  const y = await gunGetir(SAHTE_ENV, null, BUGUN, sec);
+  const y = await gunGetir(SAHTE_ENV, null, TUM_GUNLER[100], sec);
   ok('A3 butce doluyken eskimis veri BAYAT olarak sunulur, EPİAŞ\'a gidilmez', y.durum === 'veri' && y.bayat === true && y.neden === 'butce' && e.sayac.rapor === once);
+  const z = await gunGetir(SAHTE_ENV, null, BUGUN, sec);
+  ok('K1 eski gun butcesi doluyken BUGUN yine taze veri alir', z.durum === 'veri' && z.bayat === undefined && e.sayac.rapor === once + 1);
 }
 { // A4 önbelleksiz mod: süreç belleği 328 günü tutar; ikinci tarama 0 rapor
   const { e, sec } = yeni();
-  for (let i = 0; i < TUM_GUNLER.length; i++) { if (i && i % 12 === 0) e.ilerlet(60 * 1000); await gunGetir(SAHTE_ENV, null, TUM_GUNLER[i], sec); }
+  for (let i = 0; i < TUM_GUNLER.length; i++) { if (i && i % 8 === 0) e.ilerlet(60 * 1000); await gunGetir(SAHTE_ENV, null, TUM_GUNLER[i], sec); }
   const ilk = e.sayac.rapor;
   ok('A4 onbelleksiz ilk tarama: gun basina 1 rapor, 1 giris', ilk === 328 && e.sayac.giris === 1, `-> ${ilk} / ${e.sayac.giris}`);
   e.ilerlet(60 * 1000);
@@ -686,7 +728,7 @@ ok('butce sabitleri: dakikada 12 rapor + 2 giris', BUTCE.rapor === 12 && BUTCE.g
   // sınırsız tarama: dakikada en çok 12
   const { e: e2, sec: sec2 } = yeni();
   for (let tur2 = 0; tur2 < 3; tur2++) for (const g of TUM_GUNLER) await gunGetir(SAHTE_ENV, null, g, sec2);
-  ok('A3 onbelleksiz 3 x 328 tarama ayni dakikada: en cok 12 rapor + 1 giris', e2.sayac.rapor === 12 && e2.sayac.giris === 1, `-> ${e2.sayac.rapor} / ${e2.sayac.giris}`);
+  ok('A3 onbelleksiz 3 x 328 tarama ayni dakikada: 8 eski + bugun + dun = 10 rapor, 1 giris', e2.sayac.rapor === 10 && e2.sayac.giris === 1, `-> ${e2.sayac.rapor} / ${e2.sayac.giris}`);
 }
 { // A7 bilet şifreli saklanır; yeni süreç çözer; parola değişirse çözülemez → yeniden giriş
   const cache = sahteCache();
@@ -786,7 +828,7 @@ ok('butce sabitleri: dakikada 12 rapor + 2 giris', BUTCE.rapor === 12 && BUTCE.g
   ok('A9 asiri sayfa sayisi: yok/eksik, tek istek', x.durum === 'yok' && x.neden === 'eksik' && e.sayac.rapor === 1);
   ({ e, sec } = yeni({ sayfaBoyu: 3 }));
   for (const g of TUM_GUNLER.slice(0, 8)) await gunGetir(SAHTE_ENV, null, g, sec);
-  ok('A9 sayfalar da butceden duser (dakikada 12)', e.sayac.rapor === 12, `-> ${e.sayac.rapor}`);
+  ok('A9 sayfalar da butceden duser (eski gunler dakikada 8)', e.sayac.rapor === 8, `-> ${e.sayac.rapor}`);
   ({ e, sec } = yeni({ raporGovde: JSON.stringify({ items: sahteGun(DUN), page: { number: 1, size: 24, total: 24 } }) }));
   x = await gunGetir(SAHTE_ENV, null, DUN, sec);
   ok('A9 total = gelen: tek istek, veri', x.durum === 'veri' && e.sayac.rapor === 1);
@@ -827,6 +869,86 @@ ok('butce sabitleri: dakikada 12 rapor + 2 giris', BUTCE.rapor === 12 && BUTCE.g
   ok('A5 HEAD sayfa (tarihli): X-Robots-Tag noindex, follow; ust-akis yok', hd.status === 200 && hd.headers.get('X-Robots-Tag') === 'noindex, follow' && h2.e.sayac.giris === 0 && h2.e.sayac.rapor === 0);
   hd = await sayfa.onRequestHead({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti', { method: 'HEAD' }), env: SAHTE_ENV, secenek: h2.sec, next: kabukYanit });
   ok('A5 HEAD sayfa (tarihsiz): X-Robots-Tag yok', hd.status === 200 && hd.headers.get('X-Robots-Tag') === null && h2.e.sayac.giris === 0);
+}
+
+// ============================================================================
+// REVİZYON 2 / K1 — bütçe açlığı: ayrılmış pay, büyüyen bekleme, kaldığı yerden sürme
+// ============================================================================
+{ // (i) sürekli eski gün taraması + soğuk ziyaretçi: bugün AYNI dakikada veri alır
+  const { e, sec } = yeni();
+  let saldiri = 0;
+  for (let dakika = 0; dakika < 5; dakika++) {
+    for (let i = 0; i < 20; i++) await gunGetir(SAHTE_ENV, null, TUM_GUNLER[(saldiri++) % 300], sec); // saldırgan: dakikada 20 eski gün
+    const once = e.sayac.rapor;
+    const t0 = e.simdi();
+    const bugun = await gunGetir(SAHTE_ENV, null, BUGUN, sec);
+    if (dakika === 0) {
+      ok('K1 tarama surerken soguk ziyaretci BUGUN icin ayni dakikada veri alir', bugun.durum === 'veri' && bugun.bayat === undefined && e.simdi() === t0 && e.sayac.rapor === once + 1, `-> ${bugun.durum} ${bugun.neden || ''}`);
+      const dun = await gunGetir(SAHTE_ENV, null, DUN, sec);
+      ok('K1 tarama surerken DUN de veri alir', dun.durum === 'veri');
+    }
+    e.ilerlet(60 * 1000);
+  }
+  ok('K1 saldirgan dakikada en cok 8 eski gun cekebilir (5 dk: 40)', e.sayac.rapor <= 5 * BUTCE.raporEski + 2 + 1, `-> ${e.sayac.rapor}`);
+  const x = await gunGetir(SAHTE_ENV, null, BUGUN, sec);
+  ok('K1 5 dk sonra bugun yenilenir (tarama surse de)', x.durum === 'veri' && x.bayat === undefined);
+  // aralık istekleri öncelikli DEĞİLDİR (bugünü içerse bile)
+  const h = yeni();
+  for (const g of TUM_GUNLER.slice(0, 8)) await gunGetir(SAHTE_ENV, null, g, h.sec);
+  const ar = await aralikGetir(SAHTE_ENV, null, '2026-11-20', BUGUN, h.sec);
+  ok('K1 aralik istegi ayrilmis payi KULLANAMAZ', ar.durum === 'yok' && ar.neden === 'butce' && h.e.sayac.rapor === 8);
+  ok('K1 ayni anda bugunun tek gun istegi calisir', (await gunGetir(SAHTE_ENV, null, BUGUN, h.sec)).durum === 'veri' && h.e.sayac.rapor === 9);
+}
+{ // (ii) anahtar bazında büyüyen bekleme: 60 sn → 5 dk → 30 dk; başarıda sıfırlanır
+  const { e, sec } = yeni({ raporDurum: 500 });
+  const G = TUM_GUNLER[50];
+  const dene = async () => { await gunGetir(SAHTE_ENV, null, G, sec); return e.sayac.rapor; };
+  ok('K1 ilk hata: 1 istek', (await dene()) === 1);
+  e.ilerlet(30 * 1000); ok('K1 30 sn: istek yok', (await dene()) === 1);
+  e.ilerlet(31 * 1000); ok('K1 61 sn: 2. deneme', (await dene()) === 2);
+  e.ilerlet(61 * 1000); ok('K1 2. hatadan 61 sn sonra: istek YOK (bekleme 5 dk)', (await dene()) === 2);
+  e.ilerlet(4 * 60 * 1000); ok('K1 5 dk dolunca: 3. deneme', (await dene()) === 3);
+  e.ilerlet(5 * 60 * 1000 + 1000); ok('K1 3. hatadan 5 dk sonra: istek YOK (bekleme 30 dk)', (await dene()) === 3);
+  e.ilerlet(25 * 60 * 1000); ok('K1 30 dk dolunca: 4. deneme', (await dene()) === 4);
+  e.ilerlet(30 * 60 * 1000 + 1000); ok('K1 ust sinir 30 dk: 5. deneme', (await dene()) === 5);
+  e.ayar.raporDurum = 200; e.ilerlet(30 * 60 * 1000 + 1000);
+  const x = await gunGetir(SAHTE_ENV, null, G, sec);
+  ok('K1 servis duzelince veri gelir', x.durum === 'veri' && e.sayac.rapor === 6);
+  e.ayar.raporDurum = 500; e.ilerlet(6 * 60 * 60 * 1000 + 1000);
+  await dene(); e.ilerlet(61 * 1000);
+  ok('K1 basari sayaci sifirlar: yeni hata yine 60 sn sonra denenir (bayat sunulurken)', (await dene()) === 8, `-> ${e.sayac.rapor}`);
+  // sürekli hata veren ay aralığı: adım başına en çok bir birim
+  const h = yeni({ raporDurum: 500 });
+  for (let dk = 0; dk < 40; dk++) { for (let i = 0; i < 5; i++) await aralikGetir(SAHTE_ENV, null, '2026-11-03', '2026-11-09', h.sec); h.e.ilerlet(60 * 1000); }
+  ok('K1 surekli hata veren aralik: 40 dk x 5 istek -> 4 ust-akis birimi (0, 1, 6, 36. dk)', h.e.sayac.rapor === 4, `-> ${h.e.sayac.rapor}`);
+}
+{ // (iii) sayfalı ay çekimi bütçe yüzünden yarıda kalırsa kaldığı sayfadan sürer
+  const { e, sec } = yeni({ sayfaBoyu: 100 }); // Kasım 1–24: 576 kalem → 6 sayfa
+  const sayfalar = () => e.istekler.filter((i) => i.url.includes('ptf-smf-sdf')).map((i) => { const g = JSON.parse(i.body); return g.startDate.slice(0, 10) === '2026-11-01' && g.endDate.slice(0, 10) === BUGUN ? (g.page ? g.page.number : 1) : null; }).filter((n) => n !== null);
+  for (const g of ['2026-03-01', '2026-03-02', '2026-03-03', '2026-03-04', '2026-03-05']) await gunGetir(SAHTE_ENV, null, g, sec); // 5 x 1 sayfa (24/100)
+  let x = await aralikGetir(SAHTE_ENV, null, '2026-11-20', '2026-11-22', sec);
+  ok('K1 sayfali cekim butceyle kesildi: yok/eksik, 3 sayfa alindi', x.durum === 'yok' && x.neden === 'eksik' && JSON.stringify(sayfalar()) === '[1,2,3]', `-> ${x.neden} ${JSON.stringify(sayfalar())}`);
+  e.ilerlet(60 * 1000);
+  x = await aralikGetir(SAHTE_ENV, null, '2026-11-20', '2026-11-22', sec);
+  ok('K1 sonraki deneme BASTAN BASLAMAZ: 4-6. sayfalarla tamamlanir', x.durum === 'veri' && x.donemler.length === 72 && JSON.stringify(sayfalar()) === '[1,2,3,4,5,6]', `-> ${x.durum} ${x.neden || ''} ${JSON.stringify(sayfalar())}`);
+  e.ilerlet(6 * 60 * 1000);
+  x = await aralikGetir(SAHTE_ENV, null, '2026-11-20', '2026-11-22', sec);
+  ok('K1 tamamlanan cekimin yarim kaydi yeniden KULLANILMAZ (yenilemede 1. sayfadan)', x.durum === 'veri' && JSON.stringify(sayfalar().slice(6)) === '[1,2,3,4,5,6]', `-> ${JSON.stringify(sayfalar().slice(6))}`);
+  // ara sayfada hata: tamamlanan sayfalar saklanır, bekleme sonrası kaldığı yerden
+  const h = yeni({ sayfaBoyu: 100, sayfaHata: 4 });
+  const sf2 = () => h.e.istekler.filter((i) => i.url.includes('ptf-smf-sdf')).map((i) => { const g = JSON.parse(i.body); return g.page ? g.page.number : 1; });
+  x = await aralikGetir(SAHTE_ENV, null, '2026-11-20', '2026-11-22', h.sec);
+  ok('K1 4. sayfa 500: yok/eksik', x.durum === 'yok' && x.neden === 'eksik' && JSON.stringify(sf2()) === '[1,2,3,4]');
+  h.e.ayar.sayfaHata = 0; h.e.ilerlet(61 * 1000);
+  x = await aralikGetir(SAHTE_ENV, null, '2026-11-20', '2026-11-22', h.sec);
+  ok('K1 hata sonrasi: 4. sayfadan surer (1-3 yeniden istenmez)', x.durum === 'veri' && JSON.stringify(sf2()) === '[1,2,3,4,4,5,6]', `-> ${x.durum} ${JSON.stringify(sf2())}`);
+  // yarım kayıt 10 dk'dan eskiyse kullanılmaz (bayat sayfalarla taze sayfalar karışmaz)
+  const k = yeni({ sayfaBoyu: 100, sayfaHata: 3 });
+  const sf3 = () => k.e.istekler.filter((i) => i.url.includes('ptf-smf-sdf')).map((i) => { const g = JSON.parse(i.body); return g.page ? g.page.number : 1; });
+  await aralikGetir(SAHTE_ENV, null, '2026-11-20', '2026-11-22', k.sec);
+  k.e.ayar.sayfaHata = 0; k.e.ilerlet(11 * 60 * 1000);
+  x = await aralikGetir(SAHTE_ENV, null, '2026-11-20', '2026-11-22', k.sec);
+  ok('K1 10 dk\'dan eski yarim kayit kullanilmaz: bastan cekilir', x.durum === 'veri' && JSON.stringify(sf3()) === '[1,2,3,1,2,3,4,5,6]', `-> ${JSON.stringify(sf3())}`);
 }
 
 // --- sır sızıntısı yok ---
@@ -1033,7 +1155,7 @@ for (const [ad, ayar, env, sorgu] of [
   for (const b of ['csv', 'xlsx']) {
     const rb = await veriUcu.onRequestGet({ ...ctx, request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri?tarih=2026-11-24&bicim=' + b) });
     ok(`uc bayat ${b}: X-Veri-Bayat true + ilk cekim zamani (dosyada da isaret var)`, rb.status === 200 && rb.headers.get('X-Veri-Bayat') === 'true' && rb.headers.get('X-Veri-Cekildi') === '2026-11-24T14:30:00+03:00');
-    if (b === 'xlsx') ok('uc bayat xlsx: Bilgi sayfasi "Evet"', xlsxOku(new Uint8Array(await rb.arrayBuffer())).rows2.some((r) => r[0] === 'Önceki senkrondan mı (bayat)' && r[1].startsWith('Evet')));
+    if (b === 'xlsx') ok('uc bayat xlsx: Bilgi sayfasi notr ifade (N5)', xlsxOku(new Uint8Array(await rb.arrayBuffer())).rows2.some((r) => r[0] === 'Önceki senkrondan mı (bayat)' && r[1] === "Evet. Bu dosya en son 24.11.2026 14:30 tarihinde EPİAŞ'tan alınan veriyi içerir; güncel veri şu an alınamadı."));
   }
 }
 { // HEAD yalnız önbellekten; OPTIONS/CORS yok
@@ -1091,7 +1213,7 @@ const ornekOf = (h) => coz(/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.ex
   // Formlar JS'siz çalışır
   ok('kabuk tarih formu duz GET', /<form method="get" action="\/dengesizlik-maliyeti" id="dTarihForm">/.test(KABUK) && /<input type="date" id="dTarih" name="tarih" min="2026-01-01" required>/.test(KABUK));
   ok('kabuk aralik formu duz GET', /<form method="get" action="\/dengesizlik-maliyeti\/veri" id="dAralikForm">/.test(KABUK) && /name="bas"/.test(KABUK) && /name="bit"/.test(KABUK) && /<select id="dBicim" name="bicim">/.test(KABUK));
-  ok('kabuk indirme baglantilari bekleme halinde PASIF + gorunur neden', ['dCsv', 'dXlsx', 'dJson'].every((id) => new RegExp(`<a class="btn-ikincil" id="${id}" rel="nofollow" aria-disabled="true">`).test(KABUK)) && !/id="d(Csv|Xlsx|Json)"[^>]*href=/.test(KABUK) && KABUK.includes('<span class="indir-not" id="dIndirNot">Veri alınamadığı için indirme şu an kapalı</span>'));
+  ok('kabuk indirme baglantilari bekleme halinde PASIF, odaklanabilir, nedene bagli (N8)', ['dCsv', 'dXlsx', 'dJson'].every((id) => KABUK.includes(`<a class="btn-ikincil" id="${id}" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">`)) && !/id="d(Csv|Xlsx|Json)"[^>]*href=/.test(KABUK) && KABUK.includes('<span class="indir-not" id="dIndirNot">Veri alınamadığı için indirme şu an kapalı</span>'));
   ok('kabuk onceki/sonraki gun rel=nofollow', /id="dOnceki" rel="nofollow"/.test(KABUK) && /id="dSonraki" rel="nofollow"/.test(KABUK));
   ok('kabuk her girdinin etiketi var', [...KABUK.matchAll(/<(?:input|select)[^>]*\bid="([^"]+)"/g)].every((m) => m[0].includes('type="radio"') || KABUK.includes(`for="${m[1]}"`)));
   ok('kabuk radyo dugmeleri label icinde', (KABUK.match(/<label class="secenek"><input type="radio"/g) || []).length === (KABUK.match(/type="radio"/g) || []).length);
@@ -1442,7 +1564,10 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.EPIAS_PASSW
   const kapsam = [.../<h2 id="kapsam">[\s\S]*?<\/ul>/.exec(KABUK)[0].matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => coz(m[1]));
   ok('R5 kapsam ilk madde', kapsam[0] === "Bu sayfa, piyasa katılımcıları ve piyasayı izleyen profesyoneller için hazırlanmış bir bilgi aracıdır. Dengesizlik tutarı, piyasa işletmecisi ile dengeden sorumlu taraf arasında uzlaştırılır (DUY m.110(1)); son tüketicinin faturasına yansıyıp yansımayacağı tedarik sözleşmesine bağlıdır. Bu sayfa, Voltage Enerji'nin müşterilerine uyguladığı ya da uygulayacağı bir fiyatı, bedeli veya sözleşme koşulunu göstermez.");
   ok('kapsam: R5 ile yinelenen eski madde kaldirildi (7 madde)', kapsam.length === 7 && !kapsam.some((x) => x.startsWith('Dengesizlik tutarı, dengeden sorumlu taraf için')));
-  ok('sitemap: cerez-politikasi lastmod = gorunen tarih; kullanim-kosullari degismedi', /<loc>https:\/\/voltage\.com\.tr\/cerez-politikasi<\/loc>\s*<lastmod>2026-11-25<\/lastmod>/.test(readFileSync(new URL('../../sitemap.xml', import.meta.url), 'utf8')) && /<loc>https:\/\/voltage\.com\.tr\/kullanim-kosullari<\/loc>\s*<lastmod>2026-11-13<\/lastmod>/.test(readFileSync(new URL('../../sitemap.xml', import.meta.url), 'utf8')) && readFileSync(new URL('../../cerez-politikasi.html', import.meta.url), 'utf8').includes('Son güncelleme: 25 Kasım 2026'));
+  ok('sitemap: iki yasal sayfanin lastmod\'u = gorunen tarih (25.11.2026)', ['cerez-politikasi', 'kullanim-kosullari'].every((ad) => new RegExp(`<loc>https://voltage\\.com\\.tr/${ad}</loc>\\s*<lastmod>2026-11-25</lastmod>`).test(readFileSync(new URL('../../sitemap.xml', import.meta.url), 'utf8')) && readFileSync(new URL(`../../${ad}.html`, import.meta.url), 'utf8').includes('Son güncelleme: 25 Kasım 2026')));
+  ok('tutarlilik: "en gec dort saat icinde" (giris, kapsam, SSS, JSON-LD)', (KABUK.match(/en geç dört saat içinde/g) || []).length === 4 && !/izleyen dört saat içinde/.test(KABUK) && tur(KABUK, 'FAQPage').mainEntity.some((q) => q.acceptedAnswer.text.startsWith('Sistem marjinal fiyatı, ilgili uzlaştırma dönemini izleyen en geç dört saat içinde duyurulur (DUY m.68(1)(e)).')));
+  ok('istemci miktar yankisi: en az 3, en cok 6 ondalik; cok kucuk miktar reddi', KABUK.includes("return binlik(s[0]) + ',' + s[1].replace(/0{1,3}$/, '');") && KABUK.includes("'Miktar en az 0,000001 MWh olmalıdır.'"));
+  ok('istemci: indirme yalniz SSR ya da basarili uc yanitindan sonra acilir (N1)', KABUK.includes('var indir = !!state.donemler && state.indirAcik;') && (KABUK.match(/state\.indirAcik = true;/g) || []).length === 2);
   ok('istemci sayi okuyucu alana gore (fiyat / miktar)', KABUK.includes('function sayiOku(v, fiyat){') && KABUK.includes("sayiOku($(girdiId).value, false)") && KABUK.includes("sayiOku($(girdiId).value, true)"));
   ok('R3 grup ici degerlendirme', kapsam.includes('Dengeden sorumlu gruplarda grup üyesinin dengesizliği, Kurulun belirlediği dengesizlik oranı sınırı içinde grup içinde değerlendirilir; sınırı aşan kısım için tutar, üyenin bireysel dengesizliği üzerinden ayrıca hesaplanır (DUY m.111(5)). Bu sayfadaki tablo ve hesaplayıcı grup içi değerlendirmeyi içermez.'));
   ok('R4 KÜPST', kapsam.includes("Kesinleşmiş günlük üretim/tüketim programından sapma tutarı (KÜPST) ayrı bir kalemdir (DUY m.110(3)) ve bu sayfadaki fiyatlara dahil değildir. 14907 sayılı Kurul Kararı (RG 19/10/2026-33405), tüketim kapsamında oluşturulan uzlaştırmaya esas veriş-çekiş birimleri için belirlediği katsayı ve toleransların 1 Ocak 2027'den itibaren uygulanmasını öngörür; bu tutarın muhatabı ilgili piyasa katılımcısıdır."));
@@ -1489,7 +1614,7 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.EPIAS_PASSW
   ok('gecersiz tarih + veri yok: uyari "Bugunun verisi gosteriliyor" demez', idMetni(g2.h, 'dUyari') === 'Adresteki tarih geçerli değil ya da seçilebilir aralığın dışında. Seçilebilir aralık: 01.01.2026 – 24.11.2026.' && g2.h.includes('<meta name="robots" content="noindex, follow">'));
   // bekleme hâlinde indirme pasif, dönem seçici bekliyor
   const b2 = await al('', {}, {});
-  ok('bekleme: indirme pasif + neden gorunur; donem secici "Veri bekleniyor"', b2.h.includes('<a class="btn-ikincil" id="dCsv" rel="nofollow" aria-disabled="true">CSV</a>') && b2.h.includes('<span class="indir-not" id="dIndirNot">Veri alınamadığı için indirme şu an kapalı</span>') && b2.h.includes('<select id="hDonem"><option value="">Veri bekleniyor</option></select>'));
+  ok('bekleme: indirme pasif + neden gorunur; donem secici "Veri bekleniyor"', b2.h.includes('<a class="btn-ikincil" id="dCsv" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">CSV</a>') && b2.h.includes('<span class="indir-not" id="dIndirNot">Veri alınamadığı için indirme şu an kapalı</span>') && b2.h.includes('<select id="hDonem"><option value="">Veri bekleniyor</option></select>'));
 }
 { // D11: uç, tarayıcıdan doğrudan açılırsa küçük HTML hata sayfası döner
   const htmlIstek = (sorgu, env = SAHTE_ENV, ayar = {}) => { const { sec } = yeni(ayar); return veriUcu.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti/veri' + sorgu, { headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' } }), env, secenek: sec }); };

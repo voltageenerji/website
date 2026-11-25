@@ -13,7 +13,7 @@
  *   gunGetir(env, ctx, ymd, secenek?)          → {durum:'veri'|'yok', tarih, donemler, cekildi, neden?, bayat?}
  *   aralikGetir(env, ctx, bas, bit, secenek?)  → {durum:'veri'|'yok', bas, bit, donemler, cekildi, neden?, bayat?}
  *   - ASLA fırlatmaz. Veri yoksa durum 'yok' + neden kodu; uydurma değer üretilmez.
- *   - bayat:true → EPİAŞ'a şu an gidilmedi/ulaşılamadı; dönen veri daha önce
+ *   - bayat:true → güncel veri şu an alınamadı (hata, bütçe ya da süre sınırı); dönen veri daha önce
  *     EPİAŞ'tan alınmış gerçek veridir, "cekildi" o çekimin zamanıdır (SON SENKRON).
  *   - secenek.sureMs: toplam süre sınırı. Aşılırsa bayat ya da 'yok' (neden 'sure')
  *     döner; çekim ctx.waitUntil ile arka planda tamamlanır ve önbelleğe yazılır.
@@ -22,13 +22,23 @@
  * ÜST-AKIŞ KORUMASI (anonim ziyaretçi EPİAŞ hesabını yoramaz; aynı hesap ana
  * sayfadaki PTF'yi de besler, kilitlenmesi orayı da düşürür):
  *   1. Bilet alımı tek-uçuş: eşzamanlı istekler tek girişi bekler.
- *   2. Giriş hatası paylaşılan olumsuz önbellektedir: 400/401/403 → 5 dk,
- *      ağ / zaman aşımı / 5xx → 60 sn. Bu sürede hiçbir anahtar için giriş denenmez.
- *   3. Rapor 401 dönerse bilet BİR kez yenilenir; yine 401 ise aynı olumsuz
- *      önbellek devreye girer (giriş döngüsü yok).
+ *   2. Giriş hatası paylaşılan olumsuz önbellektedir. Reddedilen giriş (400/401/403)
+ *      BÜYÜYEN aralıkla yeniden denenir: 5 dk → 30 dk → 2 sa (üst sınır). Ağ / zaman
+ *      aşımı / 5xx → 60 sn. Bu sürede hiçbir anahtar için giriş denenmez. Başarılı
+ *      girişte ya da kimlik değişince (HKDF parmak izi; sahibi parolayı düzeltti)
+ *      engel hemen kalkar.
+ *   3. Rapor 401 dönerse bilet BİR kez yenilenir; yine 401 ise aynı büyüyen engel
+ *      devreye girer (giriş döngüsü yok).
  *   4. Küresel dakikalık bütçe: en çok 12 rapor isteği + 2 giriş (süreç belleği +
- *      Cache API sayacı). Aşılınca EPİAŞ'a gidilmez; bayat ya da bekleme döner.
- *   5. Başarısızlık anahtar bazında da 60 sn önbelleğe alınır.
+ *      Cache API sayacı). Rapor bütçesinin 4'ü BUGÜN ve DÜN için ayrılmıştır: eski
+ *      günler ve aralıklar dakikada en çok 8 istek kullanabilir; eski günleri tarayan
+ *      biri güncel sayfayı aç bırakamaz. Aşılınca EPİAŞ'a gidilmez; bayat ya da
+ *      bekleme döner.
+ *   5. Başarısızlık anahtar bazında BÜYÜYEN aralıkla önbelleğe alınır: 60 sn → 5 dk →
+ *      30 dk (başarıda sıfırlanır). Sürekli hata veren bir aralık adım başına en çok
+ *      bir üst-akış birimi harcar.
+ *   6. Sayfalı bir çekim bütçe ya da süre yüzünden yarıda kalırsa tamamlanan sayfalar
+ *      kısa süre saklanır; sonraki deneme baştan başlamaz, kaldığı sayfadan sürer.
  *
  * GÜVENLİK: kimlik yalnızca env'den okunur (EPIAS_USERNAME / EPIAS_PASSWORD).
  * Bilet Cache API ve KV'de DÜZ METİN saklanmaz: AES-GCM ile şifrelenir, anahtar
@@ -54,9 +64,12 @@ const ZAMAN_ASIMI_MS = 6000;       // tek bir üst-akış çağrısı (giriş ya
 const TGT_TTL_S = 100 * 60;        // resmî ömür 2 saat; 100 dk'da yenilenir
 const KISA_TTL_S = 5 * 60;         // bugün / dün: yeni dönemler yayımlanıyor
 const UZUN_TTL_S = 6 * 60 * 60;    // daha eski günler
-const HATA_TTL_S = 60;             // anahtar bazında başarısızlık (ve bayat sunum) penceresi
-const ENGEL_RED_S = 5 * 60;        // giriş reddedildi / rapor kalıcı 401: paylaşılan engel
+const HATA_ADIMLARI_S = [60, 5 * 60, 30 * 60];        // anahtar bazında başarısızlık: büyüyen bekleme
+const HATA_SAKLAMA_S = 2 * 60 * 60;                  // hata sayacının hatırlanma süresi
+const ENGEL_RED_ADIMLARI_S = [5 * 60, 30 * 60, 2 * 60 * 60]; // giriş reddedildi / rapor kalıcı 401
+const ENGEL_SAKLAMA_S = 4 * 60 * 60;                 // engel adımının hatırlanma süresi
 const ENGEL_GECICI_S = 60;         // giriş ağ / zaman aşımı / 5xx: paylaşılan engel
+const YARIM_TTL_S = 10 * 60;       // yarıda kalan sayfalı çekimin tamamlanan sayfaları
 const SAKLAMA_S = 24 * 60 * 60;    // bayat kopyanın tutulma süresi
 const KV_YENILE_MS = 12 * 60 * 60 * 1000;
 const ANAHTAR_KOKU = 'https://dengesizlik-onbellek.invalid/v1/';
@@ -68,14 +81,15 @@ const AZAMI_SAYFA = 12;            // sayfalı yanıtta izlenecek en çok sayfa
 const UCUS_AZAMI_MS = 20000;
 
 /** Dakikalık üst-akış bütçesi (tüm anahtarlar için ortak). */
-export const BUTCE = Object.freeze({ rapor: 12, giris: 2 });
+export const BUTCE = Object.freeze({ rapor: 12, raporEski: 8, giris: 2 });
 
 const bellek = new Map();   // anahtar → {kayit, son}
 const ucusta = new Map();   // anahtar → sürmekte olan çekim (aynı süreçte tek istek)
 let biletBellek = null;     // {tgt, taze} — yalnız süreç belleğinde düz metin
 let biletUcus = null;       // sürmekte olan giriş (tek-uçuş): {is, bas}
-let butceBellek = { dakika: -1, rapor: 0, giris: 0 };
+let butceBellek = { dakika: -1, rapor: 0, raporEski: 0, giris: 0 };
 let butceLogDakika = -1;
+let parmakBellek = null;    // {kimlik, deger} — kimlik parmak izi (süreç başına bir kez türetilir)
 /** İç sayaçlar (değer taşımaz; test ve teşhis için). */
 export const sayaclar = { cakisma: 0, butceAsimi: 0, kisaDevre: 0 };
 
@@ -83,7 +97,8 @@ export const sayaclar = { cakisma: 0, butceAsimi: 0, kisaDevre: 0 };
 export function _bellekTemizle() {
   bellek.clear(); ucusta.clear();
   biletBellek = null; biletUcus = null;
-  butceBellek = { dakika: -1, rapor: 0, giris: 0 }; butceLogDakika = -1;
+  butceBellek = { dakika: -1, rapor: 0, raporEski: 0, giris: 0 }; butceLogDakika = -1;
+  parmakBellek = null;
   sayaclar.cakisma = 0; sayaclar.butceAsimi = 0; sayaclar.kisaDevre = 0;
 }
 
@@ -129,7 +144,7 @@ async function sureli(s, is) {
  * kayıt dönmez. Katmanlar sırayla gezilir; TAZE kayıt bulan katman kazanır,
  * hiçbiri taze değilse ilk bulunan (bayat) kayıt yedek olarak döner.
  */
-async function oku(env, s, anahtar) {
+async function oku(env, s, anahtar, kvsiz) {
   const simdi = s.simdi();
   let aday = null;
   const tart = (kayit, son) => {
@@ -146,7 +161,7 @@ async function oku(env, s, anahtar) {
       if (r) { const k = await r.json(); if (k && tart(k.kayit, k.son)) return aday; }
     } catch (e) { /* önbellek hatası veriyi engellemez */ }
   }
-  if (env && env.PIYASA && typeof env.PIYASA.get === 'function') {
+  if (!kvsiz && env && env.PIYASA && typeof env.PIYASA.get === 'function') {
     try {
       const k = await env.PIYASA.get('dengesizlik:' + anahtar, 'json');
       if (k && tart(k.kayit, k.son)) return aday;
@@ -183,14 +198,19 @@ function yaz(env, ctx, s, anahtar, kayit, saklamaS, kv) {
 
 /**
  * Dakikalık üst-akış bütçesinden bir birim alır; bütçe dolduysa false.
+ * tur: 'giris' | 'rapor'. Rapor için oncelikli = bugün ya da dünün tek gün isteği.
+ * Öncelikli OLMAYAN istekler (eski günler, aralıklar) dakikada en çok BUTCE.raporEski
+ * birim kullanabilir; kalan pay (rapor − raporEski) bugün ve dün için ayrılmıştır.
  * Sayaç süreç belleğinde ve Cache API'de tutulur (aynı veri merkezindeki
  * süreçler arasında paylaşılır; atomik değildir, üst sınır yaklaşık tutulur).
  */
-async function butceAl(ctx, s, tur) {
+async function butceAl(ctx, s, tur, oncelikli) {
   const dakika = Math.floor(s.simdi() / 60000);
-  if (butceBellek.dakika !== dakika) butceBellek = { dakika, rapor: 0, giris: 0 };
+  if (butceBellek.dakika !== dakika) butceBellek = { dakika, rapor: 0, raporEski: 0, giris: 0 };
   const dolu = () => {
-    if (butceBellek[tur] < BUTCE[tur]) return false;
+    const d = tur === 'giris' ? butceBellek.giris >= BUTCE.giris
+      : butceBellek.rapor >= BUTCE.rapor || (!oncelikli && butceBellek.raporEski >= BUTCE.raporEski);
+    if (!d) return false;
     sayaclar.butceAsimi++;
     if (butceLogDakika !== dakika) { butceLogDakika = dakika; console.error('dengesizlik: dakikalık üst-akış bütçesi doldu —', tur); }
     return true;
@@ -201,13 +221,14 @@ async function butceAl(ctx, s, tur) {
     try {
       const r = await s.cache.match(anahtar);
       const ortak = r ? await r.json() : null;
-      if (ortak) for (const t of ['rapor', 'giris']) if (Number.isFinite(ortak[t]) && ortak[t] > butceBellek[t]) butceBellek[t] = ortak[t];
+      if (ortak) for (const t of ['rapor', 'raporEski', 'giris']) if (Number.isFinite(ortak[t]) && ortak[t] > butceBellek[t]) butceBellek[t] = ortak[t];
     } catch (e) { /* sayaç okunamadıysa süreç sayacı geçerli */ }
     if (dolu()) return false;
   }
-  butceBellek[tur]++;
+  if (tur === 'giris') butceBellek.giris++;
+  else { butceBellek.rapor++; if (!oncelikli) butceBellek.raporEski++; }
   if (s.cache) {
-    const govde = JSON.stringify({ rapor: butceBellek.rapor, giris: butceBellek.giris });
+    const govde = JSON.stringify({ rapor: butceBellek.rapor, raporEski: butceBellek.raporEski, giris: butceBellek.giris });
     arkaPlan(ctx, (async () => { await s.cache.put(anahtar, new Response(govde, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'max-age=120' } })); })());
   }
   return true;
@@ -215,15 +236,56 @@ async function butceAl(ctx, s, tur) {
 
 // ----------------------------------------------------- paylaşılan engel ----
 
+/**
+ * Kimlik parmak izi: EPIAS_PASSWORD'dan (bilgi alanında kullanıcı adıyla) HKDF-SHA-256 ile
+ * türetilen 64 bit. Engel kaydına yazılır; kimlik değişince (sahibi parolayı ya da kullanıcı
+ * adını düzeltti) eski engel geçersiz sayılır ve giriş HEMEN denenir. Parola geri elde edilemez.
+ */
+async function kimlikParmagi(env) {
+  const kimlik = `${env.EPIAS_USERNAME}\n${env.EPIAS_PASSWORD}`;
+  if (parmakBellek && parmakBellek.kimlik === kimlik) return parmakBellek.deger;
+  let deger = '';
+  try {
+    const ham = await crypto.subtle.importKey('raw', kodlayici.encode(String(env.EPIAS_PASSWORD)), 'HKDF', false, ['deriveBits']);
+    const bit = await crypto.subtle.deriveBits(
+      { name: 'HKDF', hash: 'SHA-256', salt: kodlayici.encode('voltage.com.tr/dengesizlik-maliyeti'), info: kodlayici.encode(`epias-parmak-v1:${env.EPIAS_USERNAME}`) }, ham, 64,
+    );
+    deger = b64(new Uint8Array(bit));
+  } catch (e) { /* türetilemezse parmak izi boş kalır: engel kimlikten bağımsız işler */ }
+  parmakBellek = { kimlik, deger };
+  return deger;
+}
+
+/** Bu kimliğe ait engel kaydı (taze olsun olmasın); yoksa null. */
+async function engelKaydi(env, s) {
+  const k = await oku(env, s, 'engel');
+  if (!k) return null;
+  return (k.parmak || '') === (await kimlikParmagi(env)) ? k : null;
+}
+
 /** Giriş (ya da kalıcı rapor 401) engeli tazeyse neden kodu; değilse null. */
 async function engelOku(env, s) {
-  const k = await oku(env, s, 'engel');
+  const k = await engelKaydi(env, s);
   return k && Number.isFinite(k.taze) && s.simdi() < k.taze && k.deger && typeof k.deger.neden === 'string' ? k.deger.neden : null;
 }
 
-function engelYaz(env, ctx, s, neden, sureS) {
+/**
+ * kalici: reddedilen giriş / taze biletle de 401 → büyüyen aralık (5 dk → 30 dk → 2 sa).
+ * Geçici hatalar (ağ, zaman aşımı, 5xx) 60 sn bekler ve adımı değiştirmez.
+ */
+async function engelYaz(env, ctx, s, neden, kalici) {
   const an = s.simdi();
-  return yaz(env, ctx, s, 'engel', { deger: { neden }, taze: an + sureS * 1000, yazildi: an }, sureS, true);
+  const onceki = await engelKaydi(env, s);
+  const eskiAdim = onceki && Number.isFinite(onceki.adim) ? onceki.adim : 0;
+  const adim = kalici ? eskiAdim + 1 : eskiAdim;
+  const sureS = kalici ? ENGEL_RED_ADIMLARI_S[Math.min(adim, ENGEL_RED_ADIMLARI_S.length) - 1] : ENGEL_GECICI_S;
+  return yaz(env, ctx, s, 'engel', { deger: { neden }, taze: an + sureS * 1000, yazildi: an, adim, parmak: await kimlikParmagi(env) }, adim ? ENGEL_SAKLAMA_S : sureS, true);
+}
+
+/** Başarılı girişte engel ve adım sayacı sıfırlanır. */
+async function engelTemizle(env, ctx, s) {
+  const an = s.simdi();
+  return yaz(env, ctx, s, 'engel', { deger: null, taze: 0, yazildi: an, adim: 0, parmak: await kimlikParmagi(env) }, 60, true);
 }
 
 // -------------------------------------------------------------------- bilet --
@@ -313,9 +375,10 @@ async function biletAl(env, ctx, s, gecersiz) {
     }
     if (sonuc.hata) {
       // Paylaşılan olumsuz önbellek: bu süre boyunca HİÇBİR anahtar için giriş denenmez.
-      engelYaz(env, ctx, s, sonuc.hata, sonuc.hata === 'giris-reddedildi' ? ENGEL_RED_S : ENGEL_GECICI_S);
+      await engelYaz(env, ctx, s, sonuc.hata, sonuc.hata === 'giris-reddedildi');
       return sonuc;
     }
+    await engelTemizle(env, ctx, s);
     const an = s.simdi();
     const taze = an + TGT_TTL_S * 1000;
     biletBellek = { tgt: sonuc.tgt, taze };
@@ -333,15 +396,19 @@ async function biletAl(env, ctx, s, gecersiz) {
 
 // -------------------------------------------------------------------- rapor --
 
-/** → {ogeler} | {hata, kisaDevre?} */
-async function raporCek(env, ctx, s, bas, bit) {
+/**
+ * → {ogeler} | {hata, kisaDevre?}
+ * anahtar: önbellek anahtarı (yarıda kalan sayfalı çekim bu anahtarla saklanır).
+ * oncelikli: bugün ya da dünün tek gün isteği (bütçenin ayrılmış payını kullanabilir).
+ */
+async function raporCek(env, ctx, s, anahtar, bas, bit, oncelikli) {
   const engel = await engelOku(env, s);
   if (engel) { sayaclar.kisaDevre++; return { hata: engel, kisaDevre: true }; }
 
   const sinirlar = aralikSinirlari(bas, bit);
   // → {durum: HTTP kodu} | {ogeler, sayfa} | {hata}
   const istek = async (tgt, sayfa) => {
-    if (!(await butceAl(ctx, s, 'rapor'))) return { hata: 'butce', kisaDevre: true };
+    if (!(await butceAl(ctx, s, 'rapor', oncelikli))) return { hata: 'butce', kisaDevre: true };
     try {
       return await sureli(s, async (signal) => {
         const r = await s.fetch(RAPOR_URL, {
@@ -364,49 +431,73 @@ async function raporCek(env, ctx, s, bas, bit) {
 
   let b = await biletAl(env, ctx, s, null);
   if (b.hata) return { hata: b.hata, kisaDevre: b.hata === 'butce' };
-  let x = await istek(b.tgt, null);
-  if (yetkisiz(x)) {
-    // Önbellekteki bilet geçersizleşmiş olabilir: BİR kez yenile, bir kez daha dene.
-    b = await biletAl(env, ctx, s, b.tgt);
-    if (b.hata) return { hata: b.hata, kisaDevre: b.hata === 'butce' };
-    x = await istek(b.tgt, null);
+  let yenilendi = false;
+  // Tek sayfa isteği; 401'de bilet (çekim başına) BİR kez yenilenir.
+  const cagir = async (sayfa) => {
+    let x = await istek(b.tgt, sayfa);
+    if (yetkisiz(x) && !yenilendi) {
+      // Önbellekteki bilet geçersizleşmiş olabilir: BİR kez yenile, bir kez daha dene.
+      yenilendi = true;
+      b = await biletAl(env, ctx, s, b.tgt);
+      if (b.hata) return { hata: b.hata, kisaDevre: b.hata === 'butce' };
+      x = await istek(b.tgt, sayfa);
+    }
     if (yetkisiz(x)) {
       // Taze biletle de 401: hesap/yetki sorunu. Giriş döngüsüne girilmez.
       biletBellek = null;
-      engelYaz(env, ctx, s, 'servis-yetki', ENGEL_RED_S);
+      await engelYaz(env, ctx, s, 'servis-yetki', true);
       return { hata: 'servis-yetki' };
     }
-  }
-  if (x.hata) return x;
-  if (x.durum) return { hata: 'servis-hata' };
+    if (x.durum) return { hata: 'servis-hata' };
+    return x;
+  };
 
-  // Sayfalama: page.total gelen öğe sayısından büyükse kalan sayfalar çekilir.
-  // Tamamlanamazsa 'eksik': kesik liste "yayımlanmadı" gibi SUNULMAZ.
-  let ogeler = x.ogeler;
-  const sf = x.sayfa;
-  if (sf && sf.total > ogeler.length) {
+  // Yarıda kalmış sayfalı çekim varsa kaldığı sayfadan sürer (tamamlanan sayfalar yeniden istenmez).
+  const yarimAnahtar = 'yarim/' + anahtar;
+  const yarimYaz = (deger, sureS) => { const an = s.simdi(); return yaz(env, ctx, s, yarimAnahtar, { deger, taze: an + sureS * 1000, yazildi: an }, sureS, false); };
+  let ogeler, sf, sonraki;
+  const yarim = await oku(env, s, yarimAnahtar, true);
+  const y0 = yarim && s.simdi() < yarim.taze ? yarim.deger : null;
+  if (y0 && Array.isArray(y0.ogeler) && y0.sf && y0.sf.size > 0 && Number.isFinite(y0.sonraki)) {
+    ({ ogeler, sf, sonraki } = y0);
+  } else {
+    const x = await cagir(null);
+    if (x.hata) return x;
+    ogeler = x.ogeler;
+    sf = x.sayfa;
+    if (!sf || sf.total <= ogeler.length) return { ogeler };
+    // Sayfalama: page.total gelen öğe sayısından büyükse kalan sayfalar çekilir.
+    // Tamamlanamazsa 'eksik': kesik liste "yayımlanmadı" gibi SUNULMAZ.
     if (!(sf.size > 0)) return { hata: 'eksik' };
-    const sayfaSayisi = Math.ceil(sf.total / sf.size);
-    if (sayfaSayisi > AZAMI_SAYFA) return { hata: 'eksik' };
-    for (let n = sf.number + 1; n <= sf.number + sayfaSayisi - 1 && ogeler.length < sf.total; n++) {
-      const y = await istek(b.tgt, { number: n, size: sf.size });
-      if (y.hata === 'butce') return { hata: 'eksik', kisaDevre: true };
-      if (y.hata || y.durum || !y.ogeler.length) return { hata: 'eksik' };
-      // Sunucu istenen sayfayı döndürdüğünü KENDİSİ söylemeli: page parametresini yok sayıp
-      // aynı ilk sayfayı yineleyen bir yanıt "tamamlandı" sayılmaz.
-      if (!y.sayfa || y.sayfa.number !== n) return { hata: 'eksik' };
-      ogeler = ogeler.concat(y.ogeler);
-    }
-    // Toplam, bildirilen sayıyla TAM eşleşmeli (eksik de fazla da kapalı başarısızlık).
-    if (ogeler.length !== sf.total) return { hata: 'eksik' };
+    if (Math.ceil(sf.total / sf.size) > AZAMI_SAYFA) return { hata: 'eksik' };
+    sonraki = sf.number + 1;
+    yarimYaz({ ogeler, sf, sonraki }, YARIM_TTL_S);
   }
+  const sonSayfa = sf.number + Math.ceil(sf.total / sf.size) - 1;
+  for (let n = sonraki; n <= sonSayfa && ogeler.length < sf.total; n++) {
+    const y = await cagir({ number: n, size: sf.size });
+    // Bütçe doldu: tamamlanan sayfalar saklı kalır, sonraki deneme buradan sürer.
+    if (y.hata === 'butce') return { hata: 'eksik', kisaDevre: true };
+    if (y.hata === 'servis-yetki' || (y.hata && y.hata.startsWith('giris'))) return y;
+    if (y.hata || !y.ogeler.length) return { hata: 'eksik' };
+    // Sunucu istenen sayfayı döndürdüğünü KENDİSİ söylemeli: page parametresini yok sayıp
+    // aynı ilk sayfayı yineleyen bir yanıt "tamamlandı" sayılmaz. Toplam da değişmemiş olmalı.
+    if (!y.sayfa || y.sayfa.number !== n || y.sayfa.total !== sf.total) { yarimYaz(null, 1); return { hata: 'eksik' }; }
+    ogeler = ogeler.concat(y.ogeler);
+    yarimYaz({ ogeler, sf, sonraki: n + 1 }, YARIM_TTL_S);
+  }
+  yarimYaz(null, 1); // tamamlandı ya da tutarsız: yarım kayıt bir daha kullanılmaz
+  // Toplam, bildirilen sayıyla TAM eşleşmeli (eksik de fazla da kapalı başarısızlık).
+  if (ogeler.length !== sf.total) return { hata: 'eksik' };
   return { ogeler };
 }
 
 /** Çekim + normalleştirme + önbelleğe yazım. Fırlatmaz. */
 async function cekVeYaz(env, ctx, s, anahtar, bas, bit, bugun, kayit, eski) {
   try {
-    const c = await raporCek(env, ctx, s, bas, bit);
+    // Öncelik: yalnız bugünün ve dünün tek gün istekleri (aralıklar ve eski günler değil).
+    const oncelikli = anahtar.startsWith('gun/') && bas >= gunEkle(bugun, -1);
+    const c = await raporCek(env, ctx, s, anahtar, bas, bit, oncelikli);
     let neden = c.hata || null;
     let liste = null;
     if (!neden) {
@@ -437,15 +528,18 @@ async function cekVeYaz(env, ctx, s, anahtar, bas, bit, bugun, kayit, eski) {
     if (c.kisaDevre) return eski ? { ...eski, bayat: true, neden } : { durum: 'yok', neden };
     // Kimlik, bilet ya da gövde loglanmaz: yalnız neden kodu.
     console.error('dengesizlik: EPİAŞ verisi alınamadı —', neden);
+    // Büyüyen bekleme: art arda başarısızlıkta 60 sn → 5 dk → 30 dk (başarıda sıfırlanır).
+    const hataSayisi = (kayit && Number.isFinite(kayit.hataSayisi) ? kayit.hataSayisi : 0) + 1;
+    const bekleS = HATA_ADIMLARI_S[Math.min(hataSayisi, HATA_ADIMLARI_S.length) - 1];
     if (eski) {
       // Dürüstlük merdiveni: daha önce alınmış GERÇEK veri, kendi çekim zamanıyla.
       const deger = { ...eski, bayat: true, neden };
-      const kalan = Math.max(HATA_TTL_S, Math.floor(((kayit.yazildi || an) + SAKLAMA_S * 1000 - an) / 1000));
-      yaz(env, ctx, s, anahtar, { deger, taze: an + HATA_TTL_S * 1000, yazildi: kayit.yazildi || an, kvYazildi: kayit.kvYazildi || 0, eski, hataSonrasi: true }, kalan, false);
+      const kalan = Math.max(bekleS, Math.floor(((kayit.yazildi || an) + SAKLAMA_S * 1000 - an) / 1000));
+      yaz(env, ctx, s, anahtar, { deger, taze: an + bekleS * 1000, yazildi: kayit.yazildi || an, kvYazildi: kayit.kvYazildi || 0, eski, hataSonrasi: true, hataSayisi }, kalan, false);
       return deger;
     }
     const deger = { durum: 'yok', neden };
-    yaz(env, ctx, s, anahtar, { deger, taze: an + HATA_TTL_S * 1000, yazildi: an }, HATA_TTL_S, false);
+    yaz(env, ctx, s, anahtar, { deger, taze: an + bekleS * 1000, yazildi: an, hataSayisi }, HATA_SAKLAMA_S, false);
     return deger;
   } catch (e) {
     console.error('dengesizlik: çekim beklenmeyen hata —', e && e.name);

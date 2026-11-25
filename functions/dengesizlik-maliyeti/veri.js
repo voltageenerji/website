@@ -9,7 +9,7 @@
  * JSON ALANLARI (kararlı; yeniden adlandırılmaz, yalnız ekleme yapılır):
  *   surum, baslik, sayfa, kaynak{ad,rapor,url}, yayinci, birim, saatDilimi,
  *   tarih | bas+bit, cekildi (EPİAŞ'tan alındığı an, ISO-8601 +03:00),
- *   bayat (true ise EPİAŞ'a şu an ulaşılamadı; veri "cekildi" anına aittir),
+ *   bayat (true ise güncel veri şu an alınamadı; veri "cekildi" anına aittir),
  *   ozet{toplam,yayimlanan,ptfOrt,smfOrt,pozitifOrt,negatifOrt,maliyetPozitifOrt,maliyetNegatifOrt,yon{acik,fazla,denge}},
  *   kurallar[{bas,bit,V,B,k,l,AFL,asgari,tavanBas,tavanCarpani,kaynak}], kuralAlanlari,
  *   atif, alanlar, not,
@@ -122,6 +122,8 @@ function hata(istek, durum, kod, mesaj, ek) {
 }
 
 const iki = (n) => String(n).padStart(2, '0');
+/** "2026-11-24T14:30:00+03:00" → "24.11.2026 14:30" */
+const tarihSaatTR = (iso) => (typeof iso === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(iso) ? `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)} ${iso.slice(11, 16)}` : '—');
 const saat = (dk) => `${iki(Math.floor(dk / 60))}:${iki(dk % 60)}`;
 
 /** Dönem bitişi ISO: gün sonunda ertesi günün 00:00'ı. */
@@ -234,7 +236,8 @@ async function yanit(context, govdesiz) {
           satirlar: [
             ['Kaynak', KAYNAK_ADI],
             ['EPİAŞ\'tan alındığı an', String(sonuc.cekildi || '')],
-            ['Önceki senkrondan mı (bayat)', sonuc.bayat ? 'Evet: EPİAŞ\'a şu an ulaşılamadı; veri yukarıdaki ana aittir.' : 'Hayır'],
+            // Nötr ifade: kopya bütçe ya da süre sınırı yüzünden de bayat olabilir ("EPİAŞ'a ulaşılamadı" denmez).
+            ['Önceki senkrondan mı (bayat)', sonuc.bayat ? `Evet. Bu dosya en son ${tarihSaatTR(sonuc.cekildi)} tarihinde EPİAŞ'tan alınan veriyi içerir; güncel veri şu an alınamadı.` : 'Hayır'],
             [ust.tarih ? 'Tarih' : 'Tarih aralığı', ust.tarih || `${ust.bas} – ${ust.bit}`],
             ['Atıf', ATIF],
             ['Not', NOT],

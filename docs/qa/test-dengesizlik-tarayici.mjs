@@ -236,13 +236,16 @@ bolum('S3 hesaplayıcı — “Seçili günün verisiyle” (klavye)');
     await page.press('#hMiktar', 'Enter');
     ok(`S3 belirsiz nokta "${girdi}": tahmin yok, acik hata`, (await metin(page, '#hMiktarHata')) === NOKTA_MESAJI && (await page.locator('#hSonuc').innerHTML()) === '' && (await page.getAttribute('#hMiktar', 'aria-invalid')) === 'true');
   }
-  for (const [girdi, yanki] of [['0,125', '0,125 MWh'], ['1.250,5', '1.250,500 MWh'], ['1250', '1.250,000 MWh'], ['1.234.567,5', null], ['12,3456', '12,346 MWh'], ['2800', '2.800,000 MWh'], ['1.250.000', null]]) {
+  for (const [girdi, yanki] of [['0,125', '0,125 MWh'], ['1.250,5', '1.250,500 MWh'], ['1250', '1.250,000 MWh'], ['1.234.567,5', null], ['12,3456', '12,3456 MWh'], ['2800', '2.800,000 MWh'], ['1.250.000', null], ['0,0004', '0,0004 MWh'], ['0,000001', '0,000001 MWh'], ['0,12345678', '0,123457 MWh'], ['5', '5,000 MWh']]) {
     await page.fill('#hMiktar', girdi);
     await page.press('#hMiktar', 'Enter');
     if (yanki) ok(`S3 gecerli giris "${girdi}" -> ${yanki}`, (await metin(page, '#gMiktar')) === `${yanki} (pozitif)` && (await metin(page, '#hMiktarHata')) === '');
     else ok(`S3 "${girdi}": cok gruplu binlik kabul edilir (${girdi === '1.250.000' ? 'sinir asimi mesaji' : 'sinir asimi mesaji'})`, (await metin(page, '#hMiktarHata')).includes('en çok'));
   }
-  for (const [girdi, mesaj] of [['abc', 'sayıyla girin'], ['', 'sayıyla girin'], ['0', 'sıfırdan büyük'], ['-3', 'sıfırdan büyük'], ['1,2,3', 'sayıyla girin'], ['5000000', 'en çok']]) {
+  // Çok küçük miktar "0,000 MWh" diye yankılanmaz: hesap girilen değerle yapılır ve öyle gösterilir
+  await page.fill('#hMiktar', '0,0004'); await page.press('#hMiktar', 'Enter');
+  ok('S3 cok kucuk miktar: yanki 0,0004 MWh, tutar girilen degerle', (await metin(page, '#gMiktar')) === '0,0004 MWh (pozitif)' && (await metin(page, '#gTutar')) === `${bicim(1598 * 0.0004)} TL` && !(await metin(page, '#hSonuc')).includes('0,000 MWh'));
+  for (const [girdi, mesaj] of [['abc', 'sayıyla girin'], ['', 'sayıyla girin'], ['0', 'sıfırdan büyük'], ['-3', 'sıfırdan büyük'], ['1,2,3', 'sayıyla girin'], ['5000000', 'en çok'], ['0,0000001', 'en az 0,000001 MWh']]) {
     await page.fill('#hMiktar', girdi);
     await page.press('#hMiktar', 'Enter');
     ok(`S3 gecersiz miktar "${girdi}": hata mesaji, sonuc yok, aria-invalid`, (await metin(page, '#hMiktarHata')).includes(mesaj) && (await page.locator('#hSonuc').innerHTML()) === '' && (await page.getAttribute('#hMiktar', 'aria-invalid')) === 'true' && (await page.evaluate(() => document.activeElement.id)) === 'hMiktar');
@@ -434,8 +437,17 @@ bolum('S6 dürüst bekleme hâli');
   ok('S6 ?veriyok: istemci veri ucunu CAGIRMAZ', kayit.veriIstek === 0);
   ok('S6 ?veriyok: ozet cumlesi bos, ornek gorunmez', (await metin(page, '#dOzet')) === '' && (await page.isHidden('#dOrnek')) && (await page.isHidden('#dFarkNot')) && (await page.isHidden('#dKuralUyari')));
   ok('S6 ?veriyok: indirme baglantilari PASIF + gorunur neden', (await page.getAttribute('#dCsv', 'href')) === null && (await page.getAttribute('#dXlsx', 'aria-disabled')) === 'true' && (await page.getAttribute('#dJson', 'download')) === null && (await page.isVisible('#dIndirNot')) && (await metin(page, '#dIndirNot')) === 'Veri alınamadığı için indirme şu an kapalı');
-  await page.click('#dCsv');
+  await page.click('#dCsv', { force: true }); // aria-disabled: Playwright "etkin değil" sayar; gerçek tıklama zorlanır
   ok('S6 ?veriyok: pasif baglantiya tiklamak gezinme/indirme baslatmaz', page.url().endsWith('/dengesizlik-maliyeti?veriyok'));
+  // N8: pasif denetimler klavyeyle odaklanabilir, nedeni okutulur, Enter gezinme başlatmaz
+  ok('S6 pasif indirme denetimleri: role=link, tabindex=0, aria-describedby=neden', (await Promise.all(['dCsv', 'dXlsx', 'dJson'].map((id) => page.evaluate((i) => { const e = document.getElementById(i); return [e.getAttribute('role'), e.getAttribute('tabindex'), e.getAttribute('aria-disabled'), e.getAttribute('aria-describedby')].join(); }, id)))).every((x) => x === 'link,0,true,dIndirNot'));
+  await page.focus('#dBugun');
+  await page.keyboard.press('Tab');
+  const pasifOdak = await page.evaluate(() => { const e = document.activeElement; const st = getComputedStyle(e); return { id: e.id, stil: st.outlineStyle, en: parseFloat(st.outlineWidth) }; });
+  ok('S6 pasif CSV denetimine Tab ile gelinir, odak gorunur', pasifOdak.id === 'dCsv' && pasifOdak.stil === 'solid' && pasifOdak.en >= 2, `-> ${JSON.stringify(pasifOdak)}`);
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab'); await page.keyboard.press('Tab');
+  ok('S6 pasif denetimde Enter gezinme baslatmaz; siradaki duraklar Excel ve JSON', page.url().endsWith('/dengesizlik-maliyeti?veriyok') && (await page.evaluate(() => document.activeElement.id)) === 'dJson');
   ok('S6 ?veriyok: veri bolumunde fiyat bicimli rakam yok', !/\d,\d\d/.test(await page.evaluate(() => [...document.querySelectorAll('.live, #dOzet, #dTablo')].map((e) => e.textContent).join(' '))));
   ok('S6 ?veriyok: gun etiketi ve tarih alani yine dolu', (await metin(page, '#dGun')) === '24.11.2026' && (await page.inputValue('#dTarih')) === '2026-11-24');
   await page.fill('#hMiktar', '5'); await page.press('#hMiktar', 'Enter');
@@ -491,6 +503,7 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
   ok('S7 ozet, tarihli cumle, damga: istemci = sunucu', JSON.stringify(pa.ozet) === JSON.stringify(pb.ozet) && JSON.stringify(pa.siniflar) === JSON.stringify(pb.siniflar), `-> ${JSON.stringify(pa.ozet.filter((x, i) => x !== pb.ozet[i]))} / ${JSON.stringify(pb.ozet.filter((x, i) => x !== pa.ozet[i]))}`);
   ok('S7 damga (<time>), donem secenekleri, indirme durumu: istemci = sunucu', pa.damga === pb.damga && pa.secenekler === pb.secenekler && pa.indir === pb.indir && pa.damga.includes('<time datetime="2026-11-24T14:30:00+03:00">'), `-> ${pa.damga} / ${pb.damga} ; ${pa.indir} / ${pb.indir}`);
   ok('S7 arac cubugu: istemci = sunucu', JSON.stringify(pa.araclar) === JSON.stringify(pb.araclar) && JSON.stringify(pa.tarihler) === JSON.stringify(pb.tarihler), `-> ${JSON.stringify(pa.araclar)} ${JSON.stringify(pb.araclar)} ${JSON.stringify(pa.tarihler)} ${JSON.stringify(pb.tarihler)}`);
+  ok('S7 kabuk yolu: basarili uc yanitindan sonra indirme ACILIR', (await b.page.getAttribute('#dCsv', 'href')) === '/dengesizlik-maliyeti/veri?tarih=2026-11-24&bicim=csv' && (await b.page.getAttribute('#dCsv', 'aria-disabled')) === null && (await b.page.getAttribute('#dCsv', 'tabindex')) === null && (await b.page.getAttribute('#dCsv', 'role')) === null && (await b.page.isHidden('#dIndirNot')));
   ok('S7 kabuk yolunda hata yok', b.kayit.konsol.length === 0 && b.kayit.hata.length === 0 && b.kayit.veriIstek === 1, `-> ${JSON.stringify(b.kayit)}`);
   await b.kapat();
 
@@ -514,6 +527,7 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
   const c = await ac('/dengesizlik-maliyeti', { depo: ['voltage-dengesizlik-onbellek', onbellek] });
   await c.page.waitForTimeout(300);
   ok('S7 onbellek: SON SENKRON + saklanan cekim zamani', (await metin(c.page, '#dMod')) === 'SON SENKRON' && (await metin(c.page, '#dDamga')) === 'SON SENKRON 24.11.2026 13:05');
+  ok('S7 onbellekten gelen veride indirme PASIF kalir (uc basarisiz; N1)', (await c.page.getAttribute('#dCsv', 'href')) === null && (await c.page.getAttribute('#dXlsx', 'aria-disabled')) === 'true' && (await c.page.isVisible('#dIndirNot')) && (await c.page.getAttribute('#dCsv', 'aria-describedby')) === 'dIndirNot');
   ok('S7 onbellek: saklanan gercek satirlar, eksik deger "—"', JSON.stringify(await tabloOzeti(c.page)) === JSON.stringify(['00:00–01:00|2.000,00|2.300,00|Enerji açığı|1.940,00|2.438,00|60,00|438,00', '01:00–02:00|2.010,00|—|—|—|—|—|—']));
   await c.kapat();
   // Başka günün önbelleği KULLANILMAZ

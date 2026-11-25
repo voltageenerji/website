@@ -7,7 +7,7 @@
  *
  * DÜRÜSTLÜK MERDİVENİ
  *   - EPİAŞ'tan şimdi alınan veri → "EPİAŞ VERİSİ" + alındığı an.
- *   - EPİAŞ'a ulaşılamıyor ama daha önce alınmış gerçek veri var → "SON SENKRON"
+ *   - Güncel veri şu an alınamıyor ama daha önce alınmış gerçek veri var → "SON SENKRON"
  *     + o çekimin zamanı (functions/_lib/epias.js, bayat:true).
  *   - Hiç veri yok → kabuk: "—" ve "EPİAŞ VERİSİ BEKLENİYOR". Uydurma rakam yok.
  *   - Yayımlanmamış dönem "—" kalır; 0 yazılmaz, taşınmaz.
@@ -104,9 +104,9 @@ export const CAPA = Object.freeze({
   tarih: '<input type="date" id="dTarih" name="tarih" min="2026-01-01" required>',
   onceki: '<a class="btn-ikincil" id="dOnceki" rel="nofollow" aria-disabled="true">',
   sonraki: '<a class="btn-ikincil" id="dSonraki" rel="nofollow" aria-disabled="true">',
-  csv: '<a class="btn-ikincil" id="dCsv" rel="nofollow" aria-disabled="true">',
-  xlsx: '<a class="btn-ikincil" id="dXlsx" rel="nofollow" aria-disabled="true">',
-  json: '<a class="btn-ikincil" id="dJson" rel="nofollow" aria-disabled="true">',
+  csv: '<a class="btn-ikincil" id="dCsv" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">',
+  xlsx: '<a class="btn-ikincil" id="dXlsx" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">',
+  json: '<a class="btn-ikincil" id="dJson" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">',
   indirNot: `<span class="indir-not" id="dIndirNot">${INDIR_KAPALI}</span>`,
   bas: '<input type="date" id="dBas" name="bas" min="2026-01-01" required>',
   bit: '<input type="date" id="dBit" name="bit" min="2026-01-01" required>',
