@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * /dengesizlik-maliyeti — GERÇEK VERİ KABUL DENETİMİ (18 madde).
+ * /dengesizlik-maliyeti — GERÇEK VERİ KABUL DENETİMİ (21 madde).
  *
  * Çalıştırma (çalışma dizini bir scratch klasörü olmalı; repo köküne hiçbir şey yazılmaz):
  *   KABUL_TABAN=https://<onizleme>.pages.dev node docs/qa/kabul-dengesizlik.mjs
@@ -50,6 +50,12 @@
  *   18 1–25 Ocak 2026 notu (Hukuk R2): 01-01, 01-13, 01-25 için API (site /veri; proxy varsa o da)
  *      değerleri bültenle birebir mi → "Ocak 1–25 notu: API = bülten (n/n) → not geçerli" ya da
  *      "→ NOT KALDIRILMALI" (EPİAŞ API değerlerini revize ettiyse not sayfadan kalkmalı)
+ *   19 Üç tam Kasım günü (2026-11-05, -12, -19): sayfada hiç "†" yok, fark notu boş; /veri değerleri
+ *      formülle her dönemde ≤ 0,01 (sunucunun "dengesizlik-formul-farki" günlüğünü doğuracak fark
+ *      yok; günlük dışarıdan okunamaz, koşulu bu yoldan denetlenir)
+ *   20 Tam takvim ayı aralığı (bugünden önceki son tam ay): JSON/CSV/XLSX 200, ayın her günü var,
+ *      satır sayıları üç biçimde ve gün başına dönem toplamıyla tutarlı
+ *   21 İki aya yayılan 31 günlük aralık: aynı denetimler
  *
  * Çıkış kodu: kalan madde varsa 1. Proxy bilgisi verilmezse proxy karşılaştırmaları "atlandı".
  */
@@ -519,6 +525,66 @@ else {
       }
     }
   }
+}
+
+// 19 — üç tam Kasım günü: "†" yok, formül farkı yok
+{
+  const GUNLER19 = ['2026-11-05', '2026-11-12', '2026-11-19'];
+  if (GUNLER19.some((g) => g >= BUGUN)) madde(19, 'Üç tam Kasım günü: "†" ve formül farkı yok', ATLANDI, 'günlerden biri henüz tamamlanmadı');
+  else {
+    let hancer = 0, notDolu = 0, ssrsiz = 0, karsilastirilan = 0, farkli = 0, azami = 0, eksik = 0, kuralsiz = 0;
+    // Tek aralık isteği: site aralık yanıtının günlerini tek gün önbelleğine de yazar (proxy'ye 3 yerine 1 çağrı).
+    await jsonAlSabirli(`/dengesizlik-maliyeti/veri?bas=${GUNLER19[0]}&bit=${GUNLER19[GUNLER19.length - 1]}&bicim=json`);
+    for (const g of GUNLER19) {
+      const j = await jsonAlSabirli(`/dengesizlik-maliyeti/veri?tarih=${g}&bicim=json`); // önce veri: sayfa önbellekten çizilir
+      const s = await al(`/dengesizlik-maliyeti?tarih=${g}`, { accept: 'text/html' });
+      if (!/data-ssr="1"/.test(s.metin)) ssrsiz++;
+      hancer += (((/<tbody id="dTablo">([\s\S]*?)<\/tbody>/.exec(s.metin) || [])[1] || '').match(/<span class="fark"/g) || []).length; // yalnız tablo gövdesi (sayfa betiğinde de aynı dizgi var)
+      if (coz((/<p class="note fark-not" id="dFarkNot">([\s\S]*?)<\/p>/.exec(s.metin) || [])[1] || '') !== '') notDolu++;
+      const d = j.j ? j.j.donemler : [];
+      if (!d.length || d.some((x) => !yayimlandi(x))) eksik++;
+      const k = kuralFor(j.j ? j.j.kurallar : [], g);
+      if (!k || k.dogrulandi !== true) { kuralsiz++; continue; }
+      for (const x of d) {
+        if (x.dk !== 60 || !yayimlandi(x) || x.ptf === null || x.smf === null || !x.yon) continue;
+        const r = birimFiyat({ ptf: x.ptf, smfN: x.smf, smfP: x.smf, yon: x.yon }, k);
+        if (!r) continue;
+        karsilastirilan++;
+        const f = Math.max(Math.abs(r.negatif - x.negatif), Math.abs(r.pozitif - x.pozitif));
+        if (f > azami) azami = f;
+        if (f > 0.01 + 1e-9) farkli++;
+      }
+    }
+    const iyi = !hancer && !notDolu && !ssrsiz && !eksik && !kuralsiz && karsilastirilan > 0 && !farkli;
+    madde(19, `Üç tam Kasım günü (${GUNLER19.join(', ')}): "†" yok, formül farkı yok`, iyi ? GECTI : KALDI, `"†" ${hancer}, dolu fark notu ${notDolu}, sunucu verisiz sayfa ${ssrsiz}, eksik gün ${eksik}, kuralsız gün ${kuralsiz}; karşılaştırılan ${karsilastirilan}, 0,01'den büyük fark ${farkli}, en büyük fark ${Math.round(azami * 100) / 100}`);
+  }
+}
+
+// 20 + 21 — tam takvim ayı ve iki aya yayılan 31 gün: üç biçim, her gün, tutarlı satır sayıları
+async function aralikDenetimi(no, ad, bas, bit) {
+  if (bit >= BUGUN) { madde(no, ad, ATLANDI, 'aralık henüz tamamlanmadı'); return; }
+  const yol = `/dengesizlik-maliyeti/veri?bas=${bas}&bit=${bit}`;
+  const j = await jsonAlSabirli(`${yol}&bicim=json`);
+  const c = await al(`${yol}&bicim=csv`, { accept: '*/*' });
+  const x = await al(`${yol}&bicim=xlsx`, { accept: '*/*' });
+  const d = j.j ? j.j.donemler : [];
+  const gunSayisi = Math.round((Date.parse(bit) - Date.parse(bas)) / 86400000) + 1;
+  const gunler = new Map();
+  for (const p of d) { const g = p.bas.slice(0, 10); gunler.set(g, (gunler.get(g) || 0) + 1); }
+  const gunBasi = [...gunler.entries()].every(([g, n]) => { const dk = (d.find((p) => p.bas.startsWith(g)) || {}).dk; return dk && n === 1440 / dk; });
+  const csvSatir = c.durum === 200 ? c.metin.replace(/^﻿/, '').split('\r\n').filter(Boolean).length - 1 : -1;
+  const xs = x.durum === 200 ? xlsxSatir(x.bayt) - 1 : -1;
+  const iyi = j.durum === 200 && c.durum === 200 && x.durum === 200 && gunler.size === gunSayisi && gunBasi && csvSatir === d.length && xs === d.length;
+  madde(no, `${ad} (${bas} – ${bit}, ${gunSayisi} gün)`, iyi ? GECTI : KALDI, `JSON ${j.durum} (${gunler.size}/${gunSayisi} gün, ${d.length} dönem, gün başına tam ${gunBasi}), CSV ${c.durum} (${csvSatir} satır), XLSX ${x.durum} (${xs} satır)`);
+}
+{
+  const buAy = `${BUGUN.slice(0, 7)}-01`;
+  const oncekiAySon = gunEkle(buAy, -1);
+  await aralikDenetimi(20, 'Tam takvim ayı aralığı', `${oncekiAySon.slice(0, 7)}-01`, oncekiAySon);
+  // İki aya yayılan 31 gün: önceki ayın 16'sından 30 gün sonrasına; tamamlanmamışsa bir ay geri
+  let bas21 = `${oncekiAySon.slice(0, 7)}-16`;
+  if (gunEkle(bas21, 30) >= BUGUN) bas21 = `${gunEkle(`${oncekiAySon.slice(0, 7)}-01`, -1).slice(0, 7)}-16`;
+  await aralikDenetimi(21, 'İki aya yayılan 31 günlük aralık', bas21, gunEkle(bas21, 30));
 }
 
 // 10 — bütçe (en sonda: eski gün bütçesini bilerek tüketir)

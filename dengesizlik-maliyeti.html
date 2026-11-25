@@ -145,6 +145,11 @@ a.btn-ikincil:hover, button.btn-ikincil:hover { border-color: var(--ink); backgr
 /* ---- FORMÜL ---- */
 .formul { margin: 14px 0 18px; padding: 16px 20px; border-left: 2px solid var(--accent); background: var(--paper-warm); font-family: var(--mono); font-size: 13.5px; line-height: 1.9; color: var(--ink); overflow-x: auto; }
 .formul p { margin: 0; max-width: none; color: var(--ink); white-space: nowrap; }
+.formul .nw { white-space: nowrap; }
+/* D-A1: dar ekranda formül satırları kaymaz, sarar; ifade parçaları (.nw) bölünmez */
+@media (max-width: 640px) { .formul p { white-space: normal; } }
+/* D-M1: iOS odakta yakınlaştırmasın (16 px altı girdi metni) */
+@media (max-width: 640px) { input[type="date"], input[type="text"], select { font-size: 16px; } }
 .formul .kosul { color: var(--ink-muted); }
 .ornek { margin: 18px 0 22px; padding: 16px 20px; border: 1px solid var(--line-strong); background: var(--paper); }
 .ornek:empty { display: none; }
@@ -186,6 +191,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 <body>
 <div class="page">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › Dengesizlik Maliyeti</nav>
+  <main>
   <h1>Dengesizlik Maliyeti: Pozitif ve Negatif Dengesizlik Fiyatı</h1>
   <p class="lede"><strong>Dengesizlik maliyeti</strong>, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır. Mevzuatta tanımlı bir terim değildir; Voltage Enerji tarafından EPİAŞ Şeffaflık Platformu verisinden türetilir.</p>
   <p>Bu sayfa, seçilen günün her uzlaştırma dönemi için Piyasa Takas Fiyatı'nı (PTF), Sistem Marjinal Fiyatı'nı (SMF), sistem yönünü ve EPİAŞ Şeffaflık Platformu'nda yayımlanan pozitif ve negatif dengesizlik fiyatını tek tabloda gösterir. SMF, ilgili dönemi izleyen en geç dört saat içinde piyasa katılımcılarına duyurulduğu için henüz yayımlanmamış dönemler boş kalır. Saatler Türkiye saatiyledir (UTC+03:00); tüm fiyatlar TL/MWh'tir.</p>
@@ -323,7 +329,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
         <div>
           <label class="etiket" for="hMiktar">Dengesizlik miktarı (MWh)</label>
           <input type="text" id="hMiktar" inputmode="decimal" autocomplete="off" aria-describedby="hMiktarHata">
-          <p class="hata" id="hMiktarHata"></p>
+          <p class="hata" id="hMiktarHata" role="alert"></p>
         </div>
       </div>
       <p class="kural-notu">Miktarda ondalık ayırıcı virgüldür (örnek: 0,125); binleri noktasız yazın (örnek: 2800).</p>
@@ -345,12 +351,12 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
         <div>
           <label class="etiket" for="sPtf">PTF (TL/MWh)</label>
           <input type="text" id="sPtf" inputmode="decimal" autocomplete="off" aria-describedby="sPtfHata">
-          <p class="hata" id="sPtfHata"></p>
+          <p class="hata" id="sPtfHata" role="alert"></p>
         </div>
         <div>
           <label class="etiket" for="sSmf">SMF (TL/MWh)</label>
           <input type="text" id="sSmf" inputmode="decimal" autocomplete="off" aria-describedby="sSmfHata">
-          <p class="hata" id="sSmfHata"></p>
+          <p class="hata" id="sSmfHata" role="alert"></p>
         </div>
         <div>
           <label class="etiket" for="sYon">Sistem yönü</label>
@@ -363,7 +369,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
         <div>
           <label class="etiket" for="sMiktar">Dengesizlik miktarı (MWh)</label>
           <input type="text" id="sMiktar" inputmode="decimal" autocomplete="off" aria-describedby="sMiktarHata">
-          <p class="hata" id="sMiktarHata"></p>
+          <p class="hata" id="sMiktarHata" role="alert"></p>
         </div>
       </div>
       <button type="submit" class="btn" disabled>Hesapla</button>
@@ -380,16 +386,16 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 
   <h3>Negatif dengesizlik fiyatı formülü</h3>
   <div class="formul">
-    <p>Negatif dengesizlik birim fiyatı = max(V; PTF; SMF<sub>N</sub>) × (1 + k)</p>
-    <p class="kosul">max(PTF; SMF<sub>N</sub>) azami fiyat limitine (AFL) eşitse:</p>
-    <p>Negatif dengesizlik birim fiyatı = AFL × 1,05 × (1 + k)</p>
+    <p>Negatif dengesizlik birim fiyatı = <span class="nw">max(V; PTF; SMF<sub>N</sub>) × (1 + k)</span></p>
+    <p class="kosul"><span class="nw">max(PTF; SMF<sub>N</sub>)</span> azami fiyat limitine (AFL) eşitse:</p>
+    <p>Negatif dengesizlik birim fiyatı = <span class="nw">AFL × 1,05 × (1 + k)</span></p>
   </div>
 
   <h3>Pozitif dengesizlik fiyatı formülü</h3>
   <div class="formul">
-    <p>Pozitif dengesizlik birim fiyatı = min(PTF; SMF<sub>P</sub>) × (1 − l)</p>
-    <p class="kosul">min(PTF; SMF<sub>P</sub>) &lt; V ise:</p>
-    <p>Pozitif dengesizlik birim fiyatı = (−1) × B × (1 + l)</p>
+    <p>Pozitif dengesizlik birim fiyatı = <span class="nw">min(PTF; SMF<sub>P</sub>) × (1 − l)</span></p>
+    <p class="kosul"><span class="nw">min(PTF; SMF<sub>P</sub>) &lt; V</span> ise:</p>
+    <p>Pozitif dengesizlik birim fiyatı = <span class="nw">(−1) × B × (1 + l)</span></p>
   </div>
   <p>İkinci durumda pozitif dengesizlik fiyatı eksi değerlidir: pozitif dengesizliğe düşen katılımcı alacaklı olmaz, öder. Koşul kesin küçüktür; min(PTF; SMF<sub>P</sub>) V'ye eşitse genel formül uygulanır.</p>
   <p>SMF<sub>N</sub> ve SMF<sub>P</sub>, saat içindeki dengeleme güç piyasası uzlaştırma dönemlerine ait SMF'lerin en yükseği ve en düşüğüdür. 24 Kasım 2026 itibarıyla saat başına tek SMF bulunduğu için ikisi de o saatin SMF'sine eşittir.</p>
@@ -398,7 +404,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <p><var>k</var> negatif, <var>l</var> pozitif dengesizlikte kullanılır. İkisi de ilgili uzlaştırma dönemindeki sistem yönüne göre değişir.</p>
   <div class="kucuk-sar">
     <table class="kucuk" id="dKatsayi">
-      <caption>k ve l katsayıları · 14030 sayılı Kurul Kararı · 1 Ocak 2026 teslim gününden itibaren · 24.11.2026 itibarıyla</caption>
+      <caption id="dKatsayiBaslik">k ve l katsayıları · 14030 sayılı Kurul Kararı · 1 Ocak 2026 teslim gününden itibaren · 24.11.2026 itibarıyla</caption>
       <thead>
         <tr><th scope="col">Sistem yönü</th><th scope="col">k (negatif dengesizlik)</th><th scope="col">l (pozitif dengesizlik)</th></tr>
       </thead>
@@ -414,7 +420,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <h3>V, B ve azami fiyat limiti (AFL)</h3>
   <div class="kucuk-sar">
     <table class="kucuk" id="dSabit">
-      <caption>Parametreler: formüldeki V, B ve AFL değerleri ve dayanakları</caption>
+      <caption id="dSabitBaslik">Parametreler: formüldeki V, B ve AFL değerleri ve dayanakları</caption>
       <thead>
         <tr><th scope="col">Parametre</th><th scope="col">Değer</th><th scope="col">Geçerlilik</th><th scope="col">Dayanak</th></tr>
       </thead>
@@ -494,6 +500,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <div class="about">
     <p><strong>Bu sayfa hakkında:</strong> Veri kaynağı: EPİAŞ Şeffaflık Platformu ("PTF, SMF ve SDF Listeleme" raporu). Sayfa metninin yayın/güncelleme tarihi: 24.11.2026. Bu sayfada temsili veya sentetik veri gösterilmez; veri alınamadığında alanlar boş kalır. Veride ya da metinde hata olduğunu düşünüyorsanız <a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a> adresine bildirin; düzeltmeler bu sayfada tarihiyle belirtilir. Yayıncı: Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (Voltage Enerji), ETS/3424-8/2074 numaralı EPDK tedarik lisansıyla 19 Eylül 2011'den bu yana serbest piyasada faaliyet gösterir; GÖP ve GİP'te aktif katılımcıdır.</p>
   </div>
+  </main>
 
   <footer>© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · <a href="/">Ana sayfa</a> · <a href="/kurumsal">Kurumsal</a> · <a href="/rehber">Rehber</a> · <a href="/kvkk">KVKK</a> · <a href="/cerez-politikasi">Çerez Politikası</a> · <a href="/kullanim-kosullari">Kullanım Koşulları</a></footer>
 </div>
@@ -693,8 +700,14 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   }
   /* Tablo kabı yalnız gerçekten kaydığı genişliklerde klavye durağıdır. */
   function kapOdak(){
-    var k = $('dTabloSar'); if(!k) return;
-    if(k.scrollWidth > k.clientWidth + 1) k.setAttribute('tabindex', '0'); else k.removeAttribute('tabindex');
+    var k = $('dTabloSar');
+    if(k){ if(k.scrollWidth > k.clientWidth + 1) k.setAttribute('tabindex', '0'); else k.removeAttribute('tabindex'); }
+    /* D-A1: küçük tablolar da yalnız taştıklarında klavye durağı + başlığıyla adlandırılmış bölge */
+    Array.prototype.forEach.call(document.querySelectorAll('.kucuk-sar'), function(c){
+      var cap = c.querySelector('caption[id]');
+      if(c.scrollWidth > c.clientWidth + 1){ c.setAttribute('tabindex', '0'); c.setAttribute('role', 'region'); if(cap) c.setAttribute('aria-labelledby', cap.id); }
+      else { c.removeAttribute('tabindex'); c.removeAttribute('role'); c.removeAttribute('aria-labelledby'); }
+    });
   }
   window.addEventListener('resize', kapOdak);
 

@@ -1389,7 +1389,7 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
   ok('birim dengesizlik maliyeti tanimlari (revizyon metni)', yontem.includes("<p>Negatif dengesizlik maliyeti = negatif dengesizlik fiyatı − PTF. Eksik kalan 1 MWh'in, gün öncesi piyasasında PTF'den alınmış olmasına göre ek maliyetidir (TL/MWh).</p>") && yontem.includes("<p>Pozitif dengesizlik maliyeti = PTF − pozitif dengesizlik fiyatı. Fazla kalan 1 MWh'in, PTF'den satılmış olmasına göre gelir kaybıdır (TL/MWh).</p>") && yontem.includes(NOT_ORTALAMA));
   ok('eski gosterge adi kalmadi', !/PTF'ye göre maliyet \((pozitif|negatif)\)/.test(KABUK) && !KABUK.includes("\"PTF'ye göre maliyet\""));
   // D5 / D6
-  ok('katsayi tablosu basligi (revizyon)', coz(/<table class="kucuk" id="dKatsayi">\s*<caption>([\s\S]*?)<\/caption>/.exec(KABUK)[1]) === 'k ve l katsayıları · 14030 sayılı Kurul Kararı · 1 Ocak 2026 teslim gününden itibaren · 24.11.2026 itibarıyla');
+  ok('katsayi tablosu basligi (revizyon)', coz(/<table class="kucuk" id="dKatsayi">\s*<caption id="dKatsayiBaslik">([\s\S]*?)<\/caption>/.exec(KABUK)[1]) === 'k ve l katsayıları · 14030 sayılı Kurul Kararı · 1 Ocak 2026 teslim gününden itibaren · 24.11.2026 itibarıyla');
   const par = coz(/<table class="kucuk" id="dSabit">([\s\S]*?)<\/table>/.exec(KABUK)[1]);
   ok('parametre tablosu: "Parametre", B gecerliligi, 14459 RG sayisi', par.startsWith('Parametreler:') && par.includes('ParametreDeğerGeçerlilikDayanak') && par.includes("B100 TL/MWh1 Ocak 2026'dan itibaren") && par.includes('14459 sayılı Kurul Kararı (RG 3/4/2026-33213)') && !/Sabit/.test(par));
   ok('parametre aciklamasi (revizyon metni)', yontem.includes("<p>V ve B, Kurul Kararıyla belirlenen birim fiyatlardır (DUY m.110(2)). V, negatif dengesizlik fiyatında alt sınır girdisidir; pozitif dengesizlikte eşiktir. B, min(PTF; SMF) V'nin altına indiğinde pozitif dengesizlik fiyatını belirler. AFL, azami fiyat limitidir.</p>"));
@@ -1611,6 +1611,21 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
   ok('R4 gomulu istisna ve not tablolari = sunucu', JSON.stringify(gom.istisnalar) === JSON.stringify(YAYIM_ISTISNALARI) && JSON.stringify(gom.notlar) === JSON.stringify(YAYIM_NOTLARI));
 }
 
+
+// ============================================================================
+// REVİZYON 6 — erişilebilirlik ve iOS (QA tarayıcı turu D-A1, D-A2, D-A3, D-M1)
+// ============================================================================
+{
+  const govdeK = KABUK.slice(KABUK.indexOf('<body'), KABUK.indexOf('<script type="application/json"'));
+  ok('R6 D-A2: tek <main>, H1 ile "Bu sayfa hakkinda" arasini sarar; nav ve footer disarida', (govdeK.match(/<main>/g) || []).length === 1 && (govdeK.match(/<\/main>/g) || []).length === 1 && govdeK.indexOf('<main>') < govdeK.indexOf('<h1>') && govdeK.indexOf('<nav class="crumbs"') < govdeK.indexOf('<main>') && govdeK.indexOf('<div class="about">') < govdeK.indexOf('</main>') && govdeK.indexOf('</main>') < govdeK.indexOf('<footer>'));
+  ok('R6 D-A3: dort alan hatasi role="alert"', ['hMiktarHata', 'sPtfHata', 'sSmfHata', 'sMiktarHata'].every((id) => KABUK.includes(`<p class="hata" id="${id}" role="alert"></p>`)));
+  ok('R6 D-A1: 640 px altinda formul satirlari sarar, ifadeler bolunmez', KABUK.includes('@media (max-width: 640px) { .formul p { white-space: normal; } }') && (KABUK.match(/<span class="nw">/g) || []).length === 6);
+  ok('R6 D-A1: kucuk tablolar tasinca bolge + klavye duragi (istemci), basliklari kimlikli', KABUK.includes('<caption id="dKatsayiBaslik">') && KABUK.includes('<caption id="dSabitBaslik">') && /querySelectorAll\('\.kucuk-sar'\)/.test(KABUK) && !/<div class="kucuk-sar"[^>]*(role|tabindex|aria-labelledby)=/.test(KABUK));
+  ok('R6 D-M1: 640 px altinda girdi ve secimler 16 px', KABUK.includes('@media (max-width: 640px) { input[type="date"], input[type="text"], select { font-size: 16px; } }'));
+  const diger = readFileSync(new URL('../../canli-ptf.html', import.meta.url), 'utf8');
+  ok('R6 D-A2: diger sayfalara dokunulmadi (canli-ptf main yok)', !diger.includes('<main'));
+}
+
 // ============================================================================
 // REVİZYON 3 / D — kabul denetimi betiği (docs/qa/kabul-dengesizlik.mjs) yerel sahte ortamda
 // ============================================================================
@@ -1630,12 +1645,28 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
     } catch (e) { res.writeHead(500); res.end(); }
   });
   await new Promise((coz) => P.listen(0, '127.0.0.1', coz));
-  const kos = (ek = [], env = {}) => new Promise((coz) => execFile(process.execPath, [new URL('./kabul-dengesizlik.mjs', import.meta.url).pathname, ...ek], { cwd: gecici, env: { PATH: process.env.PATH, KABUL_TABAN: S.url, KABUL_ZAMAN_ASIMI_MS: '8000', ...env }, timeout: 120000 }, (hata, cikti) => coz({ kod: hata ? hata.code : 0, cikti: String(cikti) })));
+  // Ön sunucu: sahte sitenin saati sabittir, dakikalık bütçe kendiliğinden dolmaz. Site 503 + Retry-After
+  // verdiğinde (bütçe) sahte saat bir dakika ilerletilir; kabul betiğinin "bekleyip yeniden dene" yolu
+  // gerçekteki gibi bir sonraki dakikaya düşer. Saat başka hiçbir durumda ilerlemez (eşleşen istek çiftleri kararlı).
+  const ON = createServer(async (req, res) => {
+    try {
+      const r = await fetch(S.url + req.url, { method: req.method, headers: { Accept: req.headers.accept || '*/*', ...(req.headers['user-agent'] ? { 'User-Agent': req.headers['user-agent'] } : {}) }, redirect: 'manual' });
+      if (r.status === 503 && r.headers.get('retry-after')) S.proxy.an += 61000;
+      const h = {}; r.headers.forEach((v, k) => { h[k] = v; });
+      res.writeHead(r.status, h); res.end(Buffer.from(await r.arrayBuffer()));
+    } catch (e) { res.writeHead(502); res.end(); }
+  });
+  await new Promise((coz) => ON.listen(0, '127.0.0.1', coz));
+  const ON_URL = `http://127.0.0.1:${ON.address().port}`;
+  const kos = (ek = [], env = {}) => new Promise((coz) => execFile(process.execPath, [new URL('./kabul-dengesizlik.mjs', import.meta.url).pathname, ...ek], { cwd: gecici, env: { PATH: process.env.PATH, KABUL_TABAN: ON_URL, KABUL_ZAMAN_ASIMI_MS: '8000', KABUL_YENIDEN_BEKLE_AZAMI_MS: '200', ...env }, timeout: 120000 }, (hata, cikti) => coz({ kod: hata ? hata.code : 0, cikti: String(cikti) })));
   const proxyEnv = { KABUL_PROXY_URL: `http://127.0.0.1:${P.address().port}`, KABUL_PROXY_ANAHTAR: SAHTE_ENV.PIYASA_VERI_ANAHTAR };
   const a = await kos([], proxyEnv);
   const satir = (no) => a.cikti.split('\n').find((l) => new RegExp(`^\\[[^\\]]+\\] +${no} `).test(l)) || '';
-  ok('D kabul (proxy ile): cikis 0, 18 madde, kalan yok (17-18 bulten verilmedi: atlandi)', a.kod === 0 && /\n\d+ geçti, 0 kaldı, \d+ atlandı \(18 madde\)/.test(a.cikti) && satir(17).startsWith('[ATLANDI]') && satir(18).startsWith('[ATLANDI]'), `-> ${a.kod}\n${a.cikti}`);
-  ok('D kabul: her madde tek satir', [...Array(18)].every((_, i) => satir(i + 1) !== ''));
+  ok('D kabul (proxy ile): cikis 0, 21 madde, kalan yok (17-18 bulten verilmedi: atlandi)', a.kod === 0 && /\n\d+ geçti, 0 kaldı, \d+ atlandı \(21 madde\)/.test(a.cikti) && satir(17).startsWith('[ATLANDI]') && satir(18).startsWith('[ATLANDI]'), `-> ${a.kod}\n${a.cikti}`);
+  ok('D kabul: her madde tek satir', [...Array(21)].every((_, i) => satir(i + 1) !== ''));
+  ok('R6 kabul 19: uc tam Kasim gunu, † 0, formul farki 0', satir(19).startsWith('[GEÇTİ]') && /"†" 0, dolu fark notu 0, sunucu verisiz sayfa 0, eksik gün 0, kuralsız gün 0; karşılaştırılan 72, 0,01'den büyük fark 0/.test(satir(19)), `-> ${satir(19)}`);
+  ok('R6 kabul 20: tam ay (2026-10-01 – 2026-10-31) uc bicim tutarli', satir(20).startsWith('[GEÇTİ]') && satir(20).includes('(2026-10-01 – 2026-10-31, 31 gün)') && /31\/31 gün, 744 dönem, gün başına tam true\), CSV 200 \(744 satır\), XLSX 200 \(744 satır\)/.test(satir(20)), `-> ${satir(20)}`);
+  ok('R6 kabul 21: iki aya yayilan 31 gun (2026-10-16 – 2026-11-15)', satir(21).startsWith('[GEÇTİ]') && satir(21).includes('(2026-10-16 – 2026-11-15, 31 gün)') && /31\/31 gün, 744 dönem/.test(satir(21)), `-> ${satir(21)}`);
   ok('D kabul 14: yayimlanmis her donemin yonu var (null sayimi 0)', satir(14).startsWith('[GEÇTİ]') && /yönü null 0;/.test(satir(14)), `-> ${satir(14)}`);
   ok('D kabul 15: 2026-11-01 donem basina tek satir, proxy ham satir sayisi basilir', satir(15).startsWith('[GEÇTİ]') && /dönem 24 \(60 dk\), tekil 24/.test(satir(15)) && /proxy: ham satır 24, tekil 24, uyuşmayan 0/.test(satir(15)), `-> ${satir(15)}`);
   ok('D kabul 16: 2026-01-01 veri + Kasim oncesi gunde V = 150', satir(16).startsWith('[GEÇTİ]') && /2026-01-01: durum 200, dönem 24, yayımlanan 24/.test(satir(16)) && /V = 150 görünür true/.test(satir(16)), `-> ${satir(16)}`);
@@ -1670,29 +1701,35 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
     return y;
   };
   S.ayarla({ host: ONIZ, gun: gunK });
-  const bt = await kos([], { ...proxyEnv, KABUL_BULTEN_CSV: bultenYaz('bulten.csv', false), KABUL_YENIDEN_BEKLE_AZAMI_MS: '0' });
+  const bt = await kos([], { ...proxyEnv, KABUL_BULTEN_CSV: bultenYaz('bulten.csv', false), KABUL_YENIDEN_BEKLE_AZAMI_MS: '200' });
   const satirB = (no) => bt.cikti.split('\n').find((l) => new RegExp(`^\\[[^\\]]+\\] +${no} `).test(l)) || '';
   ok('D kabul 17 (bulten ile): GECTI; site ve proxy, ay basina tek aralik istegi, uyusmayan 0', bt.kod === 0 && satirB(17).startsWith('[GEÇTİ]') && /örneklem 10 gün \(3 ay; bültende 10 gün\), 3 aralık isteği, başarısız 0/.test(satirB(17)) && /site: 10 gün, 240 saat, 1200 değer: eşleşen 1200, uyuşmayan 0, null uyuşmazlığı 0, yön uyuşmazlığı 0/.test(satirB(17)) && /proxy: 10 gün, 240 saat, 1200 değer: eşleşen 1200, uyuşmayan 0/.test(satirB(17)), `-> ${bt.kod} ${satirB(17)}`);
   ok('D kabul 18 (bulten ile): Ocak 1-25 notu satiri "API = bulten (3/3; proxy 3/3) -> not gecerli"', satirB(18).startsWith('[GEÇTİ]') && satirB(18).includes('Ocak 1–25 notu: API = bülten (3/3; proxy 3/3) → not geçerli'), `-> ${satirB(18)}`);
   S.ayarla({ host: ONIZ, gun: gunK });
-  const bk = await kos([], { KABUL_BULTEN_CSV: bultenYaz('bulten-bozuk.csv', true), KABUL_YENIDEN_BEKLE_AZAMI_MS: '0', KABUL_TOHUM: '7' });
+  const bk = await kos([], { KABUL_BULTEN_CSV: bultenYaz('bulten-bozuk.csv', true), KABUL_YENIDEN_BEKLE_AZAMI_MS: '200', KABUL_TOHUM: '7' });
   const satirK = (no) => bk.cikti.split('\n').find((l) => new RegExp(`^\\[[^\\]]+\\] +${no} `).test(l)) || '';
   ok('D kabul 17/18 (bozuk bulten): farkli degerler yakalanir, 17 KALIR; 01-13 farki -> 18 "NOT KALDIRILMALI"; ham deger basilmaz', bk.kod === 1 && satirK(17).startsWith('[KALDI]') && /uyuşmayan 2, null uyuşmazlığı 0, yön uyuşmazlığı 0, en büyük fark 12\.34/.test(satirK(17)) && satirK(18).startsWith('[KALDI]') && satirK(18).includes('Ocak 1–25 notu: API = bülten (2/3) → NOT KALDIRILMALI') && !/\d{1,3}(\.\d{3})*,\d{2}/.test(bk.cikti.replace(/0,01/g, '')) && !bk.cikti.includes('ornek.invalid'), `-> ${satirK(17)}`);
   // 2026-11-01 üst akışta çift satır: özdeş kopya → tek satır (GEÇTİ); çelişen kopya → "—" (KALDI)
   const ciftle = (celiski) => (j) => { for (const g of j.gunler) if (g.tarih === '2026-11-01') g.donemler = [...g.donemler, ...g.donemler.map((d, i) => (celiski && i === 9 ? { ...d, ptf: d.ptf + 1 } : { ...d }))]; return j; };
   S.ayarla({ host: ONIZ, gun: gunK, duzenle: ciftle(false) });
-  const c1 = await kos([], { ...proxyEnv, KABUL_YENIDEN_BEKLE_AZAMI_MS: '0' });
+  const c1 = await kos([], { ...proxyEnv, KABUL_YENIDEN_BEKLE_AZAMI_MS: '200' });
   const s15 = (c) => c.cikti.split('\n').find((l) => /^\[[^\]]+\] +15 /.test(l)) || '';
   ok('D kabul 15: ust akista ozdes cift satir -> tek satir, GECTI (proxy ham satir 48)', s15(c1).startsWith('[GEÇTİ]') && /proxy: ham satır 48, tekil 24/.test(s15(c1)), `-> ${s15(c1)}`);
   S.ayarla({ host: ONIZ, gun: gunK, duzenle: ciftle(true) });
-  const c2 = await kos([], { KABUL_YENIDEN_BEKLE_AZAMI_MS: '0' });
+  const c2 = await kos([], { KABUL_YENIDEN_BEKLE_AZAMI_MS: '200' });
   ok('D kabul 15: celisen kopya -> o donem "—", madde KALIR', s15(c2).startsWith('[KALDI]') && /yayımlanan 23;/.test(s15(c2)) && /tümü "—" satır 1/.test(s15(c2)), `-> ${s15(c2)}`);
+  // R6 madde 19: 2026-11-12 tek dönem formülden farklı -> "†" yakalanır, madde KALIR
+  S.ayarla({ host: ONIZ, gun: (g) => gunK(g).map((o, i) => (g === '2026-11-12' && i === 12 ? { ...o, negatif: o.negatif + 6.25 } : o)) });
+  const c19 = await kos([]);
+  const s19 = c19.cikti.split('\n').find((l) => /^\[[^\]]+\] +19 /.test(l)) || '';
+  ok('R6 kabul 19: tek fark -> "†" 1, fark notu 1, 0,01 ustu fark 1, KALIR', c19.kod === 1 && s19.startsWith('[KALDI]') && /"†" 1, dolu fark notu 1,/.test(s19) && /0,01'den büyük fark 1,/.test(s19), `-> ${s19}`);
   S.ayarla({});
   S.ayarla({ env: {}, host: ONIZ });
   const f = await kos([]);
   ok('D kabul: baglanti yokken madde 1 KALIR, cikis 1', f.kod === 1 && /\[KALDI\] +1 /.test(f.cikti));
   await S.kapat();
   await new Promise((coz) => P.close(coz));
+  await new Promise((coz) => ON.close(coz));
 }
 
 console.error = gercekHata;
