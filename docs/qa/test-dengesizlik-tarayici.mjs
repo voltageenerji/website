@@ -18,7 +18,7 @@ import { createRequire } from 'node:module';
 import { sunucuBaslat } from './dengesizlik-test-sunucu.mjs';
 import { sahteGun, SABIT_AN } from './dengesizlik-test-verisi.mjs';
 import { birimFiyat, kuralBul } from '../../functions/_lib/dengesizlik.js';
-import { bicim } from '../../functions/dengesizlik-maliyeti.js';
+import { bicim, senaryoNotu } from '../../functions/dengesizlik-maliyeti.js';
 
 const require = createRequire('/opt/node-tools/node_modules/');
 const { chromium } = require('playwright');
@@ -266,10 +266,14 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   await page.focus('#hModGun');
   await page.keyboard.press('ArrowDown');
   ok('S4 ok tusuyla "Kendi senaryom" secilir, form degisir', (await page.isChecked('#hModSenaryo')) && (await page.isVisible('#hSenaryo')) && (await page.isHidden('#hGun')));
-  ok('S4 kural notu: GUNCEL kural, dogrulama tarihi, tabloyla ayni sayi bicimi', (await metin(page, '#hKural')) === 'Güncel kural (24.11.2026 itibarıyla doğrulanan; 01.11.2026 – 31.12.2026 teslim günleri için kullanılır): V = 100 TL/MWh, B = 100 TL/MWh, AFL = 4.500 TL/MWh.');
-  // Klavyeyle doldur: Tab sırası PTF → SMF → yön → miktar → Hesapla
+  ok('S4 kural notu: teslim gunu (varsayilan bugun) kurali + karar atiflari; istemci = sunucu', (await metin(page, '#hKural')) === senaryoNotu('2026-11-24').metin && (await metin(page, '#hKural')).startsWith('Uygulanan kural (24.11.2026 teslim günü; 24.11.2026 itibarıyla doğrulanan; 01.11.2026 – 31.12.2026 teslim günleri için kullanılır): V = 100 TL/MWh, B = 100 TL/MWh, AFL = 4.500 TL/MWh. Dayanak:'));
+  ok('S4 teslim gunu alani: varsayilan bugun, min 01.01.2026, max bugun', (await page.inputValue('#sGun')) === '2026-11-24' && (await page.getAttribute('#sGun', 'min')) === '2026-01-01' && (await page.getAttribute('#sGun', 'max')) === '2026-11-24');
+  // Klavyeyle doldur: Tab sırası Teslim günü → PTF → SMF → yön → miktar → Hesapla
   await page.keyboard.press('Tab');
-  ok('S4 Tab ile PTF alanina gecilir', (await page.evaluate(() => document.activeElement.id)) === 'sPtf');
+  ok('S4 Tab ile once Teslim gunu alanina gecilir', (await page.evaluate(() => document.activeElement.id)) === 'sGun');
+  // Tarih alanının iç bölümleri (gün/ay/yıl) de Tab durağıdır; PTF'ye doğrudan odaklanılır.
+  await page.focus('#sPtf');
+  ok('S4 PTF alanina gecilir', (await page.evaluate(() => document.activeElement.id)) === 'sPtf');
   await page.keyboard.type('2800');
   await page.keyboard.press('Tab'); await page.keyboard.type('3400');
   await page.keyboard.press('Tab');
@@ -339,9 +343,9 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   // FİYAT alanları (PTF, SMF): Türkçe yazımda nokta binlik ayırıcıdır → "2.800" = 2800
   const FIYAT_NOKTA = 'Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125). Nokta yalnızca binlik ayırıcı olarak kabul edilir.';
   ok('S4 fiyat alaninda "2.800" binlik okunur (2800), "3.400,00" da', x.neg === '3.604,00 TL/MWh' && x.poz === '2.716,00 TL/MWh' && x.ptfHata === '' && x.smfHata === '');
-  ok('S4 yanki nasil okundugunu birimiyle gosterir', (await metin(page, '#sYanki')) === 'Senaryo: PTF 2.800,00 TL/MWh · SMF 3.400,00 TL/MWh · Enerji açığı · 1,000 MWh');
+  ok('S4 yanki nasil okundugunu birimiyle gosterir', (await metin(page, '#sYanki')) === 'Senaryo: 24.11.2026 teslim günü · PTF 2.800,00 TL/MWh · SMF 3.400,00 TL/MWh · Enerji açığı · 1,000 MWh');
   x = await senaryo('2.800,5', '3.400', 'acik');
-  ok('S4 fiyat "2.800,5" -> 2800,5', x.ptfHata === '' && (await metin(page, '#sYanki')).startsWith('Senaryo: PTF 2.800,50 TL/MWh · SMF 3.400,00 TL/MWh') && x.poz === `${bicim(2800.5 * 0.97)} TL/MWh`);
+  ok('S4 fiyat "2.800,5" -> 2800,5', x.ptfHata === '' && (await metin(page, '#sYanki')).startsWith('Senaryo: 24.11.2026 teslim günü · PTF 2.800,50 TL/MWh · SMF 3.400,00 TL/MWh') && x.poz === `${bicim(2800.5 * 0.97)} TL/MWh`);
   for (const kotu of ['0.125', '2800.50', '28.00', '1.25', '0.800', '2.80', '2.8000']) {
     x = await senaryo(kotu, '3400', 'acik');
     ok(`S4 fiyat alaninda "${kotu}": tahmin yok, hata`, x.ptfHata === FIYAT_NOKTA && x.sonuc === '');
@@ -353,7 +357,7 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   await page.press('#sMiktar', 'Enter');
   ok('S4 miktar alaninda "2.800" REDDEDILIR (fiyat alaninda kabul edilirken)', (await metin(page, '#sMiktarHata')) === 'Bu giriş belirsiz. Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125); binleri noktasız yazın (örnek: 2800).' && (await metin(page, '#sPtfHata')) === '' && (await page.locator('#hSonuc').innerHTML()) === '');
   await page.fill('#sMiktar', '1.250,5'); await page.press('#sMiktar', 'Enter');
-  ok('S4 miktar "1.250,5" kabul; fiyatlar binlik okunur', (await metin(page, '#sYanki')) === 'Senaryo: PTF 2.800,00 TL/MWh · SMF 3.400,00 TL/MWh · Enerji açığı · 1.250,500 MWh' && (await metin(page, '#sNegTutar')) === `${bicim(3604 * 1250.5)} TL`);
+  ok('S4 miktar "1.250,5" kabul; fiyatlar binlik okunur', (await metin(page, '#sYanki')) === 'Senaryo: 24.11.2026 teslim günü · PTF 2.800,00 TL/MWh · SMF 3.400,00 TL/MWh · Enerji açığı · 1.250,500 MWh' && (await metin(page, '#sNegTutar')) === `${bicim(3604 * 1250.5)} TL`);
   x = await senaryo('0', '0', 'denge');
   ok('S4 sifir fiyat gecerli', x.neg === '103,00 TL/MWh' && x.poz === '−103,00 TL/MWh');
   // Mod değişince eski sonuç silinir
@@ -363,18 +367,46 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   ok('S4 hata yok', kayit.konsol.length === 0 && kayit.hata.length === 0, `-> ${JSON.stringify(kayit)}`);
   await kapat();
 }
-{ // "Kendi senaryom" seçili güne DEĞİL güncel kurala bağlıdır (eski bir güne bakarken de)
+{ // "Kendi senaryom" seçili tablo gününe DEĞİL kendi teslim gününe bağlıdır (eski bir güne bakarken de)
   const { page, kapat } = await ac('/dengesizlik-maliyeti?tarih=2026-03-10');
   ok('S4 eski gun: tablonun ustunde V = 150 notu', (await page.locator('#dKuralUyari').isVisible()) && (await metin(page, '#dKuralUyari')) === 'Bu tarihte V değeri 150 TL/MWh idi; aşağıdaki yöntem bölümü 1 Kasım 2026 ve sonrasında uygulanan değerleri anlatır.');
   ok('S4 eski gun: ornek hesap ve † YOK', (await page.isHidden('#dOrnek')) && (await page.isHidden('#dFarkNot')) && !(await page.locator('#dTablo').innerHTML()).includes('†'));
   await page.check('#hModSenaryo');
-  ok('S4 eski gun: kural notu yine GUNCEL kural (V = 100)', (await metin(page, '#hKural')) === 'Güncel kural (24.11.2026 itibarıyla doğrulanan; 01.11.2026 – 31.12.2026 teslim günleri için kullanılır): V = 100 TL/MWh, B = 100 TL/MWh, AFL = 4.500 TL/MWh.');
+  ok('S4 eski gun: teslim gunu yine bugun, kural notu bugunun kurali (V = 100)', (await page.inputValue('#sGun')) === '2026-11-24' && (await metin(page, '#hKural')) === senaryoNotu('2026-11-24').metin);
   await page.fill('#sPtf', '450'); await page.fill('#sSmf', '120'); await page.selectOption('#sYon', 'fazla'); await page.fill('#sMiktar', '1');
   await page.press('#sMiktar', 'Enter');
   ok('S4 eski gun: 120 >= 100 -> genel formul (guncel V)', (await metin(page, '#sPozFiyat')) === '112,80 TL/MWh' && (await metin(page, '#sPozDal')).startsWith('Genel') && (await metin(page, '#sPozDal')).includes('V = 100'));
   await page.fill('#sPtf', '4500'); await page.fill('#sSmf', '4500'); await page.selectOption('#sYon', 'acik');
   await page.press('#sMiktar', 'Enter');
-  ok('S4 eski gun: tavan guncel kuraldan', (await metin(page, '#sNegFiyat')) === '5.008,50 TL/MWh' && (await metin(page, '#sNegDal')).startsWith('Tavan'));
+  ok('S4 eski gun: tavan teslim gununun kuralindan', (await metin(page, '#sNegFiyat')) === '5.008,50 TL/MWh' && (await metin(page, '#sNegDal')).startsWith('Tavan'));
+  await kapat();
+}
+{ // R3-C2: teslim günü o günün kuralını seçer; doğrulanmamış dönemde hesap REDDEDİLİR
+  const { page, kayit, kapat } = await ac('/dengesizlik-maliyeti');
+  await page.check('#hModSenaryo');
+  const dene = async (gun) => {
+    await page.fill('#sGun', gun);
+    await page.fill('#sPtf', '450'); await page.fill('#sSmf', '120'); await page.selectOption('#sYon', 'fazla'); await page.fill('#sMiktar', '1');
+    await page.press('#sMiktar', 'Enter');
+    return { not: await metin(page, '#hKural'), sonuc: await page.locator('#hSonuc').innerHTML(), poz: await page.locator('#sPozFiyat').count() ? await metin(page, '#sPozFiyat') : null, ret: await page.locator('#sRet').count() ? await metin(page, '#sRet') : null };
+  };
+  for (const g of ['2026-02-10', '2026-04-03', '2026-04-04', '2026-10-31']) {
+    const x = await dene(g);
+    ok(`C2 tarayici ${g}: dogrulanmamis kural -> ret, sonuc rakami yok`, x.ret === senaryoNotu(g).metin && x.not === senaryoNotu(g).metin && x.poz === null && !/TL\/MWh/.test(x.sonuc), `-> ${x.ret}`);
+  }
+  for (const g of ['2026-11-01', '2026-11-24']) {
+    const x = await dene(g);
+    ok(`C2 tarayici ${g}: dogrulanmis kural (V = 100) -> hesap`, x.ret === null && x.poz === '112,80 TL/MWh' && x.not === senaryoNotu(g).metin && (await metin(page, '#sYanki')).startsWith(`Senaryo: ${g.slice(8, 10)}.${g.slice(5, 7)}.2026 teslim günü`));
+  }
+  await page.fill('#sGun', '2026-10-31');
+  ok('C2 tarayici: tarih degisince eski sonuc silinir, not aninda guncellenir', (await page.locator('#hSonuc').innerHTML()) === '' && (await metin(page, '#hKural')) === senaryoNotu('2026-10-31').metin);
+  await page.fill('#sGun', '');
+  await page.press('#sMiktar', 'Enter');
+  ok('C2 tarayici: bos teslim gunu -> durust istek, hesap yok', (await metin(page, '#sRet')) === 'Teslim gününü 01.01.2026 ile 24.11.2026 arasında seçin.' && (await page.locator('#sPozFiyat').count()) === 0);
+  await page.evaluate(() => { const e = document.getElementById('sGun'); e.removeAttribute('max'); e.value = '2026-11-25'; e.dispatchEvent(new Event('input')); });
+  await page.press('#sMiktar', 'Enter');
+  ok('C2 tarayici: yarin (max disi) -> hesap yok', (await metin(page, '#sRet')).startsWith('Teslim gününü') && (await page.locator('#sPozFiyat').count()) === 0);
+  ok('C2 tarayici: hata yok', kayit.konsol.length === 0 && kayit.hata.length === 0, `-> ${JSON.stringify(kayit)}`);
   await kapat();
 }
 
@@ -560,14 +592,20 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
 }
 
 // ============================================================================
-bolum('S8 31/12/2026 sonrası: formül hesabı kendini kapatır');
+bolum('S8 31/12/2026 sonrası: bugünün teslim günüyle formül hesabı reddedilir');
 {
   const OCAK = Date.UTC(2027, 0, 5, 9, 0, 0);
   S.ayarla({ gun: (g) => sahteGun(g, 6) });
   S.proxy.an = OCAK;
   const { page, kayit, kapat } = await ac('/dengesizlik-maliyeti', { an: OCAK });
   ok('S8 2027: tablo EPİAŞ verisiyle calisir', (await metin(page, '#dGun')) === '05.01.2027' && (await page.locator('#dTablo tr[data-bas]').count()) === 24);
-  ok('S8 2027: "Kendi senaryom" kapali + durust not', (await page.isDisabled('#hModSenaryo')) && (await page.isVisible('#hKapali')) && (await metin(page, '#hKapali')).startsWith('Bugün için doğrulanmış bir dengesizlik fiyatı kuralı bulunmadığından'));
+  await page.check('#hModSenaryo');
+  ok('S8 2027: teslim gunu bugun (05.01.2027), not durust ret', (await page.inputValue('#sGun')) === '2027-01-05' && (await metin(page, '#hKural')) === senaryoNotu('2027-01-05').metin);
+  await page.fill('#sPtf', '2800'); await page.fill('#sSmf', '3400'); await page.fill('#sMiktar', '1'); await page.press('#sMiktar', 'Enter');
+  ok('S8 2027: bugunun teslim gunuyle hesap REDDEDILIR', (await metin(page, '#sRet')).startsWith('05.01.2027 teslim günü için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; bu tarih için hesap yapılmaz.') && (await page.locator('#sNegFiyat').count()) === 0);
+  await page.fill('#sGun', '2026-12-31'); await page.press('#sMiktar', 'Enter');
+  ok('S8 2027: 31.12.2026 teslim gunu secilirse dogrulanmis kuralla hesap', (await metin(page, '#sNegFiyat')) === '3.604,00 TL/MWh');
+  await page.check('#hModGun');
   ok('S8 2027: tablonun ustunde gorunur uyari', (await page.locator('#dKuralUyari').isVisible()) && (await metin(page, '#dKuralUyari')) === "Bu tarih için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; tablo EPİAŞ'ın yayımladığı değerleri gösterir. 110. maddenin 1 Ocak 2027'den itibaren uygulanacak metni bu sayfada henüz doğrulanmamıştır.");
   ok('S8 2027: senaryo formu gizli, gun modu acik', (await page.isHidden('#hSenaryo')) && (await page.isVisible('#hGun')) && (await page.isChecked('#hModGun')));
   await page.fill('#hMiktar', '2'); await page.press('#hMiktar', 'Enter');
@@ -575,9 +613,10 @@ bolum('S8 31/12/2026 sonrası: formül hesabı kendini kapatır');
   ok('S8 2027: ornek hesap bolumu gorunmez', await page.isHidden('#dOrnek'));
   ok('S8 2027: hata yok', kayit.konsol.length === 0 && kayit.hata.length === 0, `-> ${JSON.stringify(kayit)}`);
   await kapat();
-  // Senaryo GÜNCEL kurala bağlıdır: 2027'de 31.12.2026'ya bakılsa da kapalı kalır
+  // Senaryo kendi teslim gününe bağlıdır: 2027'de 31.12.2026 tablosuna bakılırken varsayılan teslim günü yine bugün
   const g = await ac('/dengesizlik-maliyeti?tarih=2026-12-31', { an: OCAK });
-  ok('S8 2027\'den 31.12.2026\'ya bakinca senaryo yine KAPALI (guncel kural yok)', (await g.page.isDisabled('#hModSenaryo')) && (await g.page.isVisible('#hKapali')) && (await g.page.isHidden('#dKuralUyari')));
+  await g.page.check('#hModSenaryo');
+  ok('S8 2027\'den 31.12.2026\'ya bakinca: tablo uyarisi yok, senaryo teslim gunu bugun (ret notu)', (await g.page.isHidden('#dKuralUyari')) && (await g.page.inputValue('#sGun')) === '2027-01-05' && (await metin(g.page, '#hKural')).startsWith('05.01.2027 teslim günü için'));
   await g.kapat();
   S.ayarla({ gun: gunVerisi(11) });
 }
@@ -591,6 +630,7 @@ bolum('S9 JavaScript kapalı: veri, yöntem ve formlar okunur/çalışır');
   ok('S9 Hesapla dugmeleri JS yokken PASIF; donem secici sunucudan dolu', (await page.locator('#dHesap button[type="submit"]:disabled').count()) === 2 && (await page.locator('#hDonem option').count()) === 24 && (await page.inputValue('#hDonem')) === '2026-11-24T10:00:00+03:00' && !(await metin(page, '#hDonem')).includes('Veri bekleniyor'));
   ok('S9 ornek hesap HTML\'de', (await metin(page, '#dOrnek h3')) === 'Örnek hesap: 24.11.2026, 10:00–11:00');
   ok('S9 noscript notu gorunur', (await page.locator('noscript').count()) === 1);
+  ok('C2 S9 teslim gunu ve kural notu sunucudan (JS yokken)', (await page.getAttribute('#sGun', 'value')) === '2026-11-24' && (await page.getAttribute('#sGun', 'max')) === '2026-11-24' && (await page.locator('#hKural').textContent()) === senaryoNotu('2026-11-24').metin);
   ok('S9 indirme baglantilari calisir durumda', (await page.getAttribute('#dCsv', 'href')) === '/dengesizlik-maliyeti/veri?tarih=2026-11-24&bicim=csv');
   await page.fill('#dTarih', '2026-11-21');
   await Promise.all([page.waitForURL(/tarih=2026-11-21/), page.click('#dTarihForm button[type="submit"]')]);

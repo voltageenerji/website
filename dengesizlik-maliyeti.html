@@ -306,7 +306,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <p class="note">Tüm değerler TL/MWh'tir. Birim dengesizlik maliyeti mevzuatta tanımlı bir terim değildir; bu sayfada EPİAŞ'ın yayımladığı fiyatlardan Voltage Enerji tarafından hesaplanır. Veriler bilgilendirme amaçlıdır; gecikmeli, eksik veya hatalı olabilir. Ticari karar ve işlemlerde EPİAŞ'ın resmî yayınları ve uzlaştırma bildirimleri esas alınmalıdır.</p>
 
   <h2 id="hesaplayici">Dengesizlik maliyeti hesaplama</h2>
-  <p>Bir dönemdeki dengesizlik miktarınızı girin. İlk seçenek seçili günün EPİAŞ verisini kullanır. İkinci seçenek, sizin girdiğiniz PTF, SMF ve sistem yönüyle güncel kuralın formülünü uygular. Hesap tek bir dönem ve tek bir piyasa katılımcısı içindir; dengeden sorumlu grup içi değerlendirmeyi ve kesinleşmiş günlük üretim/tüketim programından sapma tutarını (KÜPST) içermez.</p>
+  <p>Bir dönemdeki dengesizlik miktarınızı girin. İlk seçenek seçili günün EPİAŞ verisini kullanır. İkinci seçenek, sizin girdiğiniz PTF, SMF ve sistem yönüyle seçtiğiniz teslim gününde uygulanan kuralın formülünü uygular; o günün kuralı bu sayfada birincil kaynaklardan doğrulanmamışsa hesap yapılmaz. Hesap tek bir dönem ve tek bir piyasa katılımcısı içindir; dengeden sorumlu grup içi değerlendirmeyi ve kesinleşmiş günlük üretim/tüketim programından sapma tutarını (KÜPST) içermez.</p>
   <div class="hesap" id="dHesap">
     <fieldset>
       <legend>Hesap türü</legend>
@@ -336,8 +336,12 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     </form>
 
     <form id="hSenaryo" novalidate hidden>
-      <p class="kural-notu" id="hKural"></p>
+      <p class="kural-notu" id="hKural" role="status"></p>
       <div class="hesap-izgara">
+        <div>
+          <label class="etiket" for="sGun">Teslim günü</label>
+          <input type="date" id="sGun" name="teslim" min="2026-01-01" aria-describedby="hKural">
+        </div>
         <div>
           <label class="etiket" for="sPtf">PTF (TL/MWh)</label>
           <input type="text" id="sPtf" inputmode="decimal" autocomplete="off" aria-describedby="sPtfHata">
@@ -364,8 +368,6 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
       </div>
       <button type="submit" class="btn" disabled>Hesapla</button>
     </form>
-
-    <p class="kural-notu" id="hKapali" hidden>Bugün için doğrulanmış bir dengesizlik fiyatı kuralı bulunmadığından "Kendi senaryom" hesabı kapalıdır. Bu sayfadaki kural tablosu 31 Aralık 2026 teslim gününe kadar olan dönemi kapsar.</p>
 
     <div class="sonuc" id="hSonuc" role="status" aria-live="polite"></div>
     <p class="note" style="margin-bottom:14px">Sonuç tahminidir ve yalnızca bilgilendirme amaçlıdır; yatırım, ticari karar ya da hukuki tavsiye değildir. Kesin tutar EPİAŞ uzlaştırma bildirimiyle belirlenir. Teklif ya da taahhüt değildir. Sitenin kullanımı <a href="/kullanim-kosullari">Kullanım Koşulları</a>'na tabidir.</p>
@@ -495,7 +497,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <footer>© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · <a href="/">Ana sayfa</a> · <a href="/kurumsal">Kurumsal</a> · <a href="/rehber">Rehber</a> · <a href="/kvkk">KVKK</a> · <a href="/cerez-politikasi">Çerez Politikası</a> · <a href="/kullanim-kosullari">Kullanım Koşulları</a></footer>
 </div>
 
-<script type="application/json" id="dKurallar">{"dogrulama":"2026-11-24","kurallar":[{"bas":"2026-01-01","bit":"2026-10-31","formulGoster":false,"V":150,"B":100,"tavanCarpani":1.05,"k":{"acik":0.06,"fazla":0.03,"denge":0.03},"l":{"acik":0.03,"fazla":0.06,"denge":0.03}},{"bas":"2026-11-01","bit":"2026-12-31","formulGoster":true,"V":100,"B":100,"tavanCarpani":1.05,"k":{"acik":0.06,"fazla":0.03,"denge":0.03},"l":{"acik":0.03,"fazla":0.06,"denge":0.03}}],"tavanlar":[{"bas":"2026-04-04","bit":null,"azami":4500,"asgari":0}]}</script>
+<script type="application/json" id="dKurallar">{"dogrulama":"2026-11-24","kurallar":[{"bas":"2026-01-01","bit":"2026-10-31","dogrulama":"bekliyor","dogrulamaTarihi":null,"V":150,"B":100,"tavanCarpani":1.05,"k":{"acik":0.06,"fazla":0.03,"denge":0.03},"l":{"acik":0.03,"fazla":0.06,"denge":0.03},"kaynak":{"formul":"DUY m.110(1) (RG 29/12/2025-33122 ile değişik)","katsayi":"11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122)","V":"DUY m.110(2): başlangıç değeri","B":"DUY m.110(2): başlangıç değeri"}},{"bas":"2026-11-01","bit":"2026-12-31","dogrulama":"birincil","dogrulamaTarihi":"2026-11-24","V":100,"B":100,"tavanCarpani":1.05,"k":{"acik":0.06,"fazla":0.03,"denge":0.03},"l":{"acik":0.03,"fazla":0.06,"denge":0.03},"kaynak":{"formul":"DUY m.110(1) (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik)","katsayi":"11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122)","V":"24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405)","B":"DUY m.110(2): başlangıç değeri"}}],"tavanlar":[{"bas":"2026-04-04","bit":"2026-10-31","dogrulama":"bekliyor","dogrulamaTarihi":null,"azami":4500,"asgari":0,"kaynak":"2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)"},{"bas":"2026-11-01","bit":null,"dogrulama":"birincil","dogrulamaTarihi":"2026-11-24","azami":4500,"asgari":0,"kaynak":"2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)"}],"dogrulanmis":[{"bas":"2026-11-01","bit":"2026-12-31"}]}</script>
 <script>
 /* Dengesizlik Maliyeti — istemci betiği.
    İLKE: hiçbir kod yolunda sentetik/temsili/yedek sayı üretilmez. Ekrana yazılan
@@ -527,7 +529,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   var sorgu = new URLSearchParams(location.search);
   var veriYok = sorgu.has('veriyok'); /* QA kancası: istemci veri çekmez, önbellek okumaz */
   var ssr = govde.getAttribute('data-ssr') === '1';
-  var K = { kurallar: [], tavanlar: [], dogrulama: '' };
+  var K = { kurallar: [], tavanlar: [], dogrulama: '', dogrulanmis: [] };
   try{ K = JSON.parse($('dKurallar').textContent); }catch(e){}
 
   /* ---------- tarih (Europe/Istanbul; Türkiye kalıcı UTC+3) ---------- */
@@ -601,15 +603,19 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     indirAcik: false /* yalnız sunucu render'ı ya da bu oturumda BAŞARILI bir uç yanıtından sonra true */
   };
 
-  /* ---------- kural tablosu (sayfaya gömülü; functions/_lib/dengesizlik.js ile aynı) ---------- */
+  /* ---------- kural tablosu (sayfaya gömülü; functions/_lib/dengesizlik.js ile aynı) ----------
+     Formüle dayalı içerik yalnız kural VE tavan girdisi 'birincil' doğrulanmışsa (formulGoster). */
   function kuralBul(ymd){
     if(!ymdGecerli(ymd)) return null;
     for(var i = 0; i < K.kurallar.length; i++){
       var k = K.kurallar[i];
       if(ymd >= k.bas && ymd <= k.bit){
         var t = null;
-        for(var j = 0; j < K.tavanlar.length; j++){ var x = K.tavanlar[j]; if(ymd >= x.bas && (x.bit === null || ymd <= x.bit)) t = x; }
-        return { bas: k.bas, bit: k.bit, formulGoster: k.formulGoster === true, V: k.V, B: k.B, tavanCarpani: k.tavanCarpani, k: k.k, l: k.l, AFL: t ? t.azami : null, asgari: t ? t.asgari : null };
+        for(var j = 0; j < K.tavanlar.length; j++){ var x = K.tavanlar[j]; if(!t && ymd >= x.bas && (x.bit === null || ymd <= x.bit)) t = x; }
+        var dogru = k.dogrulama === 'birincil' && !!t && t.dogrulama === 'birincil';
+        return { bas: k.bas, bit: k.bit, formulGoster: dogru, dogrulamaTarihi: dogru ? [k.dogrulamaTarihi, t.dogrulamaTarihi].sort()[1] : null,
+          V: k.V, B: k.B, tavanCarpani: k.tavanCarpani, k: k.k, l: k.l, AFL: t ? t.azami : null, asgari: t ? t.asgari : null,
+          kaynak: { formul: k.kaynak.formul, katsayi: k.kaynak.katsayi, V: k.kaynak.V, B: k.kaynak.B, tavan: t ? t.kaynak : null } };
       }
     }
     return null;
@@ -948,16 +954,31 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     if(r.dalPozitif === 'esikAlti') return 'Eşik altı: min(PTF; SMF) < V olduğu için (−1) × B × (1 + l); V = ' + sabit(r.V) + ', B = ' + sabit(r.B) + ', l = ' + katsayiBicim(r.l);
     return 'Genel: min(PTF; SMF) × (1 − l); V = ' + sabit(r.V) + ', l = ' + katsayiBicim(r.l);
   }
-  /* "Kendi senaryom" seçili güne değil GÜNCEL (bugünün) kuralına bağlıdır. */
-  function guncelKural(){ return kuralBul(istanbulBugun()); }
-  function kuralNotu(kural){
-    return 'Güncel kural (' + (ymdGecerli(K.dogrulama) ? tarihTR(K.dogrulama) + ' itibarıyla doğrulanan; ' : '') + tarihTR(kural.bas) + ' – ' + tarihTR(kural.bit) + ' teslim günleri için kullanılır): V = ' + sabit(kural.V) + ' TL/MWh, B = ' + sabit(kural.B) + ' TL/MWh, '
-      + (kural.AFL !== null ? 'AFL = ' + sabit(kural.AFL) + ' TL/MWh.' : 'azami fiyat limiti doğrulanmadı; tavan koşulu uygulanmaz.');
+  /* "Kendi senaryom" kendi TESLİM GÜNÜNÜN kuralına bağlıdır (seçili tablo gününe değil).
+     O günün kuralı ya da tavanı birincil kaynaklardan doğrulanmamışsa hesap reddedilir.
+     Sunucudaki senaryoNotu() ile AYNI metin. */
+  function kacis(x){ return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function senaryoGunu(){
+    var el = $('sGun'), v = el ? el.value : '';
+    return ymdGecerli(v) && v >= ILK_GUN && v <= istanbulBugun() ? v : null;
+  }
+  function senaryoNotu(ymd){
+    if(!ymd) return { acik: false, metin: 'Teslim gününü ' + tarihTR(ILK_GUN) + ' ile ' + tarihTR(istanbulBugun()) + ' arasında seçin.' };
+    var t = tarihTR(ymd), liste = (K.dogrulanmis || []).map(function(a){ return tarihTR(a.bas) + ' – ' + tarihTR(a.bit); }).join(', ');
+    var ek = liste ? ' Doğrulanmış teslim günleri: ' + liste + '.' : '';
+    var kural = kuralBul(ymd);
+    if(!kural) return { acik: false, metin: t + ' teslim günü için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; bu tarih için hesap yapılmaz.' + ek };
+    if(!kural.formulGoster) return { acik: false, metin: t + ' teslim gününde uygulanan kural ve değerler bu sayfada henüz birincil kaynaklardan doğrulanmadı; bu tarih için hesap yapılmaz.' + ek };
+    return { acik: true, kural: kural, metin: 'Uygulanan kural (' + t + ' teslim günü; ' + tarihTR(kural.dogrulamaTarihi) + ' itibarıyla doğrulanan; ' + tarihTR(kural.bas) + ' – ' + tarihTR(kural.bit) + ' teslim günleri için kullanılır): '
+      + 'V = ' + sabit(kural.V) + ' TL/MWh, B = ' + sabit(kural.B) + ' TL/MWh, AFL = ' + sabit(kural.AFL) + ' TL/MWh. '
+      + 'Dayanak: formül ' + kural.kaynak.formul + '; k ve l ' + kural.kaynak.katsayi + '; V ' + kural.kaynak.V + '; B ' + kural.kaynak.B + '; AFL ' + kural.kaynak.tavan + '.' };
   }
   function senaryoHesapla(e){
     e.preventDefault();
-    var kural = guncelKural();
-    if(!kural){ sonucYaz(''); return; }
+    var not = senaryoNotu(senaryoGunu());
+    yaz('hKural', not.metin);
+    if(!not.acik){ sonucYaz('<div class="sonuc-kutu"><p id="sRet">' + kacis(not.metin) + '</p></div>'); var g = $('sGun'); if(g) g.focus(); return; }
+    var kural = not.kural;
     var ptf = fiyatOku('sPtf', 'PTF', kural), smf = fiyatOku('sSmf', 'SMF', kural), q = miktarOku('sMiktar');
     if(ptf === null || smf === null || q === null){
       sonucYaz('');
@@ -968,7 +989,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     var yon = $('sYon').value;
     var r = birimFiyat(ptf, smf, smf, yon, kural);
     if(!r){ sonucYaz(''); return; }
-    var h = '<div class="sonuc-kutu"><h3 id="sYanki">Senaryo: PTF ' + tlMwh(ptf) + ' · SMF ' + tlMwh(smf) + ' · ' + YON_ADI[yon] + ' · ' + miktarBicim(q) + ' MWh</h3>'
+    var h = '<div class="sonuc-kutu"><h3 id="sYanki">Senaryo: ' + tarihTR(senaryoGunu()) + ' teslim günü · PTF ' + tlMwh(ptf) + ' · SMF ' + tlMwh(smf) + ' · ' + YON_ADI[yon] + ' · ' + miktarBicim(q) + ' MWh</h3>'
       + (yon === 'denge' && ptf !== smf ? '<p id="sDengeUyari">Sistem dengedeyken SMF, PTF\'ye eşittir (DUY m.109(1)(c)). Girdiğiniz PTF ve SMF farklı; sonuç yalnızca varsayımsal bir senaryodur.</p>' : '')
       + '</div>'
       + '<div class="sonuc-kutu"><h3>Negatif dengesizlik</h3><dl>'
@@ -984,20 +1005,17 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     sonucYaz(h);
   }
   function modYaz(){
-    var gun = $('hModGun'), sen = $('hModSenaryo'), fGun = $('hGun'), fSen = $('hSenaryo'), kapali = $('hKapali');
+    var gun = $('hModGun'), sen = $('hModSenaryo'), fGun = $('hGun'), fSen = $('hSenaryo'), sg = $('sGun');
     if(!gun || !sen || !fGun || !fSen) return;
-    var kural = guncelKural();
-    /* Bugün için doğrulanmış kural yoksa (31/12/2026 sonrası) formül hesabı kendini kapatır. */
-    sen.disabled = !kural;
-    if(kapali) kapali.hidden = !!kural;
-    if(!kural && sen.checked) gun.checked = true;
-    if(kural) yaz('hKural', kuralNotu(kural));
+    if(sg){ var bg = istanbulBugun(); sg.max = bg; if(!sg.value) sg.value = bg; }
+    yaz('hKural', senaryoNotu(senaryoGunu()).metin);
     fGun.hidden = !gun.checked;
     fSen.hidden = !sen.checked;
   }
   if($('hGun')) $('hGun').addEventListener('submit', gunHesapla);
   if($('hSenaryo')) $('hSenaryo').addEventListener('submit', senaryoHesapla);
   ['hModGun', 'hModSenaryo'].forEach(function(id){ var el = $(id); if(el) el.addEventListener('change', function(){ sonucYaz(''); modYaz(); }); });
+  if($('sGun')) ['input', 'change'].forEach(function(o){ $('sGun').addEventListener(o, function(){ sonucYaz(''); yaz('hKural', senaryoNotu(senaryoGunu()).metin); }); });
   /* "Hesapla" düğmeleri JS yokken pasiftir (sayfa boş yere yeniden yüklenmesin); burada açılır. */
   Array.prototype.forEach.call(document.querySelectorAll('#dHesap button[type="submit"]'), function(b){ b.disabled = false; });
 

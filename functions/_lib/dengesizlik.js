@@ -33,14 +33,23 @@ export const AZAMI_ARALIK_GUN = 31;
  * Tarih sürümlü kural tablosu (teslim gününe göre).
  * k: negatif dengesizlikte, l: pozitif dengesizlikte kullanılan katsayı;
  * ikisi de ilgili uzlaştırma dönemindeki sistem yönüne bağlıdır.
+ *
+ * DOĞRULAMA DURUMU (her kural ve tavan girdisinde):
+ *   'birincil' — değerler birincil kaynaklardan (Resmî Gazete, EPDK, DUY konsolide metni)
+ *                okunup doğrulandı; dogrulamaTarihi o günü verir.
+ *   'bekliyor' — değerler henüz birincil kaynaklardan doğrulanmadı (Enerji Piyasası ajanı
+ *                2026 geçmişini doğruluyor). Bu teslim günlerinde formüle dayalı içerik
+ *                (örnek hesap, "†" karşılaştırması, "Kendi senaryom" hesabı) GÖSTERİLMEZ.
+ * Formüle dayalı içerik bir teslim günü için YALNIZ o günü kapsayan kural VE tavan girdisinin
+ * ikisi de 'birincil' ise gösterilir (kuralBul → formulGoster). Doğrulanan tablo gelince
+ * yalnız durumlar çevrilir / girdi eklenir; kod değişmez.
  */
 export const KURALLAR = Object.freeze([
   Object.freeze({
     bas: '2026-01-01',
     bit: '2026-10-31',
-    // Föyün "yayınlanabilir formül" başlığı 1 Kasım 2026 ve sonrasını kapsar: bu dilimde
-    // formüle dayalı gün içeriği (örnek hesap, formül karşılaştırması) GÖSTERİLMEZ.
-    formulGoster: false,
+    dogrulama: 'bekliyor',
+    dogrulamaTarihi: null,
     V: 150,
     B: 100,
     tavanCarpani: 1.05,
@@ -56,7 +65,8 @@ export const KURALLAR = Object.freeze([
   Object.freeze({
     bas: '2026-11-01',
     bit: '2026-12-31',
-    formulGoster: true,
+    dogrulama: 'birincil',
+    dogrulamaTarihi: '2026-11-24',
     V: 100,
     B: 100,
     tavanCarpani: 1.05,
@@ -71,16 +81,34 @@ export const KURALLAR = Object.freeze([
   }),
 ]);
 
-/** Tarih sürümlü azami/asgari fiyat limiti. bit: null → yeni karara kadar. */
+/**
+ * Tarih sürümlü azami/asgari fiyat limiti. bit: null → yeni karara kadar.
+ * 4/4/2026 öncesi için girdi yok (doğrulanmadı). Kararın kendisi tek olsa da doğrulama durumu
+ * teslim günü dönemine göre tutulur: Ocak–Ekim 2026 dönemi doğrulanana kadar 'bekliyor'.
+ */
 export const TAVANLAR = Object.freeze([
   Object.freeze({
     bas: '2026-04-04',
+    bit: '2026-10-31',
+    dogrulama: 'bekliyor',
+    dogrulamaTarihi: null,
+    azami: 4500,
+    asgari: 0,
+    kaynak: '2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)',
+  }),
+  Object.freeze({
+    bas: '2026-11-01',
     bit: null,
+    dogrulama: 'birincil',
+    dogrulamaTarihi: '2026-11-24',
     azami: 4500,
     asgari: 0,
     kaynak: '2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)',
   }),
 ]);
+
+/** Doğrulama durumları. */
+export const DOGRULAMA = Object.freeze({ BIRINCIL: 'birincil', BEKLIYOR: 'bekliyor' });
 
 /** Kural tablosunun birincil metinlerden doğrulandığı gün (föy tarihi). */
 export const KURAL_DOGRULAMA = '2026-11-24';
@@ -142,19 +170,24 @@ export function tavanBul(ymd) {
 }
 
 /**
- * O teslim günü için doğrulanmış kural; yoksa null.
- * 2026-01-01 öncesi ve 2026-12-31 sonrası → null (doğrulanmış kural yok).
+ * O teslim günü için kural; yoksa null.
+ * 2026-01-01 öncesi ve 2026-12-31 sonrası → null (bu sayfada kural yok).
  * Dönen nesne tavanı da taşır: AFL / asgari null ise tavan dalı uygulanmaz.
+ * formulGoster: kural VE tavan girdisi 'birincil' ise true (aksi hâlde formüle dayalı içerik yok).
  */
 export function kuralBul(ymd) {
   if (!ymdGecerli(ymd)) return null;
   for (const k of KURALLAR) {
     if (ymd >= k.bas && ymd <= k.bit) {
       const t = tavanBul(ymd);
+      const dogrulandi = k.dogrulama === DOGRULAMA.BIRINCIL && !!t && t.dogrulama === DOGRULAMA.BIRINCIL;
       return {
         bas: k.bas,
         bit: k.bit,
-        formulGoster: k.formulGoster === true,
+        dogrulama: k.dogrulama,
+        tavanDogrulama: t ? t.dogrulama : null,
+        formulGoster: dogrulandi,
+        dogrulamaTarihi: dogrulandi ? [k.dogrulamaTarihi, t.dogrulamaTarihi].sort().at(-1) : null,
         V: k.V,
         B: k.B,
         tavanCarpani: k.tavanCarpani,
@@ -187,8 +220,19 @@ export function kuralDilimleri() {
     sirali.forEach((bas, i) => {
       const bit = i + 1 < sirali.length ? gunEkle(sirali[i + 1], -1) : k.bit;
       const r = kuralBul(bas);
-      out.push({ bas, bit, V: r.V, B: r.B, k: r.k, l: r.l, AFL: r.AFL, asgari: r.asgari, tavanBas: r.tavanBas, tavanCarpani: r.tavanCarpani, kaynak: r.kaynak });
+      out.push({ bas, bit, V: r.V, B: r.B, k: r.k, l: r.l, AFL: r.AFL, asgari: r.asgari, tavanBas: r.tavanBas, tavanCarpani: r.tavanCarpani, kaynak: r.kaynak, dogrulama: r.dogrulama, tavanDogrulama: r.tavanDogrulama, dogrulandi: r.formulGoster });
     });
+  }
+  return out;
+}
+
+/** Formüle dayalı içeriğin gösterildiği (kural + tavan 'birincil') bitişik teslim günü aralıkları. */
+export function dogrulanmisAraliklar() {
+  const out = [];
+  for (const d of kuralDilimleri()) {
+    if (!d.dogrulandi) continue;
+    const son = out.at(-1);
+    if (son && gunEkle(son.bit, 1) === d.bas) son.bit = d.bit; else out.push({ bas: d.bas, bit: d.bit });
   }
   return out;
 }

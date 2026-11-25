@@ -11,7 +11,7 @@
  *   tarih | bas+bit, cekildi (verinin EPİAŞ'tan alındığı an; proxy'nin bildirdiği, ISO-8601 +03:00),
  *   bayat (true ise güncel veri şu an alınamadı; veri "cekildi" anına aittir),
  *   ozet{toplam,yayimlanan,ptfOrt,smfOrt,pozitifOrt,negatifOrt,maliyetPozitifOrt,maliyetNegatifOrt,yon{acik,fazla,denge}},
- *   kurallar[{bas,bit,V,B,k,l,AFL,asgari,tavanBas,tavanCarpani,kaynak}], kuralAlanlari,
+ *   kurallar[{bas,bit,V,B,k,l,AFL,asgari,tavanBas,tavanCarpani,kaynak,dogrulama,tavanDogrulama,dogrulandi}], kuralAlanlari,
  *   atif, alanlar, not,
  *   donemler[{bas,bit,dk,ptf,smf,yon,pozitif,negatif,maliyetPozitif,maliyetNegatif}]
  * Yayımlanmamış değer null'dır (0 değildir).
@@ -78,6 +78,9 @@ const KURAL_ALANLARI = {
   tavanBas: 'AFL ve asgari değerinin yürürlüğe girdiği gün; null ise doğrulanmadı',
   tavanCarpani: 'Tavan koşulunda AFL ile çarpılan katsayı',
   kaynak: 'Dayanak metinler {formul, katsayi, V, B, tavan}',
+  dogrulama: 'Kural girdisinin doğrulama durumu: birincil (birincil kaynaklardan doğrulandı) | bekliyor (henüz doğrulanmadı)',
+  tavanDogrulama: 'Tavan (AFL) girdisinin doğrulama durumu: birincil | bekliyor | null (bu tarihler için tavan girdisi yok)',
+  dogrulandi: 'true ise bu tarihlerde kural ve tavan birincil kaynaklardan doğrulanmıştır; false ise değerler henüz doğrulanmamıştır',
 };
 
 const CSV_BASLIK = [

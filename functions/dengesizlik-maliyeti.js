@@ -27,13 +27,13 @@
  * "X-Robots-Tag: noindex, nofollow" ve aynı değerli robots meta etiketi taşır
  * (functions/_lib/onizleme.js). _headers kuralları Function yanıtlarına uygulanmaz.
  *
- * FORMÜLE DAYALI GÜN İÇERİĞİ (örnek hesap, "†" formül karşılaştırması) yalnız
- * kural tablosunda formulGoster:true olan teslim günlerinde (2026-11-01 … 2026-12-31)
- * ve saatlik (dk = 60) veride gösterilir. Daha eski günlerde tablo yalnız EPİAŞ
- * değerlerini gösterir.
+ * FORMÜLE DAYALI GÜN İÇERİĞİ (örnek hesap, "†" formül karşılaştırması, "Kendi senaryom")
+ * yalnız o teslim gününü kapsayan kural VE tavan girdisi 'birincil' doğrulanmışsa
+ * (kuralBul → formulGoster; şu an 2026-11-01 … 2026-12-31) ve saatlik (dk = 60) veride
+ * gösterilir. Diğer günlerde tablo yalnız EPİAŞ değerlerini gösterir.
  */
 import {
-  kuralBul, birimFiyat, formulFarki, ozet, yayimlandi, donemEtiketi, donemDakikasi, tarihGecerli, istanbulBugun, istanbulDakika,
+  kuralBul, dogrulanmisAraliklar, birimFiyat, formulFarki, ozet, yayimlandi, donemEtiketi, donemDakikasi, tarihGecerli, istanbulBugun, istanbulDakika,
   gunEkle, YON_ADI, ILK_GUN, SAYFA_URL, VERI_URL, NOT_ORTALAMA,
 } from './_lib/dengesizlik.js';
 import { gunGetir } from './_lib/piyasa-istemci.js';
@@ -122,6 +122,8 @@ export const CAPA = Object.freeze({
   farkNot: '<p class="note fark-not" id="dFarkNot"></p>',
   donem: '<select id="hDonem"><option value="">Veri bekleniyor</option></select>',
   ornek: '<div class="ornek" id="dOrnek"></div>',
+  senaryoGun: '<input type="date" id="sGun" name="teslim" min="2026-01-01" aria-describedby="hKural">',
+  senaryoNot: '<p class="kural-notu" id="hKural" role="status"></p>',
 });
 
 /** Çapayı güvenle değiştirir; çapa yoksa HTML'e dokunmaz. Fonksiyon biçimi: $&, $1 yorumlanmasın. */
@@ -188,6 +190,25 @@ export function kuralUyarisi(tarih) {
   if (!kural) return 'Bu tarih için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; tablo EPİAŞ\'ın yayımladığı değerleri gösterir. 110. maddenin 1 Ocak 2027\'den itibaren uygulanacak metni bu sayfada henüz doğrulanmamıştır.';
   if (!kural.formulGoster) return `Bu tarihte V değeri ${sabit(kural.V)} TL/MWh idi; aşağıdaki yöntem bölümü 1 Kasım 2026 ve sonrasında uygulanan değerleri anlatır.`;
   return '';
+}
+
+/**
+ * "Kendi senaryom": seçilen teslim gününün kuralı. Kural ya da tavanı birincil kaynaklardan
+ * doğrulanmamışsa hesap REDDEDİLİR (acik: false) ve neden yazılır. İstemcideki senaryoNotu() ile AYNI.
+ */
+export function senaryoNotu(ymd) {
+  const t = tarihTR(ymd);
+  const liste = dogrulanmisAraliklar().map((a) => `${tarihTR(a.bas)} – ${tarihTR(a.bit)}`).join(', ');
+  const ek = liste ? ` Doğrulanmış teslim günleri: ${liste}.` : '';
+  const kural = kuralBul(ymd);
+  if (!kural) return { acik: false, metin: `${t} teslim günü için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; bu tarih için hesap yapılmaz.${ek}` };
+  if (!kural.formulGoster) return { acik: false, metin: `${t} teslim gününde uygulanan kural ve değerler bu sayfada henüz birincil kaynaklardan doğrulanmadı; bu tarih için hesap yapılmaz.${ek}` };
+  return {
+    acik: true,
+    metin: `Uygulanan kural (${t} teslim günü; ${tarihTR(kural.dogrulamaTarihi)} itibarıyla doğrulanan; ${tarihTR(kural.bas)} – ${tarihTR(kural.bit)} teslim günleri için kullanılır): `
+      + `V = ${sabit(kural.V)} TL/MWh, B = ${sabit(kural.B)} TL/MWh, AFL = ${sabit(kural.AFL)} TL/MWh. `
+      + `Dayanak: formül ${kural.kaynak.formul}; k ve l ${kural.kaynak.katsayi}; V ${kural.kaynak.V}; B ${kural.kaynak.B}; AFL ${kural.kaynak.tavan}.`,
+  };
 }
 
 /** Hesaplayıcının dönem seçenekleri (sunucu doldurur; JS yokken de doğru). İstemcideki donemSecenekleri() ile AYNI. */
@@ -268,6 +289,9 @@ export function kabukHazirla(html, { tarih, bugun, tarihli, gecersiz }) {
   html = swap(html, CAPA.bit, `<input type="date" id="dBit" name="bit" min="${ILK_GUN}" max="${bugun}" value="${tarih}" required>`);
   if (tarih > ILK_GUN) html = swap(html, CAPA.onceki, `<a class="btn-ikincil" id="dOnceki" rel="nofollow" href="/dengesizlik-maliyeti?tarih=${gunEkle(tarih, -1)}">`);
   if (tarih < bugun) html = swap(html, CAPA.sonraki, `<a class="btn-ikincil" id="dSonraki" rel="nofollow" href="/dengesizlik-maliyeti?tarih=${gunEkle(tarih, 1)}">`);
+  // "Kendi senaryom": teslim günü varsayılanı bugün; kural notu sunucuda yazılır (JS yokken de okunur).
+  html = swap(html, CAPA.senaryoGun, `<input type="date" id="sGun" name="teslim" min="${ILK_GUN}" max="${bugun}" value="${bugun}" aria-describedby="hKural">`);
+  html = swap(html, CAPA.senaryoNot, `<p class="kural-notu" id="hKural" role="status">${esc(senaryoNotu(bugun).metin)}</p>`);
   const ku = kuralUyarisi(tarih);
   if (ku) html = swap(html, CAPA.kuralUyari, `<p class="uyari" id="dKuralUyari" role="status">${esc(ku)}</p>`);
 

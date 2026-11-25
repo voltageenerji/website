@@ -6,7 +6,7 @@
 import {
   KURALLAR, TAVANLAR, kuralBul, tavanBul, sayi, temiz, yonCoz, birimFiyat, piyasaCoz, anCoz,
   ozet, tarihGecerli, ymdGecerli, gunEkle, gunFarki, gunIzgarasi,
-  yayimlandi, veriVar, donemEtiketi, istanbulBugun, istanbulDakika, ATIF, NOT_ORTALAMA, KURAL_DOGRULAMA, kuralDilimleri, formulFarki,
+  yayimlandi, veriVar, donemEtiketi, istanbulBugun, istanbulDakika, ATIF, NOT_ORTALAMA, KURAL_DOGRULAMA, kuralDilimleri, formulFarki, dogrulanmisAraliklar, DOGRULAMA,
 } from '../../functions/_lib/dengesizlik.js';
 import { sahteGun, sahteProxy, sahteBaglama, sahteCache, isoTR, SABIT_AN, SAHTE_ENV } from './dengesizlik-test-verisi.mjs';
 import { gunGetir, aralikGetir, _bellekTemizle, BUTCE, sayaclar, baglantiBul, _ANAHTAR_KOKU } from '../../functions/_lib/piyasa-istemci.js';
@@ -970,8 +970,8 @@ const ornekOf = (h) => coz(/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.ex
 
   // Gömülü kural tablosu = kütüphane (sürüklenme kapısı)
   const gomulu = JSON.parse(/<script type="application\/json" id="dKurallar">([\s\S]*?)<\/script>/.exec(KABUK)[1]);
-  ok('gomulu kural tablosu KURALLAR ile ayni', JSON.stringify(gomulu.kurallar) === JSON.stringify(KURALLAR.map((k) => ({ bas: k.bas, bit: k.bit, formulGoster: k.formulGoster, V: k.V, B: k.B, tavanCarpani: k.tavanCarpani, k: k.k, l: k.l }))) && gomulu.dogrulama === KURAL_DOGRULAMA && KURAL_DOGRULAMA === '2026-11-24');
-  ok('gomulu tavan tablosu TAVANLAR ile ayni', JSON.stringify(gomulu.tavanlar) === JSON.stringify(TAVANLAR.map((t) => ({ bas: t.bas, bit: t.bit, azami: t.azami, asgari: t.asgari }))));
+  ok('gomulu kural tablosu KURALLAR ile ayni', JSON.stringify(gomulu.kurallar) === JSON.stringify(KURALLAR.map((k) => ({ bas: k.bas, bit: k.bit, dogrulama: k.dogrulama, dogrulamaTarihi: k.dogrulamaTarihi, V: k.V, B: k.B, tavanCarpani: k.tavanCarpani, k: k.k, l: k.l, kaynak: k.kaynak }))) && gomulu.dogrulama === KURAL_DOGRULAMA && KURAL_DOGRULAMA === '2026-11-24');
+  ok('gomulu tavan tablosu TAVANLAR ile ayni', JSON.stringify(gomulu.tavanlar) === JSON.stringify(TAVANLAR.map((t) => ({ bas: t.bas, bit: t.bit, dogrulama: t.dogrulama, dogrulamaTarihi: t.dogrulamaTarihi, azami: t.azami, asgari: t.asgari, kaynak: t.kaynak }))) && JSON.stringify(gomulu.dogrulanmis) === JSON.stringify(dogrulanmisAraliklar()));
   // Görünen katsayı ve sabit tabloları = kütüphane
   const katsayiTablo = coz(/<table class="kucuk" id="dKatsayi">([\s\S]*?)<\/table>/.exec(KABUK)[1]);
   const tr2 = (n) => String(n).replace('.', ',');
@@ -1418,7 +1418,7 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
   ok('B6 hesaplayici girisi (KÜPST)', KABUK.includes('dengeden sorumlu grup içi değerlendirmeyi ve kesinleşmiş günlük üretim/tüketim programından sapma tutarını (KÜPST) içermez.</p>'));
   ok('B9 yon secenekleri tek kalip', KABUK.includes('<span>Negatif (eksik verdim ya da fazla çektim)</span>') && KABUK.includes('<span>Pozitif (fazla verdim ya da az çektim)</span>'));
   ok('B10 Hesapla dugmeleri JS yokken pasif + noscript notu', (KABUK.match(/<button type="submit" class="btn" disabled>Hesapla<\/button>/g) || []).length === 2 && /<noscript><p[^>]*>Hesaplayıcı JavaScript gerektirir; JavaScript kapalıyken "Hesapla" düğmeleri kapalıdır\./.test(KABUK));
-  ok('B2 kapali notu "Bugun icin"', KABUK.includes('Bugün için doğrulanmış bir dengesizlik fiyatı kuralı bulunmadığından "Kendi senaryom" hesabı kapalıdır.'));
+  ok('C2 eski "Bugun icin ... kapalidir" notu kaldirildi (teslim gunu secilir)', !KABUK.includes('hKapali') && !KABUK.includes('hesabı kapalıdır'));
   ok('F "Tarih araligini indir"', KABUK.includes('>Tarih aralığını indir</span>') && !KABUK.includes('Tarih aralığı indir'));
   ok('istemci: localStorage/uc kaydi dogrulanmadan innerHTML\'e girmez', KABUK.includes('function donemKur(o){') && KABUK.includes("if(!o || typeof o.bas !== 'string' || !BAS_RE.test(o.bas)") && KABUK.includes('function dogrula(donemler, tarih){'));
 
@@ -1479,6 +1479,62 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
   const llms = readFileSync(new URL('llms.txt', kok), 'utf8');
   ok('D12 llms.txt eki (revizyon metni)', llms.includes("24 Kasım 2026 itibarıyla: k/l enerji açığında 0,06/0,03, enerji fazlasında 0,03/0,06, dengede 0,03/0,03 (Kurul Kararı 14030); V 100 TL/MWh (1 Kasım 2026'dan itibaren, Kurul Kararı 14911), B 100 TL/MWh, azami fiyat limiti 4.500 TL/MWh (Kurul Kararı 14459). Bu değerler Kurul kararıyla değiştirilebilir. Günün ortalama pozitif ve negatif dengesizlik fiyatı sayfadaki tarihli özet cümlesinde ve JSON'da `ozet.pozitifOrt`, `ozet.negatifOrt` alanlarındadır."));
   ok('D12 llms.txt: CORS ifadesi yok, yeni gosterge adi', !/CORS|Access-Control/i.test(llms) && llms.includes("birim dengesizlik maliyeti (PTF'ye göre)") && !llms.includes("PTF'ye göre maliyet ("));
+}
+
+
+// ============================================================================
+// REVİZYON 3 / C — tarihsel hesap o günün kuralıyla; formüle dayalı içerik yalnız 'birincil' dönemde
+// ============================================================================
+{
+  ok('C1 her kural ve tavan girdisinde dogrulama durumu var', [...KURALLAR, ...TAVANLAR].every((x) => x.dogrulama === DOGRULAMA.BIRINCIL || x.dogrulama === DOGRULAMA.BEKLIYOR) && [...KURALLAR, ...TAVANLAR].every((x) => (x.dogrulama === 'birincil') === ymdGecerli(x.dogrulamaTarihi)));
+  ok('C1 durumlar: 2026-01-01..10-31 bekliyor, 2026-11-01..12-31 birincil (kural ve tavan)', KURALLAR.map((k) => `${k.bas}|${k.bit}|${k.dogrulama}`).join(' ') === '2026-01-01|2026-10-31|bekliyor 2026-11-01|2026-12-31|birincil' && TAVANLAR.map((x) => `${x.bas}|${x.bit}|${x.dogrulama}`).join(' ') === '2026-04-04|2026-10-31|bekliyor 2026-11-01|null|birincil');
+  ok('C1 dogrulanmis araliklar: yalniz 01.11.2026 - 31.12.2026', JSON.stringify(dogrulanmisAraliklar()) === '[{"bas":"2026-11-01","bit":"2026-12-31"}]');
+  // Her kural dönemi için bir tarih + sınırlar
+  const durumlar = {
+    '2026-02-10': [true, false, 150, null], '2026-04-03': [true, false, 150, null], '2026-04-04': [true, false, 150, 4500], '2026-07-15': [true, false, 150, 4500],
+    '2026-10-31': [true, false, 150, 4500], '2026-11-01': [true, true, 100, 4500], '2026-11-24': [true, true, 100, 4500], '2026-12-31': [true, true, 100, 4500], '2027-01-01': [false, false, null, null],
+  };
+  for (const [g, [var_, goster, V, AFL]] of Object.entries(durumlar)) {
+    const k = kuralBul(g);
+    ok(`C1 ${g}: kural ${var_ ? 'var' : 'yok'}, formul ${goster ? 'gosterilir' : 'gosterilmez'}, V ${V}, AFL ${AFL}`, var_ ? (k.formulGoster === goster && k.V === V && k.AFL === AFL) : k === null, `-> ${JSON.stringify(k && { f: k.formulGoster, V: k.V, AFL: k.AFL })}`);
+  }
+  ok('C1 kuralBul: kural ve tavan durumlari ayri, dogrulama tarihi yalniz dogrulanmissa', kuralBul('2026-11-01').dogrulama === 'birincil' && kuralBul('2026-11-01').tavanDogrulama === 'birincil' && kuralBul('2026-11-01').dogrulamaTarihi === '2026-11-24' && kuralBul('2026-04-03').tavanDogrulama === null && kuralBul('2026-04-04').tavanDogrulama === 'bekliyor' && kuralBul('2026-10-31').dogrulamaTarihi === null);
+  ok('C1 formulFarki yalniz dogrulanmis gunde karsilastirir', formulFarki({ dk: 60, ptf: 2800, smf: 3400, yon: 'acik', pozitif: 1, negatif: 1 }, kuralBul('2026-11-01')) === true && formulFarki({ dk: 60, ptf: 2800, smf: 3400, yon: 'acik', pozitif: 1, negatif: 1 }, kuralBul('2026-10-31')) === false);
+  const dl = kuralDilimleri();
+  ok('C1 kuralDilimleri dogrulama alanlari', dl.map((x) => `${x.dogrulama}|${x.tavanDogrulama}|${x.dogrulandi}`).join(' ') === 'bekliyor|null|false bekliyor|bekliyor|false birincil|birincil|true');
+  // Sayfa: formüle dayalı içerik (örnek, †) yalnız birincil günlerde; sınırlar
+  const fark = (g) => sahteGun(g).map((o, i) => (i === 5 ? { ...o, negatif: o.negatif + 6.25 } : o));
+  const OCAK = Date.UTC(2027, 0, 1, 9, 0, 0);
+  for (const [g, beklenen] of [['2026-04-03', false], ['2026-04-04', false], ['2026-10-31', false], ['2026-11-01', true], ['2026-12-31', true], ['2027-01-01', false]]) {
+    const { e, sec } = yeni({ gun: fark });
+    if (g > BUGUN) e.an = OCAK;
+    const y = await sayfa.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti?tarih=' + g), env: SAHTE_ENV, secenek: sec, waitUntil() {}, next: async () => new Response(KABUK, { status: 200, headers: KABUK_BASLIK }) });
+    const h = await y.text();
+    const ornekVar = !h.includes('<div class="ornek" id="dOrnek"></div>'), hancer = /† \d+ dönemde/.test(idMetni(h, 'dFarkNot'));
+    ok(`C1 sayfa ${g}: ornek hesap ve † ${beklenen ? 'VAR' : 'YOK'}`, ornekVar === beklenen && hancer === beklenen && satirlar(h).length === 24, `-> ornek ${ornekVar} † ${hancer}`);
+  }
+  // Kendi senaryom: teslim günü kuralı, doğrulanmamış günde ret
+  ok('C2 senaryoNotu 2026-11-24: uygulanan kural + karar atiflari', sayfa.senaryoNotu('2026-11-24').acik === true && sayfa.senaryoNotu('2026-11-24').metin === "Uygulanan kural (24.11.2026 teslim günü; 24.11.2026 itibarıyla doğrulanan; 01.11.2026 – 31.12.2026 teslim günleri için kullanılır): V = 100 TL/MWh, B = 100 TL/MWh, AFL = 4.500 TL/MWh. Dayanak: formül DUY m.110(1) (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik); k ve l 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122); V 24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405); B DUY m.110(2): başlangıç değeri; AFL 2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213).", `-> ${sayfa.senaryoNotu('2026-11-24').metin}`);
+  for (const g of ['2026-02-10', '2026-04-03', '2026-04-04', '2026-10-31']) ok(`C2 senaryoNotu ${g}: dogrulanmamis -> ret`, sayfa.senaryoNotu(g).acik === false && sayfa.senaryoNotu(g).metin === `${g.slice(8, 10)}.${g.slice(5, 7)}.2026 teslim gününde uygulanan kural ve değerler bu sayfada henüz birincil kaynaklardan doğrulanmadı; bu tarih için hesap yapılmaz. Doğrulanmış teslim günleri: 01.11.2026 – 31.12.2026.`);
+  ok('C2 senaryoNotu 2026-11-01 ve 2026-12-31 acik', sayfa.senaryoNotu('2026-11-01').acik && sayfa.senaryoNotu('2026-12-31').acik);
+  ok('C2 senaryoNotu 2027-01-01: kural yok -> ret', sayfa.senaryoNotu('2027-01-01').acik === false && sayfa.senaryoNotu('2027-01-01').metin.startsWith('01.01.2027 teslim günü için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; bu tarih için hesap yapılmaz.'));
+  ok('C2 senaryo notunda tasarruf / teklif dili yok', !/tasarruf|en ucuz|garanti|teklif ediyoruz/i.test(['2026-11-24', '2026-02-10', '2027-01-01'].map((g) => sayfa.senaryoNotu(g).metin).join(' ')));
+  // SSR: teslim günü alanı ve kural notu sunucuda yazılır (JS'siz de doğru)
+  const { h: hs } = await al('');
+  ok('C2 SSR: Teslim gunu alani (min 2026-01-01, max ve deger bugun)', hs.includes(`<input type="date" id="sGun" name="teslim" min="2026-01-01" max="${BUGUN}" value="${BUGUN}" aria-describedby="hKural">`) && hs.includes('<label class="etiket" for="sGun">Teslim günü</label>'));
+  ok('C2 SSR: kural notu bugunun kuraliyla', idMetni(hs, 'hKural') === sayfa.senaryoNotu(BUGUN).metin);
+  const { h: hv } = await al('', {}, {});
+  ok('C2 SSR veri yokken de teslim gunu ve kural notu yazilir', hv.includes(`max="${BUGUN}" value="${BUGUN}" aria-describedby="hKural"`) && idMetni(hv, 'hKural') === sayfa.senaryoNotu(BUGUN).metin);
+  {
+    const { e, sec } = yeni();
+    e.an = OCAK;
+    const h27 = await (await sayfa.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti'), env: SAHTE_ENV, secenek: sec, waitUntil() {}, next: async () => new Response(KABUK, { status: 200 }) })).text();
+    ok('C2 SSR 2027: teslim gunu bugun, not durust ret', h27.includes('max="2027-01-01" value="2027-01-01"') && idMetni(h27, 'hKural').startsWith('01.01.2027 teslim günü için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok;'));
+  }
+  ok('C2 kabukta teslim gunu capasi tam bir kez', KABUK.split(sayfa.CAPA.senaryoGun).length === 2 && KABUK.split(sayfa.CAPA.senaryoNot).length === 2);
+  // veri ucu: kurallar[] doğrulama alanları
+  const j = await (await veriUcu.onRequestGet(ucCtx('?bas=2026-10-25&bit=2026-11-05').ctx)).json();
+  ok('C1 veri ucu kurallar: dogrulama alanlari ve belgeleri', j.kurallar.length === 2 && j.kurallar[0].dogrulama === 'bekliyor' && j.kurallar[0].dogrulandi === false && j.kurallar[1].dogrulama === 'birincil' && j.kurallar[1].dogrulandi === true && ['dogrulama', 'tavanDogrulama', 'dogrulandi'].every((a) => typeof j.kuralAlanlari[a] === 'string'));
 }
 
 console.error = gercekHata;
