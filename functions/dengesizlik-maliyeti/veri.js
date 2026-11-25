@@ -12,7 +12,8 @@
  *   bayat (true ise güncel veri şu an alınamadı; veri "cekildi" anına aittir),
  *   ozet{toplam,yayimlanan,ptfOrt,smfOrt,pozitifOrt,negatifOrt,maliyetPozitifOrt,maliyetNegatifOrt,yon{acik,fazla,denge}},
  *   kurallar[{bas,bit,V,B,k,l,AFL,asgari,tavanBas,tavanCarpani,kaynak,dogrulama,tavanDogrulama,dogrulandi}], kuralAlanlari,
- *   atif, alanlar, not,
+ *   yayimNotlari[{bas,bit,not}] (EPİAŞ'ın yayımladığı fiyatların o günün formülünden bütünüyle farklı
+ *   olduğu, istenen tarihlerle kesişen aralıklar; yoksa []), atif, alanlar, not,
  *   donemler[{bas,bit,dk,ptf,smf,yon,pozitif,negatif,maliyetPozitif,maliyetNegatif}]
  * Yayımlanmamış değer null'dır (0 değildir).
  *
@@ -31,7 +32,7 @@
  * piyasa/v1 ucundan gelir; bu sitede EPİAŞ kimliği yoktur.
  */
 import {
-  kuralDilimleri, ozet, tarihGecerli, ymdGecerli, istanbulBugun, gunEkle, gunFarki, donemGunu, donemDakikasi,
+  kuralDilimleri, YAYIM_ISTISNALARI, YAYIM_NOTLARI, ozet, tarihGecerli, ymdGecerli, istanbulBugun, gunEkle, gunFarki, donemGunu, donemDakikasi,
   YON_ADI, ATIF, NOT_ORTALAMA, SAYFA_URL, AZAMI_ARALIK_GUN, ILK_GUN, OFSET,
 } from '../_lib/dengesizlik.js';
 import { gunGetir, aralikGetir } from '../_lib/piyasa-istemci.js';
@@ -276,6 +277,7 @@ async function yanit(context, govdesiz) {
       ozet: ozet(sonuc.donemler),
       kurallar: kurallarAralik(ust.tarih || ust.bas, ust.tarih || ust.bit),
       kuralAlanlari: KURAL_ALANLARI,
+      yayimNotlari: YAYIM_ISTISNALARI.filter((x) => x.bit >= (ust.tarih || ust.bas) && x.bas <= (ust.tarih || ust.bit)).map((x) => ({ bas: x.bas, bit: x.bit, not: YAYIM_NOTLARI[x.not] })),
       atif: ATIF,
       alanlar: ALANLAR,
       not: NOT,

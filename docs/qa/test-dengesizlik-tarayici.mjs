@@ -375,8 +375,8 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
 }
 { // "Kendi senaryom" seçili tablo gününe DEĞİL kendi teslim gününe bağlıdır (eski bir güne bakarken de)
   const { page, kapat } = await ac('/dengesizlik-maliyeti?tarih=2026-03-10');
-  ok('S4 eski gun: tablonun ustunde V = 150 notu', (await page.locator('#dKuralUyari').isVisible()) && (await metin(page, '#dKuralUyari')) === 'Bu tarihte V değeri 150 TL/MWh idi; aşağıdaki yöntem bölümü 1 Kasım 2026 ve sonrasında uygulanan değerleri anlatır.');
-  ok('S4 eski gun: ornek hesap ve † YOK', (await page.isHidden('#dOrnek')) && (await page.isHidden('#dFarkNot')) && !(await page.locator('#dTablo').innerHTML()).includes('†'));
+  ok('R4 eski gun: tablonun ustunde V = 150 ve AFL 3.400 notu', (await page.locator('#dKuralUyari').isVisible()) && (await metin(page, '#dKuralUyari')) === 'Bu tarihte V değeri 150 TL/MWh, azami fiyat limiti 3.400 TL/MWh idi; aşağıdaki yöntem bölümü 1 Kasım 2026 ve sonrasında uygulanan değerleri anlatır.');
+  ok('R4 eski gun: ornek hesap o gunun kuraliyla (AFL 3.400); formulle uyumlu veride † yok', (await page.isVisible('#dOrnek')) && (await metin(page, '#dOrnek')).includes('AFL = 3.400 TL/MWh') && (await page.isHidden('#dFarkNot')) && !(await page.locator('#dTablo').innerHTML()).includes('†'));
   await page.check('#hModSenaryo');
   ok('S4 eski gun: teslim gunu yine bugun, kural notu bugunun kurali (V = 100)', (await page.inputValue('#sGun')) === '2026-11-24' && (await metin(page, '#hKural')) === senaryoNotu('2026-11-24').metin);
   await page.fill('#sPtf', '450'); await page.fill('#sSmf', '120'); await page.selectOption('#sYon', 'fazla'); await page.fill('#sMiktar', '1');
@@ -398,8 +398,16 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   };
   for (const g of ['2026-02-10', '2026-04-03', '2026-04-04', '2026-10-31']) {
     const x = await dene(g);
-    ok(`C2 tarayici ${g}: dogrulanmamis kural -> ret, sonuc rakami yok`, x.ret === senaryoNotu(g).metin && x.not === senaryoNotu(g).metin && x.poz === null && !/TL\/MWh/.test(x.sonuc), `-> ${x.ret}`);
+    ok(`R4 tarayici ${g}: dogrulanmis kural (V = 150) -> 120 < V esik alti, −106,00`, x.ret === null && x.not === senaryoNotu(g).metin && x.poz === '−106,00 TL/MWh', `-> ${x.ret} ${x.poz}`);
   }
+  // Nisan öncesi tavan dalı: AFL 3.400 → 3.400 × 1,05 × (1 + 0,06)
+  await page.fill('#sGun', '2026-02-10'); await page.fill('#sPtf', '3.400'); await page.fill('#sSmf', '3000'); await page.selectOption('#sYon', 'acik'); await page.fill('#sMiktar', '1');
+  await page.press('#sMiktar', 'Enter');
+  ok('R4 tarayici 2026-02-10 PTF 3.400: tavan dali 3.784,20', (await metin(page, '#sNegFiyat')) === '3.784,20 TL/MWh' && (await metin(page, '#sNegDal')).startsWith('Tavan') && (await metin(page, '#sNegDal')).includes('AFL = 3.400'));
+  await page.fill('#sPtf', '4500'); await page.press('#sMiktar', 'Enter');
+  ok('R4 tarayici 2026-02-10 PTF 4.500: AFL (3.400) ustu -> hata', (await metin(page, '#sPtfHata')).includes('azami fiyat limitini (3.400 TL/MWh) aşamaz') && (await page.locator('#sNegFiyat').count()) === 0);
+  await page.fill('#sGun', '2026-04-04'); await page.press('#sMiktar', 'Enter');
+  ok('R4 tarayici 2026-04-04 PTF 4.500: tavan dali (AFL 4.500)', (await metin(page, '#sNegFiyat')) === '5.008,50 TL/MWh');
   for (const g of ['2026-11-01', '2026-11-24']) {
     const x = await dene(g);
     ok(`C2 tarayici ${g}: dogrulanmis kural (V = 100) -> hesap`, x.ret === null && x.poz === '112,80 TL/MWh' && x.not === senaryoNotu(g).metin && (await metin(page, '#sYanki')).startsWith(`Senaryo: ${g.slice(8, 10)}.${g.slice(5, 7)}.2026 teslim günü`));
@@ -594,6 +602,23 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
   await f.page.waitForTimeout(200);
   ok('S7 bozuk onbellek: sayfa calisir, bekler', (await tabloOzeti(f.page)).join() === 'Veri bekleniyor…' && f.kayit.hata.length === 0);
   await f.kapat();
+  S.ayarla({ gun: gunVerisi(11) });
+}
+
+{ // R4: 1–25 Ocak 2026 yayım istisnası — istemci çizimi (SSR'sız kabuk) gün düzeyi not, satır başına † yok
+  S.ayarla({ gun: (g) => sahteGun(g).map((o, i) => (i === 5 ? { ...o, negatif: o.negatif + 6.25 } : o)) });
+  const OCAK_NOTU = "1–25 Ocak 2026 teslim günlerinde EPİAŞ'ın yayımladığı dengesizlik fiyatları, 1 Ocak 2026'dan uygulanan DUY m.110 formülüyle hesaplanan değerlerden farklıdır. Tabloda EPİAŞ'ın yayımladığı değer gösterilir.";
+  for (const [g, istisna] of [['2026-01-01', true], ['2026-01-25', true], ['2026-01-26', false]]) {
+    for (const yol of [`/dengesizlik-maliyeti?tarih=${g}`, `/kabuk?tarih=${g}`]) {
+      const { page, kayit, kapat } = await ac(yol);
+      if (yol.startsWith('/kabuk')) await page.waitForSelector('#dTablo tr[data-bas]');
+      const uyari = await metin(page, '#dKuralUyari');
+      const hancer = (await page.locator('#dTablo .fark').count());
+      ok(`R4 ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): ${istisna ? 'gun notu, † yok' : 'not yok, † 1 satir'}`, istisna ? (uyari.endsWith(OCAK_NOTU) && hancer === 0 && (await page.isHidden('#dFarkNot'))) : (!uyari.includes('1–25 Ocak') && hancer === 1 && (await metin(page, '#dFarkNot')).startsWith('† 1 dönemde')), `-> ${uyari.slice(-60)} † ${hancer}`);
+      ok(`R4 ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): hata yok`, kayit.hata.length === 0);
+      await kapat();
+    }
+  }
   S.ayarla({ gun: gunVerisi(11) });
 }
 

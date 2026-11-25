@@ -5,7 +5,8 @@
  * sabit o föydeki "TEYİT EDİLDİ" satırlarından gelir; föyün "Açık" listesindeki
  * hiçbir şey burada varsayılmaz:
  *   - 31/12/2026 sonrası için kural YOKTUR (kuralBul → null).
- *   - 4/4/2026 öncesi için azami fiyat limiti doğrulanmadı → tavan dalı yok.
+ *   - 2026 kural geçmişi birincil kaynaklardan doğrulandı (Enerji Piyasası ajanı, 25.11.2026:
+ *     1/1–25/11/2026 Resmî Gazete fihristleri ve içlerindeki tüm EPDK kararları).
  *   - Yuvarlama kuralı doğrulanmadı → burada yuvarlama YAPILMAZ; yalnızca kayan
  *     nokta gürültüsü temizlenir (gösterimdeki 2 hane bir sunum tercihidir).
  *
@@ -48,8 +49,8 @@ export const KURALLAR = Object.freeze([
   Object.freeze({
     bas: '2026-01-01',
     bit: '2026-10-31',
-    dogrulama: 'bekliyor',
-    dogrulamaTarihi: null,
+    dogrulama: 'birincil',
+    dogrulamaTarihi: '2026-11-25',
     V: 150,
     B: 100,
     tavanCarpani: 1.05,
@@ -83,15 +84,23 @@ export const KURALLAR = Object.freeze([
 
 /**
  * Tarih sürümlü azami/asgari fiyat limiti. bit: null → yeni karara kadar.
- * 4/4/2026 öncesi için girdi yok (doğrulanmadı). Kararın kendisi tek olsa da doğrulama durumu
- * teslim günü dönemine göre tutulur: Ocak–Ekim 2026 dönemi doğrulanana kadar 'bekliyor'.
+ * Doğrulama durumu teslim günü dönemine göre tutulur (aynı karar iki dönemde ayrı tarihte doğrulandı).
  */
 export const TAVANLAR = Object.freeze([
   Object.freeze({
+    bas: '2026-01-01',
+    bit: '2026-04-03',
+    dogrulama: 'birincil',
+    dogrulamaTarihi: '2026-11-25',
+    azami: 3400,
+    asgari: 0,
+    kaynak: '27/3/2025 tarihli ve 13423 sayılı Kurul Kararı (RG 5/4/2025-32861)',
+  }),
+  Object.freeze({
     bas: '2026-04-04',
     bit: '2026-10-31',
-    dogrulama: 'bekliyor',
-    dogrulamaTarihi: null,
+    dogrulama: 'birincil',
+    dogrulamaTarihi: '2026-11-25',
     azami: 4500,
     asgari: 0,
     kaynak: '2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)',
@@ -106,6 +115,27 @@ export const TAVANLAR = Object.freeze([
     kaynak: '2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)',
   }),
 ]);
+
+/**
+ * YAYIM İSTİSNALARI: EPİAŞ'ın yayımladığı fiyatların, o gün yürürlükteki formülden BÜTÜNÜYLE
+ * farklı olduğu teslim günü aralıkları (EPİAŞ'ın kamuya açık günlük bültenlerinde görülen olgu).
+ * Bu günlerde satır başına "†" ve örnek hesaptaki karşılaştırma gösterilmez; tablonun üstünde
+ * tek bir gün düzeyi not gösterilir. Düzeltme gerekirse yalnız bu tablo değişir.
+ * Tek dönemlik farklar (ör. 2026-11-03 12:00–13:00) istisna DEĞİLDİR: olağan "†" ile gösterilir.
+ */
+export const YAYIM_NOTLARI = Object.freeze({
+  'ocak-2026-eski-kural': "1–25 Ocak 2026 teslim günlerinde EPİAŞ'ın yayımladığı dengesizlik fiyatları, 1 Ocak 2026'dan uygulanan DUY m.110 formülüyle hesaplanan değerlerden farklıdır. Tabloda EPİAŞ'ın yayımladığı değer gösterilir.",
+});
+export const YAYIM_ISTISNALARI = Object.freeze([
+  Object.freeze({ bas: '2026-01-01', bit: '2026-01-25', not: 'ocak-2026-eski-kural' }),
+]);
+
+/** O teslim gününün yayım istisnası ({bas, bit, not, metin}) ya da null. */
+export function yayimIstisnasi(ymd) {
+  if (!ymdGecerli(ymd)) return null;
+  const x = YAYIM_ISTISNALARI.find((i) => ymd >= i.bas && ymd <= i.bit);
+  return x && YAYIM_NOTLARI[x.not] ? { bas: x.bas, bit: x.bit, not: x.not, metin: YAYIM_NOTLARI[x.not] } : null;
+}
 
 /** Doğrulama durumları. */
 export const DOGRULAMA = Object.freeze({ BIRINCIL: 'birincil', BEKLIYOR: 'bekliyor' });
@@ -181,12 +211,16 @@ export function kuralBul(ymd) {
     if (ymd >= k.bas && ymd <= k.bit) {
       const t = tavanBul(ymd);
       const dogrulandi = k.dogrulama === DOGRULAMA.BIRINCIL && !!t && t.dogrulama === DOGRULAMA.BIRINCIL;
+      const istisna = yayimIstisnasi(ymd);
       return {
         bas: k.bas,
         bit: k.bit,
         dogrulama: k.dogrulama,
         tavanDogrulama: t ? t.dogrulama : null,
         formulGoster: dogrulandi,
+        // Yayımlanan değerle formül karşılaştırması ("†", örnek hesaptaki uyum cümlesi): istisna günlerinde yok.
+        karsilastir: dogrulandi && !istisna,
+        istisna: istisna ? istisna.not : null,
         dogrulamaTarihi: dogrulandi ? [k.dogrulamaTarihi, t.dogrulamaTarihi].sort().at(-1) : null,
         V: k.V,
         B: k.B,
@@ -334,7 +368,7 @@ export function birimFiyat(girdi, kural) {
  * Saat içi 15 dakikalık SMF'ler bilinmediği için dk ≠ 60'ta SMF_N = SMF_P varsayılmaz.
  */
 export function formulFarki(d, kural) {
-  if (!d || !kural || kural.formulGoster !== true || d.dk !== 60) return false;
+  if (!d || !kural || kural.formulGoster !== true || kural.karsilastir === false || d.dk !== 60) return false;
   if (d.pozitif === null || d.negatif === null || d.ptf === null || d.smf === null || !d.yon) return false;
   const r = birimFiyat({ ptf: d.ptf, smfN: d.smf, smfP: d.smf, yon: d.yon }, kural);
   if (!r) return false;
@@ -523,7 +557,7 @@ export function ozet(liste) {
 export const YON_ADI = Object.freeze({ acik: 'Enerji açığı', fazla: 'Enerji fazlası', denge: 'Dengede' });
 
 /** Atıf satırı — föydeki TR metin (24 Kasım 2026 itibarıyla); 14459'un RG sayısı (33213) Revizyon 1 ile eklendi. */
-export const ATIF = 'Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği (RG 14/4/2009-27200) m.110 (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik); k ve l katsayıları: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122); V değeri: 24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405); azami fiyat limiti: 2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213). Veri: EPİAŞ Şeffaflık Platformu. 24 Kasım 2026 itibarıyla.';
+export const ATIF = 'Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği (RG 14/4/2009-27200) m.110 (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik); k ve l katsayıları: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122); V değeri: 24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405); azami fiyat limiti: 27/3/2025 tarihli ve 13423 sayılı Kurul Kararı (RG 5/4/2025-32861) ve 2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213). Veri: EPİAŞ Şeffaflık Platformu. 24 Kasım 2026 itibarıyla.';
 
 /** Ortalamaların ne olduğu / ne olmadığı (özet cümlesi, JSON "not", XLSX "Bilgi"). */
 export const NOT_ORTALAMA = 'Ortalamalar dönemlerin aritmetik ortalamasıdır; dengesizlik hacmiyle ağırlıklandırılmamıştır. Bir portföyün gerçekleşen ya da beklenen dengesizlik maliyeti değildir; her dönemde aynı yönde 1 MWh dengesizliği olan düz bir profilin MWh başı ortalamasına karşılık gelir.';

@@ -33,7 +33,7 @@
  * gösterilir. Diğer günlerde tablo yalnız EPİAŞ değerlerini gösterir.
  */
 import {
-  kuralBul, dogrulanmisAraliklar, birimFiyat, formulFarki, ozet, yayimlandi, donemEtiketi, donemDakikasi, tarihGecerli, istanbulBugun, istanbulDakika,
+  kuralBul, dogrulanmisAraliklar, yayimIstisnasi, KURALLAR, birimFiyat, formulFarki, ozet, yayimlandi, donemEtiketi, donemDakikasi, tarihGecerli, istanbulBugun, istanbulDakika,
   gunEkle, YON_ADI, ILK_GUN, SAYFA_URL, VERI_URL, NOT_ORTALAMA,
 } from './_lib/dengesizlik.js';
 import { gunGetir } from './_lib/piyasa-istemci.js';
@@ -184,12 +184,24 @@ export function ozetCumlesi(tarih, o, donemler, cekildi) {
     + '; ortalamalar Voltage Enerji tarafından bu veriden, yalnızca dengesizlik fiyatı yayımlanan dönemler üzerinden hesaplanmıştır. ' + NOT_ORTALAMA;
 }
 
-/** Tablonun üstündeki tarih uyarısı (veriden bağımsız). İstemcideki kuralUyarisi() ile AYNI. */
+/**
+ * Tablonun üstündeki tarih uyarısı (veriden bağımsız). İstemcideki kuralUyarisi() ile AYNI.
+ * - Kural yok (2027+): doğrulanmış kural olmadığı söylenir.
+ * - Günün V ya da AFL değeri yöntem bölümünün anlattığı son dönemden (1 Kasım 2026+) farklıysa: o günün değerleri.
+ * - Yayım istisnası varsa (1–25 Ocak 2026): gün düzeyi not (satır başına "†" yerine).
+ */
 export function kuralUyarisi(tarih) {
   const kural = kuralBul(tarih);
   if (!kural) return 'Bu tarih için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; tablo EPİAŞ\'ın yayımladığı değerleri gösterir. 110. maddenin 1 Ocak 2027\'den itibaren uygulanacak metni bu sayfada henüz doğrulanmamıştır.';
-  if (!kural.formulGoster) return `Bu tarihte V değeri ${sabit(kural.V)} TL/MWh idi; aşağıdaki yöntem bölümü 1 Kasım 2026 ve sonrasında uygulanan değerleri anlatır.`;
-  return '';
+  const ref = kuralBul(KURALLAR[KURALLAR.length - 1].bas);
+  const fark = [];
+  if (kural.V !== ref.V) fark.push(`V değeri ${sabit(kural.V)} TL/MWh`);
+  if (kural.AFL !== null && kural.AFL !== ref.AFL) fark.push(`azami fiyat limiti ${sabit(kural.AFL)} TL/MWh`);
+  const parca = [];
+  if (fark.length) parca.push(`Bu tarihte ${fark.join(', ')} idi; aşağıdaki yöntem bölümü 1 Kasım 2026 ve sonrasında uygulanan değerleri anlatır.`);
+  const ist = yayimIstisnasi(tarih);
+  if (ist) parca.push(ist.metin);
+  return parca.join(' ');
 }
 
 /**
@@ -248,7 +260,9 @@ export function ornekHtml(tarih, donemler) {
     ? `Pozitif: min(${p}; ${s}) = ${bicim(Math.min(d.ptf, d.smf))} &lt; V (${sabit(r.V)}) olduğu için (−1) × ${sabit(r.B)} × (1 + ${katsayi(r.l)}) = ${bicim(r.pozitif)} TL/MWh`
     : `Pozitif: min(${p}; ${s}) × (1 − ${katsayi(r.l)}) = ${bicim(r.pozitif)} TL/MWh`;
   const fN = Math.abs(r.negatif - d.negatif), fP = Math.abs(r.pozitif - d.pozitif);
-  const uyum = !formulFarki(d, kural)
+  // Yayım istisnası günlerinde (1–25 Ocak 2026) karşılaştırma cümlesi yerine gün düzeyi not.
+  const ist = kural.karsilastir ? null : yayimIstisnasi(tarih);
+  const uyum = ist ? ist.metin : !formulFarki(d, kural)
     ? 'Formül sonucu yayımlanan değerlerle aynıdır.'
     : `Formül sonucu ile yayımlanan değer arasında fark vardır (negatif ${bicim(fN)} TL/MWh, pozitif ${bicim(fP)} TL/MWh). Tabloda EPİAŞ'ın yayımladığı değer gösterilir.`;
   return `<h3>Örnek hesap: ${tarihTR(tarih)}, ${donemEtiketi(d)}</h3>`
