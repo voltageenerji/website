@@ -384,9 +384,13 @@ async function raporCek(env, ctx, s, bas, bit) {
       const y = await istek(b.tgt, { number: n, size: sf.size });
       if (y.hata === 'butce') return { hata: 'eksik', kisaDevre: true };
       if (y.hata || y.durum || !y.ogeler.length) return { hata: 'eksik' };
+      // Sunucu istenen sayfayı döndürdüğünü KENDİSİ söylemeli: page parametresini yok sayıp
+      // aynı ilk sayfayı yineleyen bir yanıt "tamamlandı" sayılmaz.
+      if (!y.sayfa || y.sayfa.number !== n) return { hata: 'eksik' };
       ogeler = ogeler.concat(y.ogeler);
     }
-    if (ogeler.length < sf.total) return { hata: 'eksik' };
+    // Toplam, bildirilen sayıyla TAM eşleşmeli (eksik de fazla da kapalı başarısızlık).
+    if (ogeler.length !== sf.total) return { hata: 'eksik' };
   }
   return { ogeler };
 }

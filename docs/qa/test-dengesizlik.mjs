@@ -773,6 +773,14 @@ ok('butce sabitleri: dakikada 12 rapor + 2 giris', BUTCE.rapor === 12 && BUTCE.g
   ({ e, sec } = yeni({ raporGovde: JSON.stringify({ items: sahteGun(DUN).slice(0, 20), page: { number: 1, size: 0, total: 24 } }) }));
   x = await gunGetir(SAHTE_ENV, null, DUN, sec);
   ok('A9 total > gelen ama sayfa boyu bilinmiyor: yok/eksik', x.durum === 'yok' && x.neden === 'eksik');
+  // Sunucu page parametresini YOK SAYIP hep aynı ilk 20 kalemi döndürürse (QA t9): tam sayılmaz
+  ({ e, sec } = yeni({ raporGovde: JSON.stringify({ items: sahteGun(DUN).slice(0, 20), page: { number: 1, size: 20, total: 24 } }) }));
+  x = await gunGetir(SAHTE_ENV, null, DUN, sec);
+  ok('A9 page parametresi yok sayilirsa (ayni sayfa yinelenir): yok/eksik, "20 / 24" gosterilmez', x.durum === 'yok' && x.neden === 'eksik' && e.sayac.rapor === 2, `-> ${x.durum} ${x.neden || ''} ${e.sayac.rapor}`);
+  ({ e, sec } = yeni({ raporGovde: JSON.stringify({ items: sahteGun(DUN).slice(0, 20), page: { number: 1, size: 20, total: 24 } }) }));
+  const ySayfa = await sayfa.onRequestGet({ request: new Request('https://voltage.com.tr/dengesizlik-maliyeti?tarih=' + DUN), env: SAHTE_ENV, secenek: sec, next: async () => new Response(readFileSync(new URL('../../dengesizlik-maliyeti.html', import.meta.url), 'utf8'), { status: 200 }) });
+  const hSayfa = await ySayfa.text();
+  ok('A9 kesik yanitta sayfa bekleme halinde kalir (yayim sayaci "—")', hSayfa.includes('<span id="dYayim">—</span>') && hSayfa.includes('Veri bekleniyor'));
   ({ e, sec } = yeni({ sayfaBoyu: 1 }));
   x = await gunGetir(SAHTE_ENV, null, DUN, sec);
   ok('A9 asiri sayfa sayisi: yok/eksik, tek istek', x.durum === 'yok' && x.neden === 'eksik' && e.sayac.rapor === 1);

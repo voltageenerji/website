@@ -95,6 +95,7 @@ bolum('S1 sunucu render’ı (bugün, 11/24 dönem) — temel durum');
   ok('S1 icinde bulunulan donem isaretli (14:00–15:00), tek satir', (await page.locator('#dTablo tr.simdi').count()) === 1 && (await page.locator('#dTablo tr.simdi').getAttribute('data-bas')) === '2026-11-24T14:00:00+03:00');
   ok('S1 SSR sonrasi istemci veri ucunu HEMEN cagirmaz', kayit.veriIstek === 0);
   ok('S1 konsol/JS hatasi yok', kayit.konsol.length === 0 && kayit.hata.length === 0, `-> ${JSON.stringify(kayit)}`);
+  ok('S1 sayfa sitenin gercek CSP\'si altinda sunuluyor (ihlal olsa konsola duserdi)', /default-src 'self'/.test((await page.request.get(S.url + '/dengesizlik-maliyeti')).headers()['content-security-policy'] || ''));
   ok('S1 tarayici EPİAŞ\'a dogrudan gitmez', kayit.epias === 0);
   ok('S1 CLS 0 (gec yerlesim kaymasi yok)', (await page.evaluate(() => window.__cls)) < 0.005, `-> ${await page.evaluate(() => window.__cls)}`);
   // Araç çubuğu

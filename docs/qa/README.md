@@ -11,7 +11,7 @@ CI'da sessizce yeşil görünmezler.
 | `node docs/qa/test-ssr-ptf.mjs` | `/canli-ptf` sunucu render'ı: biçimlendirme, eksik saat dürüstlüğü, `onRequestGet` dayanıklılık matrisi |
 | `node docs/qa/test-admin.mjs` | **Panel kimlik doğrulama:** PBKDF2, oturum imzası/süresi, kurcalama, kaba kuvvet, veri ucu yetkilendirme ve sayfalama |
 | `node docs/qa/test-report-windows.mjs` | Rapor dönemleri (haftalık/aylık/3-6 aylık/yıllık) — bitişiklik: ne boşluk ne çakışma |
-| `node docs/qa/test-dengesizlik.mjs` | **`/dengesizlik-maliyeti`:** kural tablosu ve birim fiyat formülü (föydeki altı örnek, sınır ve boş girdi), dönem normalleştirme (tekilleştirme, 96 dönem, null), EPİAŞ istemcisi dayanıklılık matrisi (kimlik yok, giriş 401, servis 500, zaman aşımı, boş liste, kısmi gün, kopya satır, önbellek, bayat veri), XLSX yazıcı, veri ucu (JSON/CSV/XLSX, 400/503), sayfa kabuğu ve JSON-LD (SSS = görünen metin), sunucu render'ı. Sahte `fetch` ile çalışır; ağ gerekmez. XLSX denetimi için `python3` gerekir |
+| `node docs/qa/test-dengesizlik.mjs` | **`/dengesizlik-maliyeti`:** kural tablosu ve birim fiyat formülü (föydeki altı örnek, sınır ve boş girdi), dönem normalleştirme (saati değişen alanın seçimi, çelişen kopya → "—", 96 dönem, null), **üst-akış koruması** (tek-uçuş giriş, paylaşılan giriş engeli, dakikalık bütçe, şifreli bilet, toplam süre sınırı, sayfalama, önbellekten HEAD; QA B1 senaryoları: 50 eşzamanlı gün → 1 giriş, reddedilen giriş → süpürme başına 1 deneme), XLSX yazıcı, veri ucu (JSON/CSV/XLSX, `Kaynak` sütunu, `Bilgi` sayfası, 400/503, HTML hata sayfası), sayfa kabuğu, çapalar, JSON-LD (SSS = görünen metin), sunucu render'ı, formül farkı (†), yasal metinlerdeki R8 değişiklikleri. Sahte `fetch` ile çalışır; ağ gerekmez. XLSX denetimi için `python3` gerekir |
 
 ## Tarayıcı gerektirenler (Playwright)
 
@@ -25,7 +25,7 @@ export CHROMIUM_PATH=/opt/pw-browsers/chromium   # yoksa: npx playwright install
 | Test | Kapsam |
 |---|---|
 | `node docs/qa/test-ssr-hydration.mjs` | **Kritik.** Sunucu render'ı istemci hidrasyonundan sağ çıkıyor mu (QA DEF-1/DEF-13). S1 boş önbellek, S2 dünkü önbellek, S3 canlı proxy |
-| `node docs/qa/test-dengesizlik-tarayici.mjs` | **`/dengesizlik-maliyeti` uçtan uca:** gerçek fonksiyon modülleri + sahte EPİAŞ (wrangler gerekmez). Hesaplayıcının iki modu klavyeyle, istemci formülü = kütüphane, indirme bağlantıları, 320/390/768/1440'ta yatay taşma, tablo kaydırma kabı, kontrast, konsol hataları, dürüst bekleme, tazelik merdiveni, istemci çizimi = sunucu çizimi, JS'siz kullanım, 31/12/2026 sonrası kapanış. Playwright `/opt/node-tools/node_modules/` altından yüklenir |
+| `node docs/qa/test-dengesizlik-tarayici.mjs` | **`/dengesizlik-maliyeti` uçtan uca:** gerçek fonksiyon modülleri + sahte EPİAŞ, sitenin gerçek CSP'si altında (wrangler gerekmez). Hesaplayıcının iki modu klavyeyle, sayı okuma (ondalık yalnız virgül; belirsiz noktada tahmin yok), istemci formülü = kütüphane, indirme bağlantıları (bekleme hâlinde pasif), aralık formu (fetch, satır içi hata), 320/390/768/1440'ta yatay taşma, tablo kaydırma kabı, kontrast, konsol hataları, dürüst bekleme, tazelik merdiveni, istemci çizimi = sunucu çizimi, zehirli önbellek kaydı, JS'siz kullanım, 31/12/2026 sonrası kapanış. Playwright `/opt/node-tools/node_modules/` altından yüklenir |
 | `node docs/qa/smoke.mjs` | 404 oyunu: açılış → oyun → skor → tekrar |
 | `node docs/qa/smoke2.mjs` | 404 yedek içerik: hareket azaltma ve JS kapalı yolları |
 | `node docs/qa/smoke3.mjs` | Lider tablosu uçtan uca (route ile taklit edilen API) |
@@ -54,3 +54,6 @@ piyasa verisi değildir; sayfada ya da herhangi bir yayında kullanılmaz.
 7. **Doğrulanmamış kural uygulanmaz:** dengesizlik formülü yalnız kural tablosundaki
    tarihlerde çalışır (`kuralBul` → 31/12/2026 sonrası `null`); sistem yönü EPİAŞ'tan
    gelir, PTF–SMF kıyasından çıkarılmaz; yayımlanmamış dönem için rakam üretilmez.
+8. **EPİAŞ hesabı korunur:** anonim ziyaretçi sınırsız giriş ya da rapor isteği
+   tetikleyemez (tek-uçuş giriş, paylaşılan giriş engeli, dakikalık bütçe); bilet
+   önbellekte düz metin durmaz; HEAD istekleri üst-akışa gitmez.

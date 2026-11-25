@@ -9,6 +9,9 @@ import { _bellekTemizle } from '../../functions/_lib/epias.js';
 import { sahteEpias, SAHTE_ENV } from './dengesizlik-test-verisi.mjs';
 
 const KABUK = new URL('../../dengesizlik-maliyeti.html', import.meta.url);
+// Sitenin GERÇEK içerik güvenlik politikası (_headers, "/*" kuralı): HTML yanıtlarına eklenir,
+// böylece tarayıcı testleri (satır içi betik, fetch, blob indirme) üretimdeki CSP altında koşar.
+const CSP = (/^\/\*\n(?:[^\n]*\n)*?\s+Content-Security-Policy: ([^\n]+)/m.exec(readFileSync(new URL('../../_headers', import.meta.url), 'utf8')) || [])[1];
 
 /**
  * ayar: sahteEpias ayarları + { env } (varsayılan SAHTE_ENV; {} → kimlik yok).
@@ -40,6 +43,7 @@ export async function sunucuBaslat(ayar = {}) {
       else r = new Response('yok', { status: 404 });
       const basliklar = {};
       r.headers.forEach((v, k) => { basliklar[k] = v; });
+      if (CSP && (basliklar['content-type'] || '').startsWith('text/html')) basliklar['content-security-policy'] = CSP;
       res.writeHead(r.status, basliklar);
       res.end(Buffer.from(await r.arrayBuffer()));
     } catch (e) {
