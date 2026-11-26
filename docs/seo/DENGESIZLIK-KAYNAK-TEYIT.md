@@ -42,6 +42,8 @@ RG 19/10/2026-33405 m.22 birim fiyatları değiştirmez (yalnız EDTA/EDTB topla
 - 2026-11-03 12:00–13:00: yayımlanan pozitif fiyat −106,00; 1/11'den geçerli V = 100 ile formül 94,00 veriyor. Tek saat; sayfada † ile işaretlenir.
 - 24/11/2026: yayımlanan 48 değerin 48'i formülle eşleşiyor. Tavan dalı fazla yönde de çalışıyor (24/11 18:00: 4.500 × 1,05 × 1,03 = 4.866,75).
 
+**Güncelleme 26.11.2026 (gerçek veri, Şeffaflık API'si):** sayfanın veri kaynağı olan Şeffaflık "PTF, SMF ve SDF Listeleme" verisinde 1–25 Ocak 2026'nın 744 saatinin hepsinde pozitif ve negatif fiyat m.110 formülüyle birebir aynı (fark 0); Mart ve Kasım'da da fark 0. 2026-11-03 12:00 için API değeri 94,00 (formül). Yani yukarıdaki farklar yalnız EPİAŞ'ın günlük bülten PDF'lerinde var; sayfada gösterilen Şeffaflık verisinde yok. Sayfadaki Ocak notu bu yüzden kaldırıldı (Hukuk'un R2 koşulu).
+
 **KÜPST metni:** mevzuat.gov.tr konsolide PDF'i (s.104) m.110(3)'te 2027 formülünü (ç indisli) 2024 tanımlarıyla birlikte gösteriyor; bugün geçerli metin RG 17/12/2024-32755 m.23'tür: KÜPST = ΣΣΣ (KÜPSM × max(750; NPTF; SMF) × n). 1/1/2027'den RG 32789 m.13 (çeyrek bazında sapma ve SMF; PTF saatlik). 14907 sayılı Kararın tüketim katsayısı (n = 0,01) ve "diğer tüketimler" toleransı (m = 0,30) 1/1/2027'den; Ocak–Ekim 2026'da 14029 yalnız üretim katsayıları içeriyordu.
 
 **KGÜP:** DUY m.4(şş) tanım; m.69(2) (RG 33405 ile değişik, 19/10/2026'dan): "Tüm uzlaştırmaya esas veriş-çekiş birimleri, kesinleşmiş gün öncesi üretim/tüketim programlarını … bildirmekle yükümlüdür"; m.69(1) bildirim D-1 15:30, GİP kapanışından yarım saat sonrasına kadar güncellenebilir.
