@@ -13,8 +13,9 @@
  *   ozet{toplam,yayimlanan,ptfOrt,smfOrt,pozitifOrt,negatifOrt,maliyetPozitifOrt,maliyetNegatifOrt,yon{acik,fazla,denge}},
  *   kurallar[{bas,bit,V,B,k,l,AFL,asgari,tavanBas,tavanCarpani,kaynak,dogrulama,tavanDogrulama,dogrulandi}], kuralAlanlari,
  *   yayimNotlari[{bas,bit,not}] (EPİAŞ'ın yayımladığı fiyatların o günün formülünden saatlerin çoğunda
- *   farklı olduğu — 1–25 Ocak 2026: 600 saatin 589'unda en az bir fiyat farklı — istenen tarihlerle kesişen
- *   aralıklar; yoksa []; XLSX "Bilgi" sayfasında "Yayım notu" satırı), atif, alanlar, not,
+ *   farklı olduğu, istenen tarihlerle kesişen aralıklar; şu an hiç yok → []; varsa XLSX "Bilgi" sayfasında
+ *   "Yayım notu" satırı. EPİAŞ günlük bülten PDF'lerinde 1–25 Ocak 2026 fiyatları eski kurala göre;
+ *   Şeffaflık API değerleri formülle uyumlu (26.11.2026 kabul denetimi)), atif, alanlar, not,
  *   donemler[{bas,bit,dk,ptf,smf,yon,pozitif,negatif,maliyetPozitif,maliyetNegatif}]
  * Yayımlanmamış değer null'dır (0 değildir).
  *
@@ -33,7 +34,7 @@
  * piyasa/v1 ucundan gelir; bu sitede EPİAŞ kimliği yoktur.
  */
 import {
-  kuralDilimleri, YAYIM_ISTISNALARI, YAYIM_NOTLARI, ozet, tarihGecerli, ymdGecerli, istanbulBugun, gunEkle, gunFarki, donemGunu, donemDakikasi,
+  kuralDilimleri, yayimNotlariAralik, ozet, tarihGecerli, ymdGecerli, istanbulBugun, gunEkle, gunFarki, donemGunu, donemDakikasi,
   YON_ADI, ATIF, NOT_ORTALAMA, SAYFA_URL, AZAMI_ARALIK_GUN, ILK_GUN, OFSET,
 } from '../_lib/dengesizlik.js';
 import { gunGetir, aralikGetir } from '../_lib/piyasa-istemci.js';
@@ -145,7 +146,7 @@ function bitisIso(d) {
 /** İstenen tarihlerle kesişen yayım istisnaları (JSON yayimNotlari, XLSX "Bilgi" sayfası). */
 function yayimNotlari(ust) {
   const bas = ust.tarih || ust.bas, bit = ust.tarih || ust.bit;
-  return YAYIM_ISTISNALARI.filter((x) => x.bit >= bas && x.bas <= bit).map((x) => ({ bas: x.bas, bit: x.bit, not: YAYIM_NOTLARI[x.not] }));
+  return yayimNotlariAralik(bas, bit);
 }
 
 /** İstenen tarihlerle kesişen kural dilimleri (her girdinin bas/bit'i kendi geçerlilik aralığı). */

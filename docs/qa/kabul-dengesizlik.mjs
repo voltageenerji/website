@@ -44,12 +44,16 @@
  *   16 Geçmiş derinliği: 2026-01-01 veri döner (tam gün); Kasım öncesi bir gün (2026-10-15) sayfasında
  *      V = 150 görünür (tablo üstü not ya da o günün örnek hesabı)
  *   17 EPİAŞ günlük bülteniyle çapraz denetim (KABUL_BULTEN_CSV): ay başına 3 rastgele tamamlanmış gün
- *      + 2026-11-01 + 2026-01-26; PTF, SMF, yön, pozitif ve negatif dengesizlik fiyatı; site (/veri)
- *      ve proxy (varsa). Yalnız eşleşen/uyuşmayan sayıları ve en büyük mutlak fark basılır.
- *      Sabit örneklem: 2026-01-01, 2026-01-13, 2026-01-25, 2026-01-26, 2026-11-01
- *   18 1–25 Ocak 2026 notu (Hukuk R2): 01-01, 01-13, 01-25 için API (site /veri; proxy varsa o da)
- *      değerleri bültenle birebir mi → "Ocak 1–25 notu: API = bülten (n/n) → not geçerli" ya da
- *      "→ NOT KALDIRILMALI" (EPİAŞ API değerlerini revize ettiyse not sayfadan kalkmalı)
+ *      + 2026-11-01 + 2026-01-26 + sabit günler; PTF, SMF, yön, pozitif ve negatif dengesizlik fiyatı; site
+ *      (/veri) ve proxy (varsa). BİLİNEN BÜLTEN FARKI: EPİAŞ günlük bülten PDF'lerinde 1–25 Ocak 2026 ve
+ *      2026-11-03 12:00 fiyatları eski kurala göre; Şeffaflık API değerleri formülle uyumlu (26.11.2026 kabul
+ *      denetimi). Bu dönemlerde pozitif/negatif fiyat farkı, API değeri formüle eşitse ayrı sayılır ve
+ *      maddeyi düşürmez; başka her fark (ve bu dönemlerde formüle eşit olmayan API değeri) düşürür.
+ *      Yalnız sayılar ve en büyük mutlak fark basılır.
+ *   18 1–25 Ocak 2026: sayfada yayım notu YOK ve API = formül. 01-01, 01-13, 01-25 için sayfanın tablo
+ *      üstü notunda ve /veri yayimNotlari'nda yayım farkı notu olmamalı; site /veri (proxy varsa o da)
+ *      değerleri her saatlik dönemde formülle ≤ 0,01. Not varken API = formül ise KALDI (not kaldırılmalı);
+ *      API ≠ formül ise KALDI (Hukuk/Enerji Piyasası incelemeli). Bülten gerektirmez.
  *   19 Üç tam Kasım günü (2026-11-05, -12, -19): sayfada hiç "†" yok, fark notu boş; /veri değerleri
  *      formülle her dönemde ≤ 0,01 (sunucunun "dengesizlik-formul-farki" günlüğünü doğuracak fark
  *      yok; günlük dışarıdan okunamaz, koşulu bu yoldan denetlenir)
@@ -376,7 +380,9 @@ async function jsonAlSabirli(yol, sec) {
   return r;
 }
 const KASIM1 = '2026-11-01';
-const OCAK_NOTU = ['2026-01-01', '2026-01-13', '2026-01-25']; // 1–25 Ocak yayım farkı notunun dayanağı (madde 18)
+const OCAK_NOTU = ['2026-01-01', '2026-01-13', '2026-01-25']; // 1–25 Ocak: yayım notu yok ve API = formül (madde 18)
+// EPİAŞ günlük bülten PDF'lerinde eski kurala göre; Şeffaflık API değerleri formülle uyumlu (26.11.2026 kabul denetimi)
+const bilinenBultenFarki = (g, h) => (g >= '2026-01-01' && g <= '2026-01-25') || (g === '2026-11-03' && h === 12);
 const kasim1 = KASIM1 < BUGUN ? await jsonAlSabirli(`/dengesizlik-maliyeti/veri?tarih=${KASIM1}&bicim=json`) : null;
 
 // 14 — her yayımlanmış dönemin yönü var
@@ -440,11 +446,11 @@ else {
 // 17 — EPİAŞ günlük bülteniyle çapraz denetim (isteğe bağlı)
 {
   const yol = process.env.KABUL_BULTEN_CSV || '';
-  if (!yol) { madde(17, 'EPİAŞ günlük bülteniyle çapraz denetim', ATLANDI, 'KABUL_BULTEN_CSV verilmedi'); madde(18, '1–25 Ocak 2026 notu: API değerleri = bülten', ATLANDI, 'KABUL_BULTEN_CSV verilmedi'); }
+  if (!yol) madde(17, 'EPİAŞ günlük bülteniyle çapraz denetim', ATLANDI, 'KABUL_BULTEN_CSV verilmedi');
   else {
     let bulten = null;
     try { bulten = bultenOku(readFileSync(yol, 'utf8')); } catch (e) { bulten = null; }
-    if (!bulten || !bulten.size) { madde(17, 'EPİAŞ günlük bülteniyle çapraz denetim', KALDI, 'bülten dosyası okunamadı ya da boş'); madde(18, '1–25 Ocak 2026 notu: API değerleri = bülten', KALDI, 'bülten dosyası okunamadı ya da boş'); }
+    if (!bulten || !bulten.size) madde(17, 'EPİAŞ günlük bülteniyle çapraz denetim', KALDI, 'bülten dosyası okunamadı ya da boş');
     else {
       // Örneklem: ay başına 3 rastgele tamamlanmış gün (tohumlu) + sabit günler
       let tohum = Number(process.env.KABUL_TOHUM) || 20261125;
@@ -458,7 +464,7 @@ else {
       // Ay başına tek aralık isteği (en çok 31 gün): site bütçesini korur
       const ayGrup = new Map();
       for (const g of secilen) { const a = g.slice(0, 7); if (!ayGrup.has(a)) ayGrup.set(a, []); ayGrup.get(a).push(g); }
-      const site = new Map(), prx = new Map();
+      const site = new Map(), prx = new Map(), kuralGun = new Map();
       let istek = 0, basarisiz = 0;
       for (const [, gunler] of ayGrup) {
         const b = gunler[0], s = gunler[gunler.length - 1];
@@ -466,13 +472,14 @@ else {
         istek++;
         if (!r.j) { basarisiz++; continue; }
         for (const x of r.j.donemler) { const g = x.bas.slice(0, 10); if (gunler.includes(g)) { if (!site.has(g)) site.set(g, []); site.get(g).push(x); } }
+        for (const g of gunler) kuralGun.set(g, kuralFor(r.j.kurallar, g));
         if (proxyVar) {
           const p = await jsonAl(`/piyasa/v1/dengesizlik?bas=${b}&bit=${s}`, { proxy: true });
           for (const gun of (p.j && Array.isArray(p.j.gunler) ? p.j.gunler : [])) if (gunler.includes(gun.tarih)) prx.set(gun.tarih, gun.donemler || []);
         }
       }
       const kiyas = (kaynak, gunListesi = secilen) => {
-        let gun = 0, saat = 0, deger = 0, esit = 0, uyusmayan = 0, nullUyusmaz = 0, yonUyusmaz = 0, azami = 0, saatlikDegil = 0;
+        let gun = 0, saat = 0, deger = 0, esit = 0, uyusmayan = 0, nullUyusmaz = 0, yonUyusmaz = 0, azami = 0, saatlikDegil = 0, bilinen = 0;
         const ornekler = [];
         for (const g of gunListesi) {
           const satirlar = kaynak.get(g);
@@ -494,37 +501,73 @@ else {
               if ((sv === null || sv === undefined) !== (bv === null)) { nullUyusmaz++; if (ornekler.length < 10) ornekler.push(`${g} ${String(h).padStart(2, '0')}:00 ${a} site ${sv} bülten ${bv}`); continue; }
               if (sv === null || sv === undefined) { esit++; continue; }
               const f = Math.abs(sv - bv);
+              if (f <= 0.005 + 1e-9) { esit++; continue; }
+              // Bilinen bülten farkı: API değeri formüle eşitse ayrı sayılır (madde düşmez)
+              if ((a === 'pozitif' || a === 'negatif') && bilinenBultenFarki(g, h)) {
+                const k = kuralGun.get(g);
+                const r = k && x.ptf !== null && x.smf !== null && x.yon ? birimFiyat({ ptf: x.ptf, smfN: x.smf, smfP: x.smf, yon: x.yon }, k) : null;
+                if (r && Math.abs(r[a] - sv) <= 0.01 + 1e-9) { bilinen++; continue; }
+              }
               if (f > azami) azami = f;
-              if (f <= 0.005 + 1e-9) esit++; else { uyusmayan++; if (ornekler.length < 10) ornekler.push(`${g} ${String(h).padStart(2, '0')}:00 ${a} site ${sv} bülten ${bv}`); }
+              { uyusmayan++; if (ornekler.length < 10) ornekler.push(`${g} ${String(h).padStart(2, '0')}:00 ${a} site ${sv} bülten ${bv}`); }
             }
             deger++;
             if ((x.yon || null) === y.yon) esit++; else { yonUyusmaz++; if (ornekler.length < 10) ornekler.push(`${g} ${String(h).padStart(2, '0')}:00 yön site ${x.yon} bülten ${y.yon}`); }
           }
         }
-        return { gun, saat, deger, esit, uyusmayan, nullUyusmaz, yonUyusmaz, azami: Math.round(azami * 1000) / 1000, saatlikDegil, ornekler };
+        return { gun, saat, deger, esit, uyusmayan, nullUyusmaz, yonUyusmaz, azami: Math.round(azami * 1000) / 1000, saatlikDegil, bilinen, ornekler };
       };
       const ks = kiyas(site);
       const kp = proxyVar ? kiyas(prx) : null;
       const iyiK = (k) => k.gun > 0 && k.uyusmayan === 0 && k.nullUyusmaz === 0 && k.yonUyusmaz === 0;
       const iyi = basarisiz === 0 && ks.gun === secilen.length && iyiK(ks) && (!kp || (kp.gun === secilen.length && iyiK(kp)));
-      const yaz = (k) => `${k.gun} gün, ${k.saat} saat, ${k.deger} değer: eşleşen ${k.esit}, uyuşmayan ${k.uyusmayan}, null uyuşmazlığı ${k.nullUyusmaz}, yön uyuşmazlığı ${k.yonUyusmaz}, en büyük fark ${k.azami}${k.saatlikDegil ? `, saatlik olmayan ${k.saatlikDegil}` : ''}`;
+      const yaz = (k) => `${k.gun} gün, ${k.saat} saat, ${k.deger} değer: eşleşen ${k.esit}, bilinen bülten farkı ${k.bilinen}, uyuşmayan ${k.uyusmayan}, null uyuşmazlığı ${k.nullUyusmaz}, yön uyuşmazlığı ${k.yonUyusmaz}, en büyük fark ${k.azami}${k.saatlikDegil ? `, saatlik olmayan ${k.saatlikDegil}` : ''}`;
       madde(17, 'EPİAŞ günlük bülteniyle çapraz denetim (PTF, SMF, yön, pozitif, negatif)', iyi ? GECTI : KALDI, `örneklem ${secilen.length} gün (${ayGrup.size} ay; bültende ${bulten.size} gün), ${istek} aralık isteği, başarısız ${basarisiz}; site: ${yaz(ks)}${kp ? `; proxy: ${yaz(kp)}` : '; proxy karşılaştırması atlandı'}`);
-      // 18 — 1–25 Ocak 2026 notu (Hukuk R2): sayfadaki "EPİAŞ'ın yayımladığı fiyatlar m.110 formülünden farklı"
-      // notu yalnız API (site /veri ve proxy) değerleri bültenle birebir aynıysa kalabilir.
-      {
-        const gunlerN = OCAK_NOTU.filter((g) => bulten.has(g));
-        const esitGun = (kaynak) => gunlerN.filter((g) => { const k = kiyas(kaynak, [g]); return k.gun === 1 && k.saat > 0 && k.uyusmayan === 0 && k.nullUyusmaz === 0 && k.yonUyusmaz === 0; }).length;
-        const nS = esitGun(site), nP = proxyVar ? esitGun(prx) : null;
-        const tamam = gunlerN.length === OCAK_NOTU.length && nS === gunlerN.length && (nP === null || nP === gunlerN.length);
-        const satir = `Ocak 1–25 notu: API = bülten (${nS}/${gunlerN.length}${nP === null ? '' : `; proxy ${nP}/${gunlerN.length}`}) → ${tamam ? 'not geçerli' : 'NOT KALDIRILMALI'}`;
-        madde(18, `1–25 Ocak 2026 notu: ${OCAK_NOTU.join(', ')} API değerleri = bülten`, tamam ? GECTI : KALDI, `${satir}${gunlerN.length < OCAK_NOTU.length ? `; bültende eksik gün ${OCAK_NOTU.length - gunlerN.length}` : ''}`);
-      }
       if (YEREL) {
         kontrolListesi.push(`Bülten çapraz denetimi örneklemi: ${secilen.join(', ')}`);
         for (const x of [...ks.ornekler, ...(kp ? kp.ornekler.map((o) => 'proxy ' + o) : [])]) kontrolListesi.push(`  uyuşmazlık: ${x}`);
       }
     }
   }
+}
+
+// 18 — 1–25 Ocak 2026: sayfada yayım notu yok VE API = formül (bülten gerektirmez)
+{
+  const NOT_RE = /yayımladığı dengesizlik fiyatları|1–25 Ocak/;
+  const r = await jsonAlSabirli(`/dengesizlik-maliyeti/veri?bas=${OCAK_NOTU[0]}&bit=${OCAK_NOTU[OCAK_NOTU.length - 1]}&bicim=json`);
+  const jsonNot = r.j && Array.isArray(r.j.yayimNotlari) ? r.j.yayimNotlari.length : -1;
+  let sayfaNot = 0, sayfaHata = 0, karsilastirilan = 0, farkli = 0, azami = 0, kuralsiz = 0;
+  const formulKiyas = (donemler, g, kurallar) => {
+    const k = kuralFor(kurallar, g);
+    if (!k || k.dogrulandi !== true) { kuralsiz++; return; }
+    for (const x of donemler) {
+      if (x.dk !== 60 || !yayimlandi(x) || x.ptf === null || x.smf === null || !x.yon) continue;
+      const b = birimFiyat({ ptf: x.ptf, smfN: x.smf, smfP: x.smf, yon: x.yon }, k);
+      if (!b) continue;
+      karsilastirilan++;
+      const f = Math.max(Math.abs(b.negatif - x.negatif), Math.abs(b.pozitif - x.pozitif));
+      if (f > azami) azami = f;
+      if (f > 0.01 + 1e-9) farkli++;
+    }
+  };
+  for (const g of OCAK_NOTU) {
+    const s = await al(`/dengesizlik-maliyeti?tarih=${g}`, { accept: 'text/html' });
+    if (s.durum !== 200 || !/data-ssr="1"/.test(s.metin)) sayfaHata++;
+    if (NOT_RE.test(coz((/<p class="uyari" id="dKuralUyari"[^>]*>([\s\S]*?)<\/p>/.exec(s.metin) || [])[1] || ''))) sayfaNot++;
+    formulKiyas(r.j ? r.j.donemler.filter((x) => x.bas.startsWith(g)) : [], g, r.j ? r.j.kurallar : []);
+  }
+  let proxyFarkli = null;
+  if (proxyVar) {
+    const p = await jsonAl(`/piyasa/v1/dengesizlik?bas=${OCAK_NOTU[0]}&bit=${OCAK_NOTU[OCAK_NOTU.length - 1]}`, { proxy: true });
+    const once = farkli;
+    for (const gun of (p.j && Array.isArray(p.j.gunler) ? p.j.gunler : [])) if (OCAK_NOTU.includes(gun.tarih)) formulKiyas(gun.donemler || [], gun.tarih, r.j ? r.j.kurallar : []);
+    proxyFarkli = farkli - once;
+  }
+  const notVar = sayfaNot > 0 || jsonNot > 0;
+  const apiFormul = karsilastirilan > 0 && farkli === 0 && kuralsiz === 0;
+  const hukum = notVar && apiFormul ? 'NOT KALDIRILMALI (API = formül)' : !apiFormul ? 'API ≠ formül: Hukuk ve Enerji Piyasası incelemeli' : 'not yok, API = formül';
+  madde(18, `1–25 Ocak 2026 (${OCAK_NOTU.join(', ')}): sayfada yayım notu yok ve API = formül`, r.durum === 200 && !sayfaHata && !notVar && apiFormul ? GECTI : KALDI,
+    `${hukum}; sayfa notu ${sayfaNot}/${OCAK_NOTU.length}, JSON yayimNotlari ${jsonNot}, sunucu verisiz sayfa ${sayfaHata}; karşılaştırılan ${karsilastirilan}, 0,01'den büyük fark ${farkli}${proxyFarkli === null ? '' : ` (proxy ${proxyFarkli})`}, en büyük fark ${Math.round(azami * 100) / 100}, kuralsız gün ${kuralsiz}`);
 }
 
 // 19 — üç tam Kasım günü: "†" yok, formül farkı yok

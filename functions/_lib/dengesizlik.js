@@ -117,25 +117,40 @@ export const TAVANLAR = Object.freeze([
 ]);
 
 /**
- * YAYIM İSTİSNALARI: EPİAŞ'ın yayımladığı fiyatların, o gün yürürlükteki formülden saatlerin çoğunda
- * farklı olduğu teslim günü aralıkları (EPİAŞ'ın kamuya açık günlük bültenlerinde görülen olgu: 1–25 Ocak
- * 2026'da 600 saatin 589'unda en az bir fiyat farklı).
- * Bu günlerde satır başına "†" ve örnek hesaptaki karşılaştırma gösterilmez; tablonun üstünde
- * tek bir gün düzeyi not gösterilir. Düzeltme gerekirse yalnız bu tablo değişir.
- * Tek dönemlik farklar (ör. 2026-11-03 12:00–13:00) istisna DEĞİLDİR: olağan "†" ile gösterilir.
+ * YAYIM İSTİSNALARI: EPİAŞ'ın yayımladığı fiyatların o gün yürürlükteki formülden saatlerin çoğunda
+ * farklı olduğu teslim günü aralıkları. Böyle bir aralıkta satır başına "†" ve örnek hesaptaki
+ * karşılaştırma gösterilmez; tablonun üstünde tek bir gün düzeyi not gösterilir (JSON yayimNotlari,
+ * XLSX "Bilgi" sayfası). Düzeltme gerekirse yalnız bu tablo değişir.
+ * Şu an istisna YOK. EPİAŞ günlük bülten PDF'lerinde 1–25 Ocak 2026 fiyatları eski kurala göre;
+ * Şeffaflık API değerleri formülle uyumlu (26.11.2026 kabul denetimi). Sayfa API değerlerini
+ * gösterdiği için not gerekmez. 2026-11-03 12:00 için de aynı: yalnız bülten farklı.
+ * Tek dönemlik farklar istisna DEĞİLDİR: olağan "†" ile gösterilir.
  */
-export const YAYIM_NOTLARI = Object.freeze({
-  'ocak-2026-eski-kural': "1–25 Ocak 2026 teslim günlerinde EPİAŞ'ın yayımladığı dengesizlik fiyatları, saatlerin çoğunda, 1 Ocak 2026'da yürürlüğe giren DUY m.110 metnindeki formülle hesaplanan değerlerle aynı değildir. Bu günlerde uzlaştırmada hangi değerlerin esas alındığı bu sayfada doğrulanmamıştır. Tabloda EPİAŞ'ın yayımladığı değer gösterilir; kesin tutar için EPİAŞ'ın uzlaştırma bildirimleri esas alınır.",
-});
-export const YAYIM_ISTISNALARI = Object.freeze([
-  Object.freeze({ bas: '2026-01-01', bit: '2026-01-25', not: 'ocak-2026-eski-kural' }),
-]);
+export const YAYIM_NOTLARI = Object.freeze({});
+export const YAYIM_ISTISNALARI = Object.freeze([]);
+
+let aktifIstisnalar = YAYIM_ISTISNALARI;
+let aktifNotlar = YAYIM_NOTLARI;
+
+/**
+ * YALNIZ TESTLER İÇİN: mekanizmayı UYDURMA bir istisna tablosuyla sınamak. Argümansız çağrı
+ * yayımlanan tabloya (YAYIM_ISTISNALARI / YAYIM_NOTLARI) döner. Üretim kodu çağırmaz.
+ */
+export function _yayimIstisnaTablosu(istisnalar, notlar) {
+  aktifIstisnalar = Array.isArray(istisnalar) ? istisnalar : YAYIM_ISTISNALARI;
+  aktifNotlar = notlar && typeof notlar === 'object' ? notlar : YAYIM_NOTLARI;
+}
 
 /** O teslim gününün yayım istisnası ({bas, bit, not, metin}) ya da null. */
 export function yayimIstisnasi(ymd) {
   if (!ymdGecerli(ymd)) return null;
-  const x = YAYIM_ISTISNALARI.find((i) => ymd >= i.bas && ymd <= i.bit);
-  return x && YAYIM_NOTLARI[x.not] ? { bas: x.bas, bit: x.bit, not: x.not, metin: YAYIM_NOTLARI[x.not] } : null;
+  const x = aktifIstisnalar.find((i) => ymd >= i.bas && ymd <= i.bit);
+  return x && aktifNotlar[x.not] ? { bas: x.bas, bit: x.bit, not: x.not, metin: aktifNotlar[x.not] } : null;
+}
+
+/** [bas, bit] ile kesişen yayım istisnaları → [{bas, bit, not: metin}] (JSON yayimNotlari, XLSX "Bilgi"). */
+export function yayimNotlariAralik(bas, bit) {
+  return aktifIstisnalar.filter((x) => x.bit >= bas && x.bas <= bit && aktifNotlar[x.not]).map((x) => ({ bas: x.bas, bit: x.bit, not: aktifNotlar[x.not] }));
 }
 
 /** Doğrulama durumları. */

@@ -188,7 +188,7 @@ export function ozetCumlesi(tarih, o, donemler, cekildi) {
  * Tablonun üstündeki tarih uyarısı (veriden bağımsız). İstemcideki kuralUyarisi() ile AYNI.
  * - Kural yok (2027+): doğrulanmış kural olmadığı söylenir.
  * - Günün V ya da AFL değeri yöntem bölümünün anlattığı son dönemden (1 Kasım 2026+) farklıysa: o günün değerleri.
- * - Yayım istisnası varsa (1–25 Ocak 2026): gün düzeyi not (satır başına "†" yerine).
+ * - Yayım istisnası varsa (functions/_lib/dengesizlik.js YAYIM_ISTISNALARI; şu an yok): gün düzeyi not (satır başına "†" yerine).
  */
 export function kuralUyarisi(tarih) {
   const kural = kuralBul(tarih);
@@ -217,13 +217,11 @@ export function senaryoNotu(ymd) {
   if (!kural.formulGoster) return { acik: false, metin: `${t} teslim gününde uygulanan kural ve değerler bu sayfada henüz birincil kaynaklardan doğrulanmadı; bu tarih için hesap yapılmaz.${ek}` };
   // Geçerlilik aralığı V VE AFL'nin birlikte sabit kaldığı dilimdir (kuralDilimleri; ör. 01.01–03.04.2026).
   const dilim = kuralDilimleri().find((x) => ymd >= x.bas && ymd <= x.bit);
-  const ist = yayimIstisnasi(ymd);
   return {
     acik: true,
     metin: `Hesapta kullanılan değerler (${t} teslim günü; ${tarihTR(dilim.bas)} – ${tarihTR(dilim.bit)} teslim günleri için geçerli; ${tarihTR(kural.dogrulamaTarihi)} itibarıyla birincil kaynaklardan doğrulandı): `
       + `V = ${sabit(kural.V)} TL/MWh, B = ${sabit(kural.B)} TL/MWh, AFL = ${sabit(kural.AFL)} TL/MWh. `
-      + `Dayanak: formül ${kural.kaynak.formul}; k ve l ${kural.kaynak.katsayi}; V ${kural.kaynak.V}; B ${kural.kaynak.B}; AFL ${kural.kaynak.tavan}.`
-      + (ist ? ` ${ist.metin}` : ''),
+      + `Dayanak: formül ${kural.kaynak.formul}; k ve l ${kural.kaynak.katsayi}; V ${kural.kaynak.V}; B ${kural.kaynak.B}; AFL ${kural.kaynak.tavan}.`,
   };
 }
 
@@ -264,12 +262,12 @@ export function ornekHtml(tarih, donemler) {
     ? `Pozitif: min(${p}; ${s}) = ${bicim(Math.min(d.ptf, d.smf))} &lt; V (${sabit(r.V)}) olduğu için (−1) × ${sabit(r.B)} × (1 + ${katsayi(r.l)}) = ${bicim(r.pozitif)} TL/MWh`
     : `Pozitif: min(${p}; ${s}) × (1 − ${katsayi(r.l)}) = ${bicim(r.pozitif)} TL/MWh`;
   const fN = Math.abs(r.negatif - d.negatif), fP = Math.abs(r.pozitif - d.pozitif);
-  // Yayım istisnası günlerinde (1–25 Ocak 2026) karşılaştırma cümlesi yerine gün düzeyi not.
+  // Yayım istisnası günlerinde (YAYIM_ISTISNALARI; şu an yok) karşılaştırma cümlesi yerine gün düzeyi not.
   const ist = kural.karsilastir ? null : yayimIstisnasi(tarih);
   const uyum = ist ? ist.metin : !formulFarki(d, kural)
     ? 'Formül sonucu yayımlanan değerlerle aynıdır.'
     : `Formül sonucu ile yayımlanan değer arasında fark vardır (negatif ${bicim(fN)} TL/MWh, pozitif ${bicim(fP)} TL/MWh). Tabloda EPİAŞ'ın yayımladığı değer gösterilir.`;
-  return `<h3>Örnek hesap${ist ? ' (yönetmelik metnine göre)' : ''}: ${tarihTR(tarih)}, ${donemEtiketi(d)}</h3>`
+  return `<h3>Örnek hesap: ${tarihTR(tarih)}, ${donemEtiketi(d)}</h3>`
     + `<p>EPİAŞ verisi: PTF ${p} TL/MWh; SMF ${s} TL/MWh; sistem yönü ${YON_KUCUK[d.yon]}. Bu yönde k = ${katsayi(r.k)} ve l = ${katsayi(r.l)}; V = ${sabit(r.V)} TL/MWh, B = ${sabit(r.B)} TL/MWh`
     + (r.AFL !== null ? `, AFL = ${sabit(r.AFL)} TL/MWh.` : '.') + '</p>'
     + `<p class="hesap-satiri">${neg}</p><p class="hesap-satiri">${poz}</p>`

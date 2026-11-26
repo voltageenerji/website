@@ -17,7 +17,7 @@
 import { createRequire } from 'node:module';
 import { sunucuBaslat } from './dengesizlik-test-sunucu.mjs';
 import { sahteGun, SABIT_AN } from './dengesizlik-test-verisi.mjs';
-import { birimFiyat, kuralBul } from '../../functions/_lib/dengesizlik.js';
+import { birimFiyat, kuralBul, _yayimIstisnaTablosu } from '../../functions/_lib/dengesizlik.js';
 import { bicim, senaryoNotu } from '../../functions/dengesizlik-maliyeti.js';
 
 // Motor seçimi (varsayılan Chromium; davranış değişmez):
@@ -41,8 +41,9 @@ const browser = await pw[MOTOR].launch(MOTOR === 'chromium' ? { ...(CHROME ? { e
 console.log(`# motor: ${MOTOR} ${browser.version()}`);
 
 /** Yeni sayfa: sabit saat (24.11.2026 14:30 İstanbul), yazı tipleri boş CSS, EPİAŞ hostlarına istek = hata. */
-async function ac(yol, { w = 1280, h = 900, js = true, an = SABIT_AN, depo = null } = {}) {
+async function ac(yol, { w = 1280, h = 900, js = true, an = SABIT_AN, depo = null, once = null } = {}) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h }, javaScriptEnabled: js, locale: 'tr-TR', acceptDownloads: true });
+  if (once) await once(ctx); // ör. sayfa yanıtını yönlendirme ile değiştirme (fikstür)
   const page = await ctx.newPage();
   const kayit = { konsol: [], hata: [], epias: 0, veriIstek: 0 };
   page.on('console', (m) => { if (m.type() === 'error') kayit.konsol.push(m.text()); });
@@ -416,7 +417,7 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   ok('C2 tarayici: tarih degisince eski sonuc silinir, not aninda guncellenir', (await page.locator('#hSonuc').innerHTML()) === '' && (await metin(page, '#hKural')) === senaryoNotu('2026-10-31').metin);
   for (const g of ['2026-02-10', '2026-07-15', '2026-11-15', '2026-01-20']) {
     await page.fill('#sGun', g);
-    ok(`R5 tarayici ${g}: istemci notu = sunucu notu (V ve AFL dilimi${g === '2026-01-20' ? ' + Ocak notu' : ''})`, (await metin(page, '#hKural')) === senaryoNotu(g).metin, `-> ${await metin(page, '#hKural')}`);
+    ok(`R5 tarayici ${g}: istemci notu = sunucu notu (V ve AFL dilimi; R7: Ocak'ta ek not yok)`, (await metin(page, '#hKural')) === senaryoNotu(g).metin, `-> ${await metin(page, '#hKural')}`);
   }
   await page.fill('#sGun', '');
   await page.press('#sMiktar', 'Enter');
@@ -609,17 +610,37 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
   S.ayarla({ gun: gunVerisi(11) });
 }
 
-{ // R4: 1–25 Ocak 2026 yayım istisnası — istemci çizimi (SSR'sız kabuk) gün düzeyi not, satır başına † yok
+{ // R4/R7: yayım istisnası mekanizması — UYDURMA fikstürle (yayımlanan tablo boş). SSR: sunucu tablosu test
+  // ayarlayıcısıyla; istemci (SSR'sız kabuk): sayfadaki gömülü kural JSON'u yönlendirmeyle fikstüre çevrilir.
+  // !!! UYDURMA TEST İSTİSNASI — yalnız mekanizmayı sınar; sayfada ya da bir yayında KULLANILMAZ.
   S.ayarla({ gun: (g) => sahteGun(g).map((o, i) => (i === 5 ? { ...o, negatif: o.negatif + 6.25 } : o)) });
-  const OCAK_NOTU = "1–25 Ocak 2026 teslim günlerinde EPİAŞ'ın yayımladığı dengesizlik fiyatları, saatlerin çoğunda, 1 Ocak 2026'da yürürlüğe giren DUY m.110 metnindeki formülle hesaplanan değerlerle aynı değildir. Bu günlerde uzlaştırmada hangi değerlerin esas alındığı bu sayfada doğrulanmamıştır. Tabloda EPİAŞ'ın yayımladığı değer gösterilir; kesin tutar için EPİAŞ'ın uzlaştırma bildirimleri esas alınır.";
-  for (const [g, istisna] of [['2026-01-01', true], ['2026-01-25', true], ['2026-01-26', false]]) {
+  const SAHTE_NOT = 'UYDURMA TEST NOTU: bu teslim günlerinde yayımlanan fiyatlar formülden farklıdır.';
+  const FIKSTUR = { istisnalar: [{ bas: '2026-03-02', bit: '2026-03-04', not: 'test-notu' }], notlar: { 'test-notu': SAHTE_NOT } };
+  const fiksturRota = async (ctx) => ctx.route(/\/kabuk/, async (r) => {
+    const y = await r.fetch();
+    const govde = (await y.text()).replace('"istisnalar":[],"notlar":{}', `"istisnalar":${JSON.stringify(FIKSTUR.istisnalar)},"notlar":${JSON.stringify(FIKSTUR.notlar)}`);
+    await r.fulfill({ response: y, body: govde });
+  });
+  _yayimIstisnaTablosu(FIKSTUR.istisnalar, FIKSTUR.notlar);
+  for (const [g, istisna] of [['2026-03-02', true], ['2026-03-04', true], ['2026-03-05', false]]) {
+    for (const yol of [`/dengesizlik-maliyeti?tarih=${g}`, `/kabuk?tarih=${g}`]) {
+      const { page, kayit, kapat } = await ac(yol, { once: yol.startsWith('/kabuk') ? fiksturRota : null });
+      if (yol.startsWith('/kabuk')) await page.waitForSelector('#dTablo tr[data-bas]');
+      const uyari = await metin(page, '#dKuralUyari');
+      const hancer = (await page.locator('#dTablo .fark').count());
+      ok(`R4 fikstur ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): ${istisna ? 'gun notu, † yok' : 'not yok, † 1 satir'}`, istisna ? (uyari.endsWith(SAHTE_NOT) && hancer === 0 && (await page.isHidden('#dFarkNot'))) : (!uyari.includes(SAHTE_NOT) && hancer === 1 && (await metin(page, '#dFarkNot')).startsWith('† 1 dönemde')), `-> ${uyari.slice(-60)} † ${hancer}`);
+      ok(`R4 fikstur ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): hata yok`, kayit.hata.length === 0);
+      await kapat();
+    }
+  }
+  _yayimIstisnaTablosu();
+  // R7: yayımlanan tabloyla 1–25 Ocak'ta not YOK, † olağan (SSR ve istemci)
+  for (const g of ['2026-01-01', '2026-01-25']) {
     for (const yol of [`/dengesizlik-maliyeti?tarih=${g}`, `/kabuk?tarih=${g}`]) {
       const { page, kayit, kapat } = await ac(yol);
       if (yol.startsWith('/kabuk')) await page.waitForSelector('#dTablo tr[data-bas]');
       const uyari = await metin(page, '#dKuralUyari');
-      const hancer = (await page.locator('#dTablo .fark').count());
-      ok(`R4 ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): ${istisna ? 'gun notu, † yok' : 'not yok, † 1 satir'}`, istisna ? (uyari.endsWith(OCAK_NOTU) && hancer === 0 && (await page.isHidden('#dFarkNot'))) : (!uyari.includes('1–25 Ocak') && hancer === 1 && (await metin(page, '#dFarkNot')).startsWith('† 1 dönemde')), `-> ${uyari.slice(-60)} † ${hancer}`);
-      ok(`R4 ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): hata yok`, kayit.hata.length === 0);
+      ok(`R7 ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): Ocak notu yok, † olagan`, !/1–25 Ocak|yayımladığı dengesizlik fiyatları/.test(uyari) && (await page.locator('#dTablo .fark').count()) === 1 && kayit.hata.length === 0, `-> ${uyari.slice(-60)}`);
       await kapat();
     }
   }
