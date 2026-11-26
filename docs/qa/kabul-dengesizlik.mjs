@@ -41,8 +41,8 @@
  *   15 2026-11-01 (üst akışta çift satır bildirildi): dönem başına TEK satır, çelişki yok (çelişen
  *      kopya "—" olurdu: tüm dönemler yayımlanmış), sayfada da aynı satır sayısı; proxy varsa ham
  *      kopya sayısı ve birebir karşılaştırma
- *   16 Geçmiş derinliği: 2026-01-01 veri döner (tam gün); Kasım öncesi bir gün (2026-10-15) sayfasında
- *      V = 150 görünür (tablo üstü not ya da o günün örnek hesabı)
+ *   16 Geçmiş derinliği: 2026-01-01 veri döner (tam gün); Kasım öncesi bir gün (2026-10-15) sayfası sunucuda
+ *      çizilir ve /veri kurallar[] o gün için V = 150 bildirir (R8: V sayfada gösterilmez)
  *   17 EPİAŞ günlük bülteniyle çapraz denetim (KABUL_BULTEN_CSV): ay başına 3 rastgele tamamlanmış gün
  *      + 2026-11-01 + 2026-01-26 + sabit günler; PTF, SMF, yön, pozitif ve negatif dengesizlik fiyatı; site
  *      (/veri) ve proxy (varsa). BİLİNEN BÜLTEN FARKI: EPİAŞ günlük bülten PDF'lerinde 1–25 Ocak 2026 ve
@@ -54,7 +54,7 @@
  *      üstü notunda ve /veri yayimNotlari'nda yayım farkı notu olmamalı; site /veri (proxy varsa o da)
  *      değerleri her saatlik dönemde formülle ≤ 0,01. Not varken API = formül ise KALDI (not kaldırılmalı);
  *      API ≠ formül ise KALDI (Hukuk/Enerji Piyasası incelemeli). Bülten gerektirmez.
- *   19 Üç tam Kasım günü (2026-11-05, -12, -19): sayfada hiç "†" yok, fark notu boş; /veri değerleri
+ *   19 Üç tam Kasım günü (2026-11-05, -12, -19): sayfada hiç "†" yok (R8: hiç basılmaz), fark notu yok; /veri değerleri
  *      formülle her dönemde ≤ 0,01 (sunucunun "dengesizlik-formul-farki" günlüğünü doğuracak fark
  *      yok; günlük dışarıdan okunamaz, koşulu bu yoldan denetlenir)
  *   20 Tam takvim ayı aralığı (bugünden önceki son tam ay): JSON/CSV/XLSX 200, ayın her günü var,
@@ -426,21 +426,20 @@ else {
   madde(15, `${KASIM1}: dönem başına tek satır, çelişki yok (sayfa ve /veri)`, iyi ? GECTI : KALDI, `durum ${kasim1.durum}, dönem ${d.length} (${dk} dk), tekil ${tekil}, bitişik ${bitisik}, yayımlanan ${yay}; sayfa ${s15.durum} satır ${sayfaSatir}, tümü "—" satır ${tumuBos}${ek}`);
 }
 
-// 16 — geçmiş derinliği
+// 16 — geçmiş derinliği (R8: sade sayfa; V artık yalnız /veri kurallar[] verisinde, sayfada gösterilmez)
 {
   const ILK = '2026-01-01', ONCE = '2026-10-15';
   const o = await jsonAlSabirli(`/dengesizlik-maliyeti/veri?tarih=${ILK}&bicim=json`);
   const d = o.j ? o.j.donemler : [];
   const dk = d.length ? d[0].dk : null;
   const yay = d.filter(yayimlandi).length;
+  const j16 = await jsonAlSabirli(`/dengesizlik-maliyeti/veri?tarih=${ONCE}&bicim=json`);
+  const k16 = kuralFor(j16.j ? j16.j.kurallar : [], ONCE);
   const s16 = await al(`/dengesizlik-maliyeti?tarih=${ONCE}`, { accept: 'text/html' });
-  const not = coz((/<p class="uyari" id="dKuralUyari"[^>]*>([\s\S]*?)<\/p>/.exec(s16.metin) || [])[1] || '');
-  const ornek = coz((/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/.exec(s16.metin) || [])[1] || '');
-  // Kural tablosu değişebilir: V = 150 tablo üstü notta ("Bu tarihte V değeri 150 TL/MWh idi") ya da o günün örnek hesabında ("V = 150 TL/MWh") görünmeli
-  const v150 = /V değeri 150 TL\/MWh/.test(not) || /V = 150 TL\/MWh/.test(ornek);
-  const v100Yok = !/V değeri 100 TL\/MWh/.test(not) && !/V = 100 TL\/MWh/.test(ornek);
-  const iyi = o.durum === 200 && dk && d.length === 1440 / dk && yay === d.length && s16.durum === 200 && /data-ssr="1"/.test(s16.metin) && v150 && v100Yok;
-  madde(16, `Geçmiş derinliği: ${ILK} veri; Kasım öncesi gün (${ONCE}) V = 150`, iyi ? GECTI : KALDI, `${ILK}: durum ${o.durum}, dönem ${d.length}, yayımlanan ${yay}; ${ONCE}: sayfa ${s16.durum}, sunucu verisi ${/data-ssr="1"/.test(s16.metin)}, V = 150 görünür ${v150} (${/V değeri 150/.test(not) ? 'tablo üstü not' : /V = 150/.test(ornek) ? 'örnek hesap' : 'yok'}), V = 100 yok ${v100Yok}`);
+  const satir16 = ((/<tbody id="dTablo">([\s\S]*?)<\/tbody>/.exec(s16.metin) || [])[1] || '').match(/<tr[^>]*data-bas=/g) || [];
+  const v150 = !!k16 && k16.V === 150;
+  const iyi = o.durum === 200 && dk && d.length === 1440 / dk && yay === d.length && s16.durum === 200 && /data-ssr="1"/.test(s16.metin) && satir16.length > 0 && v150;
+  madde(16, `Geçmiş derinliği: ${ILK} veri; Kasım öncesi gün (${ONCE}) sunucuda çizilir, /veri kuralı V = 150`, iyi ? GECTI : KALDI, `${ILK}: durum ${o.durum}, dönem ${d.length}, yayımlanan ${yay}; ${ONCE}: sayfa ${s16.durum}, sunucu verisi ${/data-ssr="1"/.test(s16.metin)}, tablo satırı ${satir16.length}, /veri kuralı V = 150 ${v150}`);
 }
 
 // 17 — EPİAŞ günlük bülteniyle çapraz denetim (isteğe bağlı)

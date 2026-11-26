@@ -186,7 +186,7 @@ for (const [w, h] of [[320, 640], [390, 844], [768, 1024], [1440, 900]]) {
   ok('S2 96 donem: hesaplayicida 96 secenek', (await page.locator('#hDonem option').count()) === 96 && (await metin(page, '#dYayim')) === '60 / 96');
   await page.fill('#hMiktar', '2'); await page.press('#hMiktar', 'Enter');
   ok('S2 96 donem: gun verisiyle hesap YAPILMAZ (15 dk icin varsayim yok)', (await metin(page, '#gYok')) === 'Bu günün verisi 15 dakikalık dönemlerle yayımlanmış. Bu hesaplayıcı saatlik dönemler için hazırlanmıştır; 15 dakikalık veride hesap yapılmaz.' && (await page.locator('#gTutar').count()) === 0);
-  ok('S2 96 donem: ornek hesap yerine not', (await metin(page, '#dOrnek')) === 'Bu günün verisi 15 dakikalık dönemlerle yayımlanmış; örnek hesap yalnızca saatlik dönemli günlerde gösterilir.');
+  ok('R8 S2 96 donem: ornek hesap bolumu yok', (await page.locator('#dOrnek').count()) === 0);
   ok('S2 96 donem: hata yok', kayit.konsol.length === 0 && kayit.hata.length === 0);
   await kapat();
   S.ayarla({ gun: gunVerisi(11) });
@@ -273,7 +273,12 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   await page.focus('#hModGun');
   await page.keyboard.press('ArrowDown');
   ok('S4 ok tusuyla "Kendi senaryom" secilir, form degisir', (await page.isChecked('#hModSenaryo')) && (await page.isVisible('#hSenaryo')) && (await page.isHidden('#hGun')));
-  ok('S4 kural notu: teslim gunu (varsayilan bugun) kurali + karar atiflari; istemci = sunucu', (await metin(page, '#hKural')) === senaryoNotu('2026-11-24').metin && (await metin(page, '#hKural')).startsWith('Hesapta kullanılan değerler (24.11.2026 teslim günü; 01.11.2026 – 31.12.2026 teslim günleri için geçerli; 24.11.2026 itibarıyla birincil kaynaklardan doğrulandı): V = 100 TL/MWh, B = 100 TL/MWh, AFL = 4.500 TL/MWh. Dayanak:'));
+  ok('R8 S4 kural notu: yalniz carpan satiri (varsayilan yon enerji acigi); istemci = sunucu', (await metin(page, '#hKural')) === senaryoNotu('2026-11-24').metin && (await metin(page, '#hKural')) === 'Sistem enerji açığı: negatif dengesizlikte %6, pozitifte %3.');
+  await page.selectOption('#sYon', 'fazla');
+  ok('R8 S4 sistem yonu degisince carpan satiri aninda degisir (istemci = sunucu)', (await metin(page, '#hKural')) === senaryoNotu('2026-11-24', 'fazla').metin && (await metin(page, '#hKural')) === 'Sistem enerji fazlası: pozitif dengesizlikte %6, negatifte %3.');
+  await page.selectOption('#sYon', 'denge');
+  ok('R8 S4 dengede: iki yonde %3', (await metin(page, '#hKural')) === 'Sistem dengede: pozitif ve negatif dengesizlikte %3.');
+  await page.selectOption('#sYon', 'acik');
   ok('S4 teslim gunu alani: varsayilan bugun, min 01.01.2026, max bugun', (await page.inputValue('#sGun')) === '2026-11-24' && (await page.getAttribute('#sGun', 'min')) === '2026-01-01' && (await page.getAttribute('#sGun', 'max')) === '2026-11-24');
   // Klavyeyle doldur: Tab sırası Teslim günü → PTF → SMF → yön → miktar → Hesapla
   await page.keyboard.press('Tab');
@@ -376,8 +381,8 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
 }
 { // "Kendi senaryom" seçili tablo gününe DEĞİL kendi teslim gününe bağlıdır (eski bir güne bakarken de)
   const { page, kapat } = await ac('/dengesizlik-maliyeti?tarih=2026-03-10');
-  ok('R4 eski gun: tablonun ustunde V = 150 ve AFL 3.400 notu', (await page.locator('#dKuralUyari').isVisible()) && (await metin(page, '#dKuralUyari')) === 'Bu teslim gününde V değeri 150 TL/MWh, azami fiyat limiti 3.400 TL/MWh idi; aşağıdaki yöntem bölümü 1 Kasım 2026 teslim gününden itibaren uygulanan değerleri anlatır.');
-  ok('R4 eski gun: ornek hesap o gunun kuraliyla (AFL 3.400); formulle uyumlu veride † yok', (await page.isVisible('#dOrnek')) && (await metin(page, '#dOrnek')).includes('AFL = 3.400 TL/MWh') && (await page.isHidden('#dFarkNot')) && !(await page.locator('#dTablo').innerHTML()).includes('†'));
+  ok('R8 eski gun: tablonun ustunde donem notu yok', (await metin(page, '#dKuralUyari')) === '' && (await page.isHidden('#dKuralUyari')));
+  ok('R8 eski gun: ornek hesap ve † yok', (await page.locator('#dOrnek').count()) === 0 && (await page.locator('#dFarkNot').count()) === 0 && !(await page.locator('#dTablo').innerHTML()).includes('†'));
   await page.check('#hModSenaryo');
   ok('S4 eski gun: teslim gunu yine bugun, kural notu bugunun kurali (V = 100)', (await page.inputValue('#sGun')) === '2026-11-24' && (await metin(page, '#hKural')) === senaryoNotu('2026-11-24').metin);
   await page.fill('#sPtf', '450'); await page.fill('#sSmf', '120'); await page.selectOption('#sYon', 'fazla'); await page.fill('#sMiktar', '1');
@@ -399,7 +404,7 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   };
   for (const g of ['2026-02-10', '2026-04-03', '2026-04-04', '2026-10-31']) {
     const x = await dene(g);
-    ok(`R4 tarayici ${g}: dogrulanmis kural (V = 150) -> 120 < V esik alti, −106,00`, x.ret === null && x.not === senaryoNotu(g).metin && x.poz === '−106,00 TL/MWh', `-> ${x.ret} ${x.poz}`);
+    ok(`R4 tarayici ${g}: dogrulanmis kural (V = 150) -> 120 < V esik alti, −106,00`, x.ret === null && x.not === senaryoNotu(g, 'fazla').metin && x.poz === '−106,00 TL/MWh', `-> ${x.ret} ${x.poz}`);
   }
   // Nisan öncesi tavan dalı: AFL 3.400 → 3.400 × 1,05 × (1 + 0,06)
   await page.fill('#sGun', '2026-02-10'); await page.fill('#sPtf', '3.400'); await page.fill('#sSmf', '3000'); await page.selectOption('#sYon', 'acik'); await page.fill('#sMiktar', '1');
@@ -411,13 +416,13 @@ bolum('S4 hesaplayıcı — “Kendi senaryom” (klavye + formül sürüklenmes
   ok('R4 tarayici 2026-04-04 PTF 4.500: tavan dali (AFL 4.500)', (await metin(page, '#sNegFiyat')) === '5.008,50 TL/MWh');
   for (const g of ['2026-11-01', '2026-11-24']) {
     const x = await dene(g);
-    ok(`C2 tarayici ${g}: dogrulanmis kural (V = 100) -> hesap`, x.ret === null && x.poz === '112,80 TL/MWh' && x.not === senaryoNotu(g).metin && (await metin(page, '#sYanki')).startsWith(`Senaryo: ${g.slice(8, 10)}.${g.slice(5, 7)}.2026 teslim günü`));
+    ok(`C2 tarayici ${g}: dogrulanmis kural (V = 100) -> hesap`, x.ret === null && x.poz === '112,80 TL/MWh' && x.not === senaryoNotu(g, 'fazla').metin && (await metin(page, '#sYanki')).startsWith(`Senaryo: ${g.slice(8, 10)}.${g.slice(5, 7)}.2026 teslim günü`));
   }
   await page.fill('#sGun', '2026-10-31');
-  ok('C2 tarayici: tarih degisince eski sonuc silinir, not aninda guncellenir', (await page.locator('#hSonuc').innerHTML()) === '' && (await metin(page, '#hKural')) === senaryoNotu('2026-10-31').metin);
+  ok('C2 tarayici: tarih degisince eski sonuc silinir, not aninda guncellenir', (await page.locator('#hSonuc').innerHTML()) === '' && (await metin(page, '#hKural')) === senaryoNotu('2026-10-31', 'fazla').metin);
   for (const g of ['2026-02-10', '2026-07-15', '2026-11-15', '2026-01-20']) {
     await page.fill('#sGun', g);
-    ok(`R5 tarayici ${g}: istemci notu = sunucu notu (V ve AFL dilimi; R7: Ocak'ta ek not yok)`, (await metin(page, '#hKural')) === senaryoNotu(g).metin, `-> ${await metin(page, '#hKural')}`);
+    ok(`R5/R8 tarayici ${g}: istemci notu = sunucu notu (secili yon enerji fazlasi)`, (await metin(page, '#hKural')) === senaryoNotu(g, 'fazla').metin, `-> ${await metin(page, '#hKural')}`);
   }
   await page.fill('#sGun', '');
   await page.press('#sMiktar', 'Enter');
@@ -486,7 +491,7 @@ bolum('S6 dürüst bekleme hâli');
   ok('S6 ?veriyok: ozet "—"', (await Promise.all(['dYayim', 'dPtfOrt', 'dSmfOrt', 'dMalPoz', 'dMalNeg', 'dYonAcik', 'dYonFazla', 'dYonDenge'].map((id) => metin(page, '#' + id)))).every((t) => t === '—'));
   ok('S6 ?veriyok: EPİAŞ VERİSİ BEKLENİYOR', (await metin(page, '#dDamga')) === 'EPİAŞ VERİSİ BEKLENİYOR' && (await metin(page, '#dMod')) === 'VERİ BEKLENİYOR' && (await page.getAttribute('#dDamga', 'class')) === 'live-stamp waiting');
   ok('S6 ?veriyok: istemci veri ucunu CAGIRMAZ', kayit.veriIstek === 0);
-  ok('S6 ?veriyok: ozet cumlesi bos, ornek gorunmez', (await metin(page, '#dOzet')) === '' && (await page.isHidden('#dOrnek')) && (await page.isHidden('#dFarkNot')) && (await page.isHidden('#dKuralUyari')));
+  ok('S6 ?veriyok: ozet cumlesi bos, tablo ustu not gorunmez', (await metin(page, '#dOzet')) === '' && (await page.locator('#dOrnek').count()) === 0 && (await page.isHidden('#dKuralUyari')));
   ok('S6 ?veriyok: indirme baglantilari PASIF + gorunur neden', (await page.getAttribute('#dCsv', 'href')) === null && (await page.getAttribute('#dXlsx', 'aria-disabled')) === 'true' && (await page.getAttribute('#dJson', 'download')) === null && (await page.isVisible('#dIndirNot')) && (await metin(page, '#dIndirNot')) === 'Veri alınamadığı için indirme şu an kapalı');
   await page.click('#dCsv', { force: true }); // aria-disabled: Playwright "etkin değil" sayar; gerçek tıklama zorlanır
   ok('S6 ?veriyok: pasif baglantiya tiklamak gezinme/indirme baslatmaz', page.url().endsWith('/dengesizlik-maliyeti?veriyok'));
@@ -541,7 +546,7 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
   await b.page.waitForFunction(() => document.querySelectorAll('#dTablo tr[data-bas]').length > 0);
   const parcalar = (page) => page.evaluate(() => ({
     tablo: document.getElementById('dTablo').innerHTML,
-    ozet: ['dYayim', 'dPtfOrt', 'dSmfOrt', 'dMalPoz', 'dMalNeg', 'dYonAcik', 'dYonFazla', 'dYonDenge', 'dGun', 'dBantGun', 'dTabloBaslik', 'dOzet', 'dMod', 'dKuralUyari', 'dFarkNot', 'dUyari'].map((id) => document.getElementById(id).textContent),
+    ozet: ['dYayim', 'dPtfOrt', 'dSmfOrt', 'dMalPoz', 'dMalNeg', 'dYonAcik', 'dYonFazla', 'dYonDenge', 'dGun', 'dBantGun', 'dTabloBaslik', 'dOzet', 'dMod', 'dKuralUyari', 'dUyari'].map((id) => document.getElementById(id).textContent),
     damga: document.getElementById('dDamga').innerHTML,
     secenekler: [...document.querySelectorAll('#hDonem option')].map((o) => `${o.value}|${o.textContent}|${o.selected}`).join(';'),
     indir: ['dCsv', 'dXlsx', 'dJson'].map((id) => { const e = document.getElementById(id); return [e.getAttribute('rel'), e.getAttribute('aria-disabled'), e.hasAttribute('download')].join(); }).join(';') + '|' + document.getElementById('dIndirNot').hidden,
@@ -628,7 +633,7 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
       if (yol.startsWith('/kabuk')) await page.waitForSelector('#dTablo tr[data-bas]');
       const uyari = await metin(page, '#dKuralUyari');
       const hancer = (await page.locator('#dTablo .fark').count());
-      ok(`R4 fikstur ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): ${istisna ? 'gun notu, † yok' : 'not yok, † 1 satir'}`, istisna ? (uyari.endsWith(SAHTE_NOT) && hancer === 0 && (await page.isHidden('#dFarkNot'))) : (!uyari.includes(SAHTE_NOT) && hancer === 1 && (await metin(page, '#dFarkNot')).startsWith('† 1 dönemde')), `-> ${uyari.slice(-60)} † ${hancer}`);
+      ok(`R4/R8 fikstur ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): ${istisna ? 'gun notu' : 'not yok'}, † basilmaz`, (istisna ? uyari === SAHTE_NOT : !uyari.includes(SAHTE_NOT)) && hancer === 0 && (await page.locator('#dFarkNot').count()) === 0, `-> ${uyari.slice(-60)} † ${hancer}`);
       ok(`R4 fikstur ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): hata yok`, kayit.hata.length === 0);
       await kapat();
     }
@@ -640,7 +645,7 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
       const { page, kayit, kapat } = await ac(yol);
       if (yol.startsWith('/kabuk')) await page.waitForSelector('#dTablo tr[data-bas]');
       const uyari = await metin(page, '#dKuralUyari');
-      ok(`R7 ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): Ocak notu yok, † olagan`, !/1–25 Ocak|yayımladığı dengesizlik fiyatları/.test(uyari) && (await page.locator('#dTablo .fark').count()) === 1 && kayit.hata.length === 0, `-> ${uyari.slice(-60)}`);
+      ok(`R7/R8 ${g} (${yol.startsWith('/kabuk') ? 'istemci' : 'SSR'}): Ocak notu yok, † basilmaz`, uyari === '' && (await page.locator('#dTablo .fark').count()) === 0 && kayit.hata.length === 0, `-> ${uyari.slice(-60)}`);
       await kapat();
     }
   }
@@ -666,7 +671,7 @@ bolum('S8 31/12/2026 sonrası: bugünün teslim günüyle formül hesabı redded
   ok('S8 2027: senaryo formu gizli, gun modu acik', (await page.isHidden('#hSenaryo')) && (await page.isVisible('#hGun')) && (await page.isChecked('#hModGun')));
   await page.fill('#hMiktar', '2'); await page.press('#hMiktar', 'Enter');
   ok('S8 2027: gun verisiyle hesap (EPİAŞ fiyati) calisir', /TL\/MWh/.test(await metin(page, '#gFiyat')));
-  ok('S8 2027: ornek hesap bolumu gorunmez', await page.isHidden('#dOrnek'));
+  ok('S8 2027: ornek hesap bolumu yok', (await page.locator('#dOrnek').count()) === 0);
   ok('S8 2027: hata yok', kayit.konsol.length === 0 && kayit.hata.length === 0, `-> ${JSON.stringify(kayit)}`);
   await kapat();
   // Senaryo kendi teslim gününe bağlıdır: 2027'de 31.12.2026 tablosuna bakılırken varsayılan teslim günü yine bugün
@@ -682,9 +687,9 @@ bolum('S9 JavaScript kapalı: veri, yöntem ve formlar okunur/çalışır');
 {
   const { page, kapat } = await ac('/dengesizlik-maliyeti', { js: false });
   ok('S9 tablo sunucudan gelir', (await page.locator('#dTablo tr[data-bas]').count()) === 24 && (await metin(page, '#dYayim')) === '11 / 24');
-  ok('S9 ozet cumlesi, formul, SSS, kaynak HTML\'de', (await metin(page, '#dOzet')).startsWith('24.11.2026 dengesizlik özeti') && (await page.locator('.formul').count()) === 2 && (await page.locator('#dSss h3').count()) === 8 && (await metin(page, '#dAtif')).startsWith('Dayanak:'));
+  ok('S9 ozet cumlesi, formul, SSS, kaynak HTML\'de', (await metin(page, '#dOzet')).startsWith('24.11.2026 dengesizlik özeti') && (await page.locator('.formul').count()) === 1 && (await page.locator('#dSss h3').count()) === 4 && (await metin(page, '#dAtif')).startsWith('Dayanak:'));
   ok('S9 Hesapla dugmeleri JS yokken PASIF; donem secici sunucudan dolu', (await page.locator('#dHesap button[type="submit"]:disabled').count()) === 2 && (await page.locator('#hDonem option').count()) === 24 && (await page.inputValue('#hDonem')) === '2026-11-24T10:00:00+03:00' && !(await metin(page, '#hDonem')).includes('Veri bekleniyor'));
-  ok('S9 ornek hesap HTML\'de', (await metin(page, '#dOrnek h3')) === 'Örnek hesap: 24.11.2026, 10:00–11:00');
+  ok('R8 S9 ornek hesap bolumu yok', (await page.locator('#dOrnek').count()) === 0);
   ok('S9 noscript notu gorunur', (await page.locator('noscript').count()) === 1);
   ok('C2 S9 teslim gunu ve kural notu sunucudan (JS yokken)', (await page.getAttribute('#sGun', 'value')) === '2026-11-24' && (await page.getAttribute('#sGun', 'max')) === '2026-11-24' && (await page.locator('#hKural').textContent()) === senaryoNotu('2026-11-24').metin);
   ok('S9 indirme baglantilari calisir durumda', (await page.getAttribute('#dCsv', 'href')) === '/dengesizlik-maliyeti/veri?tarih=2026-11-24&bicim=csv');

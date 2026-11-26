@@ -572,8 +572,8 @@ export function ozet(liste) {
 /** Sistem yönünün görünen adı (EPİAŞ'ın terimleri). */
 export const YON_ADI = Object.freeze({ acik: 'Enerji açığı', fazla: 'Enerji fazlası', denge: 'Dengede' });
 
-/** Atıf satırı — föydeki TR metin (24 Kasım 2026 itibarıyla); 14459'un RG sayısı (33213) Revizyon 1 ile eklendi. */
-export const ATIF = 'Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği (RG 14/4/2009-27200) m.110 (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik); k ve l katsayıları: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122); V değeri: 24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405); azami fiyat limiti: 27/3/2025 tarihli ve 13423 sayılı Kurul Kararı (RG 5/4/2025-32861) ve 2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213). Veri: EPİAŞ Şeffaflık Platformu. 24 Kasım 2026 itibarıyla.';
+/** Atıf satırı (R8, sahip kararı 26.11.2026: sade sayfa) — DUY m.110 + Karar 14030 + veri kaynağı. */
+export const ATIF = 'Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı. Veri: EPİAŞ Şeffaflık Platformu.';
 
 /** Ortalamaların ne olduğu / ne olmadığı (özet cümlesi, JSON "not", XLSX "Bilgi"). */
 export const NOT_ORTALAMA = 'Ortalamalar dönemlerin aritmetik ortalamasıdır; dengesizlik hacmiyle ağırlıklandırılmamıştır. Bir portföyün gerçekleşen ya da beklenen dengesizlik maliyeti değildir; her dönemde aynı yönde 1 MWh dengesizliği olan düz bir profilin MWh başı ortalamasına karşılık gelir.';

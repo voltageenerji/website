@@ -94,13 +94,13 @@ for (const [ad, sorgu, tarih] of [['bugün (11/24, tarihsiz)', '', '2026-11-24']
   ok(`A ${ad}: özet bandı (yayımlanan/toplam, 4 ortalama, yön sayıları) ve damga <time>`, h.includes(`<span id="dYayim">${o.yayimlanan} / ${o.toplam}</span>`) && h.includes(`<div class="cv" id="dPtfOrt">${bicim(o.ptfOrt)}</div>`) && h.includes(`<div class="cv" id="dMalNeg">${bicim(o.maliyetNegatifOrt)}</div>`) && h.includes(`<b id="dYonAcik">${o.yon.acik}</b>`) && h.includes(`<time datetime="${j.cekildi}">`));
   // Yöntem bölümü
   const yontem = cozB(h.slice(h.indexOf('<h2 id="yontem">'), h.indexOf('<h2 id="kapsam">')));
-  ok(`A ${ad}: yöntem bölümü: iki formül ve koşulları`, ['Negatif dengesizlik birim fiyatı = max(V; PTF; SMFN) × (1 + k)', 'max(PTF; SMFN) azami fiyat limitine (AFL) eşitse:', 'Negatif dengesizlik birim fiyatı = AFL × 1,05 × (1 + k)', 'Pozitif dengesizlik birim fiyatı = min(PTF; SMFP) × (1 − l)', 'min(PTF; SMFP) < V ise:', 'Pozitif dengesizlik birim fiyatı = (−1) × B × (1 + l)'].every((x) => yontem.includes(x)));
-  ok(`A ${ad}: k/l katsayı tablosu ve V/B/AFL parametreleri dayanaklarıyla`, ['Enerji açığı 0,06 0,03', 'Enerji fazlası 0,03 0,06', 'Dengede 0,03 0,03', 'V 100 TL/MWh 1 Kasım 2026', '14911 sayılı Kurul Kararı', 'V 150 TL/MWh', 'B 100 TL/MWh', 'AFL 4.500 TL/MWh', 'Tavan çarpanı 1,05'].every((x) => yontem.includes(x)));
+  ok(`A ${ad}: yöntem bölümü (R8): çarpan kuralı + iki formül + ek kurallar + dayanak`, ["Sistem enerji fazlasındaysa (arz fazlası) pozitif dengesizlikte çarpan %6, negatif dengesizlikte %3'tür.", "Sistem enerji açığındaysa (talep fazlası) negatif dengesizlikte çarpan %6, pozitif dengesizlikte %3'tür.", "Sistem dengedeyse ikisi de %3'tür.", 'Pozitif dengesizlik fiyatı = min(PTF; SMF) × (1 − çarpan)', 'Negatif dengesizlik fiyatı = max(PTF; SMF) × (1 + çarpan)', "Çok düşük fiyatlı saatlerde ve azami fiyat limitinde yönetmelikteki ek kurallar uygulanır; tabloda EPİAŞ'ın yayımladığı değer gösterilir.", 'Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı.'].every((x) => yontem.includes(x)), `-> ${yontem.slice(0, 200)}`);
+  ok(`A ${ad}: (R8) V/B/AFL parametre tablosu ve katsayı tablosu yok`, !h.includes('id="dSabit"') && !h.includes('id="dKatsayi"') && !/Tavan çarpanı|14911|14459/.test(yontem));
   // Örnek hesap: SSR'da, kodla hesaplanan değer kütüphaneyle aynı
   const ornek = coz(ilk(/<div class="ornek" id="dOrnek">([\s\S]*?)<\/div>/, h) || '');
   const son = [...j.donemler].reverse().find((d) => d.pozitif !== null && d.yon);
   const r = birimFiyat({ ptf: son.ptf, smfN: son.smf, smfP: son.smf, yon: son.yon }, kuralBul(tarih));
-  ok(`A ${ad}: örnek hesap SSR'da; formül sonucu kütüphaneyle aynı`, ornek.startsWith(`Örnek hesap: ${tarihTR(tarih)}, ${son.bas.slice(11, 16)}`) && ornek.includes(`= ${bicim(r.negatif)} TL/MWh`) && ornek.includes(`= ${bicim(r.pozitif)} TL/MWh`), `-> ${ornek.slice(0, 120)}`);
+  ok(`A ${ad}: (R8) örnek hesap bölümü yok; formül kütüphanesi yine çalışır`, !h.includes('id="dOrnek"') && r !== null && Number.isFinite(r.negatif) && Number.isFinite(r.pozitif), `-> ${ornek.slice(0, 120)}`);
   // SSS ve JSON-LD
   const sssHtml = ilk(/<div id="dSss">([\s\S]*?)<\/div>/, h) || '';
   const sss = [...sssHtml.matchAll(/<h3>([\s\S]*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/g)].map((m) => [coz(m[1]), coz(m[2])]);
@@ -108,7 +108,7 @@ for (const [ad, sorgu, tarih] of [['bugün (11/24, tarihsiz)', '', '2026-11-24']
   const faq = graf.find((n) => n['@type'] === 'FAQPage');
   const faqCift = faq ? faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text]) : [];
   ok(`A ${ad}: JSON-LD ayrıştırılır; Organization, BreadcrumbList, WebPage, Dataset, WebApplication, FAQPage`, ['Organization', 'BreadcrumbList', 'WebPage', 'Dataset', 'WebApplication', 'FAQPage'].every((t) => graf.some((n) => n['@type'] === t)));
-  ok(`A ${ad}: SSS 8 soru, FAQPage soru ve cevapları görünen SSS metniyle birebir`, sss.length === 8 && JSON.stringify(sss) === JSON.stringify(faqCift), `-> ${sss.length}/${faqCift.length} ${sss.findIndex((x, i) => JSON.stringify(x) !== JSON.stringify(faqCift[i]))}`);
+  ok(`A ${ad}: SSS 4 soru (R8), FAQPage soru ve cevapları görünen SSS metniyle birebir`, sss.length === 4 && JSON.stringify(sss) === JSON.stringify(faqCift), `-> ${sss.length}/${faqCift.length} ${sss.findIndex((x, i) => JSON.stringify(x) !== JSON.stringify(faqCift[i]))}`);
   const ds = graf.find((n) => n['@type'] === 'Dataset') || {};
   const wp = graf.find((n) => n['@type'] === 'WebPage') || {};
   ok(`A ${ad}: Dataset dateModified = çekim anı, kapsam ve indirme adresleri`, ds.dateModified === j.cekildi && wp.dateModified === j.cekildi && (sorgu ? ds.temporalCoverage === tarih && ds.distribution.every((d) => d.contentUrl.includes(`tarih=${tarih}`)) : ds.temporalCoverage === '2026-01-01/..' && ds.distribution.length === 3), `-> ${ds.dateModified} ${ds.temporalCoverage}`);
@@ -139,7 +139,7 @@ for (const [ad, sorgu, tarih] of [['bugün (11/24, tarihsiz)', '', '2026-11-24']
     formul: document.querySelectorAll('.formul').length,
     gorunurMetin: document.body.innerText.length,
   }));
-  ok(`A ${MOTOR} ${browser.version()} JS kapalı (Googlebot UA, 412 px): 24 satır, özet, 2 formül, 8 SSS görünür`, v.satir === 24 && v.ozet.startsWith('23.11.2026 dengesizlik özeti') && v.formul === 2 && v.sss === 8 && /^00:00–01:00 2\.000,00 /.test(v.ilkSatir), `-> ${JSON.stringify(v)}`);
+  ok(`A ${MOTOR} ${browser.version()} JS kapalı (Googlebot UA, 412 px): 24 satır, özet, 1 formül kutusu, 4 SSS görünür (R8)`, v.satir === 24 && v.ozet.startsWith('23.11.2026 dengesizlik özeti') && v.formul === 1 && v.sss === 4 && /^00:00–01:00 2\.000,00 /.test(v.ilkSatir), `-> ${JSON.stringify(v)}`);
   await browser.close();
 }
 await S.kapat();
