@@ -1,4 +1,4 @@
-# GEÇİCİ QA iş akışı — yeni tasarım yayın adayı (RC 0879f2b, önizleme https://9c79718b.website-dh5.pages.dev):
+# GEÇİCİ QA iş akışı — yeni tasarım yayın adayı (RC 81e4688, önizleme https://c9c6f0d1.website-dh5.pages.dev; masaüstü CLS önizleme ↔ üretim):
 # gerçek Safari (safaridriver), iOS Simülatörü'nde Mobile Safari, Firefox ve WebKit (iPhone 15 öykünmesi).
 # İş bitince bu dosya bir sonraki commit ile SİLİNİR (CLAUDE.md kural 6). Form GÖNDERİLMEZ. Günlüğe yalnız denetim
 # adları, geçti/kaldı ve sayılar basılır (sayfa gövdesi yok). Ekran görüntüleri (herkese açık sayfalar, kişisel veri
@@ -13,14 +13,15 @@ concurrency:
   group: gecici-qa-yayin
   cancel-in-progress: true
 env:
-  TABAN: https://9c79718b.website-dh5.pages.dev
+  TABAN: https://c9c6f0d1.website-dh5.pages.dev
+  URETIM: https://website-dh5.pages.dev
   PW_SURUM: 1.64.1
   SELENIUM_SURUM: 4.52.0
 
 jobs:
   linux-firefox-webkit:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 50
     steps:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
@@ -277,8 +278,41 @@ jobs:
           console.log(`${gecti} passed, ${kaldi} failed`);
           process.exit(kaldi ? 1 : 0);
           QAEOF
-          npm install --no-audit --no-fund "playwright@${PW_SURUM}" >/dev/null 2>&1; echo "npm $?"
-          npx playwright install --with-deps firefox webkit >/dev/null 2>&1; echo "tarayıcı kurulumu $?"
+          cat > cls.mjs <<'QAEOF'
+          #!/usr/bin/env node
+          // Masaüstü CLS (Chromium, 1440×900, soğuk önbellek, her koşu yeni bağlam): web-vitals oturum penceresi kuralıyla
+          // (1 sn ara, 5 sn pencere) en büyük pencere; yükleme + 4 sn bekleme, kaydırma yok. Çıktı yalnız sayılar.
+          //   SAYFALAR="/rehber /rehber/tekstil-elektrik" ADRESLER="rc=https://… prod=https://…" N=7 MODUL=… node cls.mjs
+          import { createRequire } from 'node:module';
+          const req = createRequire((process.env.MODUL || process.cwd() + '/node_modules').replace(/\/?$/, '/'));
+          const { chromium } = req('playwright');
+          const N = +(process.env.N || 7);
+          const SAYFALAR = (process.env.SAYFALAR || '/rehber /rehber/tekstil-elektrik').split(' ');
+          const ADRES = Object.fromEntries(process.env.ADRESLER.split(' ').map(x => x.split('=')));
+          const med = (a) => { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
+          const b = await chromium.launch();
+          let kotu = 0;
+          for (const yol of SAYFALAR) {
+            for (const [ad, taban] of Object.entries(ADRES)) {
+              const v = [], fontGec = [];
+              for (let i = 0; i < N; i++) {
+                const c = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+                const p = await c.newPage();
+                await p.addInitScript(() => { window.__ls = []; new PerformanceObserver(l => l.getEntries().forEach(e => { if (!e.hadRecentInput) window.__ls.push([e.startTime, e.value]); })).observe({ type: 'layout-shift', buffered: true }); });
+                await p.goto(taban + yol, { waitUntil: 'load', timeout: 60000 }); await p.waitForTimeout(4000);
+                const r = await p.evaluate(() => { let en = 0, top = 0, bas = 0, son = 0; for (const [t, x] of window.__ls) { if (t - son > 1000 || t - bas > 5000) { bas = t; top = 0; } top += x; son = t; if (top > en) en = top; } const f = performance.getEntriesByType('resource').filter(e => /fonts\.gstatic/.test(e.name)).map(e => e.responseEnd); return [en, f.length ? Math.max(...f) : 0]; });
+                v.push(r[0]); fontGec.push(r[1]); await c.close();
+              }
+              const m = med(v), mx = Math.max(...v), ok = m <= 0.02 && mx <= 0.1;
+              if (ad === 'rc' && !ok) kotu++;
+              console.log(`${ok ? 'GECTI' : 'KALDI'} CLS ${ad} ${yol}: medyan ${m.toFixed(4)} · en çok ${mx.toFixed(4)} · koşular ${v.map(x => x.toFixed(3)).join(' ')} · yazı tipi bitişi medyan ${Math.round(med(fontGec))} ms`);
+            }
+          }
+          await b.close();
+          process.exit(kotu ? 1 : 0);
+          QAEOF
+          npm install --no-audit --no-fund "playwright@${PW_SURUM}" "lighthouse@12.6.1" >/dev/null 2>&1; echo "npm $?"
+          npx playwright install --with-deps chromium firefox webkit >/dev/null 2>&1; echo "tarayıcı kurulumu $?"
       - name: Önizleme durum kodları ve başlıklar (yalnız sayılar)
         shell: bash {0}
         run: |
@@ -293,6 +327,28 @@ jobs:
           for p in /docs/qa/README.md /CLAUDE.md /lib/admin-auth.js /tools/gsc-export.mjs /.github/workflows/lead-reports.yml; do echo "gizli $p http=$(curl -sS -o /dev/null -m 30 -w '%{http_code}' "$TABAN$p")"; done
           for p in /img/kapak-1600.webp /img/kapak-mobil-579.webp /img/sektor-kimya-800.webp; do curl -sS -o /dev/null -m 30 -w "$p %{http_code} %{content_type}\n" "$TABAN$p"; done
           curl -sS -o /dev/null -m 30 -w 'epias-proxy ptf/today http=%{http_code}\n' -H "Origin: $TABAN" https://epias-proxy.emirhantan-ku.workers.dev/ptf/today
+      - name: Masaüstü CLS — /rehber ve /rehber/tekstil-elektrik, 7 koşu, önizleme ↔ üretim (Chromium 1440×900)
+        working-directory: ${{ runner.temp }}/qa
+        continue-on-error: true
+        run: ADRESLER="rc=$TABAN prod=$URETIM" N=7 MODUL=$PWD/node_modules node cls.mjs
+      - name: Masaüstü CLS — Lighthouse 12.6.1 masaüstü, 7 koşu
+        working-directory: ${{ runner.temp }}/qa
+        continue-on-error: true
+        shell: bash {0}
+        run: |
+          export CHROME_PATH=$(node -e "console.log(require('playwright').chromium.executablePath())")
+          for y in /rehber /rehber/tekstil-elektrik; do for ad in rc prod; do [ $ad = rc ] && B=$TABAN || B=$URETIM; v=""
+            for i in 1 2 3 4 5 6 7; do ./node_modules/.bin/lighthouse "$B$y" --preset=desktop --only-categories=performance --chrome-flags="--headless=new --no-sandbox" --output=json --output-path=lh.json --quiet >/dev/null 2>&1
+              v="$v $(python3 -c "import json;a=json.load(open('lh.json'))['audits'];print('%.4f/%d/%d'%(a['cumulative-layout-shift']['numericValue'],a['largest-contentful-paint']['numericValue'],round(json.load(open('lh.json'))['categories']['performance']['score']*100)))" 2>/dev/null || echo hata)"; done
+            echo "LH masaüstü $ad $y (CLS/LCP ms/skor):$v" | python3 -c "
+          import sys,statistics as st
+          l=sys.stdin.read().strip(); p=[x.split('/') for x in l.split(':',1)[1].split() if '/' in x]
+          c=[float(x[0]) for x in p]; print(l); print('   medyan CLS %.4f · en çok %.4f · medyan LCP %d ms · medyan skor %d'%(st.median(c),max(c),st.median([int(x[1]) for x in p]),st.median([int(x[2]) for x in p])) if p else '   ölçüm yok')"
+          done; done
+      - name: Masaüstü CLS — 25 alt sayfanın hepsi, 3 koşu, önizleme ↔ üretim
+        working-directory: ${{ runner.temp }}/qa
+        continue-on-error: true
+        run: SAYFALAR="/rehber/15-dakikalik-uzlastirma /rehber/cam-seramik-elektrik /rehber/demir-celik-elektrik /rehber/elektrik-faturasi-neden-yuksek /rehber/elektrik-tedarikcisi-nasil-secilir /rehber/i-rec-nedir /rehber/kapsam-2-elektrik-emisyonu /rehber/kimya-elektrik /rehber/osb-elektrik-tedariki /rehber/skdm-elektrik-sertifika /rehber/sktt /rehber/soguk-zincir-elektrik /rehber/veri-merkezi-elektrik /rehber/yek-g-i-rec-farki /rehber/yek-g-nedir /sanayi-elektrik-tedariki /elektrik-faturasi-hesaplama /canli-ptf /kurumsal /kvkk /cerez-politikasi /kullanim-kosullari /" ADRESLER="rc=$TABAN prod=$URETIM" N=3 MODUL=$PWD/node_modules node cls.mjs
       - name: Firefox (Playwright) ve WebKit (iPhone 15 öykünmesi)
         working-directory: ${{ runner.temp }}/qa
         shell: bash {0}
