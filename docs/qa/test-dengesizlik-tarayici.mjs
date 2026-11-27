@@ -652,6 +652,27 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
   S.ayarla({ gun: gunVerisi(11) });
 }
 
+{ // R9: tablo ilk ekranda; maliyet sütunları vurgulu
+  for (const [w, h] of [[1440, 900], [390, 844]]) {
+    const { page, kapat } = await ac('/dengesizlik-maliyeti', { w, h });
+    const r = await page.evaluate(() => {
+      const kutu = (s) => { const e = document.querySelector(s); const b = e.getBoundingClientRect(); return { ust: b.top, alt: b.bottom }; };
+      return { tarih: kutu('#dTarih'), baslik: kutu('.dm-tablo thead'), satir1: kutu('#dTablo tr:nth-child(1)'), satir3: kutu('#dTablo tr:nth-child(3)'), bant: kutu('section.live'), kaydirma: window.scrollY, yatay: document.documentElement.scrollWidth > window.innerWidth };
+    });
+    if (w === 1440) ok('R9 1440x900: tablo basligi ve ilk satirlar kaydirmadan gorunur; ozet bandi tablonun altinda', r.kaydirma === 0 && r.baslik.alt <= h && r.satir3.alt <= h && r.bant.ust > r.satir3.alt && !r.yatay, `-> ${JSON.stringify(r)}`);
+    else ok('R9 390x844: tarih secici ve tablo basligi ilk ekranda', r.kaydirma === 0 && r.tarih.alt <= h && r.baslik.alt <= h && r.bant.ust > r.baslik.alt && !r.yatay, `-> ${JSON.stringify(r)}`);
+    if (w === 1440) {
+      const s = await page.evaluate(() => {
+        const st = (el) => { const c = getComputedStyle(el); return { fw: c.fontWeight, bg: c.backgroundColor, renk: c.color }; };
+        const satir = document.querySelector('#dTablo tr:nth-child(2)');
+        return { ptf: st(satir.children[1]), poz: st(satir.children[6]), neg: st(satir.children[7]), bas7: st(document.querySelectorAll('.dm-tablo thead th')[6]) };
+      });
+      ok('R9 maliyet sutunlari kalin ve hafif zeminli; diger sutunlar degil', Number(s.poz.fw) >= 600 && Number(s.neg.fw) >= 600 && Number(s.ptf.fw) < 600 && s.poz.bg === 'rgb(243, 235, 211)' && s.neg.bg === 'rgb(243, 235, 211)' && s.ptf.bg !== s.poz.bg && s.bas7.bg === 'rgb(233, 222, 191)', `-> ${JSON.stringify(s)}`);
+    }
+    await kapat();
+  }
+}
+
 // ============================================================================
 bolum('S8 31/12/2026 sonrası: bugünün teslim günüyle formül hesabı reddedilir');
 {

@@ -103,6 +103,18 @@ a.btn-ikincil:hover, button.btn-ikincil:hover { border-color: var(--ink); backgr
 .indir-not[hidden] { display: none; }
 .fark { color: var(--red-ink); font-weight: 600; }
 .adimlar { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+/* R9: tablo ilk ekranda — üstteki tarih satırı sıkı; tablo başlığına yakın boşluk */
+.arac-tarih { padding: 10px 14px; margin-bottom: 12px; }
+.arac-satir.arac-ilk { margin-top: 0; padding-top: 0; border-top: 0; }
+h2#tablo { margin: 18px 0 10px; font-size: clamp(20px, 2.4vw, 24px); }
+.page > main > .lede { margin-bottom: 16px; }
+@media (max-width: 640px) {
+  .page { padding-top: 28px; }
+  .crumbs { margin-bottom: 22px; }
+  .arac-tarih .adimlar { flex-wrap: nowrap; gap: 6px; }
+  .arac-tarih .adimlar .btn-ikincil { padding-left: 9px; padding-right: 9px; }
+  .dm-tablo thead th { padding-top: 6px; padding-bottom: 6px; }
+}
 .hata { font-size: 13px; color: var(--red-ink); margin: 6px 0 0; max-width: none; }
 .hata:empty { display: none; }
 .yardim { font-size: 12.5px; color: var(--ink-muted); margin: 8px 0 0; flex-basis: 100%; }
@@ -118,6 +130,9 @@ a.btn-ikincil:hover, button.btn-ikincil:hover { border-color: var(--ink); backgr
 .dm-tablo tbody th { position: sticky; left: 0; z-index: 1; background: var(--paper); font-weight: 400; text-align: left; white-space: nowrap; padding: 8px 10px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); color: var(--ink); }
 .dm-tablo td { text-align: right; white-space: nowrap; padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--ink-soft); }
 .dm-tablo td.yon { text-align: left; }
+/* R9: iki maliyet sütunu vurgulu (kalın değer + hafif zemin; kontrast ≥ 4,5:1) */
+.dm-tablo thead th:nth-child(7), .dm-tablo thead th:nth-child(8) { background: #E9DEBF; color: var(--ink); }
+.dm-tablo td:nth-child(7), .dm-tablo td:nth-child(8) { background: #F3EBD3; color: var(--ink); font-weight: 600; }
 .dm-tablo tr:last-child td, .dm-tablo tr:last-child th { border-bottom: 0; }
 .dm-tablo tr.simdi td, .dm-tablo tr.simdi th { background: var(--now); color: var(--ink); font-weight: 500; }
 .dm-tablo .bos, .dm-tablo .bekle { color: var(--ink-muted); }
@@ -187,11 +202,49 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › Dengesizlik Maliyeti</nav>
   <main>
   <h1>Dengesizlik Maliyeti: Pozitif ve Negatif Dengesizlik Fiyatı</h1>
-  <p class="lede"><strong>Dengesizlik maliyeti</strong>, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır. Mevzuatta tanımlı bir terim değildir; Voltage Enerji tarafından EPİAŞ Şeffaflık Platformu verisinden türetilir.</p>
-  <p>Bu sayfa, seçilen günün her uzlaştırma dönemi için Piyasa Takas Fiyatı'nı (PTF), Sistem Marjinal Fiyatı'nı (SMF), sistem yönünü ve EPİAŞ Şeffaflık Platformu'nda yayımlanan pozitif ve negatif dengesizlik fiyatını tek tabloda gösterir. SMF, ilgili dönemi izleyen en geç dört saat içinde piyasa katılımcılarına duyurulduğu için henüz yayımlanmamış dönemler boş kalır. Saatler Türkiye saatiyledir (UTC+03:00); tüm fiyatlar TL/MWh'tir.</p>
-  <div class="updated">Sayfa metni: 24.11.2026 · Veri günü: <span id="dGun">—</span> · Veri: EPİAŞ Şeffaflık Platformu</div>
+  <p class="lede"><strong>Dengesizlik maliyeti</strong>, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır.</p>
+
+  <div class="arac arac-tarih" id="dArac">
+    <form method="get" action="/dengesizlik-maliyeti" id="dTarihForm">
+      <div>
+        <label class="etiket" for="dTarih">Gün</label>
+        <input type="date" id="dTarih" name="tarih" min="2026-01-01" required>
+      </div>
+      <button type="submit" class="btn">Göster</button>
+      <div class="adimlar">
+        <a class="btn-ikincil" id="dOnceki" rel="nofollow" aria-disabled="true">‹ Önceki gün</a>
+        <a class="btn-ikincil" id="dSonraki" rel="nofollow" aria-disabled="true">Sonraki gün ›</a>
+        <a class="btn-ikincil" id="dBugun" href="/dengesizlik-maliyeti">Bugün</a>
+      </div>
+    </form>
+  </div>
 
   <p class="uyari" id="dUyari" role="status"></p>
+
+  <h2 id="tablo">Dönem bazında PTF, SMF, pozitif ve negatif dengesizlik fiyatı</h2>
+  <p class="uyari" id="dKuralUyari" role="status"></p>
+  <div class="tablo-sar" id="dTabloSar" role="region" aria-labelledby="dTabloBaslik" tabindex="0">
+    <table class="dm-tablo">
+      <caption id="dTabloBaslik">Dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · saatler Türkiye saatiyle (UTC+03:00) · tüm değerler TL/MWh</caption>
+      <thead>
+        <tr>
+          <th scope="col">Dönem</th>
+          <th scope="col">PTF<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col">SMF<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col" class="sol">Sistem yönü</th>
+          <th scope="col">Pozitif dengesizlik fiyatı<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col">Negatif dengesizlik fiyatı<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col">Pozitif dengesizlik maliyeti (PTF'ye göre)<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col">Negatif dengesizlik maliyeti (PTF'ye göre)<span class="sr-only"> (TL/MWh)</span></th>
+        </tr>
+      </thead>
+      <tbody id="dTablo">
+        <tr><td colspan="8" class="bekle">Veri bekleniyor…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Her satır bir uzlaştırma dönemidir. Pozitif ve negatif dengesizlik fiyatı EPİAŞ'ın yayımladığı değerdir; bu sayfada yeniden hesaplanmaz. Değeri yayımlanmamış hücre "—" olarak kalır; tahmini ya da önceki dönemden taşınmış rakam gösterilmez.</p>
+  <p class="note">Tüm değerler TL/MWh'tir. Birim dengesizlik maliyeti mevzuatta tanımlı bir terim değildir; bu sayfada EPİAŞ'ın yayımladığı fiyatlardan Voltage Enerji tarafından hesaplanır. Veriler bilgilendirme amaçlıdır; gecikmeli, eksik veya hatalı olabilir. Ticari karar ve işlemlerde EPİAŞ'ın resmî yayınları ve uzlaştırma bildirimleri esas alınmalıdır.</p>
 
   <section class="live" aria-label="Seçili günün dengesizlik özeti">
     <div class="live-head">
@@ -230,23 +283,10 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
       <span class="live-stamp waiting" id="dDamga">EPİAŞ VERİSİ BEKLENİYOR</span>
     </div>
   </section>
-
   <p class="day-sum" id="dOzet"></p>
 
-  <div class="arac" id="dArac">
-    <form method="get" action="/dengesizlik-maliyeti" id="dTarihForm">
-      <div>
-        <label class="etiket" for="dTarih">Gün</label>
-        <input type="date" id="dTarih" name="tarih" min="2026-01-01" required>
-      </div>
-      <button type="submit" class="btn">Göster</button>
-      <div class="adimlar">
-        <a class="btn-ikincil" id="dOnceki" rel="nofollow" aria-disabled="true">‹ Önceki gün</a>
-        <a class="btn-ikincil" id="dSonraki" rel="nofollow" aria-disabled="true">Sonraki gün ›</a>
-        <a class="btn-ikincil" id="dBugun" href="/dengesizlik-maliyeti">Bugün</a>
-      </div>
-    </form>
-    <div class="arac-satir" id="dIndir">
+  <div class="arac" id="dIndirKutu">
+    <div class="arac-satir arac-ilk" id="dIndir">
       <span class="arac-baslik">Seçili günü indir</span>
       <a class="btn-ikincil" id="dCsv" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">CSV</a>
       <a class="btn-ikincil" id="dXlsx" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">Excel (.xlsx)</a>
@@ -279,30 +319,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     </div>
   </div>
 
-  <h2 id="tablo">Dönem bazında PTF, SMF, pozitif ve negatif dengesizlik fiyatı</h2>
-  <p>Her satır bir uzlaştırma dönemidir. Pozitif ve negatif dengesizlik fiyatı EPİAŞ'ın yayımladığı değerdir; bu sayfada yeniden hesaplanmaz. Değeri yayımlanmamış hücre "—" olarak kalır; tahmini ya da önceki dönemden taşınmış rakam gösterilmez.</p>
-  <p class="uyari" id="dKuralUyari" role="status"></p>
-  <div class="tablo-sar" id="dTabloSar" role="region" aria-labelledby="dTabloBaslik" tabindex="0">
-    <table class="dm-tablo">
-      <caption id="dTabloBaslik">Dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · tüm değerler TL/MWh</caption>
-      <thead>
-        <tr>
-          <th scope="col">Dönem</th>
-          <th scope="col">PTF<span class="sr-only"> (TL/MWh)</span></th>
-          <th scope="col">SMF<span class="sr-only"> (TL/MWh)</span></th>
-          <th scope="col" class="sol">Sistem yönü</th>
-          <th scope="col">Pozitif dengesizlik fiyatı<span class="sr-only"> (TL/MWh)</span></th>
-          <th scope="col">Negatif dengesizlik fiyatı<span class="sr-only"> (TL/MWh)</span></th>
-          <th scope="col">Pozitif dengesizlik maliyeti (PTF'ye göre)<span class="sr-only"> (TL/MWh)</span></th>
-          <th scope="col">Negatif dengesizlik maliyeti (PTF'ye göre)<span class="sr-only"> (TL/MWh)</span></th>
-        </tr>
-      </thead>
-      <tbody id="dTablo">
-        <tr><td colspan="8" class="bekle">Veri bekleniyor…</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p class="note">Tüm değerler TL/MWh'tir. Birim dengesizlik maliyeti mevzuatta tanımlı bir terim değildir; bu sayfada EPİAŞ'ın yayımladığı fiyatlardan Voltage Enerji tarafından hesaplanır. Veriler bilgilendirme amaçlıdır; gecikmeli, eksik veya hatalı olabilir. Ticari karar ve işlemlerde EPİAŞ'ın resmî yayınları ve uzlaştırma bildirimleri esas alınmalıdır.</p>
+  <div class="updated">Sayfa metni: 24.11.2026 · Veri günü: <span id="dGun">—</span> · Veri: EPİAŞ Şeffaflık Platformu</div>
 
   <h2 id="hesaplayici">Dengesizlik maliyeti hesaplama</h2>
   <p>Bir dönemdeki dengesizlik miktarınızı girin. İlk seçenek seçili günün EPİAŞ verisini kullanır. İkinci seçenek, girdiğiniz PTF, SMF ve sistem yönüyle, seçtiğiniz teslim gününde yürürlükte olan yönetmelik ve Kurul kararı değerlerine göre hesap yapar; o günün değerleri bu sayfada birincil kaynaklardan doğrulanmamışsa hesap yapılmaz. Hesap tek bir dönem ve tek bir piyasa katılımcısı içindir.</p>
@@ -386,11 +403,24 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <p>Çok düşük fiyatlı saatlerde ve azami fiyat limitinde yönetmelikteki ek kurallar uygulanır; tabloda EPİAŞ'ın yayımladığı değer gösterilir.</p>
   <p>Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı.</p>
 
+  <h2 id="sss">Sık sorulan sorular</h2>
+  <div id="dSss">
+  <h3>Dengesizlik maliyeti nedir?</h3>
+  <p>Dengesizlik maliyeti, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır. Mevzuatta tanımlı bir terim değildir; Voltage Enerji tarafından EPİAŞ Şeffaflık Platformu verisinden türetilir.</p>
+  <h3>Pozitif ve negatif dengesizlik fiyatı nasıl hesaplanır?</h3>
+  <p>Pozitif dengesizlik fiyatı min(PTF; SMF) × (1 − çarpan), negatif dengesizlik fiyatı max(PTF; SMF) × (1 + çarpan) formülüyle hesaplanır. Çarpan sistem yönüne göre %3 ya da %6'dır. Çok düşük fiyatlı saatlerde ve azami fiyat limitinde yönetmelikteki ek kurallar uygulanır; tabloda EPİAŞ'ın yayımladığı değer gösterilir. Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı.</p>
+  <h3>Sistem yönü neyi değiştirir?</h3>
+  <p>Sistem yönü çarpanı belirler. Sistem enerji fazlasındaysa (arz fazlası) pozitif dengesizlikte çarpan %6, negatif dengesizlikte %3'tür. Sistem enerji açığındaysa (talep fazlası) negatif dengesizlikte çarpan %6, pozitif dengesizlikte %3'tür. Sistem dengedeyse ikisi de %3'tür. Tabloda EPİAŞ'ın yayımladığı sistem yönü gösterilir.</p>
+  <h3>Veriyi nasıl indiririm?</h3>
+  <p>Tablonun üstündeki bağlantılar seçili günü CSV, Excel (.xlsx) ve JSON olarak indirir. Tarih aralığı formu en çok 31 günlük veriyi tek dosyada verir. Aynı veri https://voltage.com.tr/dengesizlik-maliyeti/veri adresinden tarih ve biçim parametreleriyle de alınabilir. Veri alınamadığında boş dosya üretilmez.</p>
+  </div>
+
   <h2 id="kapsam">Kapsam ve sınırlar</h2>
   <ul class="liste">
     <li>Bu sayfa bilgilendirme amaçlıdır; yatırım, ticari karar ya da hukuki tavsiye, teklif ya da taahhüt değildir.</li>
     <li>Kesin tutar EPİAŞ uzlaştırma bildirimiyle belirlenir.</li>
     <li>Bu sayfa, Voltage Enerji'nin müşterilerine uyguladığı ya da uygulayacağı bir fiyatı, bedeli veya sözleşme koşulunu göstermez.</li>
+    <li>Voltage Enerji, standart teklif ve sözleşmelerinde dengesizlik bedelini müşteriye yansıtmaz.</li>
   </ul>
 
   <h2 id="kaynak">Kaynak ve dayanak</h2>
@@ -405,17 +435,6 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   <blockquote>Kaynak: Voltage Enerji — Dengesizlik Maliyeti (<a href="https://voltage.com.tr/dengesizlik-maliyeti">https://voltage.com.tr/dengesizlik-maliyeti</a>), veri: EPİAŞ Şeffaflık Platformu.</blockquote>
   <p>Veri, <code>https://voltage.com.tr/dengesizlik-maliyeti/veri</code> adresinden de alınabilir. Parametreler: <code>tarih=YYYY-AA-GG</code> (tek gün) ya da <code>bas</code> ve <code>bit</code> (en çok 31 günlük aralık); <code>bicim=json</code>, <code>csv</code> ya da <code>xlsx</code>.</p>
 
-  <h2 id="sss">Sık sorulan sorular</h2>
-  <div id="dSss">
-  <h3>Dengesizlik maliyeti nedir?</h3>
-  <p>Dengesizlik maliyeti, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır. Mevzuatta tanımlı bir terim değildir; Voltage Enerji tarafından EPİAŞ Şeffaflık Platformu verisinden türetilir.</p>
-  <h3>Pozitif ve negatif dengesizlik fiyatı nasıl hesaplanır?</h3>
-  <p>Pozitif dengesizlik fiyatı min(PTF; SMF) × (1 − çarpan), negatif dengesizlik fiyatı max(PTF; SMF) × (1 + çarpan) formülüyle hesaplanır. Çarpan sistem yönüne göre %3 ya da %6'dır. Çok düşük fiyatlı saatlerde ve azami fiyat limitinde yönetmelikteki ek kurallar uygulanır; tabloda EPİAŞ'ın yayımladığı değer gösterilir. Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı.</p>
-  <h3>Sistem yönü neyi değiştirir?</h3>
-  <p>Sistem yönü çarpanı belirler. Sistem enerji fazlasındaysa (arz fazlası) pozitif dengesizlikte çarpan %6, negatif dengesizlikte %3'tür. Sistem enerji açığındaysa (talep fazlası) negatif dengesizlikte çarpan %6, pozitif dengesizlikte %3'tür. Sistem dengedeyse ikisi de %3'tür. Tabloda EPİAŞ'ın yayımladığı sistem yönü gösterilir.</p>
-  <h3>Veriyi nasıl indiririm?</h3>
-  <p>Tablonun üstündeki bağlantılar seçili günü CSV, Excel (.xlsx) ve JSON olarak indirir. Tarih aralığı formu en çok 31 günlük veriyi tek dosyada verir. Aynı veri https://voltage.com.tr/dengesizlik-maliyeti/veri adresinden tarih ve biçim parametreleriyle de alınabilir. Veri alınamadığında boş dosya üretilmez.</p>
-  </div>
 
   <h2 id="ilgili">İlgili sayfalar</h2>
   <ul class="liste">
@@ -672,7 +691,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
   function ozetYaz(){
     var t = tarihTR(state.tarih);
     yaz('dGun', t); yaz('dBantGun', t);
-    yaz('dTabloBaslik', t + ' · dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · tüm değerler TL/MWh');
+    yaz('dTabloBaslik', t + ' · dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · saatler Türkiye saatiyle (UTC+03:00) · tüm değerler TL/MWh');
     yaz('dKuralUyari', kuralUyarisi(state.tarih));
     if(!state.donemler){
       ['dYayim', 'dPtfOrt', 'dSmfOrt', 'dMalPoz', 'dMalNeg', 'dYonAcik', 'dYonFazla', 'dYonDenge'].forEach(function(id){ yaz(id, '—'); });

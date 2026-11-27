@@ -115,7 +115,7 @@ export const CAPA = Object.freeze({
   bas: '<input type="date" id="dBas" name="bas" min="2026-01-01" required>',
   bit: '<input type="date" id="dBit" name="bit" min="2026-01-01" required>',
   kuralUyari: '<p class="uyari" id="dKuralUyari" role="status"></p>',
-  tabloBaslik: '<caption id="dTabloBaslik">Dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · tüm değerler TL/MWh</caption>',
+  tabloBaslik: '<caption id="dTabloBaslik">Dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · saatler Türkiye saatiyle (UTC+03:00) · tüm değerler TL/MWh</caption>',
   tablo: '<tbody id="dTablo">\n        <tr><td colspan="8" class="bekle">Veri bekleniyor…</td></tr>\n      </tbody>',
   donem: '<select id="hDonem"><option value="">Veri bekleniyor</option></select>',
   senaryoGun: '<input type="date" id="sGun" name="teslim" min="2026-01-01" aria-describedby="hKural">',
@@ -246,7 +246,7 @@ export function kabukHazirla(html, { tarih, bugun, tarihli, gecersiz }) {
   const t = tarihTR(tarih);
   html = swap(html, CAPA.gun, `<span id="dGun">${t}</span>`);
   html = swap(html, CAPA.bantGun, `<span id="dBantGun">${t}</span>`);
-  html = swap(html, CAPA.tabloBaslik, `<caption id="dTabloBaslik">${t} · dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · tüm değerler TL/MWh</caption>`);
+  html = swap(html, CAPA.tabloBaslik, `<caption id="dTabloBaslik">${t} · dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · saatler Türkiye saatiyle (UTC+03:00) · tüm değerler TL/MWh</caption>`);
   html = swap(html, CAPA.tarih, `<input type="date" id="dTarih" name="tarih" min="${ILK_GUN}" max="${bugun}" value="${tarih}" required>`);
   const bas0 = gunEkle(tarih, -6) < ILK_GUN ? ILK_GUN : gunEkle(tarih, -6);
   html = swap(html, CAPA.bas, `<input type="date" id="dBas" name="bas" min="${ILK_GUN}" max="${bugun}" value="${bas0}" required>`);
