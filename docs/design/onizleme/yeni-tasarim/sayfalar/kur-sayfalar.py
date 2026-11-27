@@ -26,16 +26,22 @@ Kayma olursa (canlı sayfa ya da ana sayfa kaynağı değişirse) doğrulama sat
 - 404: oyun sahnesinin stil kuralları canlıdan aynen alınır; değiştirilen her parça tam bir kez bulunmalı.
 404 (yalnız yedek içeriğe kabuk): bkz. kur_404().
 Kullanım: python3 kur-sayfalar.py [çıktı dizini]
+Yayın adayı (isteğe bağlı ortam değişkenleri; verilmezse davranış aynı):
+  KAYNAK_KOK=<dizin>    canlı sayfaların (ve index.html'in) okunacağı kök, ör. main'in temiz bir kopyası (varsayılan: depo kökü)
+  HARIC=<yol>,<yol>     üretilmeyecek sayfalar (SAYFALAR'da olmalı); kapsam denetimi bu sayfalar dışında aynen yapılır
+  YENI_ANA=<dosya>      çapa denetiminde kullanılacak yeni ana sayfa (varsayılan: ../index.html)
 """
 import hashlib
 import os
 import re
 import sys
 
-KOK = '/home/user/website'
+KOK = os.environ.get('KAYNAK_KOK') or '/home/user/website'
 BURASI = os.path.dirname(os.path.abspath(__file__))
 YAPI = os.path.join(BURASI, '..', 'yapi')
 CIKTI = sys.argv[1] if len(sys.argv) > 1 else os.path.join(BURASI, 'cikti')
+HARIC = {p for p in (os.environ.get('HARIC') or '').split(',') if p}
+YENI_ANA = os.environ.get('YENI_ANA') or os.path.join(BURASI, '..', 'index.html')
 
 
 def oku(yol):
@@ -164,7 +170,7 @@ assert MENU_JS.rstrip().endswith('})();'), 'menü betiği beklenen biçimde bitm
 BOLUM_CAPALARI = ('hakkimizda', 'hizmetler', 'yaklasim', 'iletisim')
 for c in BOLUM_CAPALARI + ('leadForm',):
     tek(INDEX, 'id="%s"' % c, 'canlı ana sayfada çapa #' + c)
-    tek(oku(os.path.join(BURASI, '..', 'index.html')), 'id="%s"' % c, 'yeni ana sayfada çapa #' + c)
+    tek(oku(YENI_ANA), 'id="%s"' % c, 'yeni ana sayfada çapa #' + c)
 
 
 def dil_ozniteligi_sil(parca):
@@ -278,7 +284,8 @@ assert len({s['yol'] for s in SAYFALAR}) == len(SAYFALAR) == 29  # 19 rehber + 1
 # Kapsam: kökteki ve rehber/ altındaki her herkese açık HTML sayfası listede; panel.html (iç araç) ve index.html (ana sayfa
 # hazırlığı ayrı) hariç. Canlıya yeni sayfa eklenirse üretim durur.
 _canli = sorted([f for f in os.listdir(KOK) if f.endswith('.html')] + ['rehber/' + f for f in os.listdir(os.path.join(KOK, 'rehber')) if f.endswith('.html')])
-assert sorted(s['yol'] for s in SAYFALAR) == sorted(set(_canli) - {'index.html', 'panel.html'}), set(_canli) ^ {s['yol'] for s in SAYFALAR}
+assert HARIC <= {s['yol'] for s in SAYFALAR}, ('HARIC listesinde üreticide olmayan sayfa', HARIC - {s['yol'] for s in SAYFALAR})
+assert sorted(s['yol'] for s in SAYFALAR if s['yol'] not in HARIC) == sorted(set(_canli) - {'index.html', 'panel.html'} - HARIC), set(_canli) ^ {s['yol'] for s in SAYFALAR}
 
 KABUK_CSS = oku(os.path.join(BURASI, 'kabuk.css'))
 
@@ -512,6 +519,9 @@ def kur_404(ayar):
 
 if __name__ == '__main__':
     for ayar in SAYFALAR:
+        if ayar['yol'] in HARIC:
+            sys.stdout.write('atlandı (HARIC): %s\n' % ayar['yol'])
+            continue
         hedef, boy, css, _ = kur(ayar)
         sys.stdout.write('yazıldı: %s  %d bayt (stil %d)%s\n' % (os.path.relpath(hedef, BURASI), boy, css,
                                                                  '  [DONDURULMUŞ: yayın 10.12 ölçümü ve sahip onayından sonra]' if ayar.get('dondurulmus') else ''))
