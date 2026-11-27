@@ -1,6 +1,6 @@
 name: gecici-seo-regresyon
 # GEÇİCİ (Teknik SEO, 27.11): yeni tasarım yayın adayı (RC) ile main arasında canlı başlık/durum kodu
-# denetimi ve Lighthouse karşılaştırması (2. tur: yalnız Lighthouse 12.6.1, 7 koşu, gözlenen metrikler). Günlüğe YALNIZ durum kodu, başlık değeri, bayt sayısı,
+# denetimi ve Lighthouse karşılaştırması (3. tur: mobil, devtools kısıtlaması, 5 koşu). Günlüğe YALNIZ durum kodu, başlık değeri, bayt sayısı,
 # özet (hash) ve metrik yazılır; sayfa gövdesi, Search Console verisi yazılmaz. Bir sonraki commit'te silinir.
 on:
   push:
@@ -14,8 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sayfa: ['/', '/rehber/tekstil-elektrik', '/rehber', '/canli-ptf', '/elektrik-faturasi-hesaplama', '/kurumsal']
-        form: [mobile, desktop]
+        sayfa: ['/', '/rehber/tekstil-elektrik', '/rehber', '/kurumsal']
+        form: [mobile]
     steps:
       - name: Lighthouse kur
         shell: bash {0}
@@ -57,10 +57,10 @@ jobs:
           for h in https://website-dh5.pages.dev https://9c79718b.website-dh5.pages.dev; do curl -s -o /dev/null "$h$SAYFA"; curl -s -o /dev/null "$h$SAYFA"; done
           PRE=""; [ "$FORM" = desktop ] && PRE="--preset=desktop"
           : > tum.txt
-          for i in 1 2 3 4 5 6 7; do
+          for i in 1 2 3 4 5; do
             for pair in "main https://website-dh5.pages.dev" "rc https://9c79718b.website-dh5.pages.dev"; do
               set -- $pair
-              npx lighthouse "$2$SAYFA" $PRE --only-categories=performance --output=json --output-path=r.json --quiet --chrome-flags="--headless=new --no-sandbox" >/dev/null 2>&1
+              npx lighthouse "$2$SAYFA" $PRE --throttling-method=devtools --only-categories=performance --output=json --output-path=r.json --quiet --chrome-flags="--headless=new --no-sandbox" >/dev/null 2>&1
               node p.mjs r.json "$1 $i" | tee -a tum.txt
             done
           done
