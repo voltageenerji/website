@@ -12,12 +12,13 @@ jobs:
       B: https://6da52819.website-dh5.pages.dev
     steps:
       - name: HTTP, noindex, SSR, aktarıcı (yalnız durum kodları ve sayılar)
+        shell: bash {0}
         run: |
-          set -u
+          set +e
           for p in / /rehber/tekstil-elektrik /canli-ptf /kurumsal /dengesizlik-maliyeti /img/kapak-1600.webp /img/sektor-tekstil-800.webp; do
             k=$(curl -sS -o b.html -D h.txt -m 30 -w '%{http_code}' "$B$p")
             r=$(grep -ci '^x-robots-tag: noindex' h.txt)
-            m=$(grep -c 'name="robots" content="noindex' b.html || true)
+            m=$(grep -o "<meta name=\"robots\" content=\"[^\"]*\"" b.html | head -1)
             echo "$p http=$k xrobots_noindex=$r meta_noindex=$m bayt=$(wc -c < b.html)"
           done
           curl -sS -m 30 "$B/" -o a.html; echo "anasayfa: PTF_PROXY_onizleme=$(grep -c "PTF_PROXY = '/onizleme-ptf'" a.html) nav-cta=$(grep -c 'nav-cta' a.html)"
