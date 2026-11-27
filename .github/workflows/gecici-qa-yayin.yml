@@ -58,7 +58,7 @@ jobs:
                   h1: D.querySelectorAll('h1').length, nav: !!D.querySelector('.nav-links'), menuDugme: !!D.getElementById('mobileMenuBtn'),
                   kunye: !!f && /Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı|Est\. 2011 · EPIAS Market Participant/.test(f.textContent.replace(/\s+/g, ' ')),
                   atla: !!s && s.getAttribute('href') === '#icerik' && /^(İçeriğe atla|Skip to content)$/.test(s.textContent.trim()) && !!D.getElementById('icerik'),
-                  hata: (W.__qaHata || []).length
+                  hata: (W.__qaHata || []).length, azalt: matchMedia('(prefers-reduced-motion: reduce)').matches
                 };
               },
               menu: function () { var b = D.getElementById('mobileMenuBtn'), m = D.getElementById('mobileMenu'); return { dugmeGorunur: gor(b), acik: !!m && !m.hidden && gor(m), aria: b ? b.getAttribute('aria-expanded') : null, baglanti: m ? [].slice.call(m.querySelectorAll('a')).filter(gor).length : 0 }; },
@@ -184,7 +184,7 @@ jobs:
               await A.get(TABAN + '/');
               await bekle(7000); // canlı veri ve şerit
               const d0 = await A.js(() => window.__qa.durum());
-              console.log(`# ana sayfa · ${d0.motor} · pencere ${d0.w} px (istemci ${d0.cw}) · dpr ${d0.dpr}`);
+              console.log(`# ana sayfa · ${d0.motor} · pencere ${d0.w} px (istemci ${d0.cw}) · dpr ${d0.dpr} · hareket azaltma tercihi ${d0.azalt ? 'AÇIK' : 'kapalı'}`);
               const etiket = `ana ${d0.cw}px`;
               ok(`${etiket}: yatay taşma yok`, d0.tasma <= 0, d0.tasma);
               ok(`${etiket}: tek h1, atla bağlantısı (#icerik), künye "Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı"`, d0.h1 === 1 && d0.atla && d0.kunye, [d0.h1, d0.atla, d0.kunye]);
@@ -194,7 +194,9 @@ jobs:
               ok(`${etiket}: saatlik tablo 24 hücre, yalnız sayı ya da "—", sıfır yok`, a.saat.toplam === 24 && a.saat.tire + a.saat.sayi === 24 && a.saat.sifir === 0, a.saat);
               if (a.serit.gizli === false) {
                 const s = await A.jsAsync((ms, bitti) => window.__qa.serit(ms, bitti), 2000);
-                ok(`${etiket}: şerit görünür ve akıyor (2 sn'de ≥ 20 px), sıfır fiyat yok`, s.yol >= 20 && a.serit.sifirHucre === 0, [a.serit.hucre, s.yol, a.serit.sifirHucre]);
+                const dg = await A.js(() => { const d = document.getElementById('mcpDur'); return !!d && d.getBoundingClientRect().width > 0 && getComputedStyle(d).display !== 'none'; });
+                if (d0.azalt) ok(`${etiket}: hareket azaltma tercihinde şerit durur, durdur düğmesi gizli; sıfır fiyat yok`, s.yol < 1 && !dg && a.serit.sifirHucre === 0, [a.serit.hucre, s.yol, dg]);
+                else ok(`${etiket}: şerit görünür ve akıyor (2 sn'de ≥ 20 px), sıfır fiyat yok`, s.yol >= 20 && a.serit.sifirHucre === 0, [a.serit.hucre, s.yol, a.serit.sifirHucre]);
               } else not(`${etiket}: şerit gizli (canlı veri yok → dürüst: ray gösterilmez) hücre=${a.serit.hucre}`);
               // Menü (dar ekranda)
               const m0 = await A.js(() => window.__qa.menu());
@@ -397,7 +399,7 @@ jobs:
                   h1: D.querySelectorAll('h1').length, nav: !!D.querySelector('.nav-links'), menuDugme: !!D.getElementById('mobileMenuBtn'),
                   kunye: !!f && /Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı|Est\. 2011 · EPIAS Market Participant/.test(f.textContent.replace(/\s+/g, ' ')),
                   atla: !!s && s.getAttribute('href') === '#icerik' && /^(İçeriğe atla|Skip to content)$/.test(s.textContent.trim()) && !!D.getElementById('icerik'),
-                  hata: (W.__qaHata || []).length
+                  hata: (W.__qaHata || []).length, azalt: matchMedia('(prefers-reduced-motion: reduce)').matches
                 };
               },
               menu: function () { var b = D.getElementById('mobileMenuBtn'), m = D.getElementById('mobileMenu'); return { dugmeGorunur: gor(b), acik: !!m && !m.hidden && gor(m), aria: b ? b.getAttribute('aria-expanded') : null, baglanti: m ? [].slice.call(m.querySelectorAll('a')).filter(gor).length : 0 }; },
@@ -523,7 +525,7 @@ jobs:
               await A.get(TABAN + '/');
               await bekle(7000); // canlı veri ve şerit
               const d0 = await A.js(() => window.__qa.durum());
-              console.log(`# ana sayfa · ${d0.motor} · pencere ${d0.w} px (istemci ${d0.cw}) · dpr ${d0.dpr}`);
+              console.log(`# ana sayfa · ${d0.motor} · pencere ${d0.w} px (istemci ${d0.cw}) · dpr ${d0.dpr} · hareket azaltma tercihi ${d0.azalt ? 'AÇIK' : 'kapalı'}`);
               const etiket = `ana ${d0.cw}px`;
               ok(`${etiket}: yatay taşma yok`, d0.tasma <= 0, d0.tasma);
               ok(`${etiket}: tek h1, atla bağlantısı (#icerik), künye "Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı"`, d0.h1 === 1 && d0.atla && d0.kunye, [d0.h1, d0.atla, d0.kunye]);
@@ -533,7 +535,9 @@ jobs:
               ok(`${etiket}: saatlik tablo 24 hücre, yalnız sayı ya da "—", sıfır yok`, a.saat.toplam === 24 && a.saat.tire + a.saat.sayi === 24 && a.saat.sifir === 0, a.saat);
               if (a.serit.gizli === false) {
                 const s = await A.jsAsync((ms, bitti) => window.__qa.serit(ms, bitti), 2000);
-                ok(`${etiket}: şerit görünür ve akıyor (2 sn'de ≥ 20 px), sıfır fiyat yok`, s.yol >= 20 && a.serit.sifirHucre === 0, [a.serit.hucre, s.yol, a.serit.sifirHucre]);
+                const dg = await A.js(() => { const d = document.getElementById('mcpDur'); return !!d && d.getBoundingClientRect().width > 0 && getComputedStyle(d).display !== 'none'; });
+                if (d0.azalt) ok(`${etiket}: hareket azaltma tercihinde şerit durur, durdur düğmesi gizli; sıfır fiyat yok`, s.yol < 1 && !dg && a.serit.sifirHucre === 0, [a.serit.hucre, s.yol, dg]);
+                else ok(`${etiket}: şerit görünür ve akıyor (2 sn'de ≥ 20 px), sıfır fiyat yok`, s.yol >= 20 && a.serit.sifirHucre === 0, [a.serit.hucre, s.yol, a.serit.sifirHucre]);
               } else not(`${etiket}: şerit gizli (canlı veri yok → dürüst: ray gösterilmez) hücre=${a.serit.hucre}`);
               // Menü (dar ekranda)
               const m0 = await A.js(() => window.__qa.menu());
@@ -722,6 +726,17 @@ jobs:
           nohup node ios-yedek.mjs > ../yedek.log 2>&1 &
           for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8790/robots.txt && break; sleep 1; done
           curl -s -o /dev/null -w 'aktarıcı %{http_code}\n' http://127.0.0.1:8790/
+      - name: Gerçek Safari — hareket azaltma tercihi olduğu gibi (koşucu varsayılanı), aktarıcı üzerinden canlı veriyle
+        working-directory: ${{ runner.temp }}/qa
+        continue-on-error: true
+        run: |
+          echo "reduceMotion (kullanıcı): $(defaults read com.apple.universalaccess reduceMotion 2>&1 | head -1)"
+          TABAN=http://127.0.0.1:8790 MOD=safari MODUL=$PWD/node_modules perl -e 'alarm shift; exec @ARGV' 600 node gercek.mjs
+      - name: Hareket azaltmayı kapatmayı dene (yalnız koşucuda)
+        continue-on-error: true
+        run: |
+          defaults write com.apple.universalaccess reduceMotion -bool false 2>&1 | head -2; sudo defaults write com.apple.universalaccess reduceMotion -bool false 2>&1 | head -2
+          killall Safari 2>/dev/null; echo "reduceMotion şimdi: $(defaults read com.apple.universalaccess reduceMotion 2>&1 | head -1)"
       - name: Gerçek Safari (macOS, safaridriver) — aktarıcı üzerinden canlı veriyle
         working-directory: ${{ runner.temp }}/qa
         continue-on-error: true
@@ -769,7 +784,7 @@ jobs:
           for x in r:
               d=x.get('durum',{}); o={k:x[k] for k in ('menuAcik','menuKapali','ana','serit','isaret','yazi','bahar','hesap','tablo','hata') if k in x}
               if x.get('yol')=='/': print('  bahar', 'KAPALI' if x.get('baharsiz') else 'AÇIK', 'kare', x.get('bahar',{}).get('kare'), 'en uzun', x.get('bahar',{}).get('enUzunMs'), '>50', x.get('bahar',{}).get('uzun50'), '>100', x.get('bahar',{}).get('uzun100'), 'yazı gecikme en çok', (x.get('yazi') or [0,0])[1], 'ms · örtülü', x.get('bahar',{}).get('ortulu'), 'kesişim', x.get('bahar',{}).get('kesisim'), 'sonra süs', x.get('bahar',{}).get('sonraSus'))
-              print(' ',x.get('yol'),'·',d.get('motor'),'·',d.get('w'),'px dpr',d.get('dpr'),'· taşma',d.get('tasma'),'· h1',d.get('h1'),'· atla',d.get('atla'),'· künye',d.get('kunye'),'· js hata',d.get('hata'),'·',json.dumps(o,ensure_ascii=False))
+              print(' ',x.get('yol'),'·',d.get('motor'),'·',d.get('w'),'px dpr',d.get('dpr'),'· taşma',d.get('tasma'),'· h1',d.get('h1'),'· atla',d.get('atla'),'· künye',d.get('kunye'),'· js hata',d.get('hata'),'· hareket azaltma',d.get('azalt'),'·',json.dumps(o,ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
