@@ -11,10 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
       - name: Playwright kur
+        shell: bash {0}
         run: |
-          mkdir -p /tmp/o && cd /tmp/o && npm init -y >/dev/null && npm i playwright@1.49.1 >/dev/null 2>&1
-          npx playwright install --with-deps chromium webkit >/dev/null 2>&1; echo kuruldu
+          mkdir -p /tmp/o && cd /tmp/o && npm init -y >/dev/null
+          npm install --no-audit --no-fund "playwright@1.64.1" >/dev/null 2>&1; echo "npm $?"
+          npx playwright install --with-deps chromium webkit >/dev/null 2>&1; echo "tarayici $?"
       - name: Olc
         shell: bash {0}
         run: |
