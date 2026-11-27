@@ -116,7 +116,7 @@ for (const yol of SAYFALAR) {
   if (DONDURULMUS.includes(yol)) yaz('  bilgi  DONDURULMUŞ rehber (SEO ölçümü 10.12): canlı dosyaya dokunulmadı; yalnız bu üretilmiş kopya var. Yayın 10.12 ölçümü ve sahip onayından sonra.');
   const eskiAltMetin = metinler(e.altSatir).join(' ');
   yaz(`  bilgi  kaldırılan eski alt satır metni: "${eskiAltMetin}"`);
-  yaz(`  bilgi  yasak numara (216 479 05 10) yok: ${!/216\s*479\s*05\s*10|2164790510/.test(sonra)}`);
+  yaz(`  bilgi  yasak numara (CLAUDE.md kural 11) yok: ${!/216\s*479\s*05\s*10|2164790510/.test(sonra)}`);
 }
 
 // ---- O: 404 oyun stili ----
