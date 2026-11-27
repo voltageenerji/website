@@ -5,6 +5,11 @@ paths:
   - "elektrik-faturasi-hesaplama.html"
   - "kurumsal.html"
   - "canli-ptf.html"
+  - "kvkk.html"
+  - "cerez-politikasi.html"
+  - "kullanim-kosullari.html"
+  - "sanayi-elektrik-tedariki.html"
+  - "404.html"
   - "sitemap.xml"
   - "llms.txt"
 ---
@@ -19,3 +24,6 @@ paths:
 - **Calculators.** Outputs say "tahminidir" and "teklif veya taahhüt değildir". Thresholds follow the law: serbest tüketici is strictly above 500 kWh; SKTT applies above the limit.
 - **Language.** Turkish reads natively. Prefer short sentences; avoid long dashes and slogan patterns ("X değil, Y", triplets).
 - **Gate.** QA verdict before `main`; Legal & Compliance for any new public claim.
+- **Shell (since 2026-11-27).** Header, menu, footer and page CSS come from the generator `docs/design/onizleme/yeni-tasarim/sayfalar/kur-sayfalar.py` (shell `sayfalar/kabuk.css` + `sayfalar/stil/*.css`). Edit page content in the live file, then regenerate and copy the `cikti/` version back; never hand-edit the shell in one page. `karsilastir.mjs` must pass (head minus style, content, scripts, ids and SSR anchors byte-identical).
+- **Fonts.** Keep the metric-matched fallbacks (`Newsreader Fallback`, `Archivo Fallback` regular and bold) in `kabuk.css`: without them desktop CLS regresses (QA-YT-1).
+- **Not yet in the new shell:** `rehber/ptf-nedir`, `rehber/serbest-tuketici`, `rehber/tedarikci-degistirme` (frozen until the 10 Dec measurement) and `dengesizlik-maliyeti` (unreleased). Their new-shell versions wait in `cikti/`.
