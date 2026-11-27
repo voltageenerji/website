@@ -1,0 +1,107 @@
+name: gecici-seo-regresyon
+# GEÇİCİ (Teknik SEO, 27.11): yeni tasarım yayın adayı (RC) ile main arasında canlı başlık/durum kodu
+# denetimi ve Lighthouse karşılaştırması. Günlüğe YALNIZ durum kodu, başlık değeri, bayt sayısı,
+# özet (hash) ve metrik yazılır; sayfa gövdesi, Search Console verisi yazılmaz. Bir sonraki commit'te silinir.
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-seo-regresyon.yml]
+permissions: {}
+jobs:
+  basliklar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Durum kodlari, yonlendirmeler, X-Robots-Tag
+        shell: bash {0}
+        run: |
+          H_PROD=https://voltage.com.tr; H_MPD=https://website-dh5.pages.dev; H_RC=https://9c79718b.website-dh5.pages.dev
+          SAYFALAR="/ /kvkk /cerez-politikasi /kullanim-kosullari /canli-ptf /rehber /rehber/serbest-tuketici /rehber/tedarikci-degistirme /rehber/elektrik-tedarikcisi-nasil-secilir /rehber/osb-elektrik-tedariki /rehber/ptf-nedir /rehber/15-dakikalik-uzlastirma /rehber/tekstil-elektrik /rehber/demir-celik-elektrik /rehber/kimya-elektrik /rehber/veri-merkezi-elektrik /rehber/soguk-zincir-elektrik /rehber/cam-seramik-elektrik /kurumsal /sanayi-elektrik-tedariki /elektrik-faturasi-hesaplama /rehber/sktt /rehber/elektrik-faturasi-neden-yuksek /rehber/yek-g-i-rec-farki /rehber/yek-g-nedir /rehber/i-rec-nedir /rehber/kapsam-2-elektrik-emisyonu /rehber/skdm-elektrik-sertifika /panel"
+          DIGER="/bu-sayfa-yok-seo-test /robots.txt /sitemap.xml /llms.txt /index.html /kurumsal.html /rehber.html /rehber/tekstil-elektrik.html /canli-ptf.html /rehber/ /kurumsal/ /rehber/yenilenebilir-ureticiler /docs/x /lib/x /tools/x /game404/x /.claude/x /.github/x /CLAUDE.md /DEPLOY.md /CHANGELOG.md /README.md /.gitignore /?lang=en /img/kapak-1200.webp /img/sektor-osb-800.webp /og-image.jpg /canli-ptf/veri"
+          bak() { # host yol
+            hdr=$(mktemp); body=$(mktemp)
+            out=$(curl -s -o "$body" -D "$hdr" --max-time 30 -H 'Accept-Encoding: br, gzip' -w '%{http_code} %{size_download}' "$1$2")
+            g() { grep -i "^$1:" "$hdr" | head -1 | cut -d' ' -f2- | tr -d '\r'; }
+            raw=$(curl -s --compressed --max-time 30 "$1$2" | tee "$body.raw" | wc -c)
+            h=$(sha256sum "$body.raw" | cut -c1-12)
+            ni=$(grep -c 'content="noindex' "$body.raw")
+            echo "$(basename $1 | cut -d. -f1) $2 kod/aktarim=$out ham=$raw sha=$h loc=[$(g location)] xrt=[$(g x-robots-tag)] cc=[$(g cache-control)] ce=[$(g content-encoding)] ct=[$(g content-type | cut -d';' -f1)] meta_noindex=$ni"
+            rm -f "$hdr" "$body" "$body.raw"
+          }
+          for p in $SAYFALAR $DIGER; do for h in $H_PROD $H_MPD $H_RC; do bak $h $p; done; done
+          echo "--- www"; curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.voltage.com.tr/kurumsal
+      - name: Bot kullanici ajanlari (ayni bayt mi)
+        shell: bash {0}
+        run: |
+          declare -A UA=(
+            [chrome]='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+            [googlebot]='Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+            [bingbot]='Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)'
+            [gptbot]='Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)'
+            [claudebot]='Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)'
+            [perplexitybot]='Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)'
+          )
+          for h in https://voltage.com.tr https://9c79718b.website-dh5.pages.dev; do
+            for p in / /rehber/tekstil-elektrik /rehber /kurumsal /elektrik-faturasi-hesaplama /canli-ptf; do
+              for k in chrome googlebot bingbot gptbot claudebot perplexitybot; do
+                f=$(mktemp); c=$(curl -s --compressed -o "$f" --max-time 30 -A "${UA[$k]}" -w '%{http_code}' "$h$p")
+                echo "$(basename $h | cut -d. -f1) $p $k kod=$c bayt=$(wc -c <"$f") sha=$(sha256sum "$f" | cut -c1-12) ssr=$(grep -c '<body data-ssr' "$f") h1=$(grep -o '<h1' "$f" | wc -l)"
+                rm -f "$f"
+              done
+            done
+          done
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        sayfa: ['/', '/rehber/tekstil-elektrik', '/rehber', '/canli-ptf', '/elektrik-faturasi-hesaplama', '/kurumsal']
+        form: [mobile, desktop]
+    steps:
+      - name: Lighthouse kur
+        shell: bash {0}
+        run: |
+          mkdir l && cd l && npm init -y >/dev/null && npm i lighthouse@12.2.1 >/dev/null 2>&1; echo "kurulum=$?"; google-chrome --version
+      - name: Lighthouse 5 kosu x 2 host (sirali, dönüşümlü)
+        shell: bash {0}
+        working-directory: l
+        env:
+          SAYFA: ${{ matrix.sayfa }}
+          FORM: ${{ matrix.form }}
+        run: |
+          export CHROME_PATH=$(which google-chrome)
+          cat > p.mjs <<'JS'
+          import fs from 'fs';
+          const [f, etiket] = process.argv.slice(2);
+          const r = JSON.parse(fs.readFileSync(f, 'utf8')); const a = r.audits;
+          const n = (k) => a[k] && a[k].numericValue != null ? a[k].numericValue : NaN;
+          let lcpSel = '-';
+          try { const d = a['largest-contentful-paint-element'].details; const it = d.items[0].items ? d.items[0].items[0] : d.items[0]; lcpSel = (it.node.selector || '').slice(-70) + ' <' + (it.node.snippet || '').slice(1, 12); } catch (e) {}
+          const req = (a['network-requests'] && a['network-requests'].details.items) || [];
+          const tip = {}; for (const q of req) { const t = q.resourceType || 'x'; tip[t] = tip[t] || [0, 0]; tip[t][0]++; tip[t][1] += q.transferSize || 0; }
+          const rb = a['render-blocking-resources'] && a['render-blocking-resources'].details ? a['render-blocking-resources'].details.items.length : 0;
+          const rbms = a['render-blocking-resources'] ? Math.round(a['render-blocking-resources'].numericValue || 0) : 0;
+          const o = { etiket, skor: Math.round(r.categories.performance.score * 100), lcp: Math.round(n('largest-contentful-paint')), fcp: Math.round(n('first-contentful-paint')), si: Math.round(n('speed-index')), tbt: Math.round(n('total-blocking-time')), cls: +n('cumulative-layout-shift').toFixed(4), bayt: Math.round(n('total-byte-weight')), istek: req.length, rb, rbms, lcpSel, tip: Object.entries(tip).map(([k, v]) => k + ':' + v[0] + '/' + v[1]).join(','), hata: r.runtimeError ? r.runtimeError.code : '' };
+          console.log('SONUC ' + JSON.stringify(o));
+          JS
+          cat > m.mjs <<'JS'
+          import fs from 'fs';
+          const s = fs.readFileSync(0, 'utf8').split('\n').filter(l => l.startsWith('SONUC ')).map(l => JSON.parse(l.slice(6)));
+          const med = (v) => { v = v.filter(x => !Number.isNaN(x)).sort((a, b) => a - b); const m = v.length >> 1; return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2; };
+          for (const h of ['main', 'rc']) { const x = s.filter(o => o.etiket.startsWith(h + ' ')); if (!x.length) continue;
+            const o = {}; for (const k of ['skor', 'lcp', 'fcp', 'si', 'tbt', 'cls', 'bayt', 'istek', 'rb', 'rbms']) o[k] = med(x.map(y => y[k]));
+            o.lcp_aralik = Math.min(...x.map(y => y.lcp)) + '-' + Math.max(...x.map(y => y.lcp)); o.n = x.length;
+            console.log('MEDYAN ' + process.env.FORM + ' ' + process.env.SAYFA + ' ' + h + ' ' + JSON.stringify(o)); }
+          JS
+          for h in https://website-dh5.pages.dev https://9c79718b.website-dh5.pages.dev; do curl -s -o /dev/null "$h$SAYFA"; curl -s -o /dev/null "$h$SAYFA"; done
+          PRE=""; [ "$FORM" = desktop ] && PRE="--preset=desktop"
+          : > tum.txt
+          for i in 1 2 3 4 5; do
+            for pair in "main https://website-dh5.pages.dev" "rc https://9c79718b.website-dh5.pages.dev"; do
+              set -- $pair
+              npx lighthouse "$2$SAYFA" $PRE --only-categories=performance --output=json --output-path=r.json --quiet --chrome-flags="--headless=new --no-sandbox" >/dev/null 2>&1
+              node p.mjs r.json "$1 $i" | tee -a tum.txt
+            done
+          done
+          node m.mjs < tum.txt
