@@ -16,6 +16,8 @@
  * ?ptfoff  → SSR devre dışı (QA kancası, istemcideki kancayla aynı ad).
  */
 
+import { onizlemeKoru } from './_lib/onizleme.js';
+
 const PROXY = 'https://epias-proxy.emirhantan-ku.workers.dev';
 const TIMEOUT_MS = 4000;
 const TR_MONTHS = ['OCA', 'ŞUB', 'MAR', 'NİS', 'MAY', 'HAZ', 'TEM', 'AĞU', 'EYL', 'EKİ', 'KAS', 'ARA'];
@@ -207,7 +209,13 @@ function htmlResponse(html, maxAge, sMaxAge) {
   });
 }
 
+// Önizleme hostlarında (pages.dev, yerel) X-Robots-Tag + robots meta "noindex, nofollow"; üretimde yanıt aynen döner.
+// _headers kuralları Function yanıtlarına uygulanmaz (functions/_lib/onizleme.js).
 export async function onRequestGet(context) {
+  return onizlemeKoru(context && context.request, await sayfaYanit(context));
+}
+
+async function sayfaYanit(context) {
   const { request } = context;
   let shell = null;
   try {
