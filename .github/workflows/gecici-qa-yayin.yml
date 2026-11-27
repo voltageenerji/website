@@ -359,7 +359,7 @@ jobs:
 
   macos-safari-ios:
     runs-on: macos-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     steps:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
@@ -725,11 +725,11 @@ jobs:
       - name: Gerçek Safari (macOS, safaridriver) — aktarıcı üzerinden canlı veriyle
         working-directory: ${{ runner.temp }}/qa
         continue-on-error: true
-        run: TABAN=http://127.0.0.1:8790 MOD=safari MODUL=$PWD/node_modules node gercek.mjs
+        run: TABAN=http://127.0.0.1:8790 MOD=safari MODUL=$PWD/node_modules perl -e 'alarm shift; exec @ARGV' 600 node gercek.mjs
       - name: Gerçek Safari (macOS, safaridriver) — önizleme adresine doğrudan (gerçek başlıklar, CORS → dürüst bekleme)
         working-directory: ${{ runner.temp }}/qa
         continue-on-error: true
-        run: MOD=safari MODUL=$PWD/node_modules node gercek.mjs
+        run: MOD=safari MODUL=$PWD/node_modules perl -e 'alarm shift; exec @ARGV' 600 node gercek.mjs
       - name: iOS Simülatörü — Mobile Safari, safaridriver ile (Uzaktan Otomasyon)
         id: iossd
         working-directory: ${{ runner.temp }}/qa
@@ -739,7 +739,7 @@ jobs:
           xcrun simctl bootstatus "$UDID" -b > /dev/null; echo "önyükleme $?"
           for k in RemoteAutomationEnabled WebKitRemoteAutomationEnabled; do xcrun simctl spawn "$UDID" defaults write com.apple.mobilesafari $k -bool true; done
           xcrun simctl spawn "$UDID" defaults write com.apple.WebInspector RemoteAutomationEnabled -bool true
-          TABAN=http://127.0.0.1:8790 MOD=ios IOS_UDID=$UDID MODUL=$PWD/node_modules node gercek.mjs; k=$?; echo "ios-safaridriver çıkış $k"; exit $k
+          TABAN=http://127.0.0.1:8790 MOD=ios IOS_UDID=$UDID MODUL=$PWD/node_modules perl -e 'alarm shift; exec @ARGV' 240 node gercek.mjs; k=$?; echo "ios-safaridriver çıkış $k"; exit $k
       - name: iOS Simülatörü — Mobile Safari, openurl + sayfa içi senaryo + ekran OCR (her durumda)
         working-directory: ${{ runner.temp }}/qa
         shell: bash {0}
