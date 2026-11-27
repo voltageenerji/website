@@ -519,35 +519,51 @@ for (const w of [1280, 375]) {
   ok('F5 kutucuk kaldırılınca form eski görünüme döner', geri[0] === false && geri[1] === 'rgb(245, 180, 28)' && geri[2] === '0', JSON.stringify(geri));
   await k.ctx.close();
 }
-// F8 Bahar anı (27.11, sahip isteği): yeşil kutucuk işaretlenince ≈4,5 sn çiçek + kelebek; süs, tıklamayı engellemez, temizlenir
-const BH = '.bh-cicek, .bh-kat, .bh-kelebek';
-const bahar = (p) => p.evaluate((BH) => ({ n: document.querySelectorAll(BH).length, cicek: document.querySelectorAll('.bh-cicek').length, kelebek: document.querySelectorAll('.bh-kelebek').length, kat: document.querySelectorAll('.bh-kat').length }), BH);
-/* Etki boyunca her karede kelebeğin, çiçeklerin ve formun ölçüsünü kaydeder: içerik kutusuna girme, taşma, yerleşim kayması */
+// F8 Bahar anı (27.11, sahip isteği; 2. tur "daha belirgin"): yeşil kutucuk işaretlenince ≈5,8 sn; formun iki kenarında dört
+// çiçek, çimde 0–2 çiçek, iki kelebek, beş yaprak. Süs, tıklamayı engellemez, içerik kutusuna ve sol sütuna girmez, temizlenir.
+const BH = '.bh-kat, .bh-cicek, .bh-kelebek, .bh-yaprak';
+const bahar = (p) => p.evaluate((BH) => ({ n: document.querySelectorAll(BH).length, cicek: document.querySelectorAll('.bh-cicek').length, cim: document.querySelectorAll('.bh-cim').length, kelebek: document.querySelectorAll('.bh-kelebek').length, yaprak: document.querySelectorAll('.bh-yaprak').length, kat: document.querySelectorAll('.bh-kat').length }), BH);
+/* genişliğe göre beklenen sayılar: [çiçek (kenar + çim), kelebek, yaprak]; 320 px'te düğmenin altı dar olduğu için çim çiçeği yok */
+const BEKLENEN = { 1440: [6, 2, 5], 1280: [6, 2, 5], 390: [5, 2, 5], 320: [4, 2, 5] };
+const toplam = (w) => BEKLENEN[w][0] + BEKLENEN[w][1] + BEKLENEN[w][2] + 1;
+/* Etki boyunca her karede süs öğelerinin, formun ve yasak bölgelerin ölçüsünü kaydeder: içerik kutusuna / başlık ve künyeye
+   girme, taşma, yerleşim kayması, ekranda aynı anda görünen öğe sayısı, kelebeklerin yolu, animasyonların özellikleri */
 const kaydet = (p, sure) => p.evaluate(({ sure, BH }) => new Promise((coz) => {
   const f = document.getElementById('leadForm'), cs = getComputedStyle(f), fr0 = f.getBoundingClientRect(), boy0 = document.documentElement.scrollHeight;
-  const icSag = () => f.getBoundingClientRect().right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight);
+  const icerik = () => { const r = f.getBoundingClientRect(); return { l: r.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft), r: r.right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight), t: r.top + parseFloat(cs.borderTopWidth) + parseFloat(cs.paddingTop), b: r.bottom - parseFloat(cs.borderBottomWidth) - parseFloat(cs.paddingBottom) }; };
+  const kesisir = (a, b) => a.right > b.l + 0.5 && a.left < b.r - 0.5 && a.bottom > b.t + 0.5 && a.top < b.b - 0.5;
+  const yasak = () => [...document.querySelectorAll('.contact-head, .contact-kunye')].map(e => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom, ad: e.className }; });
   const gonder = document.getElementById('leadSubmit');
-  const k = { kare: 0, kelebekKare: 0, ihlal: [], tasma: 0, kayma: 0, hareket: new Set(), pe: new Set(), aria: new Set(), konum: new Set(), maxN: 0 };
-  const t0 = performance.now();
+  const k = { ihlal: [], tasma: 0, kayma: 0, pe: new Set(), aria: new Set(), konum: new Set(), maxN: 0, enCokGorunen: 0, cicekEn: 0, kelebekEn: 0, kelebek: [new Set(), new Set()], dikey: [[1e9, -1e9], [1e9, -1e9]], tamGorunur: [0, 0], ozellik: new Set(), sonVar: 0 };
+  const t0 = performance.now(); let onceki = t0;
   (function tur(){
-    k.kare++;
-    const ogeler = [...document.querySelectorAll(BH)]; k.maxN = Math.max(k.maxN, ogeler.length);
-    ogeler.forEach(e => { const c = getComputedStyle(e); k.pe.add(c.pointerEvents); k.konum.add(c.position); if (!e.classList.contains('bh-kelebek')) k.aria.add(e.getAttribute('aria-hidden')); });
-    const kb = document.querySelector('.bh-kelebek');
-    if (kb && +getComputedStyle(kb).opacity > 0) {
-      const r = kb.getBoundingClientRect(), kat = document.querySelector('.bh-kat').getBoundingClientRect();
-      const gor = r.right > kat.left && r.left < kat.right && r.bottom > kat.top && r.top < kat.bottom && r.left < innerWidth;
-      if (gor) { k.kelebekKare++; k.hareket.add(Math.round(r.left) + ',' + Math.round(r.top));
-        const fr = f.getBoundingClientRect();
-        if (r.bottom > fr.top && r.top < fr.bottom && r.left < icSag() - 0.5) k.ihlal.push('kelebek ' + Math.round(r.left) + '<' + Math.round(icSag())); }
-    }
-    document.querySelectorAll('.bh-cicek').forEach((c, i) => { const r = c.getBoundingClientRect();
-      if (i === 0 && r.left < icSag() - 0.5) k.ihlal.push('dal çiçeği ' + Math.round(r.left));
-      if (i === 1 && r.top < gonder.getBoundingClientRect().bottom - 0.5) k.ihlal.push('çim çiçeği ' + Math.round(r.top)); });
+    const simdi = performance.now(), dt = simdi - onceki; onceki = simdi;
+    const ogeler = [...document.querySelectorAll(BH)]; k.maxN = Math.max(k.maxN, ogeler.length); if (ogeler.length) k.sonVar = simdi - t0;
+    const ic = icerik(), ys = yasak(); let gorunen = 0;
+    ogeler.forEach(e => {
+      const c = getComputedStyle(e); k.pe.add(c.pointerEvents); k.konum.add(c.position); k.aria.add(e.getAttribute('aria-hidden'));
+      if (e.classList.contains('bh-kat')) return;
+      const r = e.getBoundingClientRect(), op = +c.opacity, ad = e.className.split(' ')[0];
+      if (op > 0.02 && r.width) {
+        if (kesisir(r, ic)) k.ihlal.push(ad + ' içerik ' + [r.left, r.top, r.right, r.bottom].map(Math.round).join(','));
+        ys.forEach(y => { if (kesisir(r, y)) k.ihlal.push(ad + ' ' + y.ad); });
+        if (e.classList.contains('bh-cim') && r.top < gonder.getBoundingClientRect().bottom - 0.5) k.ihlal.push('çim çiçeği düğmenin üstünde');
+        if (op > 0.5 && r.left >= 0 && r.right <= innerWidth && r.top >= 64 && r.bottom <= innerHeight) gorunen++;
+      }
+      if (e.classList.contains('bh-cicek')) k.cicekEn = Math.max(k.cicekEn, r.width);
+      if (e.classList.contains('bh-kelebek')) {
+        k.kelebekEn = Math.max(k.kelebekEn, r.width);
+        const i = [...document.querySelectorAll('.bh-kelebek')].indexOf(e);
+        if (op > 0 && r.right > 0 && r.left < innerWidth) { k.kelebek[i].add(Math.round(r.left) + ',' + Math.round(r.top)); k.dikey[i] = [Math.min(k.dikey[i][0], r.top), Math.max(k.dikey[i][1], r.top)]; }
+        if (op > 0.5 && r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight) k.tamGorunur[i] += dt;
+      }
+    });
+    document.getAnimations().forEach(a => { const h = a.effect && a.effect.target; if (h && h.closest && h.closest('.bh-kat')) a.effect.getKeyframes().forEach(kf => Object.keys(kf).forEach(o => { if (!['offset', 'easing', 'composite', 'computedOffset'].includes(o)) k.ozellik.add(o); })); });
+    k.enCokGorunen = Math.max(k.enCokGorunen, gorunen);
     k.tasma = Math.max(k.tasma, document.documentElement.scrollWidth - innerWidth);
     const fr = f.getBoundingClientRect(); k.kayma = Math.max(k.kayma, Math.abs(fr.height - fr0.height), Math.abs(fr.width - fr0.width), Math.abs(document.documentElement.scrollHeight - boy0), f.scrollLeft);
-    if (performance.now() - t0 < sure) requestAnimationFrame(tur);
-    else coz({ ...k, hareket: k.hareket.size, pe: [...k.pe], aria: [...k.aria], konum: [...k.konum], ihlal: k.ihlal.slice(0, 5) });
+    if (simdi - t0 < sure) requestAnimationFrame(tur);
+    else coz({ ...k, kelebek: k.kelebek.map(s => s.size), dikey: k.dikey.map(d => Math.round(d[1] - d[0])), tamGorunur: k.tamGorunur.map(Math.round), pe: [...k.pe], aria: [...k.aria], konum: [...k.konum], ozellik: [...k.ozellik].sort(), ihlal: k.ihlal.slice(0, 5), cicekEn: Math.round(k.cicekEn), kelebekEn: Math.round(k.kelebekEn) });
   })();
 }), { sure, BH });
 for (const [w, h] of [[1440, 900], [390, 844], [320, 568]]) {
@@ -556,33 +572,44 @@ for (const [w, h] of [[1440, 900], [390, 844], [320, 568]]) {
   ok(`F8 ${w}px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)`, (await bahar(p)).n === 0);
   await p.locator('#lead-yesil').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, 120));
   await p.check('#lead-yesil');
-  const kayit = await kaydet(p, 4200);
-  const ilk = kayit.maxN;
-  ok(`F8 ${w}px işaretlenince ${w >= 360 ? 'iki çiçek' : 'dal çiçeği (alt boşluk dar)'} ve bir kelebek; hepsi aria-hidden, pointer-events: none, mutlak konumlu`, ilk === (w >= 360 ? 4 : 3) && kayit.pe.join() === 'none' && kayit.aria.join() === 'true' && kayit.konum.join() === 'absolute', JSON.stringify(kayit));
-  ok(`F8 ${w}px kelebek uçuyor (en az 40 ayrı konum) ve formun içerik kutusuna hiç girmiyor; çiçekler iç boşlukta`, kayit.hareket >= 40 && kayit.ihlal.length === 0, JSON.stringify([kayit.hareket, kayit.ihlal]));
+  const ilk = await bahar(p);
+  const kayit = await kaydet(p, 5000);
+  const [nc, nk, ny] = BEKLENEN[w];
+  ok(`F8 ${w}px işaretlenince ${nc} çiçek (${w > 360 ? 'çim çiçeği dahil' : 'çim çiçeği yok, alt boşluk dar'}), ${nk} kelebek, ${ny} yaprak tek katmanda; hepsi aria-hidden, pointer-events: none, mutlak konumlu`,
+    ilk.cicek === nc && ilk.kelebek === nk && ilk.yaprak === ny && ilk.kat === 1 && kayit.maxN === toplam(w) && kayit.pe.join() === 'none' && kayit.aria.join() === 'true' && kayit.konum.join() === 'absolute', JSON.stringify([ilk, kayit.maxN, kayit.pe, kayit.aria, kayit.konum]));
+  ok(`F8 ${w}px belirgin: en büyük çiçek ≥ ${w > 640 ? 56 : 30} px, kelebek ≥ ${w > 640 ? 60 : 34} px (önceki tur 22 / 30 px); aynı anda en az 5 süs öğesi ekranda`,
+    kayit.cicekEn >= (w > 640 ? 56 : 30) && kayit.kelebekEn >= (w > 640 ? 60 : 34) && kayit.enCokGorunen >= 5, JSON.stringify([kayit.cicekEn, kayit.kelebekEn, kayit.enCokGorunen]));
+  ok(`F8 ${w}px iki kelebek de uçuyor (her biri ≥ 40 ayrı konum, ≥ 150 px dikey yol) ve her biri ≥ 0,8 sn tamamen ekranda`,
+    kayit.kelebek.every(n => n >= 40) && kayit.dikey.every(d => d >= 150) && kayit.tamGorunur.every(t => t >= 800), JSON.stringify([kayit.kelebek, kayit.dikey, kayit.tamGorunur]));
+  ok(`F8 ${w}px hiçbir süs öğesi formun içerik kutusuna (alanlar, etiketler, düğmeler) ya da başlık / künye metnine girmiyor; çim çiçekleri düğmenin altında`, kayit.ihlal.length === 0, JSON.stringify(kayit.ihlal));
+  ok(`F8 ${w}px animasyonlar yalnız transform, opacity ve sap çizimi (stroke-dashoffset) kullanır`, kayit.ozellik.every(o => ['transform', 'opacity', 'strokeDashoffset'].includes(o)) && kayit.ozellik.includes('transform'), JSON.stringify(kayit.ozellik));
   ok(`F8 ${w}px etki boyunca yatay taşma yok, form ve sayfa boyu değişmiyor, form içeriği yana kaymıyor`, kayit.tasma === 0 && kayit.kayma < 0.5, JSON.stringify([kayit.tasma, kayit.kayma]));
-  await p.waitForTimeout(700);
+  const besSn = await bahar(p);
+  await p.waitForTimeout(1100);
   const son = await bahar(p);
-  ok(`F8 ${w}px ≈4,5 sn sonra öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır`, son.n === 0 && await p.evaluate(() => document.getElementById('leadForm').classList.contains('yesil') && +getComputedStyle(document.querySelector('.form-flora-kutu .fl-d')).opacity > 0.7), JSON.stringify(son));
+  ok(`F8 ${w}px 5 sn'de hâlâ sürer, ≈5,8 sn'de öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır`, besSn.n > 0 && son.n === 0 && await p.evaluate(() => document.getElementById('leadForm').classList.contains('yesil') && +getComputedStyle(document.querySelector('.form-flora-kutu .fl-d')).opacity > 0.7), JSON.stringify([besSn, son]));
   await p.uncheck('#lead-yesil'); await p.waitForTimeout(400);
   ok(`F8 ${w}px kutucuk kaldırılınca bahar anı başlamaz`, (await bahar(p)).n === 0);
   ok(`F8 ${w}px konsol ve sayfa hatası yok`, durum.konsol.filter(k => !/Failed to load resource|requestfailed/.test(k)).length === 0, durum.konsol.join(' | '));
   await ctx.close();
 }
-{ // F8 hızlı aç-kapa: gösterimler üst üste binmez; ortada kaldırılınca hızla söner
+{ // F8 hızlı aç-kapa: gösterimler üst üste binmez; ortada kaldırılınca hızla söner; pencere boyu değişince söner
   const { ctx, p } = await baglam({ w: 1280, h: 900 });
   await ac(p);
   await p.locator('#lead-yesil').scrollIntoViewIfNeeded();
-  const say = () => p.evaluate(() => [document.querySelectorAll('.bh-kelebek').length, document.querySelectorAll('.bh-cicek').length]);
-  let enCok = [0, 0];
-  for (let i = 0; i < 4; i++) { await p.click('#lead-yesil'); const s = await say(); enCok = [Math.max(enCok[0], s[0]), Math.max(enCok[1], s[1])]; }
+  const say = () => p.evaluate(() => [document.querySelectorAll('.bh-kelebek').length, document.querySelectorAll('.bh-cicek').length, document.querySelectorAll('.bh-kat').length]);
+  let enCok = [0, 0, 0];
+  for (let i = 0; i < 4; i++) { await p.click('#lead-yesil'); const s = await say(); enCok = enCok.map((v, j) => Math.max(v, s[j])); }
   await p.check('#lead-yesil'); await p.waitForTimeout(150); await p.click('#lead-yesil'); await p.click('#lead-yesil');
-  const s2 = await say(); enCok = [Math.max(enCok[0], s2[0]), Math.max(enCok[1], s2[1])];
-  ok('F8 hızlı aç-kapa: aynı anda en çok bir kelebek ve iki çiçek', enCok[0] <= 1 && enCok[1] <= 2, JSON.stringify(enCok));
-  await p.waitForTimeout(5000); await p.uncheck('#lead-yesil'); await p.waitForTimeout(400);
+  const s2 = await say(); enCok = enCok.map((v, j) => Math.max(v, s2[j]));
+  ok('F8 hızlı aç-kapa: aynı anda en çok bir katman, iki kelebek ve bir gösterimin çiçekleri', enCok[0] <= 2 && enCok[1] <= BEKLENEN[1280][0] && enCok[2] <= 1, JSON.stringify(enCok));
+  await p.waitForTimeout(6200); await p.uncheck('#lead-yesil'); await p.waitForTimeout(400);
   await p.check('#lead-yesil'); await p.waitForTimeout(1200);
   const orta = await bahar(p); await p.uncheck('#lead-yesil'); await p.waitForTimeout(500);
-  ok('F8 gösterim ortasında kutucuk kaldırılınca öğeler 0,5 sn içinde silinir', orta.n === 4 && (await bahar(p)).n === 0, JSON.stringify(orta));
+  ok('F8 gösterim ortasında kutucuk kaldırılınca öğeler 0,5 sn içinde silinir', orta.n === toplam(1280) && (await bahar(p)).n === 0, JSON.stringify(orta));
+  await p.check('#lead-yesil'); await p.waitForTimeout(900);
+  const once = await bahar(p); await p.setViewportSize({ width: 1180, height: 900 }); await p.waitForTimeout(500);
+  ok('F8 gösterim sürerken pencere boyu değişirse süs 0,5 sn içinde silinir (yerinden kaymış süs kalmaz)', once.n > 0 && (await bahar(p)).n === 0, JSON.stringify(once));
   await ctx.close();
 }
 { // F8 etki sürerken form kullanılabilir: alanlara yazılır, KVKK işaretlenir, gönderilir
@@ -590,25 +617,25 @@ for (const [w, h] of [[1440, 900], [390, 844], [320, 568]]) {
   await ac(p);
   await doldur(p); await p.uncheck('#lead-kvkk');
   await p.locator('#lead-yesil').scrollIntoViewIfNeeded();
-  await p.check('#lead-yesil'); await p.waitForTimeout(900);
-  const ust = await p.evaluate(() => { const al = []; document.querySelectorAll('.bh-cicek, .bh-kelebek').forEach(e => { const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x >= 0 && x < innerWidth && y >= 0 && y < innerHeight) { const h = document.elementFromPoint(x, y); al.push(h ? (h.closest('.bh-cicek, .bh-kelebek, .bh-kat') ? 'SÜS' : 'alt') : 'yok'); } }); return al; });
+  await p.check('#lead-yesil'); await p.waitForTimeout(1600);
+  const ust = await p.evaluate(() => { const al = []; document.querySelectorAll('.bh-cicek, .bh-kelebek, .bh-yaprak').forEach(e => { const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x >= 0 && x < innerWidth && y >= 0 && y < innerHeight) { const h = document.elementFromPoint(x, y); al.push(h ? (h.closest('.bh-kat') ? 'SÜS' : 'alt') : 'yok'); } }); return al; });
   await p.fill('#lead-mesaj', 'Bahar sırasında yazıldı'); await p.check('#lead-kvkk');
   const n = (await bahar(p)).n;
   await p.click('#leadSubmit'); await p.waitForSelector('.form-success', { timeout: 5000 });
-  ok('F8 etki sürerken: süs tıklamayı yakalamaz (elementFromPoint), alan doldurulur, KVKK işaretlenir, form gönderilir (yesil:true)', n === 4 && ust.length > 0 && !ust.includes('SÜS') && durum.gonderiler.length === 1 && durum.gonderiler[0].govde.yesil === true && durum.gonderiler[0].govde.mesaj === 'Bahar sırasında yazıldı', JSON.stringify([n, ust, durum.gonderiler.length]));
-  await p.waitForTimeout(4200);
-  ok('F8 gönderimden sonra da süs öğeleri silinir, hata yok', (await bahar(p)).n === 0 && durum.konsol.filter(k => !/Failed to load resource|requestfailed/.test(k)).length === 0, durum.konsol.join(' | '));
+  ok('F8 etki sürerken: süs tıklamayı yakalamaz (elementFromPoint), alan doldurulur, KVKK işaretlenir, form gönderilir (yesil:true)', n === toplam(390) && ust.length >= 3 && !ust.includes('SÜS') && durum.gonderiler.length === 1 && durum.gonderiler[0].govde.yesil === true && durum.gonderiler[0].govde.mesaj === 'Bahar sırasında yazıldı', JSON.stringify([n, ust, durum.gonderiler.length]));
+  await p.waitForTimeout(600);
+  ok('F8 gönderilince süs 0,6 sn içinde silinir (başarı iletisinin üstünde kalmaz), hata yok', (await bahar(p)).n === 0 && durum.konsol.filter(k => !/Failed to load resource|requestfailed/.test(k)).length === 0, durum.konsol.join(' | '));
   await ctx.close();
 }
-{ // F8 hareket azaltma: kelebek yok, açılma yok; tek çiçek yerinde belirip söner
+{ // F8 hareket azaltma: kelebek ve yaprak yok, açılma yok; çiçekler yerinde yalnız saydamlıkla belirip söner
   const { ctx, p, durum } = await baglam({ w: 390, h: 844, azalt: true });
   await ac(p);
   await p.locator('#lead-yesil').scrollIntoViewIfNeeded();
   await p.check('#lead-yesil'); await p.waitForTimeout(1500);
-  const r = await p.evaluate(() => { const c = document.querySelector('.bh-cicek'); return { ...{ n: document.querySelectorAll('.bh-cicek').length, kelebek: document.querySelectorAll('.bh-kelebek, .bh-kat').length }, css: c ? c.querySelectorAll('*').length && [...c.querySelectorAll('*')].reduce((t, e) => t + e.getAnimations().length, 0) : -1, waapi: c ? c.getAnimations().map(a => Object.keys(a.effect.getKeyframes()[0]).filter(k => !['offset', 'easing', 'composite', 'computedOffset'].includes(k)).join()) : [], tac: c ? getComputedStyle(c.querySelector('.bh-tac')).transform : '' }; });
-  ok('F8 hareket azaltma: kelebek yok; tek çiçek, yalnız saydamlıkla belirir (yer değiştiren ya da açılan animasyon yok)', r.n === 1 && r.kelebek === 0 && r.css === 0 && r.waapi.join() === 'opacity' && r.tac === 'none', JSON.stringify(r));
-  await p.waitForTimeout(2300);
-  ok('F8 hareket azaltma: çiçek ≈3,5 sn sonra silinir, hata yok', (await bahar(p)).n === 0 && durum.konsol.filter(k => !/Failed to load resource|requestfailed/.test(k)).length === 0);
+  const r = await p.evaluate(() => { const cc = [...document.querySelectorAll('.bh-cicek')]; return { n: cc.length, kelebek: document.querySelectorAll('.bh-kelebek').length, yaprak: document.querySelectorAll('.bh-yaprak').length, css: cc.reduce((t, c) => t + [...c.querySelectorAll('*')].reduce((u, e) => u + e.getAnimations().length, 0), 0), waapi: [...new Set(cc.flatMap(c => c.getAnimations().map(a => Object.keys(a.effect.getKeyframes()[0]).filter(k => !['offset', 'easing', 'composite', 'computedOffset'].includes(k)).join())))], tac: [...new Set(cc.map(c => getComputedStyle(c.querySelector('.bh-tac')).transform))], en: Math.max(...cc.map(c => c.getBoundingClientRect().width)) }; });
+  ok('F8 hareket azaltma: kelebek ve yaprak yok; çiçekler (aynı büyük ölçüde) yalnız saydamlıkla belirir, yer değiştiren ya da açılan animasyon yok', r.n === BEKLENEN[390][0] && r.kelebek === 0 && r.yaprak === 0 && r.css === 0 && r.waapi.join() === 'opacity' && r.tac.join() === 'none' && r.en >= 30, JSON.stringify(r));
+  await p.waitForTimeout(3300);
+  ok('F8 hareket azaltma: çiçekler ≈4,5 sn sonra silinir, hata yok', (await bahar(p)).n === 0 && durum.konsol.filter(k => !/Failed to load resource|requestfailed/.test(k)).length === 0);
   await ctx.close();
 }
 { // F8 betik kapalı: süs yok
@@ -985,8 +1012,23 @@ const alanOku = (p) => p.evaluate(() => [...document.querySelectorAll('details.a
   ok('L3 yedi görsel: srcset 480w/800w/1200w (kendi dosyaları), sizes dolu, width=1200 height=800, loading=lazy, decoding=async', y.img.length === 7 && y.img.every((i, n) => i.srcset === [480, 800, 1200].map(k => `img/sektor-${SEKTOR[n][0]}-${k}.webp ${k}w`).join(', ') && i.src === `img/sektor-${SEKTOR[n][0]}-800.webp` && /^\(min-width: 1384px\) \d+px, \(min-width: 1040px\) \d+vw, /.test(i.sizes) && i.w === '1200' && i.h === '800' && i.lazy === 'lazy' && i.dec === 'async'), JSON.stringify(y.img.map(i => i.sizes)));
   ok('L3 görsellerin alt metni TR ve EN dolu, anahtar kelime yığını değil (≤ 12 kelime, “elektrik tedariki/fiyat” gibi arama kalıbı yok)', y.img.every(i => i.alt === i.tr && i.tr.length > 15 && i.en.length > 15 && i.tr.split(' ').length <= 12 && !/tedarik|fiyat|ucuz|voltage/i.test(i.tr + i.en)), JSON.stringify(y.img.map(i => i.alt)));
   ok('L3 görsellerin hepsi ilk ekranın altında (1440×900): kapak görseli LCP adayı kalır', y.img.every(i => i.ust > 900), y.img.map(i => i.ust).join());
-  ok('L4 temsilî görsel notu bölümde görünür (TR ve EN)', y.not[0] === 'Görseller temsilîdir; Voltage Enerji tesislerini göstermez.' && y.not[1] === 'Images are illustrative and do not show Voltage Enerji facilities.' && y.not[2] > 0 && y.not[3] >= 13, JSON.stringify(y.not));
+  ok('L4 temsilî görsel notu bölümde görünür (TR ve EN)', y.not[0] === 'Görseller temsilîdir; müşterilerimizin tesislerini ya da belirli bir tesisi göstermez.' && y.not[1] === 'Images are illustrative and do not show our customers\' facilities or any specific site.' && y.not[2] > 0 && y.not[3] >= 13, JSON.stringify(y.not));
   ok('L5 dizgi: kart kutusu yok (yuvarlak köşe, gölge, zemin, çerçeve yok); görsel üstünde yazı ya da örtü yok', y.kart.every(k => /^0px\|none\|rgba\(0, 0, 0, 0\)\|0px$/.test(k)) && y.ortu === 0, JSON.stringify(y.kart.slice(0, 2)));
+  { // L4b hukuk düzeltmeleri (27.11, Hukuk ve Uyum "CLEAR WITH CHANGES"): alt bilgi "EPİAŞ Piyasa Katılımcısı" (üyelik değil),
+    // sektör notu müşteri tesislerini göstermez, EN kaynak satırında "EPIAS"; 320 px'te alt bilgi satırı taşmaz (TR ve EN)
+    const hk = await p.evaluate(() => { const s = [...document.querySelectorAll('.footer .cl-v span')].find(e => /2011/.test(e.textContent)); return [s && s.textContent, s && s.getAttribute('data-tr'), s && s.getAttribute('data-en'), [...document.querySelectorAll('.en-only')].map(e => e.textContent).filter(t => /Transparency Platform/.test(t)), document.body.innerHTML.includes('EPİAŞ Üyesi') || document.body.innerHTML.includes('EPIAS Member')]; });
+    ok('L4b alt bilgi: “Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı” / “Est. 2011 · EPIAS Market Participant”; “EPİAŞ Üyesi / EPIAS Member” sayfada yok; EN kaynak satırı “EPIAS Transparency Platform”',
+      hk[0] === 'Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı' && hk[1] === hk[0] && hk[2] === 'Est. 2011 · EPIAS Market Participant' && hk[3].length === 1 && /Source: EPIAS Transparency Platform\./.test(hk[3][0]) && hk[4] === false, JSON.stringify(hk));
+    const d = await baglam({ w: 320, h: 568 });
+    await ac(d.p);
+    const tas = [];
+    for (const dil of ['tr', 'en']) {
+      await d.p.evaluate((dil) => document.querySelector('.lang-btn[data-lang="' + dil + '"]').click(), dil); await d.p.waitForTimeout(150);
+      tas.push(await d.p.evaluate(() => { const s = [...document.querySelectorAll('.footer .cl-v span')].find(e => /2011/.test(e.textContent)), r = s.getBoundingClientRect(), v = s.closest('.cl-v').getBoundingClientRect(); return [document.documentElement.lang, s.textContent, Math.round(r.right - v.right), Math.round(r.right), document.documentElement.scrollWidth - innerWidth]; }));
+    }
+    ok('L4b 320 px: alt bilgi satırı (TR ve EN) sütunundan ve ekrandan taşmaz', tas.length === 2 && tas[1][1] === 'Est. 2011 · EPIAS Market Participant' && tas.every(t => t[2] <= 0 && t[3] <= 320 && t[4] === 0), JSON.stringify(tas));
+    await d.ctx.close();
+  }
   const olcu = async (w, h, dsf = 1) => {
     const k = await baglam({ w, h, dsf });
     await ac(k.p, '', 200);

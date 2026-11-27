@@ -70,7 +70,7 @@ GEÇTİ  C1 375px menü → #yaklasim: hedef üst bandın hemen altında
 GEÇTİ  C1 375px menü → #iletisim: hedef üst bandın hemen altında
 GEÇTİ  C1 375px üst banttaki “Teklif Al” → #teklif: hedef üst bandın hemen altında
 GEÇTİ  C1 375px “Teklif Al” inişi: form başlığı ve ilk alan ilk ekranda, bandın altında (arada başka içerik yok)
-       375px “Teklif Al” → form üst kenarı 80 px, üst bant alt kenarı 65 px, form başlığı 103 px, ilk alanın alt kenarı 256 px (ekran 667 px)
+       375px “Teklif Al” → form üst kenarı 80 px, üst bant alt kenarı 65 px, form başlığı 103 px, ilk alanın alt kenarı 257 px (ekran 667 px)
 GEÇTİ  C2 375px kapak “Teklif Al” → form başlığı görünür
 GEÇTİ  C3 375px kapak “Hizmetlerimizi İncele” → #hizmetler; üst bant “scrolled”
 GEÇTİ  D1 375px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü düğmesi (44×44) yan yana sığıyor; dil seçimi üst bantta değil
@@ -177,32 +177,42 @@ GEÇTİ  F5 yeşil kutucuk: form “yesil” sınıfı, yeşil düğme ve kenar,
 GEÇTİ  F5 yeşil seçim gövdede yesil:true
 GEÇTİ  F5 kutucuk kaldırılınca form eski görünüme döner
 GEÇTİ  F8 1440px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)
-GEÇTİ  F8 1440px işaretlenince iki çiçek ve bir kelebek; hepsi aria-hidden, pointer-events: none, mutlak konumlu
-GEÇTİ  F8 1440px kelebek uçuyor (en az 40 ayrı konum) ve formun içerik kutusuna hiç girmiyor; çiçekler iç boşlukta
+GEÇTİ  F8 1440px işaretlenince 6 çiçek (çim çiçeği dahil), 2 kelebek, 5 yaprak tek katmanda; hepsi aria-hidden, pointer-events: none, mutlak konumlu
+GEÇTİ  F8 1440px belirgin: en büyük çiçek ≥ 56 px, kelebek ≥ 60 px (önceki tur 22 / 30 px); aynı anda en az 5 süs öğesi ekranda
+GEÇTİ  F8 1440px iki kelebek de uçuyor (her biri ≥ 40 ayrı konum, ≥ 150 px dikey yol) ve her biri ≥ 0,8 sn tamamen ekranda
+GEÇTİ  F8 1440px hiçbir süs öğesi formun içerik kutusuna (alanlar, etiketler, düğmeler) ya da başlık / künye metnine girmiyor; çim çiçekleri düğmenin altında
+GEÇTİ  F8 1440px animasyonlar yalnız transform, opacity ve sap çizimi (stroke-dashoffset) kullanır
 GEÇTİ  F8 1440px etki boyunca yatay taşma yok, form ve sayfa boyu değişmiyor, form içeriği yana kaymıyor
-GEÇTİ  F8 1440px ≈4,5 sn sonra öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
+GEÇTİ  F8 1440px 5 sn'de hâlâ sürer, ≈5,8 sn'de öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
 GEÇTİ  F8 1440px kutucuk kaldırılınca bahar anı başlamaz
 GEÇTİ  F8 1440px konsol ve sayfa hatası yok
 GEÇTİ  F8 390px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)
-GEÇTİ  F8 390px işaretlenince iki çiçek ve bir kelebek; hepsi aria-hidden, pointer-events: none, mutlak konumlu
-GEÇTİ  F8 390px kelebek uçuyor (en az 40 ayrı konum) ve formun içerik kutusuna hiç girmiyor; çiçekler iç boşlukta
+GEÇTİ  F8 390px işaretlenince 5 çiçek (çim çiçeği dahil), 2 kelebek, 5 yaprak tek katmanda; hepsi aria-hidden, pointer-events: none, mutlak konumlu
+GEÇTİ  F8 390px belirgin: en büyük çiçek ≥ 30 px, kelebek ≥ 34 px (önceki tur 22 / 30 px); aynı anda en az 5 süs öğesi ekranda
+GEÇTİ  F8 390px iki kelebek de uçuyor (her biri ≥ 40 ayrı konum, ≥ 150 px dikey yol) ve her biri ≥ 0,8 sn tamamen ekranda
+GEÇTİ  F8 390px hiçbir süs öğesi formun içerik kutusuna (alanlar, etiketler, düğmeler) ya da başlık / künye metnine girmiyor; çim çiçekleri düğmenin altında
+GEÇTİ  F8 390px animasyonlar yalnız transform, opacity ve sap çizimi (stroke-dashoffset) kullanır
 GEÇTİ  F8 390px etki boyunca yatay taşma yok, form ve sayfa boyu değişmiyor, form içeriği yana kaymıyor
-GEÇTİ  F8 390px ≈4,5 sn sonra öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
+GEÇTİ  F8 390px 5 sn'de hâlâ sürer, ≈5,8 sn'de öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
 GEÇTİ  F8 390px kutucuk kaldırılınca bahar anı başlamaz
 GEÇTİ  F8 390px konsol ve sayfa hatası yok
 GEÇTİ  F8 320px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)
-GEÇTİ  F8 320px işaretlenince dal çiçeği (alt boşluk dar) ve bir kelebek; hepsi aria-hidden, pointer-events: none, mutlak konumlu
-GEÇTİ  F8 320px kelebek uçuyor (en az 40 ayrı konum) ve formun içerik kutusuna hiç girmiyor; çiçekler iç boşlukta
+GEÇTİ  F8 320px işaretlenince 4 çiçek (çim çiçeği yok, alt boşluk dar), 2 kelebek, 5 yaprak tek katmanda; hepsi aria-hidden, pointer-events: none, mutlak konumlu
+GEÇTİ  F8 320px belirgin: en büyük çiçek ≥ 30 px, kelebek ≥ 34 px (önceki tur 22 / 30 px); aynı anda en az 5 süs öğesi ekranda
+GEÇTİ  F8 320px iki kelebek de uçuyor (her biri ≥ 40 ayrı konum, ≥ 150 px dikey yol) ve her biri ≥ 0,8 sn tamamen ekranda
+GEÇTİ  F8 320px hiçbir süs öğesi formun içerik kutusuna (alanlar, etiketler, düğmeler) ya da başlık / künye metnine girmiyor; çim çiçekleri düğmenin altında
+GEÇTİ  F8 320px animasyonlar yalnız transform, opacity ve sap çizimi (stroke-dashoffset) kullanır
 GEÇTİ  F8 320px etki boyunca yatay taşma yok, form ve sayfa boyu değişmiyor, form içeriği yana kaymıyor
-GEÇTİ  F8 320px ≈4,5 sn sonra öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
+GEÇTİ  F8 320px 5 sn'de hâlâ sürer, ≈5,8 sn'de öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
 GEÇTİ  F8 320px kutucuk kaldırılınca bahar anı başlamaz
 GEÇTİ  F8 320px konsol ve sayfa hatası yok
-GEÇTİ  F8 hızlı aç-kapa: aynı anda en çok bir kelebek ve iki çiçek
+GEÇTİ  F8 hızlı aç-kapa: aynı anda en çok bir katman, iki kelebek ve bir gösterimin çiçekleri
 GEÇTİ  F8 gösterim ortasında kutucuk kaldırılınca öğeler 0,5 sn içinde silinir
+GEÇTİ  F8 gösterim sürerken pencere boyu değişirse süs 0,5 sn içinde silinir (yerinden kaymış süs kalmaz)
 GEÇTİ  F8 etki sürerken: süs tıklamayı yakalamaz (elementFromPoint), alan doldurulur, KVKK işaretlenir, form gönderilir (yesil:true)
-GEÇTİ  F8 gönderimden sonra da süs öğeleri silinir, hata yok
-GEÇTİ  F8 hareket azaltma: kelebek yok; tek çiçek, yalnız saydamlıkla belirir (yer değiştiren ya da açılan animasyon yok)
-GEÇTİ  F8 hareket azaltma: çiçek ≈3,5 sn sonra silinir, hata yok
+GEÇTİ  F8 gönderilince süs 0,6 sn içinde silinir (başarı iletisinin üstünde kalmaz), hata yok
+GEÇTİ  F8 hareket azaltma: kelebek ve yaprak yok; çiçekler (aynı büyük ölçüde) yalnız saydamlıkla belirir, yer değiştiren ya da açılan animasyon yok
+GEÇTİ  F8 hareket azaltma: çiçekler ≈4,5 sn sonra silinir, hata yok
 GEÇTİ  F8 betik kapalıyken kutucuk işaretlenir, bahar anı öğesi oluşmaz
 GEÇTİ  F6 geçersiz tür (.txt): “Lütfen PDF, JPG, PNG, WEBP ya da HEIC yükleyin.”, istek yok, mesaj odakta
 GEÇTİ  F6 dört dosya: “En fazla 3 fatura dosyası yükleyebilirsiniz.”, istek yok
@@ -361,6 +371,8 @@ GEÇTİ  L3 görsellerin alt metni TR ve EN dolu, anahtar kelime yığını değ
 GEÇTİ  L3 görsellerin hepsi ilk ekranın altında (1440×900): kapak görseli LCP adayı kalır
 GEÇTİ  L4 temsilî görsel notu bölümde görünür (TR ve EN)
 GEÇTİ  L5 dizgi: kart kutusu yok (yuvarlak köşe, gölge, zemin, çerçeve yok); görsel üstünde yazı ya da örtü yok
+GEÇTİ  L4b alt bilgi: “Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı” / “Est. 2011 · EPIAS Market Participant”; “EPİAŞ Üyesi / EPIAS Member” sayfada yok; EN kaynak satırı “EPIAS Transparency Platform”
+GEÇTİ  L4b 320 px: alt bilgi satırı (TR ve EN) sütunundan ve ekrandan taşmaz
        sektör görselleri 1440px @1x: demir-celik 710×376 → 800.webp · kimya 498×214 → 800.webp · osb 392×214 → 480.webp · lojistik 286×214 → 480.webp · cam-seramik 286×214 → 480.webp · veri-merkezi 392×214 → 480.webp · tekstil 498×214 → 800.webp
 GEÇTİ  L6 1440px @1x yedi görsel yüklendi; sizes değeri çizim genişliğini doğru bildirir (± %8); seçilen dosya yeterli ve gereğinden büyük değil
        sektör görselleri 1280px @1x: demir-celik 660×349 → 800.webp · kimya 463×192 → 480.webp · osb 364×192 → 480.webp · lojistik 266×192 → 480.webp · cam-seramik 266×192 → 480.webp · veri-merkezi 364×192 → 480.webp · tekstil 463×192 → 480.webp
@@ -381,15 +393,15 @@ GEÇTİ  L8 zemin ritmi: art arda üç açık bölüm yok; koyu bölümler sekt�
 GEÇTİ  L9 şirket cümlesi “Neden Voltage?” bölümünün içinde, sakin (≤ 22 px); üç ilke etiketi duruyor ve gövde metninden küçük; “Bir firma kadar köklü…” satırı kaldırıldı (TR ve EN)
 GEÇTİ  L10 kurumsal blok: EPDK lisansı “Voltage Enerji Hakkında” bölümünde H3 olarak şirket bilgilerinin yanında; ayrı lisans bölümü yok; tüm şirket ve lisans bilgileri, imza ve dört rozet duruyor; fotoğraf yok
 GEÇTİ  L0 1440: betiğin aradığı her id sayfada var (kaldırılmış öğeye bağlı betik yok); konsol hatası yok
-       sayfa boyu: 1440 px’te 9541 → 7998 px; 390 px’te 14106 → 10631 px (hedef: ≈ 8.000 ve ≈ 10.500)
+       sayfa boyu: 1440 px’te 9541 → 7998 px; 390 px’te 14106 → 10676 px (hedef: ≈ 8.000 ve ≈ 10.500)
 GEÇTİ  L11 sayfa önceki hazırlık sürümünden kısa (içerik silinmeden): 1440 px’te en az 1.300 px, 390 px’te en az 3.000 px
 GEÇTİ  M1 1440x900 ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk 729 px)
        1440x900: kapak alt kenarı 630 px, bilgi satırı alt kenarı 729 px; karşılaştırılan 1440×900 piksel; ilk 729 px içinde farklı piksel 0; altında farklı piksel 17561 (satır 815–887: yeniden düzenlenen Hizmetler bölümünün başı)
 GEÇTİ  M1 390x844 ilk ekran (bekleme durumu): üst bant, başlık, alt metin, düğmeler ve PTF kartı önceki hazırlık sürümüyle aynı yerde ve ölçüde; kapak yalnız şerit yeri kadar (44 px) uzadı
-       390x844: kapak alt kenarı 811 px, bilgi satırı alt kenarı 966 px; karşılaştırılan 390×844 piksel; ilk 844 px içinde farklı piksel 202535; altında farklı piksel 0 (ekranın tamamı aynı)
+       390x844: kapak alt kenarı 811 px, bilgi satırı alt kenarı 966 px; karşılaştırılan 390×844 piksel; ilk 844 px içinde farklı piksel 201431; altında farklı piksel 0 (ekranın tamamı aynı)
 GEÇTİ  M1 390x844@2x ilk ekran (bekleme durumu): üst bant, başlık, alt metin, düğmeler ve PTF kartı önceki hazırlık sürümüyle aynı yerde ve ölçüde; kapak yalnız şerit yeri kadar (44 px) uzadı
        390x844@2x: kapak alt kenarı 811 px, bilgi satırı alt kenarı 966 px; karşılaştırılan 780×1688 piksel; ilk 844 px içinde farklı piksel 800508; altında farklı piksel 0 (ekranın tamamı aynı)
 GEÇTİ  N1 390px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 GEÇTİ  N1 1440px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 
-TOPLAM: 365 geçti, 0 kaldı
+TOPLAM: 377 geçti, 0 kaldı

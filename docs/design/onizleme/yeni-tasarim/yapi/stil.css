@@ -436,36 +436,47 @@ p.form-hint { margin: -8px 0 20px; }
   .form.yesil .flora-cim { animation: cimSal 5s ease-in-out infinite alternate; }
 }
 
-/* ============ BAHAR ANI (sahip isteği 27.11) — yeşil enerji kutucuğu İŞARETLENİNCE ≈4,5 sn: dalın dibinde bir çiçek açar,
-   çimde bir çiçek daha; sağdan bir kelebek gelip çiçeğe konar, uçup gider. Öğeleri betik ekler ve bitince siler (// 9).
-   Yalnız süs: aria-hidden, tıklamayı engellemez, mutlak konumlu (yerleşim kaymaz), yalnız transform ve opacity değişir.
-   Hareket azaltma tercihinde kelebek yok; dalın dibindeki çiçek açık hâlde belirip söner. ============ */
-.form > .bh-cicek { position: absolute; z-index: 1; pointer-events: none; }
-.bh-cicek svg, .bh-kelebek svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.bh-p { fill: #FCF8EE; stroke: #3F7F4C; stroke-width: 0.7; transform-box: view-box; transform-origin: 0 0; }
-.bh-gb { fill: #E3A72F; stroke: #A9761A; stroke-width: 0.5; transform-box: view-box; transform-origin: 0 0; }
-.bh-tac { transform-box: view-box; transform-origin: 0 0; }
-.bh-sap { fill: none; stroke: #3F7F4C; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+/* ============ BAHAR ANI (sahip isteği 27.11; 2. tur aynı gün: "daha belirgin") — yeşil enerji kutucuğu İŞARETLENİNCE ≈5,8 sn:
+   formun iki kenarında sırayla dört çiçek, çimde bir-iki çiçek açar; iki kelebek gelip çiçeklere konar, uçup gider; birkaç
+   yaprak süzülür. Öğeleri betik ekler ve bitince siler (// 9). Hepsi sayfa genişliğinde, taşmayı kesen tek bir mutlak
+   katmanda; yalnız süs: aria-hidden, tıklamayı engellemez, yalnız transform ve opacity değişir. Formun içerik kutusuna
+   girmez. Hareket azaltma tercihinde kelebek ve yaprak yok; çiçekler açık hâlde belirip söner. ============ */
 .bh-kat { position: absolute; left: 0; width: 100%; overflow: hidden; pointer-events: none; z-index: 60; }
-.bh-kelebek { position: absolute; left: 0; top: 0; width: 30px; height: 25px; margin: -12.5px 0 0 -15px; }
+.bh-kat > div { position: absolute; left: 0; top: 0; }
+.bh-kat svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.bh-p ellipse { fill: #FCF8EE; stroke: #3F7F4C; stroke-width: 0.8; }
+.bh-pa ellipse { fill: #F2BC48; stroke: #9A6A14; }
+.bh-pd, .bh-yd { fill: none; stroke: #A9C79C; stroke-width: 0.6; stroke-linecap: round; }
+.bh-pa .bh-pd { stroke: #D3951F; }
+.bh-p, .bh-gb, .bh-tac, .bh-yp { transform-box: view-box; transform-origin: 0 0; }
+.bh-gb { fill: #E3A72F; stroke: #A9761A; stroke-width: 0.6; }
+.bh-gb.bh-gl { fill: #1E2536; stroke: #1E2536; }
+.bh-yp path:first-child { fill: #CFE2C3; stroke: #3F7F4C; stroke-width: 0.8; stroke-linejoin: round; }
+.bh-yd { stroke: #3F7F4C; stroke-width: 0.5; }
+.bh-sap { fill: none; stroke: #3F7F4C; stroke-width: 1.3; stroke-linecap: round; stroke-dasharray: 1; }
+.bh-yaprak ellipse { fill: #FCF8EE; stroke: #3F7F4C; stroke-width: 0.5; }
+.bh-ya ellipse { fill: #F2BC48; stroke: #9A6A14; }
 .bh-ks, .bh-kg { transform-box: view-box; transform-origin: 0 0; }
 .bh-ku { fill: #E9AC33; } .bh-ka { fill: #D7962A; } .bh-ku, .bh-ka { stroke: #7A520F; stroke-width: 0.45; stroke-linejoin: round; }
 .bh-kc { fill: #1E2536; } .bh-kn { fill: none; stroke: #1E2536; stroke-width: 0.55; stroke-linecap: round; }
-@keyframes bhTac { from { transform: scale(0.25) rotate(-55deg); opacity: 0; } 40% { opacity: 1; } to { transform: none; opacity: 1; } }
+.bh-kb { fill: #FCF8EE; } .bh-kv { fill: none; stroke: #A9761A; stroke-width: 0.3; stroke-linecap: round; }
+.bh-kelebek { filter: drop-shadow(0 3px 3px rgba(20, 30, 50, 0.18)); }
+@keyframes bhTac { from { transform: scale(0.2) rotate(-60deg); opacity: 0; } 40% { opacity: 1; } to { transform: none; opacity: 1; } }
 @keyframes bhYap { from { transform: scale(0.35, 0.12); } to { transform: none; } }
 @keyframes bhGb { from { transform: scale(0); } to { transform: none; } }
 @keyframes bhSap { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-@keyframes bhCirp { from { transform: none; } to { transform: scaleX(0.28); } }
+/* kanat çırpma: ease-in ile kanatlar zamanın çoğunda açık görünür; konunca yavaş ve yarım */
+@keyframes bhCirp { from { transform: none; } to { transform: scaleX(0.22); } }
+@keyframes bhDin { from { transform: none; } to { transform: scaleX(0.55); } }
 @media (prefers-reduced-motion: no-preference) {
-  .bh-cicek .bh-tac { animation: bhTac 1.1s cubic-bezier(0.2, 0.7, 0.25, 1) var(--bd, 0.15s) both; }
-  .bh-cicek .bh-p { animation: bhYap 0.9s cubic-bezier(0.2, 0.7, 0.25, 1) calc(var(--bd, 0.15s) + var(--i) * 70ms) both; }
-  .bh-cicek .bh-gb { animation: bhGb 0.5s ease-out calc(var(--bd, 0.15s) + 0.55s) both; }
-  .bh-cicek .bh-sap { animation: bhSap 0.8s cubic-bezier(0.45, 0, 0.25, 1) both; }
-  .bh-cicek .bh-sap + .bh-sap { animation-delay: 0.35s; animation-duration: 0.6s; }
-  .bh-ks, .bh-kg { animation: bhCirp 0.14s ease-in-out infinite alternate; }
-  .bh-kelebek.konar .bh-ks, .bh-kelebek.konar .bh-kg { animation-duration: 0.8s; }
+  .bh-cicek .bh-tac { animation: bhTac 1.1s cubic-bezier(0.2, 0.7, 0.25, 1) var(--bd) both; }
+  .bh-cicek .bh-p { animation: bhYap 0.9s cubic-bezier(0.2, 0.7, 0.25, 1) calc(var(--bd) + var(--i) * 70ms) both; }
+  .bh-cicek .bh-gb { animation: bhGb 0.5s ease-out calc(var(--bd) + 0.55s) both; }
+  .bh-cicek .bh-sap { animation: bhSap 0.6s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--bd) - 0.4s) both; }
+  .bh-cicek .bh-yp { animation: bhGb 0.55s cubic-bezier(0.2, 0.7, 0.25, 1) calc(var(--bd) - 0.15s + var(--j) * 0.12s) both; }
+  .bh-ks, .bh-kg { animation: bhCirp 0.17s ease-in infinite alternate; }
+  .bh-kelebek.konar .bh-ks, .bh-kelebek.konar .bh-kg { animation: bhDin 0.9s ease-in-out infinite alternate; }
 }
-@media (max-width: 640px) { .bh-kelebek { width: 22px; height: 19px; margin: -9.5px 0 0 -11px; } }
 
 /* KVKK onayı, tuzak alan, gönderim durumları */
 .form-consent { display: flex; align-items: flex-start; gap: 12px; margin-top: 2px; padding: 11px 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); cursor: pointer; }

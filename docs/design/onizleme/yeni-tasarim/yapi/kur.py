@@ -177,67 +177,152 @@ js += """
   yaz();
 })();
 
-// 9) Bahar anı (sahip isteği 27.11): yeşil enerji kutucuğu İŞARETLENİNCE ≈4,5 sn. Dalın dibinde bir çiçek açar, çimde bir
-//    çiçek daha; sağdan bir kelebek gelip çiçeğe konar ve uçup gider. Mevcut yeşil görünüme dokunmaz, yalnız ekler.
-//    Süs: aria-hidden, pointer-events yok, mutlak konum; kelebek yalnız formun sağ iç boşluğunda ve sayfa kenarında uçar
-//    (alanların üstüne girmez). Aynı anda tek gösterim; kutucuk kaldırılınca hızla söner; bitince öğeler DOM'dan silinir.
-//    Hareket azaltma tercihinde kelebek ve açılma yok: dalın dibindeki çiçek açık hâlde belirip söner (yalnız saydamlık).
+// 9) Bahar anı (sahip isteği 27.11; 2. tur aynı gün: "daha belirgin"): yeşil enerji kutucuğu İŞARETLENİNCE ≈5,8 sn.
+//    Formun iki kenarında sırayla dört çiçek açar (dalın dibinde, onun üstünde, solda iki), gönder düğmesinin altındaki
+//    çimde bir-iki çiçek daha; iki kelebek ekranın kenarından gelip birer çiçeğe konar ve uçup gider; birkaç yaprak
+//    yavaşça süzülür. Mevcut yeşil görünüme dokunmaz, yalnız ekler. Bütün süs, sayfa genişliğinde taşmayı kesen tek bir
+//    mutlak katmandadır: aria-hidden, pointer-events yok, yalnız transform ve opacity değişir; hiçbir öğe formun içerik
+//    kutusuna (alanlar, etiketler, düğmeler) ve iki sütunlu düzende sol sütuna girmez. Aynı anda tek gösterim; kutucuk
+//    kaldırılınca, form gönderilince ya da formun boyu değişince 0,3 sn'de söner; bitince öğeler DOM'dan silinir.
+//    Hareket azaltma tercihinde kelebek, yaprak ve açılma yok: çiçekler açık hâlleriyle yerlerinde belirip söner.
 (function(){
   var kutu = document.getElementById('lead-yesil'), form = document.getElementById('leadForm');
   if(!kutu || !form || !form.animate) return;
   var az = window.matchMedia('(prefers-reduced-motion: reduce)'), g = null;
-  var TAC = '<g class="bh-tac">' + [0, 72, 144, 216, 288].map(function(a, i){ return '<g transform="rotate(' + a + ')"><ellipse class="bh-p" style="--i:' + i + '" cy="-5" rx="3.1" ry="5"/></g>'; }).join('') + '<circle class="bh-gb" r="2.3"/></g>';
-  var KANAT = '<path class="bh-ku" d="M-.6 -1.5C-3 -8.5 -9.5 -10.8 -12 -8.2C-13.4 -6.4 -11.2 -2 -6.5 -.4C-4.2 .4 -1.8 0 -.6 -1.5Z"/><path class="bh-kc" d="M-12 -8.2C-11 -9.6 -9.2 -9.9 -7.6 -9.2C-9 -8.2 -10.2 -7 -10.8 -5.4C-11.7 -6.1 -12.4 -7.2 -12 -8.2Z"/><path class="bh-ka" d="M-.6 .8C-3.5 .6 -8.6 2.4 -8.4 6C-8.2 8.6 -5.2 9 -3.6 6.6C-2.4 4.8 -1.2 2.6 -.6 .8Z"/>';
+  /* çiçek başı (0,0) merkezli, yarıçap ≈19 birim. tür: k krem yaprak + kehribar göbek, a kehribar yaprak + lacivert göbek, p papatya */
+  function bas(t){
+    var n = t === 'p' ? 8 : 5, ry = t === 'p' ? 9.4 : 9.6, rx = t === 'p' ? 3.7 : 6.3, s = '<g class="bh-tac">';
+    for(var i = 0; i < n; i++) s += '<g transform="rotate(' + (i * 360 / n) + ')"><g class="bh-p' + (t === 'a' ? ' bh-pa' : '') + '" style="--i:' + i + '"><ellipse cy="' + (-ry) + '" rx="' + rx + '" ry="' + ry + '"/><path class="bh-pd" d="M0 -5V' + (-ry * 1.55).toFixed(1) + '"/></g></g>';
+    return s + '<circle class="bh-gb' + (t === 'a' ? ' bh-gl' : '') + '" r="' + (t === 'p' ? 4.8 : 4.4) + '"/></g>';
+  }
+  function yp(x, y, a, j){ return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ')"><g class="bh-yp" style="--j:' + j + '"><path d="M0 0C3 -3.4 9.4 -3.8 13.5 0C9.4 3.8 3 3.4 0 0Z"/><path class="bh-yd" d="M1.5 0H11"/></g></g>'; }
+  /* kenar çiçeği: baş, kısa sap ve iki yaprak (viewBox -20 -20 40 58); çim çiçeği: kısa sap, tek yaprak (viewBox -14 -31 28 33) */
+  function kenar(t){ return '<path class="bh-sap" pathLength="1" d="M0 15Q-1.6 26 .4 37"/>' + yp(-.5, 25, 200, 0) + yp(.1, 31, -28, 1) + bas(t); }
+  function cim(t){ return '<path class="bh-sap" pathLength="1" d="M0 2Q-1.4 -6 0 -13"/>' + yp(-.4, -5, 205, 0) + '<g transform="translate(0 -18.5) scale(.64)">' + bas(t) + '</g>'; }
+  var KANAT = '<path class="bh-ku" d="M-.6 -1.5C-3 -8.5 -9.5 -10.8 -12 -8.2C-13.4 -6.4 -11.2 -2 -6.5 -.4C-4.2 .4 -1.8 0 -.6 -1.5Z"/><path class="bh-kc" d="M-12 -8.2C-11 -9.6 -9.2 -9.9 -7.6 -9.2C-9 -8.2 -10.2 -7 -10.8 -5.4C-11.7 -6.1 -12.4 -7.2 -12 -8.2Z"/><circle class="bh-kb" cx="-10.4" cy="-7.6" r=".55"/><circle class="bh-kb" cx="-9" cy="-8.7" r=".42"/><path class="bh-ka" d="M-.6 .8C-3.5 .6 -8.6 2.4 -8.4 6C-8.2 8.6 -5.2 9 -3.6 6.6C-2.4 4.8 -1.2 2.6 -.6 .8Z"/><path class="bh-kv" d="M-1.3 -1.8Q-5 -4.6 -8.6 -6.4M-1.4 1.2Q-3.8 3.4 -5.2 6.2"/>';
+  var KELEBEK = '<g class="bh-ks">' + KANAT + '</g><g transform="scale(-1 1)"><g class="bh-kg">' + KANAT + '</g></g><ellipse class="bh-kc" rx=".9" ry="5.2" cy=".5"/><path class="bh-kn" d="M-.3 -4.5Q-1.5 -8 -3.2 -9.2M.3 -4.5Q1.5 -8 3.2 -9.2"/>';
   function oge(kap, sinif, stil, kutuDeger, ic){
     var d = document.createElement('div'); d.className = sinif; d.setAttribute('aria-hidden', 'true'); d.style.cssText = stil;
     d.innerHTML = '<svg viewBox="' + kutuDeger + '" focusable="false">' + ic + '</svg>'; kap.appendChild(d); return d;
   }
+  function sil(b){ b.ogeler.forEach(function(e){ e.remove(); }); if(b.ro) b.ro.disconnect(); window.removeEventListener('resize', b.boyut); if(g === b) g = null; }
   function sondur(hizli){
     var b = g; if(!b || b.son) return; b.son = true; b.zaman.forEach(clearTimeout);
     b.ogeler.forEach(function(e){ e.animate([{ opacity: getComputedStyle(e).opacity }, { opacity: 0 }], { duration: hizli ? 300 : 800, fill: 'forwards' }); });
-    setTimeout(function(){ b.ogeler.forEach(function(e){ e.remove(); }); if(g === b) g = null; }, hizli ? 350 : 850);
+    setTimeout(function(){ sil(b); }, hizli ? 350 : 850);
+  }
+  /* Kelebek yolu: [t ms, x, y, konma noktası mı] düğümlerinden 40 ms'lik kareler (Hermite eğrisi). Uçarken hafif inip
+     kalkar ve yatay hıza göre en çok 12° eğilir; konunca durur. x her karede, o andaki eğimle dönmüş kutunun yarısı
+     hesaba katılarak izinli şeridin içine kıstırılır (sinir). */
+  function yol(nk, sinir, bw, bh){
+    var son = nk[nk.length - 1][0], kare = [], i = 0, onceki = null, konma = nk.filter(function(n){ return n[3]; }).map(function(n){ return n[0]; });
+    function m(j, e){ return (nk[j][3] || j === 0 || j === nk.length - 1) ? 0 : (nk[j + 1][e] - nk[j - 1][e]) / (nk[j + 1][0] - nk[j - 1][0]); }
+    for(var t = 0; t <= son; t += 40){
+      while(i < nk.length - 2 && t > nk[i + 1][0]) i++;
+      var a = nk[i], c = nk[i + 1], d = c[0] - a[0], u = Math.min(1, (t - a[0]) / d), u2 = u * u, u3 = u2 * u;
+      var h0 = 2 * u3 - 3 * u2 + 1, h1 = u3 - 2 * u2 + u, h2 = 3 * u2 - 2 * u3, h3 = u3 - u2;
+      var x = h0 * a[1] + h1 * d * m(i, 1) + h2 * c[1] + h3 * d * m(i + 1, 1), y = h0 * a[2] + h1 * d * m(i, 2) + h2 * c[2] + h3 * d * m(i + 1, 2);
+      var uz = konma.reduce(function(z, k){ return Math.min(z, Math.abs(t - k)); }, 1e9), dur = a[3] && c[3];
+      var s = dur ? 0 : Math.min(1, uz / 260);
+      y += Math.sin(t / 95) * bw * 0.07 * s;
+      var aci = onceki === null ? 0 : Math.max(-12, Math.min(12, (x - onceki) * 0.8)) * s, r = Math.abs(aci) * Math.PI / 180; onceki = x;
+      x = sinir(x, (bw * Math.cos(r) + bh * Math.sin(r)) / 2 + 1);
+      kare.push({ transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + aci.toFixed(1) + 'deg)', opacity: 1, offset: t / son });
+    }
+    kare[kare.length - 1].offset = 1;
+    return kare;
   }
   function basla(){
-    var fr = form.getBoundingClientRect(), cs = getComputedStyle(form), dal = form.querySelector('.form-flora-kutu .flora-dal');
-    if(!dal || !fr.width) return;
-    var bl = parseFloat(cs.borderLeftWidth) || 0, bt = parseFloat(cs.borderTopWidth) || 0, pr = parseFloat(cs.paddingRight) || 0, pl = parseFloat(cs.paddingLeft) || 0;
-    var W = form.clientWidth, H = form.clientHeight, dr = dal.getBoundingClientRect();
-    /* dalın dibi: viewBox (-152 -6 172 232) içinde (8, 4) noktası; çiçek formun sağ iç boşluğunda kalır */
-    var s = Math.max(12, Math.min(22, pr - 3));
-    var x = Math.min(Math.max(dr.left + 160 / 172 * dr.width - fr.left - bl, W - pr + s / 2 + 1), W - s / 2 - 1);
-    var y = dr.top + 10 / 232 * dr.height - fr.top - bt;
-    g = { ogeler: [], zaman: [] };
+    var fr = form.getBoundingClientRect(), cs = getComputedStyle(form), dal = form.querySelector('.form-flora-kutu .flora-dal'), gk = form.querySelector('.form-green');
+    if(!dal || !gk || !fr.width) return;
+    var px = function(p){ return parseFloat(cs[p]) || 0; };
+    var cl = fr.left + px('borderLeftWidth') + px('paddingLeft'), cr = fr.right - px('borderRightWidth') - px('paddingRight');
+    var R = document.documentElement.clientWidth, sx = window.scrollX, sy = window.scrollY, gr = gk.getBoundingClientRect(), dr = dal.getBoundingClientRect();
+    /* İki sütunlu düzende sol sütun (başlık ve künye) yasak bölgedir; tek sütunda form ekranın iki kenarına kadar uzanır */
+    var bsl = document.querySelector('.contact-head'), br = bsl && bsl.getBoundingClientRect(), iki = !!(br && br.width && br.right <= fr.left + 1);
+    var solSinir = iki ? br.right + 8 : 0, bolum = form.closest('section') || form;
+    /* katman: görünen alanın biraz üstünden formun altına; tek sütunda formun üstündeki başlığa girmez */
+    var ust = (iki ? bolum.getBoundingClientRect().top : fr.top) + sy, T = Math.max(ust, sy - 200), Y = function(v){ return v + sy - T; };
+    var kat = document.createElement('div');
+    kat.className = 'bh-kat'; kat.setAttribute('aria-hidden', 'true'); kat.style.cssText = 'top:' + T + 'px;height:' + (fr.bottom + sy - T + 1) + 'px';
+    g = { ogeler: [kat], zaman: [], fr: [fr.width, fr.height] };
     var b = g;
-    b.ogeler.push(oge(form, 'bh-cicek', 'left:' + (x - s / 2) + 'px;top:' + (y - s / 2) + 'px;width:' + s + 'px;height:' + s + 'px', '-11 -11 22 22', TAC));
+    /* çiçek ölçüsü: kenar şeridine sığan en büyük ölçü (masaüstünde 60 px); çiçek form çizgisinin üstünde durur */
+    var SR = Math.min(60, R - cr - 2), SL = Math.min(60, cl - solSinir - 2);
+    var orta = function(s, kenarX, enAz, enCok){ return Math.max(enAz + s / 2, Math.min(enCok - s / 2, kenarX)); };
+    var cicekler = [], yb = dr.top + 10 / 232 * dr.height;
+    function ekle(sag, s, yBas, t, bd){
+      if(s < 18) return null;
+      var x = sag ? orta(s, fr.right - 0.5, cr + 2, R) : orta(s, fr.left + 0.5, solSinir, cl - 2);
+      var c = { x: x + sx, y: Y(yBas), s: s, t: t, sag: sag };
+      c.e = oge(kat, 'bh-cicek', '--bd:' + bd + 's;left:' + (c.x - s / 2) + 'px;top:' + (c.y - s / 2) + 'px;width:' + s + 'px;height:' + (s * 1.45) + 'px', '-20 -20 40 58', kenar(t));
+      cicekler.push(c); return c;
+    }
+    var s2 = SR * 0.7, s3 = SL * 0.86, s4 = SL * 0.64;
+    var f1 = ekle(true, SR, yb, 'k', 0.1);
+    var f2 = ekle(true, s2, yb - SR / 2 - 6 - s2 * 0.95, 'a', 0.5);
+    var y3 = gr.top + gr.height * 0.42, f3 = ekle(false, s3, y3, 'a', 0.85);
+    var f4 = ekle(false, s4, y3 + s3 * 0.95 + 8 + s4 / 2, 'p', 1.2);
+    /* çim çiçekleri: gönder düğmesinin altındaki iç boşlukta; yer yoksa çizilmez, geniş formda iki tane */
+    var alt = 0;
+    for(var i = 0; i < form.children.length; i++){ var ch = form.children[i], rr = ch.getBoundingClientRect(); if(rr.height && !/flora|hp-field/.test(ch.className)) alt = Math.max(alt, rr.bottom); }
+    var h = Math.min(40, fr.bottom - px('borderBottomWidth') - alt - 3), gw = cr - cl;
+    if(h >= 16) [0.13, 0.6].slice(0, gw >= 460 ? 2 : 1).forEach(function(o, j){
+      var w = h * 28 / 33, x = cl + gw * o + sx, y = Y(fr.bottom - px('borderBottomWidth') - h);
+      cicekler.push({ e: oge(kat, 'bh-cicek bh-cim', '--bd:' + (1.45 + j * 0.3) + 's;left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px', '-14 -31 28 33', cim(j ? 'a' : 'k')) });
+    });
+    document.body.appendChild(kat);
+    cicekler.forEach(function(c){ b.ogeler.push(c.e); });
+    /* formun boyu değişirse (dil, hata iletisi, gönderim) süs yerinden kayacağı için hızla söner */
+    b.boyut = function(){ sondur(true); };
+    window.addEventListener('resize', b.boyut);
+    if(window.ResizeObserver){ b.ro = new ResizeObserver(function(){ var r = form.getBoundingClientRect(); if(Math.abs(r.width - b.fr[0]) > 1 || Math.abs(r.height - b.fr[1]) > 1) sondur(true); }); b.ro.observe(form); }
     if(az.matches){
-      b.ogeler[0].animate([{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 3500, fill: 'both' });
-      b.zaman.push(setTimeout(function(){ b.ogeler.forEach(function(e){ e.remove(); }); if(g === b) g = null; }, 3550));
+      cicekler.forEach(function(c, j){ c.e.animate([{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 3800, delay: j * 120, fill: 'both' }); });
+      b.zaman.push(setTimeout(function(){ sil(b); }, 3800 + cicekler.length * 120 + 100));
       return;
     }
-    /* çimdeki çiçek: gönder düğmesinin altındaki iç boşlukta; yer yoksa çizilmez */
-    var alt = 0;
-    for(var i = 0; i < form.children.length; i++){ var c = form.children[i], r = c.getBoundingClientRect(); if(r.height && !/flora|hp-field|bh-/.test(c.className)) alt = Math.max(alt, r.bottom); }
-    var h = Math.min(34, fr.bottom - bt - alt - 3);
-    if(h >= 16) b.ogeler.push(oge(form, 'bh-cicek', '--bd:.55s;left:' + (pl + (W - pl - pr) * 0.16) + 'px;top:' + (H - h) + 'px;width:' + (h * 2 / 3) + 'px;height:' + h + 'px', '-12 -34 24 36',
-      '<path class="bh-sap" pathLength="1" d="M0 2Q-1.6 -9 0 -19"/><path class="bh-sap" pathLength="1" d="M-.4 -7Q4.5 -11.5 8 -9.2Q4.6 -5.6 -.4 -7"/><g transform="translate(0 -23)">' + TAC + '</g>'));
-    /* kelebek: sayfa genişliğinde, taşmayı kesen mutlak bir şeritte; yolu formun içerik kenarının sağında kalır */
-    var sx = window.scrollX, sy = window.scrollY, R = document.documentElement.clientWidth, yari = R <= 640 ? 11 : 15;
-    var lx = Math.max(fr.left + bl + x, fr.right - pr + yari + 1) + sx, ly = fr.top + bt + y - s * 0.15 + sy;
-    var T = Math.max(0, ly - 260), kat = document.createElement('div');
-    kat.className = 'bh-kat'; kat.setAttribute('aria-hidden', 'true'); kat.style.cssText = 'top:' + T + 'px;height:' + (ly - T + 40) + 'px';
-    document.body.appendChild(kat); b.ogeler.push(kat); ly -= T;
-    var k = oge(kat, 'bh-kelebek', 'opacity:0', '-13 -11 26 22', '<g class="bh-ks">' + KANAT + '</g><g transform="scale(-1 1)"><g class="bh-kg">' + KANAT + '</g></g><ellipse class="bh-kc" rx=".9" ry="5.2" cy=".5"/><path class="bh-kn" d="M-.3 -4.5Q-1.5 -8 -3.2 -9.2M.3 -4.5Q1.5 -8 3.2 -9.2"/>');
-    var d = R - lx, n = function(px, py, a){ return { transform: 'translate(' + px + 'px,' + py + 'px) rotate(' + a + 'deg)', opacity: 1 }; };
-    var yol = [n(R + 20, ly - 170, -25), n(lx + d * 0.75, ly - 120, -10), n(lx + Math.min(26, d * 0.5), ly - 64, 12), n(lx + Math.min(6, d * 0.2), ly - 16, -6), n(lx, ly, 0),
-               n(lx, ly, 0), n(lx + Math.min(14, d * 0.3), ly - 40, 14), n(lx + d * 0.6, ly - 130, 20), n(R + 30, ly - 230, 24)];
-    [0, 0.14, 0.28, 0.4, 0.466, 0.644, 0.73, 0.86, 1].forEach(function(o, i){ yol[i].offset = o; yol[i].easing = 'ease-in-out'; });
-    k.animate(yol, { duration: 3650, delay: 350, fill: 'both' });
-    b.zaman.push(setTimeout(function(){ k.classList.add('konar'); }, 2050), setTimeout(function(){ k.classList.remove('konar'); }, 2700),
-                 setTimeout(function(){ sondur(false); }, 3600));
+    /* kelebekler: masaüstünde 64 px, telefonda 40 px (320 px'te 32; konunca kenar şeridine tam sığar). hx: en çok eğik
+       hâldeki yarı genişlik; konma noktası düz duran kelebeğin yarı genişliğiyle hesaplanır */
+    var bw = R <= 360 ? 32 : (R <= 640 ? 40 : 64), bh = bw * 22 / 26, hx = bw * 0.59 + 1, hd = bw / 2 + 1;
+    function kelebek(gecikme, sure, nk, sinir){
+      var k = oge(kat, 'bh-kelebek', 'width:' + bw + 'px;height:' + bh + 'px;margin:' + (-bh / 2) + 'px 0 0 ' + (-bw / 2) + 'px;opacity:0', '-13 -11 26 22', KELEBEK);
+      b.ogeler.push(k);
+      k.animate(yol(nk, sinir, bw, bh), { duration: nk[nk.length - 1][0], delay: gecikme, fill: 'both' });
+      b.zaman.push(setTimeout(function(){ k.classList.add('konar'); }, gecikme + sure[0]), setTimeout(function(){ k.classList.remove('konar'); }, gecikme + sure[1]));
+    }
+    var vu = Y(Math.max(0, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64)) - bh;
+    if(f1){ /* sağdan gelir, iniş-çıkışlarla dalın dibindeki çiçeğe konar, sağ üstten çıkar */
+      var xa = cr + hx, xz = Math.max(xa, R - bw * 0.62), lx = Math.max(Math.min(f1.x - sx, R - bw / 2), cr + hd), ly = f1.y - f1.s * 0.3, md = function(o){ return xa + (xz - xa) * o; };
+      kelebek(300, [1950, 2900], [[0, R + bw * 1.3, ly - 300], [450, xz, ly - 250], [900, md(0.15), ly - 175], [1300, xz, ly - 105], [1650, md(0.35), ly - 40], [1950, lx, ly, 1],
+        [2900, lx, ly, 1], [3250, md(0.55), ly - 70], [3700, xz, ly - 170], [4400, R + bw * 1.4, ly - 320]], function(x, y){ return Math.max(cr + y, Math.min(R + bw * 2, x)); });
+    }
+    if(f3){ /* soldan (iki sütunda yukarıdan) gelir, soldaki çiçeğe konar, geldiği yöne gider */
+      var xb = cl - hx, xs = iki ? solSinir + hx : -bw * 2, xc = Math.min(xb, iki ? xs : bw * 0.62), mx = Math.max(Math.min(f3.x - sx, cl - hd), iki ? solSinir + hd : Math.min(bw / 2, cl - hd)), my = f3.y - f3.s * 0.3, me = function(o){ return xc + (xb - xc) * o; };
+      var giris = iki ? [[0, me(0.5), vu - 40], [600, me(0.9), Math.max(vu + 120, my - 300)], [1100, me(0.1), my - 190], [1550, me(0.85), my - 90]]
+                      : [[0, -bw * 1.3, my + 210], [600, xc, my + 150], [1100, me(0.8), my + 70], [1550, xc, my - 50]];
+      var cikis = iki ? [[3150, me(0.3), my - 80], [3650, me(0.9), my - 220], [4150, me(0.4), vu - 60]]
+                      : [[3150, me(0.4), my - 70], [3650, xc, my - 170], [4150, -bw * 1.4, my - 300]];
+      kelebek(750, [1950, 2800], giris.concat([[1950, mx, my, 1], [2800, mx, my, 1]], cikis), function(x, y){ return Math.min(cl - y, Math.max(iki ? solSinir + y : -bw * 2, x)); });
+    }
+    /* yapraklar: çiçeklerden kopup yavaşça süzülür; yalnız kenar şeridinde kalır */
+    var pw = R <= 640 ? 8 : 10, ph = pw * 1.6, pd = pw * 0.95;
+    [[f1, 1900, 1], [f2, 2350, -1], [f3, 2650, 1], [f1, 3000, -1], [f4, 3300, 1]].forEach(function(p){
+      var c = p[0]; if(!c) return;
+      var xmin = c.sag ? cr + pd + sx : solSinir + pd + sx, xmax = c.sag ? R - pd + sx : cl - pd + sx, A = Math.min(16, (xmax - xmin) / 2), dy = R <= 640 ? 95 : 140, kf = [];
+      for(var i = 0; i <= 16; i++){
+        var u = i / 16, x = Math.max(xmin, Math.min(xmax, c.x + p[2] * (Math.sin(u * Math.PI * 2.2) * A + u * 8))), y = c.y + dy * u * (0.4 + 0.6 * u);
+        kf.push({ transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + (p[2] * u * 320).toFixed(0) + 'deg)', opacity: u < 0.1 ? u * 10 : (u > 0.72 ? (1 - u) / 0.28 : 1) });
+      }
+      var e = oge(kat, 'bh-yaprak' + (c.t === 'a' ? ' bh-ya' : ''), 'width:' + pw + 'px;height:' + ph + 'px;margin:' + (-ph / 2) + 'px 0 0 ' + (-pw / 2) + 'px;opacity:0', '-3 -5 6 10', '<ellipse rx="2.6" ry="4.4"/>');
+      b.ogeler.push(e); e.animate(kf, { duration: 2500, delay: p[1], fill: 'both' });
+    });
+    b.zaman.push(setTimeout(function(){ sondur(false); }, 4950));
   }
   kutu.addEventListener('change', function(){
     if(kutu.checked){ if(!g) basla(); } else sondur(true);
   });
+  form.addEventListener('submit', function(){ sondur(true); });
 })();
 """
 
