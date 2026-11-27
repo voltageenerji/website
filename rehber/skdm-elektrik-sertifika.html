@@ -117,6 +117,9 @@ body.menu-open{overflow:hidden}
 .nav-logo-text{font-size:15px;letter-spacing:.12em}}
 @media (forced-colors: active){.btn{border:1px solid CanvasText}}
 /* ===== 2) Alt sayfa kabuğu ve ortak içerik dizgisi (sayfalar/kabuk.css) ===== */
+/* Yedek yazı tipi ölçüleri Archivo'ya eşitlenir: web yazı tipi geç gelince metin yeniden dizilmez (masaüstü CLS,
+   SEO regresyon denetimi N1, 27.11). Değerler Archivo font ölçülerinden hesaplandı. */
+@font-face{font-family:'Archivo Fallback';src:local('Arial'),local('Liberation Sans'),local('Helvetica');size-adjust:99.7%;ascent-override:88.1%;descent-override:21.1%;line-gap-override:0%}
 /* Alt sayfa kabuğu: üst bant ana sayfanın kaydırılmış hâliyle aynıdır (koyu zemin, 68 px; 1039 px ve altında 64 px;
    sarı "Teklif Al"). Alt sayfada kapak fotoğrafı olmadığı için bant baştan koyudur ve sayfa akışındadır (yapışkan
    değildir): uzun okuma ve veri sayfalarında dikey alan içeriğe kalır, tablo başlığı sayfa kayarken ekranın en üstünde
@@ -199,6 +202,7 @@ p.note{margin:0 0 28px;padding-left:14px;border-left:2px solid var(--line-strong
 @media print{.site-header,.mobile-menu,.skip{display:none}
 .sayfa-bas{background:none;color:#000}
 .sayfa-bas .crumbs,.sayfa-bas .crumbs a,.sayfa-bas .updated,.sayfa-bas .lede{color:#000}}
+:root{--sans:'Archivo','Archivo Fallback',-apple-system,'Segoe UI',sans-serif}
 /* ===== 3) Sayfaya özgü: sayfalar/stil/icerik.css ===== */
 /* Ortak içerik bileşenleri (rehberler, sanayi-elektrik-tedariki, elektrik-faturasi-hesaplama): metin tabloları, kısa cevap
    ve açıklama kutuları, canlı veri notu. Seçiciler canlıdakiyle aynı (.tbl, td.num, .answer, .aciklama, .today-link,
