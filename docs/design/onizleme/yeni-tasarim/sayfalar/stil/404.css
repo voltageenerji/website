@@ -1,0 +1,47 @@
+/* /404 — "Transmission Dash" oyunu ve statik yedeği. Oyun sahnesinin kuralları canlı 404.html'den üretici tarafından aynen
+   alınır (bu dosyadan önce gelir); bu dosya yalnız (1) sahnenin renk belirteçlerini sahneye sınırlar ve (2) yedek içeriği
+   (JS kapalı, WebGL yok, hareket azaltma, bağlam kaybı) yeni kabukla yeniden yazar. Oyun açıkken (body.g-on) kabuk
+   gizlenir: oyun canlıdaki gibi tam ekrandır. */
+
+/* (1) Sahne belirteçleri: canlıdaki :root değerleri aynen; kabuğun --ink / --line belirteçleriyle çakışmasın diye yalnız
+   sahnede ve oyun açıkken teşhis satırında tanımlı. Sahnede yazı canlıdaki gibi açık renk, aynı yazı ailesi listesi ve normal
+   satır aralığında;
+   klavye odağı sahnede açık mavi çerçeve. */
+#gStage, body.g-on #gDiag { --bg: #04060e; --ink: #e8eef8; --dim: #8593ab; --cyan: #7ecbff; --cyan-deep: #2e86c8; --amber: #d99a4e; --line: rgba(126, 203, 255, 0.14); --glass: rgba(8, 13, 26, 0.72); --focus: #7ecbff; }
+#gStage { font-family: 'Archivo', -apple-system, sans-serif; color: var(--ink); line-height: normal; }
+:where(#gStage) a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
+/* Kabuğun düğme sıfırlaması (font: inherit, kenarlık, zemin) sahnede geri alınır: düğmeler canlıdaki gibi tarayıcı varsayılanı
+   + oyunun kendi sınıfları (.g-btn, .g-cta) */
+:where(#gStage) button { all: revert; }
+body.g-on { background: radial-gradient(120% 90% at 50% 0%, #0a1226 0%, #04060e 55%, #020409 100%); color: #e8eef8; }
+body.g-on .skip, body.g-on .site-header, body.g-on .mobile-menu, body.g-on .sayfa-404, body.g-on > footer { display: none; }
+body.g-on #gFallback { display: none; }
+
+/* (2) Statik yedek: koyu sayfa başı yüzeyi (alt sayfaların H1 bandı), büyük "404" ince Archivo (serif yalnız H1'de; bu
+   sayfada H1 yok, metin aynen), "Sayfa Bulunamadı" başlık boyunda düz yazı, bağlantılar ana sayfanın liste dilinde: üstte
+   ince açık çizgi, kutu yok, sarı ok. Monospace yok (teşhis satırı hariç: teknik çıktı). */
+.sayfa-404 { padding-block: clamp(36px, 5vw, 80px) clamp(48px, 6vw, 96px); background: var(--night); }
+#gFallback { max-width: 760px; }
+.f-404 { font-weight: 300; font-size: clamp(76px, 11vw, 136px); line-height: 1; letter-spacing: 0.02em; color: var(--white); font-variant-numeric: tabular-nums; }
+.f-sub { margin: 14px 0 20px; font-size: clamp(24px, 2.4vw, 32px); font-weight: 600; line-height: 1.2; letter-spacing: -0.016em; color: var(--white); }
+#gFallback p { max-width: 36em; font-size: 17px; line-height: 1.65; color: var(--on-dark); text-wrap: pretty; }
+#gFallback p[lang="en"] { color: var(--on-dark-muted); }
+.f-start { margin-top: 28px; }
+#gFallback .g-cta { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; font: inherit; font-size: 16px; font-weight: 600; line-height: 1.2; color: var(--white); background: transparent; border: 1px solid var(--on-dark-muted); border-radius: 3px; cursor: pointer; transition: border-color 0.2s, background-color 0.2s; }
+#gFallback .g-cta:hover { border-color: var(--white); background: rgba(255, 255, 255, 0.06); }
+#gFallback .f-start .f-note { margin-top: 12px; font-size: 15px; line-height: 1.6; color: var(--on-dark-muted); }
+.f-links { display: grid; max-width: 640px; margin: 36px 0 0; border-bottom: 1px solid var(--hair-dark); }
+.f-link { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 16px 0 17px; color: var(--white); text-decoration: none; border-top: 1px solid var(--hair-dark); }
+.f-link .t { font-size: 17px; font-weight: 600; text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 4px; transition: text-decoration-color 0.2s; }
+.f-link .d { font-size: 15.5px; line-height: 1.5; color: var(--on-dark-muted); }
+.f-link .go { flex: none; font-size: 18px; line-height: 1; color: var(--cta); }
+.f-link:hover .t, .f-link:focus-visible .t { text-decoration-color: var(--cta); }
+/* Teşhis satırı (?tani=1; yalnız ekranda): oyun kapalıyken yedeğin altında aynı koyu yüzeyde */
+#gDiag { margin: 0; padding: 0 max(var(--pad), calc((100% - 1240px) / 2)) 28px; font-family: var(--mono); font-size: 11px; line-height: 1.6; color: var(--on-dark-muted); background: var(--night); overflow-wrap: anywhere; }
+body.g-on #gDiag { color: var(--dim); }
+@media (max-width: 759px) {
+  .f-link { padding: 14px 0 15px; }
+  .f-link .t { font-size: 16.5px; }
+  .f-link .d { font-size: 15px; }
+}
+@media (forced-colors: active) { #gFallback .g-cta { border-color: ButtonText; } }

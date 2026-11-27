@@ -6,9 +6,12 @@
 // (gerçek fonksiyon modülleri + SAHTE veri). /canli-ptf?ornek → functions/canli-ptf.js inject() ile SAHTE 24 saat.
 // !!! "-test-verisi" adlı ekran görüntülerindeki rakamlar UYDURMA TEST VERİSİDİR; gerçek piyasa verisi değildir.
 // Piyasa proxy'sine giden her istek kesilir: canlı veri yok → sayfa dürüst bekleme ya da SON SENKRON durumunda kalır.
+// 2. aşama: cikti/ altındaki bütün sayfalar (29). 404: Pages gibi bilinmeyen adres 404.html'i 404 durumuyla döner; denetimler
+// yedek yolunda (hareket azaltma; ayrıca JS kapalı) yapılır, ek olarak oyun açılınca (WebGL, SwiftShader) kabuğun gizlendiği
+// denetlenir. Ekran görüntülerinde 404 yedek hâlindedir (hareket azaltma).
 import http from 'node:http';
 import { createRequire } from 'node:module';
-import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
 const ONCE = process.env.ONCE, SONRA = process.env.SONRA, GORUNTU = process.env.GORUNTU;
@@ -35,7 +38,7 @@ async function sunucu(kok) {
     if (yol === '/') yol = '/index.html';
     let dosya = join(kok, yol);
     if (!extname(dosya) && existsSync(dosya + '.html')) dosya += '.html';
-    if (!existsSync(dosya)) { res.writeHead(404); return res.end('yok'); }
+    if (!existsSync(dosya)) { res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' }); return res.end(readFileSync(join(kok, '404.html'))); }
     let govde = readFileSync(dosya);
     if (yol === '/canli-ptf' && u.searchParams.has('ornek')) {
       // !!! UYDURMA TEST VERİSİ (yerleşim incelemesi için); 05:00 eksik saat
@@ -49,14 +52,17 @@ async function sunucu(kok) {
   return { url: `http://127.0.0.1:${s.address().port}`, kapat: async () => { s.close(); await dm.kapat(); } };
 }
 
-const SAYFALAR = [
-  ['rehber-tekstil-elektrik', '/rehber/tekstil-elektrik'],
-  ['canli-ptf', '/canli-ptf'],
-  ['canli-ptf', '/canli-ptf?ornek', '-test-verisi'],
-  ['kurumsal', '/kurumsal'],
-  ['dengesizlik-maliyeti', '/dengesizlik-maliyeti', '-test-verisi'],
-  ['dengesizlik-maliyeti', '/dengesizlik-maliyeti?veriyok', '-bekleme'],
-];
+const tumu = [...readdirSync(new URL('cikti/', BURASI)).filter((f) => f.endsWith('.html')), ...readdirSync(new URL('cikti/rehber/', BURASI)).map((f) => 'rehber/' + f)].sort();
+const SAYFALAR = [];
+for (const f of tumu) {
+  const yol = '/' + f.replace(/\.html$/, '');
+  const ad = f.replace(/\.html$/, '').replace('/', '-');
+  if (f === '404.html') SAYFALAR.push([ad, '/olmayan-bir-adres']);
+  else if (f === 'canli-ptf.html') SAYFALAR.push([ad, yol], [ad, yol + '?ornek', '-test-verisi']);
+  else if (f === 'dengesizlik-maliyeti.html') SAYFALAR.push([ad, yol, '-test-verisi'], [ad, yol + '?veriyok', '-bekleme']);
+  else SAYFALAR.push([ad, yol]);
+}
+if (process.env.YALNIZ) SAYFALAR.splice(0, SAYFALAR.length, ...SAYFALAR.filter(([ad]) => process.env.YALNIZ.split(',').includes(ad)));
 const GENISLIK = [[320, 640], [390, 844], [768, 1024], [1440, 900]];
 
 const satir = [];
@@ -64,7 +70,7 @@ let kalan = 0;
 const yaz = (s = '') => { satir.push(s); console.log(s); };
 const ok = (ad, kosul, ek = '') => { if (!kosul) kalan++; yaz(`  ${kosul ? 'GEÇTİ' : 'KALDI'}  ${ad}${ek ? ' — ' + ek : ''}`); };
 
-const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+const browser = await pw.chromium.launch({ args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 async function ac(taban, yol, { w = 1440, h = 900, js = true, azalt = false } = {}) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, javaScriptEnabled: js, locale: 'tr-TR', reducedMotion: azalt ? 'reduce' : 'no-preference' });
   await ctx.route(/epias-proxy|cloudflareinsights/, (r) => r.abort());
@@ -73,8 +79,10 @@ async function ac(taban, yol, { w = 1440, h = 900, js = true, azalt = false } = 
   if (js && yol.startsWith('/dengesizlik')) await page.clock.install({ time: new Date(SABIT_AN) });
   const hatalar = [];
   page.on('pageerror', (e) => hatalar.push(e.message));
-  page.on('console', (m) => { if (m.type() === 'error' && !/ERR_FAILED|net::/.test(m.text())) hatalar.push(m.text()); });
-  await page.goto(taban + yol, { waitUntil: 'load' });
+  // 404 sayfasının kendi belgesi bilerek 404 durumuyla gelir; Chromium bunu konsola yazar: yalnız o satır sayılmaz
+  page.on('console', (m) => { if (m.type() === 'error' && !/ERR_FAILED|net::/.test(m.text()) && !(m.location().url === taban + yol && / 404 /.test(m.text()))) hatalar.push(m.text()); });
+  const yanit = await page.goto(taban + yol, { waitUntil: 'load' });
+  page.durum = yanit.status();
   if (js) { await page.evaluate(() => document.fonts && document.fonts.ready); await page.waitForTimeout(250); }
   else await page.waitForTimeout(400);
   return { page, ctx, hatalar, kapat: () => ctx.close() };
@@ -99,11 +107,19 @@ const karsitlik = (page) => page.evaluate(() => {
     sayi++; enDusuk = Math.min(enDusuk, o);
     if (o < 4.5) kotu.push(`${o.toFixed(2)} ${el.tagName}.${el.className} "${n.nodeValue.trim().slice(0, 24)}"`);
   }
-  // SVG metinleri: dolgu rengi, en yakın opak zemine karşı
+  // SVG metinleri: dolgu rengi; zemin, metnin ortasının altında kalan en üstteki dolgulu SVG şekli (ör. adım şemasındaki
+  // koyu kod çipi), yoksa SVG'nin arkasındaki en yakın opak zemin
   for (const t of document.querySelectorAll('svg text')) {
     if (!t.getClientRects().length) continue;
     const f = ayir(getComputedStyle(t).fill); if (!f) continue;
-    const z = zemin(t.closest('svg').parentElement), o = oran(kar(f, z), z);
+    const tr = t.getBoundingClientRect(), cx = tr.left + tr.width / 2, cy = tr.top + tr.height / 2;
+    let z = zemin(t.closest('svg').parentElement);
+    for (const s of t.closest('svg').querySelectorAll('rect, path, circle, polygon')) {
+      if (!(s.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING)) continue;
+      const sf = ayir(getComputedStyle(s).fill), sr = s.getBoundingClientRect();
+      if (sf && sf.a > 0 && cx >= sr.left && cx <= sr.right && cy >= sr.top && cy <= sr.bottom) z = kar(sf, z);
+    }
+    const o = oran(kar(f, z), z);
     sayi++; enDusuk = Math.min(enDusuk, o);
     if (o < 4.5) kotu.push(`${o.toFixed(2)} svg text "${t.textContent.slice(0, 20)}"`);
   }
@@ -135,16 +151,17 @@ async function odakGez(page) {
 }
 
 const SUNUCU = { once: await sunucu(ONCE), sonra: await sunucu(SONRA) };
-yaz(`# Alt sayfa 1. aşama — görsel ve erişilebilirlik denetimi (Chromium ${browser.version()}, ${new Date().toISOString().slice(0, 16)}Z)`);
+yaz(`# Alt sayfalar (1. + 2. aşama, ${tumu.length} sayfa) — görsel ve erişilebilirlik denetimi (Chromium ${browser.version()}, ${new Date().toISOString().slice(0, 16)}Z)`);
 yaz('# Piyasa proxy istekleri kesildi (canlı veri yok). "-test-verisi" görünümlerindeki rakamlar UYDURMA TEST VERİSİDİR.');
 
 for (const [ad, yol, ek = ''] of SAYFALAR) {
-  yaz(`\n=== ${yol}${ek ? ` (${ek.slice(1)})` : ''}`);
+  const d404 = ad === '404';
+  yaz(`\n=== ${yol}${ek ? ` (${ek.slice(1)})` : ''}${d404 ? ' (404.html; denetimler yedek yolunda: hareket azaltma)' : ''}`);
   // Ekran görüntüleri: önce / sonra, 1440 ve 390, tam sayfa, deviceScaleFactor 1
   const boylar = {};
   for (const hal of ['once', 'sonra']) {
     for (const [w, h] of [[1440, 900], [390, 844]]) {
-      const { page, kapat } = await ac(SUNUCU[hal].url, yol, { w, h });
+      const { page, kapat } = await ac(SUNUCU[hal].url, yol, { w, h, azalt: d404 });
       boylar[`${hal}-${w}`] = (await tasma(page)).boy;
       await page.screenshot({ path: join(GORUNTU, `${ad}-${hal}-${w}${ek}.png`), fullPage: true });
       await kapat();
@@ -153,7 +170,8 @@ for (const [ad, yol, ek = ''] of SAYFALAR) {
   yaz(`  bilgi  sayfa boyu (px) 1440: ${boylar['once-1440']} → ${boylar['sonra-1440']} · 390: ${boylar['once-390']} → ${boylar['sonra-390']}`);
   // Denetimler (yalnız yeni sayfa)
   for (const [w, h] of GENISLIK) {
-    const { page, hatalar, kapat } = await ac(SUNUCU.sonra.url, yol, { w, h });
+    const { page, hatalar, kapat } = await ac(SUNUCU.sonra.url, yol, { w, h, azalt: d404 });
+    if (w === 1440) ok(`HTTP durumu ${d404 ? '404 (bilinmeyen adres → 404.html)' : '200'}`, page.durum === (d404 ? 404 : 200), String(page.durum));
     const t = await tasma(page);
     const k = await karsitlik(page);
     ok(`${w}px yatay taşma yok`, !t.yatay, t.yatay ? `scrollWidth ${t.sw}` : '');
@@ -177,22 +195,46 @@ for (const [ad, yol, ek = ''] of SAYFALAR) {
   // Betik kapalı
   for (const w of [390, 1440]) {
     const { page, kapat } = await ac(SUNUCU.sonra.url, yol, { w, h: 900, js: false });
-    const r = await page.evaluate(() => ({ h1: !!document.querySelector('h1') && document.querySelector('h1').getBoundingClientRect().height > 0, metin: document.querySelector('main').innerText.length, menuDugme: getComputedStyle(document.getElementById('mobileMenuBtn')).display, alt: document.querySelectorAll('footer a').length }));
+    const r = await page.evaluate(() => { const b = document.querySelector('h1') || document.querySelector('.f-sub'); return { h1: !!b && b.getBoundingClientRect().height > 0, metin: document.querySelector('main').innerText.length, menuDugme: getComputedStyle(document.getElementById('mobileMenuBtn')).display, alt: [...document.querySelectorAll('footer a')].filter((a) => a.getClientRects().length).length, ust: getComputedStyle(document.getElementById('nav')).display }; });
     const t = await tasma(page);
-    ok(`JS kapalı ${w}px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var`, r.h1 && r.metin > 1500 && !t.yatay && r.menuDugme === 'none' && r.alt >= 10, JSON.stringify(r));
+    ok(`JS kapalı ${w}px: ${d404 ? 'yedek (404, Sayfa Bulunamadı, bağlantılar)' : 'başlık ve içerik'} okunur, taşma yok, işlevsiz menü düğmesi gizli, üst bant ve alt bilgi bağlantıları var`, r.h1 && r.metin > (d404 ? 250 : 1500) && !t.yatay && r.menuDugme === 'none' && r.alt >= 10 && r.ust !== 'none', JSON.stringify(r));
     await kapat();
   }
   // Hareket azaltma
   {
     const { page, kapat } = await ac(SUNUCU.sonra.url, yol, { azalt: true });
-    await page.hover('.sayfa-govde a, .crumbs a');
+    await page.hover('.sayfa-govde a, .sayfa-iz a, #gFallback a');
     const r = await page.evaluate(() => ({ kaydirma: getComputedStyle(document.documentElement).scrollBehavior, gecis: [...document.querySelectorAll('a, button')].map((e) => getComputedStyle(e).transitionDuration).filter((d) => !/^0s(, 0s)*$/.test(d)).length, anim: document.getAnimations().length }));
     ok('hareket azaltma: kaydırma auto, geçiş 0 sn, çalışan animasyon yok', r.kaydirma === 'auto' && r.gecis === 0 && r.anim === 0, JSON.stringify(r));
     await kapat();
-    const b = await ac(SUNUCU.sonra.url, yol);
-    const anim = await b.page.evaluate(() => [...document.querySelectorAll('*')].filter((e) => getComputedStyle(e).animationName !== 'none').length);
-    ok('normal modda da otomatik animasyon yok', anim === 0, String(anim));
-    await b.kapat();
+    if (d404) {
+      // Oyun sahnesi önce ↔ sonra: sahnedeki her öğenin konumu, ölçüsü ve görünüşü (hesaplanmış stil) aynı mı
+      const sahneOlc = async (hal) => {
+        const b = await ac(SUNUCU[hal].url, yol, { w: 1440, h: 900 });
+        await b.page.waitForFunction(() => document.body.classList.contains('g-on'), null, { timeout: 15000 }).catch(() => {});
+        await b.page.waitForTimeout(400);
+        const v = await b.page.evaluate(() => [...document.querySelectorAll('#gStage, #gStage *')].map((e) => { const s = getComputedStyle(e), r = e.getBoundingClientRect();
+          return [e.id || e.className.baseVal || e.className || e.tagName, Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height), s.display, s.color, s.fontFamily, s.fontSize, s.fontWeight, s.lineHeight, s.letterSpacing, s.textDecorationLine, s.backgroundColor, s.backgroundImage, s.borderTopColor, s.borderTopWidth, e.getAnimations().length ? 'canlandırma' : s.opacity].join(' | '); }));
+        await b.kapat(); return v;
+      };
+      const so = await sahneOlc('once'), ss = await sahneOlc('sonra');
+      const farkli = so.map((x, i) => (x === ss[i] ? null : `${x}  ≠  ${ss[i]}`)).filter(Boolean);
+      ok(`1440px oyun sahnesi önce ↔ sonra: ${so.length} öğenin konumu, ölçüsü, rengi, yazısı, zemini ve çizgisi aynı`, so.length === ss.length && farkli.length === 0, farkli.slice(0, 3).join(' ;; '));
+      // Oyun yolu: WebGL ile oyun açılır (body.g-on), kabuk ve yedek gizlenir, sahne tam ekran (canlıdaki gibi)
+      for (const [w, h] of [[1440, 900], [390, 844]]) {
+        const b = await ac(SUNUCU.sonra.url, yol, { w, h });
+        await b.page.waitForFunction(() => document.body.classList.contains('g-on'), null, { timeout: 15000 }).catch(() => {});
+        const g = await b.page.evaluate(() => { const gor = (s) => [...document.querySelectorAll(s)].some((e) => e.getClientRects().length && getComputedStyle(e).display !== 'none'); return { gOn: document.body.classList.contains('g-on'), kabuk: ['.skip', '#nav', '#mobileMenu', 'body > footer', '.sayfa-404', '#gFallback'].filter(gor), sahne: getComputedStyle(document.getElementById('gStage')).display, intro: getComputedStyle(document.getElementById('gIntro')).color, kaydir: document.documentElement.scrollHeight <= innerHeight + 1 }; });
+        if (w === 1440) await b.page.screenshot({ path: join(GORUNTU, `404-sonra-${w}-oyun.png`) });
+        ok(`${w}px oyun açılınca (g-on) kabuk ve yedek gizli, sahne görünür, intro yazısı canlıdaki açık renk, sayfa kaymaz`, g.gOn && g.kabuk.length === 0 && g.sahne === 'block' && g.intro === 'rgb(232, 238, 248)' && g.kaydir, JSON.stringify(g));
+        await b.kapat();
+      }
+    } else {
+      const b = await ac(SUNUCU.sonra.url, yol);
+      const anim = await b.page.evaluate(() => [...document.querySelectorAll('*')].filter((e) => getComputedStyle(e).animationName !== 'none').length);
+      ok('normal modda da otomatik animasyon yok', anim === 0, String(anim));
+      await b.kapat();
+    }
   }
 }
 
@@ -219,5 +261,5 @@ for (const [ad, yol, ek = ''] of SAYFALAR) {
 await browser.close();
 await SUNUCU.once.kapat(); await SUNUCU.sonra.kapat();
 yaz(`\nSONUÇ: ${kalan === 0 ? 'hepsi geçti' : kalan + ' denetim kaldı'}`);
-writeFileSync(new URL('sonuclar/denetim.txt', BURASI), satir.join('\n') + '\n');
+if (!process.env.YALNIZ) writeFileSync(new URL('sonuclar/denetim.txt', BURASI), satir.join('\n') + '\n');
 process.exit(kalan ? 1 : 0);

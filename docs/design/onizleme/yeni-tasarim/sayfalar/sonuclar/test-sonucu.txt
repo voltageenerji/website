@@ -1,15 +1,40 @@
-# Alt sayfa 1. aşama — mevcut QA paketleri, üretilen sayfalar yerine konmuş kopyada
-# tarih: 2026-11-27T09:22Z · depo HEAD: 0f07c1c · node v22.23.5
-# dosya özetleri (sha256, ilk 12):
-#   rehber/tekstil-elektrik.html 825db78f433a
-#   canli-ptf.html f3aed2d12c7b
-#   kurumsal.html 24f75d61a147
-#   dengesizlik-maliyeti.html 0ddd8a9b37c9
+# Alt sayfalar (1. + 2. aşama) — mevcut QA paketleri, üretilen sayfalar yerine konmuş kopyada
+# tarih: 2026-11-27T11:02Z · depo HEAD: 69ce05a · node v22.23.5
+# sayfa sayısı: 29 · dosya özetleri (sha256, ilk 12):
+#   404.html 7b39d18f756d
+#   canli-ptf.html a2aca881f605
+#   cerez-politikasi.html 72a9b3aeff05
+#   dengesizlik-maliyeti.html 05da2faba4ea
+#   elektrik-faturasi-hesaplama.html 3c70c7cd78b1
+#   kullanim-kosullari.html 77939bd79241
+#   kurumsal.html 65f804f6a0ce
+#   kvkk.html 310b4b23ddd2
+#   rehber.html 2f93e20daf6b
+#   rehber/15-dakikalik-uzlastirma.html 503f6bec70ee
+#   rehber/cam-seramik-elektrik.html 50671953ac96
+#   rehber/demir-celik-elektrik.html 1bc753e20ec5
+#   rehber/elektrik-faturasi-neden-yuksek.html 69c1db1cd200
+#   rehber/elektrik-tedarikcisi-nasil-secilir.html 1e2936cd4b0f
+#   rehber/i-rec-nedir.html 9660464e6317
+#   rehber/kapsam-2-elektrik-emisyonu.html 81c9eb660d81
+#   rehber/kimya-elektrik.html e721f42a3c35
+#   rehber/osb-elektrik-tedariki.html c4f90a1d566a
+#   rehber/ptf-nedir.html b1a13aa9b49a
+#   rehber/serbest-tuketici.html 49fffbb927d1
+#   rehber/skdm-elektrik-sertifika.html 6330104b625e
+#   rehber/sktt.html 33ecfabf1985
+#   rehber/soguk-zincir-elektrik.html 96cce4797159
+#   rehber/tedarikci-degistirme.html d4ff32afb98c
+#   rehber/tekstil-elektrik.html 0c2281e4af24
+#   rehber/veri-merkezi-elektrik.html 441d0f8ac8e8
+#   rehber/yek-g-i-rec-farki.html 0a5ccf81b552
+#   rehber/yek-g-nedir.html 790cdaff99e6
+#   sanayi-elektrik-tedariki.html 7b3ca4adba72
 
 ## node docs/qa/test-ssr-ptf.mjs
 canli-ptf SSR failed, serving static shell: binding gone
 canli-ptf SSR failed, serving static shell: kalici hata
-69 passed, 0 failed
+72 passed, 0 failed
 çıkış kodu: 0
 
 ## node docs/qa/test-dengesizlik.mjs
@@ -32,3 +57,41 @@ FAIL R6 D-A2: diger sayfalara dokunulmadi (canli-ptf main yok)
 ## node docs/qa/test-ssr-hydration.mjs
 25 passed, 0 failed
 çıkış kodu: 0
+
+## python3 -I docs/qa/test-guard.py (koruma kancası; sayfa değişikliğinden bağımsız, yayın günü cp ile index.html yerleştirme 'ask' ister)
+
+79 passed, 0 failed
+çıkış kodu: 0
+
+## node docs/qa/smoke.mjs (404 oyun akışı: açılış → oyun → duraklat → çarpışma → skor → tekrar)
+çıkış kodu: 0
+    BOOT: {"gOn":true,"fallbackVisible":false,"hasGame":true,"webgl":true}
+    STATE after powerup: {"state":"powerup","distance":0,"mwh":0,"fps":true}
+    FPS: 16.5
+    STATE after inputs: {"state":"run","distance":130.54453815400402,"mwh":0,"fps":true}
+    PAUSE overlay worked: true
+    DIED: true {"state":"over","distance":757.9163094477827,"mwh":60,"fps":true}
+    OVER panel: true {"d":"0,76 km","e":"60 MWh","eff":"%24","rank":"Şebeke Mühendisi"}
+    RESTART: {"state":"run","distance":30.878600288160953,"mwh":0,"fps":true}
+    CONSOLE ERRORS: Failed to load resource: the server responded with a status of 404 (File not found)
+  GEÇTİ  oyun açıldı, yedek gizli
+  GEÇTİ  Esc ile duraklatma paneli
+  GEÇTİ  çarpışma ve oyun sonu
+  GEÇTİ  skor paneli
+  GEÇTİ  tekrar oyna
+  GEÇTİ  konsol hatası yok (bilinen tek ortam satırı hariç: statik sunucuda /api/score 404)
+smoke kalan: 0
+
+## node docs/qa/smoke2.mjs (404: hareket azaltmada yedek, mobil dokunuşla oyun, sekme gizlenince duraklama)
+çıkış kodu: 0
+    REDUCED-MOTION: {"gOn":false,"fallback":true,"links":["/","/rehber","/canli-ptf","/?kaynak=404#leadForm"]}
+    MOBILE boot: {"gOn":true,"press":"Gücü geri getirmek için dokunun"}
+    MOBILE state: {"state":"run","distance":35.571984873503965,"mwh":0,"fps":true}
+    AUTO-PAUSE on hidden: true
+    MOBILE errors: none
+  GEÇTİ  hareket azaltmada oyun açılmaz, yedek görünür
+  GEÇTİ  yedekteki dört bağlantı aynı sırada
+  GEÇTİ  mobilde oyun açıldı
+  GEÇTİ  sekme gizlenince duraklama
+  GEÇTİ  mobilde hata yok
+smoke2 kalan: 0

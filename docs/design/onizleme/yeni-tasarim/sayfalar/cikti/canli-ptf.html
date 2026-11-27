@@ -151,6 +151,9 @@ body.menu-open .site-header{position:fixed;inset:0 0 auto 0}
 .sayfa-kurumsal{--sutun:860px}
 .sayfa-veri{--sutun:880px}
 .sayfa-arac{--sutun:1080px}
+.sayfa-dizin{--sutun:1080px}
+.sayfa-hizmet{--sutun:860px}
+.sayfa-hesap,.sayfa-yasal{--sutun:760px}
 .sayfa-govde .wrap > *{max-width:var(--sutun,760px)}
 .sayfa-govde p{margin-bottom:16px;max-width:44em;text-wrap:pretty}
 .sayfa-govde h2{margin:clamp(40px,4vw,56px) 0 14px;max-width:28em;font-size:clamp(24px,2.1vw,30px);font-weight:600;line-height:1.2;letter-spacing:-.02em;color:var(--ink);text-wrap:balance}
@@ -222,6 +225,28 @@ p.note{margin:0 0 28px;padding-left:14px;border-left:2px solid var(--line-strong
   .live-cells .cell:nth-child(odd) { padding-left: 0; border-left: 0; }
   .live-cells .cell:nth-child(n+3) { border-top: 1px solid var(--hair-dark); }
 }
+/* ===== 3) Sayfaya özgü: sayfalar/stil/sema.css ===== */
+/* Şema figürleri (satır içi SVG): ortak kap ve PTF oluşum şeması. canli-ptf ve rehber/ptf-nedir aynı figürü taşır
+   (işaretleme bayt bayt aynı). Eksen ve eğriler koyu, eşleşme noktası sarı; etiketler düz yazı (monospace değil). */
+.vfig { max-width: 560px; margin: 30px 0 34px; }
+.vfig svg { display: block; width: 100%; height: auto; overflow: visible; }
+.vfig-cap { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.6; color: var(--ink-muted); }
+.ptf-fig .ax { fill: none; stroke: var(--ink-muted); stroke-width: 1; }
+.ptf-fig .crv { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: miter; stroke-linecap: butt; }
+.ptf-fig .gd { fill: none; stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 4 3; }
+.ptf-fig .dot { fill: var(--cta); stroke: var(--ink); stroke-width: 1.3; }
+.ptf-fig .rule { fill: none; stroke: var(--line-strong); stroke-width: 1; }
+.ptf-fig text { font-family: var(--sans); letter-spacing: 0.06em; fill: var(--ink-muted); }
+.ptf-fig .lbl { font-size: 10px; }
+.ptf-fig .key { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; fill: var(--ink); }
+.ptf-fig .note { font-size: 9px; letter-spacing: 0.08em; }
+@media print { .vfig { break-inside: avoid; page-break-inside: avoid; } }
+/* Dar ekranda SVG küçüldüğü için etiketler kullanıcı biriminde büyütülür (canlıdaki kuralla aynı ölçek) */
+@media (max-width: 640px) {
+  .ptf-fig .lbl { font-size: 13px; }
+  .ptf-fig .key { font-size: 14px; }
+  .ptf-fig .note { font-size: 12px; letter-spacing: 0.05em; }
+}
 /* ===== 3) Sayfaya özgü: sayfalar/stil/canli-ptf.css ===== */
 /* /canli-ptf — sayfaya özgü: anlık değer bandının ayrıntıları, gün grafiği, saatlik tablo, PTF oluşum şeması.
    Seçici ve kimlikler canlıdakiyle aynıdır (functions/canli-ptf.js ve sayfa betiği bunlara yazar). */
@@ -251,27 +276,8 @@ p.note{margin:0 0 28px;padding-left:14px;border-left:2px solid var(--line-strong
 .ptf-table .ptf-wait, .ptf-table .empty { color: var(--ink-muted); }
 .ptf-table td.ptf-wait { padding-block: 14px; text-align: left; font-family: var(--sans); }
 
-/* PTF oluşum şeması (satır içi SVG): eksen ve eğriler koyu, eşleşme noktası sarı; etiketler düz yazı */
-.vfig { max-width: 560px; margin: 30px 0 34px; }
-.vfig svg { display: block; width: 100%; height: auto; overflow: visible; }
-.vfig-cap { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.6; color: var(--ink-muted); }
-.ptf-fig .ax { fill: none; stroke: var(--ink-muted); stroke-width: 1; }
-.ptf-fig .crv { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: miter; stroke-linecap: butt; }
-.ptf-fig .gd { fill: none; stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 4 3; }
-.ptf-fig .dot { fill: var(--cta); stroke: var(--ink); stroke-width: 1.3; }
-.ptf-fig .rule { fill: none; stroke: var(--line-strong); stroke-width: 1; }
-.ptf-fig text { font-family: var(--sans); letter-spacing: 0.06em; fill: var(--ink-muted); }
-.ptf-fig .lbl { font-size: 10px; }
-.ptf-fig .key { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; fill: var(--ink); }
-.ptf-fig .note { font-size: 9px; letter-spacing: 0.08em; }
-@media print { .vfig { break-inside: avoid; page-break-inside: avoid; } }
-/* Dar ekranda SVG küçüldüğü için etiketler kullanıcı biriminde büyütülür (canlıdaki kuralla aynı ölçek) */
-@media (max-width: 640px) {
-  .ptf-fig .lbl { font-size: 13px; }
-  .ptf-fig .key { font-size: 14px; }
-  .ptf-fig .note { font-size: 12px; letter-spacing: 0.05em; }
-  .live-chart text { font-size: 22px; }
-}
+/* PTF oluşum şeması ve figür kabı: stil/sema.css */
+@media (max-width: 640px) { .live-chart text { font-size: 22px; } }
 </style>
 </head>
 <body>

@@ -1,0 +1,96 @@
+# Alt sayfalar (1. + 2. aşama) — mevcut QA paketleri, TABAN: canlı sayfalarla
+# tarih: 2026-11-27T11:09Z · depo HEAD: 74d421b · node v22.23.5
+# sayfa sayısı: 29 · dosya özetleri (sha256, ilk 12):
+#   404.html 18f301c2a0c8
+#   canli-ptf.html f44034055320
+#   cerez-politikasi.html a0728f2328eb
+#   dengesizlik-maliyeti.html 35571e25a6b0
+#   elektrik-faturasi-hesaplama.html 126c6e6165a1
+#   kullanim-kosullari.html ecded6527ba0
+#   kurumsal.html 1a24b0975b93
+#   kvkk.html dae517878bb1
+#   rehber.html 472c7e2bb669
+#   rehber/15-dakikalik-uzlastirma.html d4aba0bd743e
+#   rehber/cam-seramik-elektrik.html eb9c85f2797b
+#   rehber/demir-celik-elektrik.html 8d42804a87d2
+#   rehber/elektrik-faturasi-neden-yuksek.html 44b298a6b6c7
+#   rehber/elektrik-tedarikcisi-nasil-secilir.html 47e2ef23e56d
+#   rehber/i-rec-nedir.html b038feaf4230
+#   rehber/kapsam-2-elektrik-emisyonu.html 68526bd46c96
+#   rehber/kimya-elektrik.html b7ad02ecd638
+#   rehber/osb-elektrik-tedariki.html e55aa88e9aed
+#   rehber/ptf-nedir.html 857fd2a8bca8
+#   rehber/serbest-tuketici.html 398a5c06b7c6
+#   rehber/skdm-elektrik-sertifika.html 1c52e40949de
+#   rehber/sktt.html 0ed992643ab2
+#   rehber/soguk-zincir-elektrik.html 8f8ae8e02a9a
+#   rehber/tedarikci-degistirme.html cafe6fbfa1e3
+#   rehber/tekstil-elektrik.html f7fe43a40b9e
+#   rehber/veri-merkezi-elektrik.html d08d63d325d8
+#   rehber/yek-g-i-rec-farki.html cfc11623f8e3
+#   rehber/yek-g-nedir.html a5734915ee08
+#   sanayi-elektrik-tedariki.html 21d476507cf5
+
+## node docs/qa/test-ssr-ptf.mjs
+canli-ptf SSR failed, serving static shell: binding gone
+canli-ptf SSR failed, serving static shell: kalici hata
+72 passed, 0 failed
+çıkış kodu: 0
+
+## node docs/qa/test-dengesizlik.mjs
+1100 passed, 0 failed
+çıkış kodu: 0
+
+## node docs/qa/test-dengesizlik-ssr-kanit.mjs
+31 passed, 0 failed
+çıkış kodu: 0
+
+## env TARAYICI=chromium node docs/qa/test-dengesizlik-tarayici.mjs
+286 passed, 0 failed (chromium)
+çıkış kodu: 0
+
+## env TARAYICI=chromium AXE_MODUL=/tmp/claude-0/-home-user-website/25c75427-f784-5804-91b7-4539c0d36614/scratchpad/as-axe/node_modules node docs/qa/test-dengesizlik-erisilebilirlik.mjs
+109 passed, 0 failed (chromium; 20 not)
+çıkış kodu: 0
+
+## node docs/qa/test-ssr-hydration.mjs
+25 passed, 0 failed
+çıkış kodu: 0
+
+## python3 -I docs/qa/test-guard.py (koruma kancası; sayfa değişikliğinden bağımsız, yayın günü cp ile index.html yerleştirme 'ask' ister)
+
+79 passed, 0 failed
+çıkış kodu: 0
+
+## node docs/qa/smoke.mjs (404 oyun akışı: açılış → oyun → duraklat → çarpışma → skor → tekrar)
+çıkış kodu: 0
+    BOOT: {"gOn":true,"fallbackVisible":false,"hasGame":true,"webgl":true}
+    STATE after powerup: {"state":"powerup","distance":0,"mwh":0,"fps":true}
+    FPS: 16
+    STATE after inputs: {"state":"run","distance":134.06192130042493,"mwh":0,"fps":true}
+    PAUSE overlay worked: true
+    DIED: true {"state":"over","distance":893.285214845365,"mwh":144,"fps":true}
+    OVER panel: true {"d":"0,89 km","e":"144 MWh","eff":"%33","rank":"Şebeke Mühendisi"}
+    RESTART: {"state":"run","distance":31.768253206794515,"mwh":0,"fps":true}
+    CONSOLE ERRORS: Failed to load resource: the server responded with a status of 404 (File not found)
+  GEÇTİ  oyun açıldı, yedek gizli
+  GEÇTİ  Esc ile duraklatma paneli
+  GEÇTİ  çarpışma ve oyun sonu
+  GEÇTİ  skor paneli
+  GEÇTİ  tekrar oyna
+  GEÇTİ  konsol hatası yok (bilinen tek ortam satırı hariç: statik sunucuda /api/score 404)
+smoke kalan: 0
+
+## node docs/qa/smoke2.mjs (404: hareket azaltmada yedek, mobil dokunuşla oyun, sekme gizlenince duraklama)
+çıkış kodu: 0
+    REDUCED-MOTION: {"gOn":false,"fallback":true,"links":["/","/rehber","/canli-ptf","/?kaynak=404#leadForm","/","/kvkk","/cerez-politikasi","/kullanim-kosullari"]}
+    MOBILE boot: {"gOn":true,"press":"Gücü geri getirmek için dokunun"}
+    MOBILE state: {"state":"run","distance":34.95442410637452,"mwh":0,"fps":true}
+    AUTO-PAUSE on hidden: true
+    MOBILE errors: none
+  GEÇTİ  hareket azaltmada oyun açılmaz, yedek görünür
+  GEÇTİ  yedekteki dört bağlantı aynı sırada
+  GEÇTİ  mobilde oyun açıldı
+  GEÇTİ  sekme gizlenince duraklama
+  GEÇTİ  mobilde hata yok
+smoke2 kalan: 0

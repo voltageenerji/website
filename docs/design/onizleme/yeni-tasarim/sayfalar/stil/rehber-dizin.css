@@ -1,0 +1,19 @@
+/* /rehber — rehber dizini. Ana sayfanın hizmet ve sektör listesi dili: kart kutusu, zemin, gölge yok; her rehber üstte ince
+   çizgili bir liste öğesi; konu etiketi küçük büyük harf (ana sayfadaki .label), başlık Archivo 600 (serif yalnız H1'de),
+   "Rehberi oku →" koyu yazı. Öğenin tamamı tek bağlantı (canlıdaki gibi); üzerine gelince ve klavye odağında başlığın
+   altı sarı çizilir. Seçiciler canlıdakiyle aynı (.cards, .card, .tag, .go). */
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--g); margin: 36px 0 8px; }
+.sayfa-govde a.card { display: flex; flex-direction: column; min-width: 0; padding: 18px 0 26px; color: var(--ink-soft); text-decoration: none; border-top: 1px solid var(--line-strong); }
+.card .tag { margin-bottom: 8px; font-size: 12.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); }
+.sayfa-govde .card h2 { margin: 0 0 8px; max-width: none; font-size: clamp(19px, 1.6vw, 21px); line-height: 1.3; letter-spacing: -0.01em; text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 4px; transition: text-decoration-color 0.2s; }
+.sayfa-govde .card p { margin: 0 0 12px; font-size: 16px; line-height: 1.6; color: var(--ink-muted); }
+.card .go { margin-top: auto; font-size: 15px; font-weight: 600; color: var(--ink); }
+.card:hover h2, .card:focus-visible h2 { text-decoration-color: var(--cta); }
+@media (max-width: 759px) {
+  .cards { grid-template-columns: 1fr; margin-top: 28px; }
+  .sayfa-govde a.card { padding: 16px 0 20px; }
+  .sayfa-govde .card p { font-size: 15.5px; }
+}
+@media (forced-colors: active) { .card:hover h2, .card:focus-visible h2 { text-decoration-color: LinkText; } }
+/* Geniş dizin sütununda paragraflar okuma ölçüsünde kalır (sütun kuralı .wrap > * daha özgül) */
+.sayfa-dizin .wrap > p { max-width: 44em; }

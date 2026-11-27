@@ -1,23 +1,34 @@
-# Alt sayfalar yeni tasarım sisteminde — 1. aşama (ortak kabuk + dört örnek sayfa)
+# Alt sayfalar yeni tasarım sisteminde — 1. aşama (ortak kabuk + dört örnek) ve 2. aşama (kalan bütün herkese açık sayfalar)
 
-**Durum:** hazırlık, yayında değil. Canlı sayfa dosyalarına, `functions/`, `_headers`, `_redirects`, `sitemap.xml`, dondurulmuş rehberlere ve `main`'e dokunulmadı. `/docs/*` sitede sunulmaz. Sahip önizlemeyi görüp onaylayınca kalan sayfalara geçilir; yayın, yeni ana sayfayla birlikte (10 Aralık SEO ölçümünden sonra) QA ve Hukuk kararıyla yapılır.
+**Durum:** hazırlık, yayında değil. Canlı sayfa dosyalarına, `functions/`, `_headers`, `_redirects`, `sitemap.xml`, dondurulmuş rehberlere ve `main`'e dokunulmadı. `/docs/*` sitede sunulmaz. Sahip 1. aşama önizlemesini gördü ve "kalan sayfalarla devam" dedi (27.11). Yayın, yeni ana sayfayla **birlikte** (10 Aralık SEO ölçümünden sonra) QA ve Hukuk kararıyla yapılır.
 
-Örnek sayfalar: `rehber/tekstil-elektrik.html` (rehber), `canli-ptf.html` (sunucu render'lı veri sayfası), `kurumsal.html`, `dengesizlik-maliyeti.html` (sunucu render'lı araç: dönem tablosu, ≤ 640 px dört sütunlu tablo, hesaplayıcı, indirmeler, SSS).
+**Kapsam (29 sayfa):** 1. aşama: `rehber/tekstil-elektrik`, `canli-ptf`, `kurumsal`, `dengesizlik-maliyeti`. 2. aşama: kalan 18 rehber, `rehber.html` (dizin), `sanayi-elektrik-tedariki`, `elektrik-faturasi-hesaplama`, `kvkk`, `cerez-politikasi`, `kullanim-kosullari`, `404`. Kapsam dışı: `panel.html` (iç araç), `index.html` (ana sayfa hazırlığı ayrı: `../NOTLAR.md`). Üretici, kökte ya da `rehber/` altında listede olmayan yeni bir sayfa görürse durur.
+
+> **DONDURULMUŞ ÜÇ REHBER — `rehber/ptf-nedir`, `rehber/serbest-tuketici`, `rehber/tedarikci-degistirme`: yayın yalnız 10 Aralık SEO ölçümünden ve sahibin onayından sonra.** Canlı dosyalarına dokunulmadı; yalnız `cikti/` altında üretilmiş kopyaları var. İçerik canlı dosyadan bayt bayt akar (metin, başlık, şema, iç bağlantı aynı); değişen yalnız stil ve kabuk. Üretici bu üç canlı dosyanın sha256 özetini bilir: dosya değişirse üretim durur (bilinçli inceleme ister).
 
 ## Dosyalar
 
 | Dosya | Ne |
 |---|---|
-| `kur-sayfalar.py` | Üretici. Canlı sayfaları **okur** (yazmaz), `cikti/<aynı göreli yol>` üretir. Her kayma noktasında `count == 1` doğrulaması vardır; canlı sayfa ya da ana sayfa kaynağı değişip yapı tutmazsa durur. |
-| `kabuk.css` | Alt sayfa kabuğu ve ortak içerik dizgisi (sayfa başı, gövde, başlıklar, listeler, bağlantılar, teklif kutusu, not, alıntı, "bu sayfa hakkında", hareket azaltma). |
-| `stil/veri-bandi.css` | Piyasa veri bandı (`.live`), canli-ptf ve dengesizlik ortak. |
-| `stil/canli-ptf.css`, `stil/kurumsal.css`, `stil/dengesizlik-maliyeti.css` | Sayfaya özgü stil (seçiciler canlıdakiyle aynı, yalnız yeni belirteçlerle yeniden yazıldı). |
-| `cikti/…` | Üretilen dört sayfa. |
-| `karsilastir.mjs` | Önce/sonra karşılaştırması → `sonuclar/karsilastirma.txt`. |
-| `testleri-kos.sh` | Mevcut QA paketlerini, üretilen sayfalar konmuş geçici depo kopyasında koşar → `sonuclar/test-sonucu.txt`. |
-| `denetle.mjs` | Taşma, karşıtlık, odak, JS kapalı, hareket azaltma, mobil menü, üst bant eşliği + önce/sonra ekran görüntüleri → `sonuclar/denetim.txt`. |
+| `kur-sayfalar.py` | Üretici. Canlı sayfaları **okur** (yazmaz), `cikti/<aynı göreli yol>` üretir. Kayma kapıları: her kesme noktasında `count == 1`; belge başı, tek `<style>`, `<div class="page">`, içerik izi / geri bağlantısı, tek H1, güncelleme satırı, eski alt satır, sayfa kabı; **sınıf kapısı** (içerikte ve sayfa betiklerinde geçen her sınıfın yeni stilde kuralı olmalı: canlı sayfaya kabukta karşılığı olmayan bir bileşen eklenirse üretim durur); dondurulmuş üç rehberin özeti; 404 oyun stilinin değiştirilen her parçası; kapsam (canlıdaki sayfa listesi = üretici listesi). |
+| `kabuk.css` | Alt sayfa kabuğu ve ortak içerik dizgisi (sayfa başı, gövde, sütun genişlikleri, başlıklar, listeler, bağlantılar, teklif kutusu, not, alıntı, "bu sayfa hakkında", hareket azaltma). |
+| `stil/veri-bandi.css` | Piyasa veri bandı (`.live`): canli-ptf, dengesizlik. |
+| `stil/sema.css` | **(2. aşama, ortak)** Figür kabı (`.vfig`, `.vfig-cap`) ve PTF oluşum şeması (`.ptf-fig`): canli-ptf ve rehber/ptf-nedir (figür işaretlemesi iki sayfada bayt bayt aynı). 1. aşamada `canli-ptf.css` içindeydi; taşındı. |
+| `stil/sutunlar.css` | **(2. aşama, ortak)** İki sütunlu karşılaştırma (`.cols`, `.col`): kurumsal ve sanayi. 1. aşamada `kurumsal.css` içindeydi; taşındı. |
+| `stil/icerik.css` | **(2. aşama)** Ortak içerik bileşenleri: metin tabloları (`.tbl`, `td.num`), kısa cevap / açıklama / bugünün PTF'si kutuları (`.answer`, `.aciklama`, `.today-link`), canlı veri notu (`.live-note .k`). 9 rehber, sanayi, fatura hesaplama. |
+| `stil/tedarikci-degistirme.css` | **(2. aşama)** Beş adım şeması (`.stepfig`, yatay/dikey iki SVG). |
+| `stil/rehber-dizin.css` | **(2. aşama)** Rehber dizini (`.cards`, `.card`, `.tag`, `.go`). |
+| `stil/elektrik-faturasi-hesaplama.css` | **(2. aşama)** Üç araç: form, açılır alan, sonuç kutuları, betiğin yazdığı tablolar (`.tool`, `.row`, `.hint`, `.out`, `.ok`, `.warn`, `.big`). |
+| `stil/yasal.css` | **(2. aşama)** Hukuki metinler: koyu şeritteki "← voltage.com.tr ana sayfa" bağlantısı (`.back`), sondaki bilgi notu (`div.note`), teknik anahtar adları (`code`). |
+| `stil/404.css` | **(2. aşama)** 404: sahne belirteçlerinin sahneye sınırlanması ve statik yedeğin yeni kabukla stili. Oyun sahnesinin kuralları bu dosyada değil, üretici canlı `404.html`'den aynen alır. |
+| `stil/canli-ptf.css`, `stil/kurumsal.css`, `stil/dengesizlik-maliyeti.css` | 1. aşama sayfaya özgü stil (seçiciler canlıdakiyle aynı, yeni belirteçlerle). |
+| `cikti/…` | Üretilen 29 sayfa. |
+| `karsilastir.mjs` | Önce/sonra karşılaştırması (29 sayfa) → `sonuclar/karsilastirma.txt`. |
+| `testleri-kos.sh` | Mevcut QA paketlerini, 29 üretilmiş sayfa konmuş geçici depo kopyasında koşar (+ 404 duman testleri ve koruma kancası testi) → `sonuclar/test-sonucu.txt`; `TABAN=1` ile canlı sayfalarla taban → `sonuclar/test-sonucu-taban.txt`. |
+| `denetle.mjs` | 29 sayfa (31 görünüm): taşma, karşıtlık, odak, JS kapalı, hareket azaltma, mobil menü, HTTP durumu, 404 oyun yolu ve sahne eşliği, üst bant eşliği + önce/sonra ekran görüntüleri → `sonuclar/denetim.txt`. `YALNIZ=ad,ad` ile tek sayfa (sonuç dosyası yazılmaz). |
+| `hesap-denetle.mjs` | **(2. aşama)** `elektrik-faturasi-hesaplama` önce/sonra davranış denetimi (sayfanın kendi tarayıcı testi yok) → `sonuclar/hesap-denetim.txt`. |
 
-Yeniden üretim: `python3 kur-sayfalar.py`, sonra (depo dışındaki bir dizinden) `KOPYA=<geçici> AXE_MODUL=<axe-core node_modules> bash testleri-kos.sh`, `node karsilastir.mjs`, `ONCE=<HEAD kopyası> SONRA=<KOPYA> GORUNTU=<dizin> node denetle.mjs`.
+Yeniden üretim: `python3 kur-sayfalar.py`, sonra (depo dışındaki bir dizinden) `KOPYA=<geçici> AXE_MODUL=<axe-core node_modules> bash testleri-kos.sh`, `node karsilastir.mjs`, `node hesap-denetle.mjs`, `ONCE=<TABAN=1 kopyası> SONRA=<KOPYA> GORUNTU=<dizin> node denetle.mjs`.
 
 ## Neyin nereden geldiği
 
@@ -58,43 +69,66 @@ Yeniden üretim: `python3 kur-sayfalar.py`, sonra (depo dışındaki bir dizinde
 - Karşılaştırma iki şey yapar: (1) canli-ptf.js'deki 12 `swap` çapası ve dengesizlik `CAPA` nesnesindeki 40 çapanın her birinin yeni kabukta tam bir kez geçtiğini sayar; (2) iki fonksiyonu **eski ve yeni kabukla gerçekten çalıştırır** (canli: `inject()`; dengesizlik: `onRequestGet` + QA'nın sahte proxy'si; bugün 11/24 dönem, geçmiş gün, veri yok) ve üretilen içerik bölgesinin, baş bölümünün (stil hariç) ve `<body …>` özniteliklerinin bayt bayt aynı olduğunu doğrular.
 - Betiklerin yazdığı sınıflar (`live-mode`/`live-stamp` + `stale`/`waiting`, `dm-js`, `satir-ac`, `simdi`, `detay`, `sonuc-kutu` …) stilde karşılanır. Merdiven aynı: canlı → sunucu render'ı → önbellek ("SON SENKRON") → dürüst bekleme; eksik saat/dönem "—". Telefon tablosunun kırılma noktası betikle aynı (640 px).
 
+## 2. aşama: sayfa kararları
+
+Hepsinde 1. aşamanın ilkeleri: kart kutusu / gölge / ızgara deseni yok; serif yalnız H1'de; monospace yalnız piyasa verisinde ve teknik kimliklerde; yeni metin yok; tasarruf ifadesi yok; yayımlanmayacak numara yok (üretici ve karşılaştırma denetler).
+
+- **Rehberler (19):** 1. aşamadaki tekstil kalıbı. Bileşenler: metin tabloları (`stil/icerik.css`: üstte 2 px koyu çizgi, satır çizgileri, küçük büyük harf başlıklar, dikey çizgi yok; 4+ sütunlu tablolar telefonda kap içinde kayar — canlıdaki 600 px alt sınırın karşılığı; sayı sütunu sağa hizalı, başlığı da), kısa cevap / yazar açıklaması / "bugünün PTF'si" kutuları (krem, solda sarı çizgi), canlı veri notu. Tablolardaki sayılar (SKTT limitleri) mevzuat eşiğidir, piyasa verisi değil: **monospace değil**, tabular rakam. Menü: "Rehber" `aria-current="true"` (içerik izi Rehber'den geçer; üretici denetler). Teklif düğmesi: sayfanın kendi `kaynak=rehber-<ad>` etiketi.
+  - `ptf-nedir`: PTF oluşum şeması canli-ptf ile aynı figür → ortak `stil/sema.css`.
+  - `tedarikci-degistirme`: beş adım şeması yeni belirteçlerle (beyaz kutular, vurgulu son adım krem zemin + koyu çizgi, koyu kod çipi; adım kodları ve dipnot düz yazı, monospace değil). Yatay/dikey SVG geçişi canlıdaki özgüllük ve kırılma noktasıyla (640 px). Figür rehber sütununun tam genişliğinde.
+- **`rehber.html` (dizin):** ana sayfanın hizmet/sektör listesi dili: 22 rehber iki sütunlu (759 px ve altında tek sütun) üst çizgili liste; konu etiketi küçük büyük harf, başlık Archivo 600, "Rehberi oku →" koyu yazı; öğenin tamamı tek bağlantı (canlıdaki gibi), üzerine gelince ve klavye odağında başlığın altı sarı. Sütun 1080 px, giriş paragrafları 44 em. Menü: "Rehber" `aria-current="page"`.
+- **`sanayi-elektrik-tedariki`:** hizmet sayfası, sütun 860 px; kısa cevap kutusu ve "yaptığımız / yapmadığımız iş" sütunları (kurumsalla ortak `stil/sutunlar.css`: kutu yok, üst çizgi). Lisans numarası `.mono` (teknik kimlik). Menüde karşılığı yok (Hizmetler bölüm çapası sayfa değildir): `aria-current` yok.
+- **`elektrik-faturasi-hesaplama`:** dengesizlik hesaplayıcısının dili (krem kutu, 14 px kalın etiketler, beyaz 44 px girdiler, 16 px yazı; sonuç kutusu beyaz, üstte 2 px koyu çizgi; uyarıda solda kırmızı çizgi). Açılır alan başlığı 44 px dokunma hedefi. Sonuçtaki tutarlar kullanıcının fatura rakamları: monospace değil, tabular. Sonuç kutusu en dar ekranda (320 px) ve uç değerlerde kendi içinde kayar; sayfa taşmaz (**canlı sayfa 320 ve 390 px'te uç değerlerle sayfayı taşırıyordu: 407 px**). Sayfada iki teklif etiketi var (`elektrik-faturasi-hesaplama`, araç sonrası `-sonuc`); üst bant sayfanın kendi etiketini, `kaynak=elektrik-faturasi-hesaplama` kullanır (yeni etiket yok). "Tahminidir / teklif veya taahhüt değildir" metinleri ve eşik mantığı betikte, bayt bayt aynı.
+- **Hukuki metinler (`kvkk`, `cerez-politikasi`, `kullanim-kosullari`):** içerik izi yerine canlıdaki "← voltage.com.tr ana sayfa" bağlantısı koyu şeritte, içerik izi dilinde (metin aynı). Sütun 760 px. Sondaki not (taslak şerhi; KVKK'da İngilizce iletişim notu) krem kutu. "TASLAK" şerhleri ve çerez politikasının `<!DOCTYPE>` sonrasındaki TASLAK yorumu aynen. Sayfalarda teklif düğmesi yok → üst bantta da yok (yeri boş korunur, menü kaymaz). Geçerli sayfa alt bilgideki kendi bağlantısında `aria-current="page"`.
+- **`404`:** oyun canlıdaki gibi tam ekran; **kabuk yalnız statik yedeğin çevresinde** (JS kapalı, WebGL yok, hareket azaltma, bağlam kaybı). Oyun açılınca (`body.g-on`) atlama bağlantısı, üst bant, mobil menü, yedek ve alt bilgi gizlenir.
+  - Oyun stili canlı `404.html`'den **aynen** alınır; yalnız `:root` belirteçleri (`--ink`, `--line` … kabukla çakışıyordu) aynı değerlerle sahneye sınırlandı, sıfırlama/gövde/bağlantı kuralları karşılandı, kabuğun düğme sıfırlaması sahnede geri alındı. Kanıt: 1440 px'te sahnedeki 79 öğenin konumu, ölçüsü, rengi, yazısı, zemini ve çizgisi önce ↔ sonra aynı (`denetim.txt`). Tek bilinçli fark: sahnede klavye odağı artık 2 px açık mavi çerçeve (önceden tarayıcı varsayılanı).
+  - Yedek: koyu sayfa başı yüzeyi; "404" ince Archivo, "Sayfa Bulunamadı" başlık boyunda düz yazı (H1 yok — canlıda da yok, yapı değiştirilmedi); dört bağlantı ana sayfanın liste dilinde (üst çizgi, sarı ok); "Oyunu başlat" düğmesi çerçeveli açık düğme (sarı yalnız teklif düğmesinde). Yedeğin eski alt satırı kabuğun alt bilgisine yer bıraktı (bu yüzden `smoke2` yedekte 8 değil 4 bağlantı sayar; diğer 4 hedef alt bilgide).
+  - Gerçek 404 durumu ve `noindex, follow` korunur (baş bölümü bayt bayt; `wrangler pages dev` ile bilinmeyen adres → 404 + yeni yedek doğrulandı). Teklif düğmesi: yedekteki `kaynak=404`.
+- **Ortak:** `.nav-right` teklif düğmesi olmayan sayfada boş ve yerinde (Orkestratör düzeltmesi, 1. aşama).
+
 ## Doğrulama (özet; ayrıntı `sonuclar/`)
 
-- `karsilastirma.txt`: **hepsi geçti** — baş (stil hariç) bayt bayt, içerik bayt bayt, betikler bayt bayt, id/bağlantı/form denetimleri kayıpsız, kabuk metinlerinin hepsi yeni ana sayfada var, SSR çapaları ve SSR çıktıları eşit.
-- `test-sonucu.txt` (Chromium): test-ssr-ptf 69/69 · test-dengesizlik **1099/1100** · test-dengesizlik-ssr-kanit 31/31 · test-dengesizlik-tarayici 286/286 · test-dengesizlik-erisilebilirlik 109/109 (axe-core 4.10.2) · test-ssr-hydration 25/25. Taban (canlı sayfalarla): 69, 1100, 31, 286, 109.
-  - **Kalan 1 denetim:** `R6 D-A2: diger sayfalara dokunulmadi (canli-ptf main yok)` — dengesizlik işinin kapsam bekçisi ("canli-ptf.html'de `<main>` olmamalı"). Yeni kabuk her alt sayfaya bilerek tek `<main>` ekler (erişilebilirlik: ana içerik bölgesi). Davranış değil kapsam denetimi; bugün değiştirilirse canlı canli-ptf.html ile kırılır. **Test değiştirilmedi.** Yayın günü QA'ya öneri: bu satır "canli-ptf.html'de tek `<main>` var" olarak çevrilsin.
-  - **Metin sabitleyen testler (değiştirilmedi, karşılandı):** `kabuk hareket azaltma + gorunur odak`, R6 D-A1, R6 D-M1, R9 (maliyet sütunu renkleri), R10 (dm-js, 44 px) ve R6 D-A2 (yalın `<main>`/`<footer>`) CSS'i ya da işaretlemeyi metin olarak arar. Kurallar korunan davranışla aynı anlamda ve aynı metinle yazıldı; bu yüzden sayfa stili sıkıştırılmadı ve alt bilgi iç kapla sarıldı.
-  - Firefox ve WebKit koşulamadı (Playwright tarayıcıları bu ortama indirilemedi).
-- `denetim.txt`: 4 sayfa (canli-ptf ve dengesizlik ikişer hâlde) × 320/390/768/1440: yatay taşma yok, karşıtlık ≥ 4,5:1 (SVG metinleri dahil), sayfa/konsol hatası yok; 390 ve 1440'ta Tab ile bütün duraklarda görünür odak, odaklanan öğe görünür ve örtülmüyor; mobil menü açılır/Esc ile kapanır; JS kapalıyken içerik okunur, taşma yok; hareket azaltmada geçiş 0 sn, animasyon yok; üst bant ana sayfayla eş. **Hepsi geçti.**
-- Sayfa boyu artar (1440 px'te +8–18 %, 390 px'te +9–13 %): gövde yazısı 15,5 → 17 px, koyu sayfa başı ve tam alt bilgi. Ayrıntı `denetim.txt`.
-- HTML boyu (gzip): tekstil 5,7 → 10,4 KB, canli-ptf ≈ 18,2 KB, kurumsal ≈ 10,9 KB, dengesizlik ≈ 31,1 KB.
+- `karsilastirma.txt`: **331/331 geçti** — 29 sayfada baş (stil hariç) bayt bayt, belge başı (doctype/TASLAK yorumu) aynı, içerik bayt bayt (404'te yedek + teşhis satırı + oyun sahnesi), betikler bayt bayt (+ tek menü betiği), id/bağlantı/form denetimleri kayıpsız, kabuk metinleri yeni ana sayfada var, `aria-current` beklenen yerde, üst bant teklif etiketi sayfanın kendi etiketi; 404 oyun stili canlıdan aynen; SSR çapaları ve SSR çıktıları eşit.
+- `test-sonucu.txt` (Chromium; 29 sayfa yerinde) ↔ `test-sonucu-taban.txt` (canlı sayfalar): test-ssr-ptf 72/72 ↔ 72 · test-dengesizlik **1099/1100** ↔ 1100 · ssr-kanit 31/31 ↔ 31 · tarayıcı 286/286 ↔ 286 · erişilebilirlik 109/109 ↔ 109 (axe-core 4.10.2; bilgi notu 7 ↔ 20) · ssr-hydration 25/25 ↔ 25 · test-guard 79/79 ↔ 79 · smoke (404 oyun akışı) 6/6 ↔ 6/6 · smoke2 (404 yedek, mobil, duraklama) 5/5 ↔ 5/5.
+  - Kalan 1: **`R6 D-A2: diger sayfalara dokunulmadi (canli-ptf main yok)`** — 1. aşamadaki bilinen kapsam bekçisi; test değiştirilmedi (yayın günü maddesi aşağıda).
+  - `smoke.mjs` yalnız durum yazar; beklenen satırlar `testleri-kos.sh` içinde aranır. Tek konsol satırı (`Failed to load resource … 404`) statik sunucuda olmayan `/api/score` (lider tablosu Pages Function'ı) isteğidir; tabanda da aynı.
+- `hesap-denetim.txt`: **36/36 geçti** — 26 senaryoda önce ↔ sonra üç sonuç kutusunun sınıfı ve HTML'i ile aktarılan birim değeri bayt bayt aynı (2026 eşikleri 500/501, 4.000/4.001, 15.000/15.001 dahil); yalnız klavyeyle Tab sırası aynı, açılır alan Enter ile, abone grubu ok tuşuyla, klavye sonucu = fare sonucu, 24 odak durağında görünür çerçeve; 320/390/768/1440 px'te sayfa taşmıyor. Sitenin gerçek CSP'si altında.
+- `denetim.txt`: **748/748 geçti** — 29 sayfa, 31 görünüm (canli-ptf ve dengesizlik ikişer hâlde) × 320/390/768/1440: yatay taşma yok; karşıtlık ≥ 4,5:1 (SVG metinleri dahil; en düşük 5,27); sayfa/konsol hatası yok; HTTP durumu (404 sayfası bilinmeyen adreste 404); 390 ve 1440'ta Tab ile bütün duraklarda görünür odak, odaklanan öğe ekranda ve örtülmüyor, sıra atlama bağlantısı → logo → menü/teklif; 390'da mobil menü açılır (bant sabit) / Esc ile kapanır; JS kapalıyken içerik okunur, üst bant ve alt bilgi var, işlevsiz menü düğmesi gizli; hareket azaltmada geçiş 0 sn, animasyon yok; normal modda otomatik animasyon yok (404 hariç: oyun). 404: oyun açılınca kabuk ve yedek gizli (1440 ve 390), sahnedeki 79 öğe önce ↔ sonra hesaplanmış stilde aynı. Üst bant ana sayfayla eş (1440, 390). Bu turda denetimin SVG karşıtlık ölçümü düzeltildi: metin, altındaki dolgulu SVG şekline (ör. adım şemasındaki koyu çip) göre ölçülüyor; önceki ölçüm beyaz "S5" yazısını sayfa zeminine karşı 1:1 sayıyordu. Sayfa boyu artar: içerik sayfalarında (26 görünüm) 1440 px'te +7–22 %, 390 px'te +6–21 %; kısa sayfalarda oransal artış büyük (hukuki metinler +26–43 %, 404 yedeği 931 → 1.357 px, telefonda 978 → 1.623 px: alt bilgi sayfanın yarısı); rehber dizini kısalır (1440: 3.877 → 3.679, 390: 7.159 → 6.903 px). Neden: gövde yazısı 17 px, koyu sayfa başı, tam alt bilgi. Sayfa sayfa değerler `denetim.txt`.
+- `wrangler pages dev` (3.114.17, kopya; depo dışında): temiz adresler 200, `.html` → 308 temiz adres, bilinmeyen adres (kökte ve `/rehber/` altında) → 404 + yeni yedek + `noindex, follow`, `/docs/*` → 302, canli-ptf ve dengesizlik Function'ları yeni kabuğu sarıyor (`<body data-ssr="1">`, `data-tarih`).
+- Ekran görüntüleri (deviceScaleFactor 1, 1440 + 390, önce/sonra, tam sayfa; depo dışında): `/tmp/claude-0/-home-user-website/25c75427-f784-5804-91b7-4539c0d36614/scratchpad/alt-sayfalar-2/` — `<ad>-{once,sonra}-{1440,390}[-test-verisi|-bekleme].png`, ek olarak `404-sonra-1440-oyun.png`. "-test-verisi" görüntülerindeki rakamlar UYDURMA test verisidir.
+- HTML boyu (gzip, KB, önce → sonra): rehberler 5,2–8,6 → 10,1–14,8; rehber dizini 5,1 → 10,3; sanayi 7,6 → 13,5; fatura hesaplama 9,1 → 15,4; KVKK 3,9 → 9,2; çerez 2,8 → 8,2; kullanım 2,7 → 8,0; 404 5,6 → 11,7 (oyun betiği ayrı dosya, değişmedi); canli-ptf 12,8 → 18,0; kurumsal 6,1 → 10,9; dengesizlik 25,2 → 30,5. Artışın çoğu satır içi kabuk stili (≈ 4,3 KB gzip) ve tam alt bilgi.
 
 ## Hukuk için: yeni metin
 
-- **Sayfa içeriğinde yeni metin yok** (bayt bayt karşılaştırma).
-- Kabuk metinlerinin hepsi yeni ana sayfada var (karşılaştırma "T" satırı). Canlı ana sayfada **olmayan** iki tanesi, ana sayfa hazırlığının Hukuk bekleyen listesinde zaten duruyor: "İçeriğe atla" (atlama bağlantısı) ve menüdeki "Canlı PTF".
-- Kaldırılan: her sayfadaki eski alt satır ("© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · …"). Yerine ana sayfanın alt bilgisi geldi (şirket, merkez, iletişim, sicil, "Est. 2011 · EPİAŞ Üyesi", hukuki bağlantılar); eski satırdaki her bağlantı hedefi kabukta var.
-- Alt sayfalar ilk kez tam alt bilgi gösterir: ticaret sicil no, adres, lisans no ve "EPİAŞ Üyesi" artık her sayfada. Hepsi canlı ana sayfada yayımlı; yeni iddia değil, ama görünürlük arttı.
-- Devralınan küçük tutarsızlık (değiştirilmedi): menü düğmesinin erişilebilir adı İngilizce "Menu" (ana sayfada da öyle).
-- Yasaklı numara yok; tasarruf ifadesi yok.
+- **Sayfa içeriğinde yeni metin yok** (29 sayfada bayt bayt karşılaştırma). Dondurulmuş üç rehberin metni de aynen.
+- Kabuk metinlerinin hepsi yeni ana sayfada var (karşılaştırma "T" satırı). Canlı ana sayfada **olmayan** iki tanesi ana sayfa hazırlığının Hukuk listesinde zaten duruyor: "İçeriğe atla" ve menüdeki "Canlı PTF".
+- Görünürlüğü artanlar (yeni iddia değil, canlı ana sayfada yayımlı): ticaret sicil no, adres, lisans no, "Est. 2011 · EPİAŞ Üyesi" artık 29 sayfanın hepsinde, **hukuki metinler ve 404 dahil**. Hukuki metinlerde ilk kez üst menü ve tam alt bilgi var.
+- Kaldırılan: her sayfadaki eski alt satır ("© 2026 Voltan Elektrik … · Ana sayfa · …"); 404'te yedeğin içindeki aynı satır. Hedeflerinin hepsi alt bilgide.
+- Üst bantta "Teklif Al" yalnız sayfada zaten teklif düğmesi olan sayfalarda (rehberler, dizin, sanayi, fatura hesaplama, canli-ptf, kurumsal, 404). Hukuki metinlerde ve dengesizlikte yok.
+- Devralınan küçük tutarsızlık (değiştirilmedi): menü düğmesinin erişilebilir adı İngilizce "Menu".
+- Yasaklı numara yok; tasarruf ifadesi yok (kabukta üretici denetler; içerik değişmedi).
 
 ## Bilinen açıklar
 
-- Firefox, WebKit/Safari, iOS ve gerçek cihaz denetlenmedi; gerçek PTF proxy'si bu ortamdan erişilemedi (canli-ptf bekleme ve sahte SSR verisiyle görüldü).
-- `wrangler pages dev` ile temiz adres / `_redirects` sınanmadı (statik sunucu + QA'nın fonksiyon sunucusu kullanıldı).
-- Lighthouse ölçülmedi.
-- Telefonda canli-ptf gün grafiğinin saat etiketleri büyütüldü (22 kullanıcı birimi); "18:00" ile "24:00" birbirine yakın duruyor.
-- En düşük/en yüksek saat hücresi veri yokken sarı "—" gösterir (betiğin `resetFigures` davranışı; canlıda da aynı).
-- Ana sayfa yayına girmeden alt sayfalar yayına alınırsa ziyaretçi bu kez ters yönde fark görür: ikisi birlikte yayımlanmalı.
+- Firefox, WebKit/Safari, iOS ve gerçek cihaz denetlenmedi; gerçek PTF proxy'si bu ortamdan erişilemedi. Lighthouse ölçülmedi.
+- `.tbl` tablolarında 4+ sütun alt sınırı ve sayı sütunu başlık hizası `:has()` ile (Firefox 121+, Safari 15.4+); desteklemeyen tarayıcıda tablo sıkışarak sığar, başlık sola hizalı kalır.
+- Fatura hesaplama: 320 px'te ve uç değerlerde (12 milyon TL) 1. aracın sonuç tablosu kutu içinde yatay kayar; kayan kutu klavyeyle odaklanamaz (axe `scrollable-region-focusable` bu uç durumda uyarabilir). Gerçekçi değerlerde (2.450,80 TL) kayma yok.
+- 404 yedeğinde H1 yok (canlıda da yok; yapı değiştirilmedi). İstenirse "Sayfa Bulunamadı" satırı H1 yapılabilir: içerik değişikliği sayılır, ayrı karar.
+- 404 oyununda klavye odağı artık 2 px açık mavi çerçeve (kabuğun odak kuralı); önceden tarayıcı varsayılanıydı.
+- 1. aşamadan: canli-ptf gün grafiğinde telefonda "18:00" ile "24:00" yakın; en düşük/en yüksek hücresi veri yokken sarı "—".
+- Ana sayfa ile alt sayfalar **birlikte** yayımlanmalı (biri tek başına giderse ziyaretçi iki ayrı tasarım görür).
+- Ana sayfa hazırlığı (`../yapi/stil.css`, `../yapi/govde.html`) değişirse alt sayfalar yeniden üretilmeli; kabuk oradan okunur. Bu teslimde üretim o dosyaların çalışma ağacındaki hâliyle yapıldı ve kabuk kuralları/menü değişmedi.
 
-## Kalan sayfalar için (2. aşama)
+## Yayın günü kontrol listesi (ana sayfa + 29 alt sayfa birlikte)
 
-Üretici sayfa listesine eklemekle büyür; her sayfa için gereken:
+Ön koşul: sahibin tam sayfa onayı (ana sayfa + alt sayfalar); QA kararı; Hukuk ve Uyum (ana sayfanın yeni metinleri + yukarıdaki görünürlük notları); **10 Aralık SEO ölçümü tamamlanmış ve dondurulmuş üç rehber için sahip onayı alınmış.**
 
-1. **Aynı kalıptaki içerik sayfaları** (`<div class="page">` + içerik izi + H1 + güncelleme satırı + `.cta` + `.about` + eski alt satır): kalan 18 rehber (dondurulmuş üçü dahil: ptf-nedir, serbest-tuketici, tedarikci-degistirme — onlarda yalnız stil ve kabuk değişir, metin değişmez; Hukuk/SEO ile 10.12 sonrası zamanlaması konuşulmalı), `sanayi-elektrik-tedariki`, `kvkk`, `cerez-politikasi`, `kullanim-kosullari`. Önce her sayfanın sınıf envanteri çıkarılır (`grep -o 'class="[^"]*"'`); kabukta karşılığı olmayan bileşenler (ör. rehberlerdeki şema figürleri, karşılaştırma tabloları, `.ornek`, TASLAK şerhleri) için `stil/` altına sayfa ya da bileşen dosyası yazılır. Hukuki metinlerde "taslak" notları olduğu gibi kalır.
-2. **`rehber.html` (dizin):** liste/kart düzeni ana sayfadaki sektör ve hizmet dizgisine göre yeniden kurulmalı (kart kutusu yok, üst çizgili liste); dizin içeriği aynen.
-3. **`elektrik-faturasi-hesaplama.html`:** iki betikli araç; formlar ve sonuç kutuları için dengesizlik hesaplayıcısının dili kullanılır; "tahminidir / teklif veya taahhüt değildir" metinleri ve eşik mantığı aynen; kendi tarayıcı testi yok — QA'dan form ve sonuç için kısa bir test istenmeli.
-4. **`404.html`:** oyun sayfası tam ekran ve kendi tasarımında; yalnız yedek içeriğe (JS/WebGL yok) kabuk (üst bant + alt bilgi) ve yeni belirteçler. Gerçek 404 durumu ve `noindex` korunur; `smoke2.mjs` ile denetlenir.
-5. `panel.html` kapsam dışı (iç araç, `noindex`).
-6. Her sayfa için: `karsilastir.mjs` listesine ekleme (baş/içerik/betik eşliği), `denetle.mjs` listesine ekleme (taşma, karşıtlık, odak, JS kapalı), önce/sonra görüntüleri; `sitemap.xml` `<lastmod>` yalnız içerik değişirse (bu iş stil değişikliği; içerik tarihi değişmez — SEO ile teyit).
-7. Yayın günü: `R6 D-A2 canli-ptf main yok` test satırının güncellenmesi (yukarıda), `.claude/rules/content-pages.md`'ye kabuk kuralı ("alt sayfalar üreticiyle; kabuk elle değiştirilmez") eklenmesi, `CHANGELOG.md` ve defter kaydı.
+1. Çalışma dalında, güncel `main` üzerinde: `python3 docs/design/onizleme/yeni-tasarim/yapi/kur.py` (ana sayfa), ardından `python3 docs/design/onizleme/yeni-tasarim/sayfalar/kur-sayfalar.py`. Üretici durursa (canlı sayfa ya da ana sayfa kaynağı değişmiş, yeni bileşen sınıfı, dondurulmuş rehber özeti, yeni sayfa) nedenini giderin; dondurulmuş özet değiştiyse değişikliği inceleyip `SAYFALAR` içindeki özeti güncelleyin.
+2. Doğrulamaları yeniden koşun (depo dışındaki bir dizinden): `node karsilastir.mjs` (hepsi geçmeli), `node hesap-denetle.mjs` (hepsi geçmeli), `KOPYA=… AXE_MODUL=… bash testleri-kos.sh` (yalnız R6 D-A2 kalmalı; madde 5), `ONCE=… SONRA=… GORUNTU=… node denetle.mjs` (hepsi geçmeli). Ana sayfa için `../NOTLAR.md` "Yayın adımları".
+3. Dosyaları yerine koyun: `cikti/` altındaki 29 dosya aynı göreli yola kopyalanır (`cp docs/design/onizleme/yeni-tasarim/sayfalar/cikti/<yol> <yol>`; `rehber/` dahil; `404.html` dahil). Ana sayfa `../NOTLAR.md` adımlarıyla (görseller `/img/`, yollar, `index.html` — kanca sahip onayı sorar). `panel.html` değişmez.
+4. Stil kararı: satır içi (bu hazırlık). Ayrı dosyaya geçilecekse yukarıdaki "Stil" bölümündeki plan (`/assets/kabuk-<tarih>.css`, `_headers` önbellek kuralı, dengesizlik testlerinin metin aradığı kurallar sayfa stilinde kalır).
+5. Test: `docs/qa/test-dengesizlik.mjs` içindeki `R6 D-A2 … (canli-ptf main yok)` satırı "canli-ptf.html'de tek `<main>` var" olarak çevrilir (QA). `docs/qa/smoke2.mjs` yedek bağlantı listesi artık 4 (eski alt satırın 4 hedefi alt bilgide) — test yalnız yazdırır, değişiklik gerekmez; `testleri-kos.sh` dört bağlantıyı bekler.
+6. `sitemap.xml`: `<lastmod>` **değişmez** (içerik değişmedi, yalnız tasarım; SEO ile teyit). `llms.txt` değişmez. JSON-LD `dateModified` ve görünen "son güncelleme" tarihleri değişmez (içerik kuralı: yalnız içerik değişikliği tarihi günceller).
+7. Kurallar ve kayıtlar: `.claude/rules/content-pages.md`'ye "alt sayfalar `sayfalar/kur-sayfalar.py` ile üretilir; kabuk ve sayfa stili elle değil kaynaktan değiştirilir" kuralı; `.claude/rules/homepage.md` kanonik tasarım tarihi; `docs/OPERASYON-DEFTERI.md` ve `CHANGELOG.md` kaydı.
+8. QA kararı ve (kamuya açık metin için) Hukuk kararı → çalışma dalını itin, `main`'i ona ileri sarın (kural 8). Önizleme dağıtımında (dalın pages.dev adresi) bir tur: 29 sayfa açılıyor, `/olmayan` 404 + yedek, oyun açılıyor.
+9. Yayından sonra: canli-ptf ve dengesizlik SSR (`<body data-ssr="1">`, tablo dolu; yalnız "—" ise önce proxy); fatura hesaplamada bir hesap (2.450,80 TL / 520 kWh → 4,71 TL/kWh); telefonda menü; rehber dizini; 404 oyunu ve hareket azaltmada yedek; Search Console'da 29 sayfanın kapsam/LCP/CLS izlemesi (özellikle dondurulmuş üç rehber).

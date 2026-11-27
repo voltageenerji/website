@@ -1,0 +1,9 @@
+/* Hukuki metinler (/kvkk, /cerez-politikasi, /kullanim-kosullari). Canlıda içerik izi yerine "← voltage.com.tr ana sayfa"
+   bağlantısı var: o bağlantı koyu şeritte içerik izi yerinde ve onun dilinde durur (metin aynı). Sondaki bilgi notu
+   (taslak şerhi / İngilizce iletişim notu) krem kutu, solda çizgi; metni aynen. Teknik anahtar adları (code) monospace. */
+.sayfa-iz .back { display: inline-block; padding-block: 2px; font-size: 14px; line-height: 1.5; color: var(--on-dark); text-decoration: underline; text-decoration-color: rgba(255, 255, 255, 0.36); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.sayfa-iz .back:hover { color: var(--white); text-decoration-color: var(--cta); }
+.sayfa-govde div.note { max-width: 46em; margin-top: 48px; padding: 16px 20px; font-size: 15px; line-height: 1.6; color: var(--ink-soft); background: var(--paper); border-left: 3px solid var(--line-strong); }
+.sayfa-govde code { padding: 1px 5px; font-family: var(--mono); font-size: 14px; background: var(--paper); overflow-wrap: anywhere; }
+.sayfa-yasal h2 { font-size: clamp(22px, 1.9vw, 26px); }
+@media print { .sayfa-iz .back { color: #000; } }

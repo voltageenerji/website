@@ -1,21 +1,23 @@
-# Alt sayfa 1. aşama — önce/sonra karşılaştırması (node v22.23.5, 2026-11-27T09:22Z)
+# Alt sayfalar (1. + 2. aşama, 29 sayfa) — önce/sonra karşılaştırması (node v22.23.5, 2026-11-27T11:17Z)
 
-=== rehber/tekstil-elektrik.html (önce 15660 B → sonra 32221 B; stil 2472 → 14175 B)
+=== 404.html (önce 19740 B → sonra 40900 B; stil 13174 → 29647 B)
   GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
-  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı aynı
-  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
-  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I yedek içerik (eski alt satır hariç), teşhis satırı ve oyun sahnesi bayt bayt aynı
+  GEÇTİ  I 404: tek <main id="gFallback">, H1 yok (canlıdaki gibi); yedek → teşhis → alt bilgi → oyun sahnesi; noindex korunuyor
   GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
   GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
-  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
-  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim mailto:info@voltage.com.tr /kurumsal
+  GEÇTİ  K form denetimleri (8 etiket) bayt bayt ve aynı sırada
   GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
-  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  GEÇTİ  A geçerli sayfa işareti: [] — []
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=404 (sayfada geçen etiketler: 404)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · KVKK · Çerez Politikası · Kullanım Koşulları"
   bilgi  yasak numara (216 479 05 10) yok: true
 
-=== canli-ptf.html (önce 39689 B → sonra 57068 B; stil 8479 → 21070 B)
+=== canli-ptf.html (önce 39689 B → sonra 57451 B; stil 8479 → 21453 B)
   GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
-  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
   GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
   GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
   GEÇTİ  S 2 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
@@ -23,25 +25,29 @@
   GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim
   GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
   GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/canli-ptf","page"],["/canli-ptf","page"]] — [["/canli-ptf","page"],["/canli-ptf","page"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=canli-ptf (sayfada geçen etiketler: canli-ptf)
   bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Çerez Politikası · Kullanım Koşulları"
   bilgi  yasak numara (216 479 05 10) yok: true
 
-=== kurumsal.html (önce 19749 B → sonra 36186 B; stil 4335 → 16004 B)
+=== cerez-politikasi.html (önce 6180 B → sonra 24781 B; stil 1679 → 15507 B)
   GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
-  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
   GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
   GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
-  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  S 0 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
   GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
-  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /rehber /canli-ptf /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim /kurumsal
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /rehber /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
   GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
-  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
-  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Rehber · Canlı PTF · KVKK · Çerez Politikası · Kullanım Koşulları"
+  GEÇTİ  T kabuktaki 44 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/cerez-politikasi","page"]] — [["/cerez-politikasi","page"]]
+  GEÇTİ  Q üst bant "Teklif Al": sayfada teklif düğmesi yok → bantta da yok, yeri boş korunur
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · KVKK Aydınlatma Metni · Kullanım Koşulları"
   bilgi  yasak numara (216 479 05 10) yok: true
 
-=== dengesizlik-maliyeti.html (önce 92119 B → sonra 109767 B; stil 18372 → 31355 B)
+=== dengesizlik-maliyeti.html (önce 92119 B → sonra 109866 B; stil 18372 → 31454 B)
   GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
-  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
   GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı — izinli tek fark: sayfanın kendi <main>/</main> satırları kabuğun yalın <main> öğesine taşındı
   GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
   GEÇTİ  S 4 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
@@ -49,8 +55,394 @@
   GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim
   GEÇTİ  K form denetimleri (47 etiket) bayt bayt ve aynı sırada
   GEÇTİ  T kabuktaki 44 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [] — []
+  GEÇTİ  Q üst bant "Teklif Al": sayfada teklif düğmesi yok → bantta da yok, yeri boş korunur
   bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Çerez Politikası · Kullanım Koşulları"
   bilgi  yasak numara (216 479 05 10) yok: true
+
+=== elektrik-faturasi-hesaplama.html (önce 29155 B → sonra 50462 B; stil 4639 → 21178 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 2 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr
+  GEÇTİ  K form denetimleri (22 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [] — []
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=elektrik-faturasi-hesaplama (sayfada geçen etiketler: elektrik-faturasi-hesaplama-sonuc, elektrik-faturasi-hesaplama)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Çerez Politikası · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== kullanim-kosullari.html (önce 6034 B → sonra 24640 B; stil 1679 → 15507 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 0 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /kvkk /cerez-politikasi · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /rehber /canli-ptf /#iletisim mailto:info@voltage.com.tr /kullanim-kosullari
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 44 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/kullanim-kosullari","page"]] — [["/kullanim-kosullari","page"]]
+  GEÇTİ  Q üst bant "Teklif Al": sayfada teklif düğmesi yok → bantta da yok, yeri boş korunur
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · KVKK Aydınlatma Metni · Çerez Politikası"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== kurumsal.html (önce 19749 B → sonra 36639 B; stil 4335 → 16457 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /rehber /canli-ptf /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim /kurumsal
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/kurumsal","page"]] — [["/kurumsal","page"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=kurumsal (sayfada geçen etiketler: kurumsal)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Rehber · Canlı PTF · KVKK · Çerez Politikası · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== kvkk.html (önce 10031 B → sonra 28620 B; stil 1683 → 15507 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 0 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /rehber /canli-ptf /#iletisim /kvkk
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 44 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/kvkk","page"]] — [["/kvkk","page"]]
+  GEÇTİ  Q üst bant "Teklif Al": sayfada teklif düğmesi yok → bantta da yok, yeri boş korunur
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Çerez Politikası · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber.html (önce 16410 B → sonra 34267 B; stil 3280 → 16319 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /rehber /#iletisim mailto:info@voltage.com.tr
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","page"],["/rehber","page"]] — [["/rehber","page"],["/rehber","page"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber (sayfada geçen etiketler: rehber)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · KVKK · Çerez Politikası · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/15-dakikalik-uzlastirma.html (önce 21821 B → sonra 40846 B; stil 2890 → 17050 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-15-dakikalik-uzlastirma (sayfada geçen etiketler: rehber-15-dakikalik-uzlastirma)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/cam-seramik-elektrik.html (önce 16049 B → sonra 32713 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-cam-seramik-elektrik (sayfada geçen etiketler: rehber-cam-seramik-elektrik)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/demir-celik-elektrik.html (önce 16273 B → sonra 32937 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-demir-celik-elektrik (sayfada geçen etiketler: rehber-demir-celik-elektrik)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/elektrik-faturasi-neden-yuksek.html (önce 18668 B → sonra 33152 B; stil 4609 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-elektrik-faturasi-neden-yuksek (sayfada geçen etiketler: rehber-elektrik-faturasi-neden-yuksek)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Çerez Politikası · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/elektrik-tedarikcisi-nasil-secilir.html (önce 25990 B → sonra 44888 B; stil 3028 → 17050 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-elektrik-tedarikcisi-nasil-secilir (sayfada geçen etiketler: rehber-elektrik-tedarikcisi-nasil-secilir)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/i-rec-nedir.html (önce 17481 B → sonra 34136 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-i-rec-nedir (sayfada geçen etiketler: rehber-i-rec-nedir)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/kapsam-2-elektrik-emisyonu.html (önce 21481 B → sonra 40509 B; stil 2890 → 17050 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-kapsam-2-elektrik-emisyonu (sayfada geçen etiketler: rehber-kapsam-2-elektrik-emisyonu)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/kimya-elektrik.html (önce 16115 B → sonra 32773 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-kimya-elektrik (sayfada geçen etiketler: rehber-kimya-elektrik)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/osb-elektrik-tedariki.html (önce 16258 B → sonra 32923 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-osb-elektrik-tedariki (sayfada geçen etiketler: rehber-osb-elektrik-tedariki)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/ptf-nedir.html (önce 27609 B → sonra 46099 B; stil 5075 → 18714 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-ptf-nedir (sayfada geçen etiketler: rehber-ptf-nedir)
+  bilgi  DONDURULMUŞ rehber (SEO ölçümü 10.12): canlı dosyaya dokunulmadı; yalnız bu üretilmiş kopya var. Yayın 10.12 ölçümü ve sahip onayından sonra.
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/serbest-tuketici.html (önce 20226 B → sonra 39156 B; stil 2978 → 17050 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-serbest-tuketici (sayfada geçen etiketler: rehber-serbest-tuketici)
+  bilgi  DONDURULMUŞ rehber (SEO ölçümü 10.12): canlı dosyaya dokunulmadı; yalnız bu üretilmiş kopya var. Yayın 10.12 ölçümü ve sahip onayından sonra.
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/skdm-elektrik-sertifika.html (önce 22597 B → sonra 41622 B; stil 2890 → 17050 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-skdm-elektrik-sertifika (sayfada geçen etiketler: rehber-skdm-elektrik-sertifika)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/sktt.html (önce 16681 B → sonra 33915 B; stil 4609 → 17050 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim mailto:info@voltage.com.tr
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-sktt (sayfada geçen etiketler: rehber-sktt)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Çerez Politikası · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/soguk-zincir-elektrik.html (önce 15615 B → sonra 32280 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-soguk-zincir-elektrik (sayfada geçen etiketler: rehber-soguk-zincir-elektrik)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/tedarikci-degistirme.html (önce 28004 B → sonra 46248 B; stil 4531 → 17913 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-tedarikci-degistirme (sayfada geçen etiketler: rehber-tedarikci-degistirme)
+  bilgi  DONDURULMUŞ rehber (SEO ölçümü 10.12): canlı dosyaya dokunulmadı; yalnız bu üretilmiş kopya var. Yayın 10.12 ölçümü ve sahip onayından sonra.
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/tekstil-elektrik.html (önce 15660 B → sonra 32320 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-tekstil-elektrik (sayfada geçen etiketler: rehber-tekstil-elektrik)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/veri-merkezi-elektrik.html (önce 16437 B → sonra 33102 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-veri-merkezi-elektrik (sayfada geçen etiketler: rehber-veri-merkezi-elektrik)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/yek-g-i-rec-farki.html (önce 21073 B → sonra 40092 B; stil 2890 → 17050 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-yek-g-i-rec-farki (sayfada geçen etiketler: rehber-yek-g-i-rec-farki)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== rehber/yek-g-nedir.html (önce 19146 B → sonra 35801 B; stil 2472 → 14274 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /kvkk /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /canli-ptf /#iletisim mailto:info@voltage.com.tr /cerez-politikasi
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [["/rehber","true"],["/rehber","true"]] — [["/rehber","true"],["/rehber","true"]]
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=rehber-yek-g-nedir (sayfada geçen etiketler: rehber-yek-g-nedir)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== sanayi-elektrik-tedariki.html (önce 25407 B → sonra 44623 B; stil 3218 → 17708 B)
+  GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
+  GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı
+  GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
+  GEÇTİ  I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında
+  GEÇTİ  S 1 betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği
+  GEÇTİ  K kaybolan id yok; her id sayısı canlıdakiyle aynı; kabukla eklenenler tek — eklenen (kabuk): nav×1, mobileMenuBtn×1, mobileMenu×1, icerik×1
+  GEÇTİ  K içerikteki bağlantı hedeflerinin hepsi duruyor; eski alt satırın hedefleri kabukta var — eski alt satır: / /kurumsal /rehber /canli-ptf /kvkk /cerez-politikasi /kullanim-kosullari · kabukla eklenen hedefler: #icerik /#hakkimizda /#hizmetler /#yaklasim /#iletisim mailto:info@voltage.com.tr
+  GEÇTİ  K form denetimleri (0 etiket) bayt bayt ve aynı sırada
+  GEÇTİ  T kabuktaki 45 görünür metnin hepsi yeni ana sayfada var
+  GEÇTİ  A geçerli sayfa işareti: [] — []
+  GEÇTİ  Q üst bant "Teklif Al": kaynak=sanayi-elektrik-tedariki (sayfada geçen etiketler: sanayi-elektrik-tedariki)
+  bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · Canlı PTF · KVKK · Çerez Politikası · Kullanım Koşulları"
+  bilgi  yasak numara (216 479 05 10) yok: true
+
+=== 404 oyun sahnesi stili (canlıdan aynen)
+  GEÇTİ  O oyun sahnesi kuralları (intro, HUD, paneller, lider tablosu, bildirim), oyun açıkken teşhis satırı ve dokunmatik kuralları bayt bayt yeni stilde — 9763 B oyun + 389 B dokunmatik
+  GEÇTİ  O sahne belirteçleri (8) canlı :root ile aynı değerlerde, yalnız sahneye sınırlı
+  GEÇTİ  O oyun açıkken kabuk gizli, yedek gizli (canlıdaki kural)
+  GEÇTİ  O betik: /g404/game.js aynen ve yerinde (oyun sahnesinin ardında, defer)
 
 === SSR çapaları (fonksiyonların aradığı birebir metin; yeni kabukta tam bir kez)
   GEÇTİ  M canli-ptf.js: 12 swap çapası + <tbody id="pTable"> + "dateModified"

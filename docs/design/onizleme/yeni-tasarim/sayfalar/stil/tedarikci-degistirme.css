@@ -1,0 +1,23 @@
+/* /rehber/tedarikci-degistirme — beş adım şeması (iki satır içi SVG: geniş ekranda yatay, ≤ 640 px dikey). İşaretleme ve
+   sınıflar canlıdakiyle aynı; yalnız renk ve yazı ailesi yeni belirteçlerle. Adım kodları (S1–S5) ve dipnot düz yazı
+   (monospace yalnız piyasa verisinde); kutular beyaz, ince çizgili; vurgulu son adım krem zemin ve koyu çizgi, kod çipi
+   koyu (ana sayfadaki süreç adımlarının dili); bağlayıcılar soluk koyu. Görünürlük kuralı canlıdakiyle aynı özgüllükte
+   (QA D-1). Ortak figür kabı (.vfig, .vfig-cap): stil/sema.css. */
+.vfig svg.stepfig-v { display: none; }
+.stepfig .box { fill: var(--white); stroke: var(--line-strong); stroke-width: 1; }
+.stepfig .box-hi { fill: var(--paper); stroke: var(--ink); stroke-width: 1.6; }
+.stepfig .cn { fill: none; stroke: var(--ink-muted); stroke-width: 1.3; stroke-linejoin: miter; stroke-linecap: butt; }
+.stepfig .chip { fill: var(--ink); }
+.stepfig .rule { fill: none; stroke: var(--line-strong); stroke-width: 1; }
+.stepfig .st-s { font-family: var(--sans); font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em; fill: var(--ink-muted); }
+.stepfig .st-s-hi { font-family: var(--sans); font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; fill: var(--white); }
+.stepfig .st-t { font-family: var(--sans); font-size: 15px; font-weight: 600; fill: var(--ink); }
+.stepfig .st-x { font-family: var(--sans); font-size: 11px; fill: var(--ink-soft); }
+.stepfig-v .st-x { font-size: 11.5px; }
+.stepfig .note { font-family: var(--sans); font-size: 9.5px; letter-spacing: 0.08em; fill: var(--ink-muted); }
+@media (max-width: 640px) {
+  .vfig svg.stepfig-h { display: none; }
+  .vfig svg.stepfig-v { display: block; }
+}
+/* Şema rehber sütununun tam genişliğinde (ortak kabın 560 px sınırı PTF grafiği içindir) */
+.vfig:has(.stepfig) { max-width: var(--sutun, 760px); }

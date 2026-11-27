@@ -1,0 +1,7 @@
+/* İki sütunlu karşılaştırma (kurumsal: ne yapıyoruz / ne yapmıyoruz; sanayi: yaptığımız iş / yapmadığımız): ana sayfanın
+   hizmet listesi dili — üstte ince çizgi, kutu ve zemin yok. kurumsal ve sanayi-elektrik-tedariki ortak. */
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px var(--g); margin: 24px 0 18px; }
+.col { padding-top: 16px; border-top: 1px solid var(--line-strong); }
+.sayfa-govde .col h3 { margin-top: 0; }
+.col ul { margin-bottom: 0; font-size: 16px; }
+@media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }

@@ -1,0 +1,45 @@
+/* /elektrik-faturasi-hesaplama — üç tarayıcı içi araç. Dengesizlik hesaplayıcısının form ve sonuç dili: krem kutu, ince
+   çerçeve; etiketler düz yazı (14 px, 600); girdiler beyaz, 44 px, 16 px yazı (iOS odakta yakınlaştırmaz), koyu çerçeve;
+   sonuç kutusu beyaz, üstte 2 px koyu çizgi (.ok), uyarıda solda kırmızı çizgi (.warn). Seçiciler, kimlikler ve sınıflar
+   canlıdakiyle aynı (.tool, .row, .hint, .out, .out.ok, .out.warn, .big, td.num); betiğin yazdığı tablolar ve notlar da
+   karşılanır. Rakamlar monospace değil (kullanıcının fatura tutarları, piyasa verisi değil): tabular, sağa hizalı. */
+.tool { margin: 24px 0 32px; padding: 20px 22px 18px; background: var(--paper); border: 1px solid var(--line-strong); border-radius: 4px; }
+.sayfa-govde .tool h3 { margin: 0 0 8px; font-size: 19px; }
+.sayfa-govde .tool .hint { max-width: none; margin: 0 0 14px; font-size: 14.5px; line-height: 1.55; color: var(--ink-muted); }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; margin-bottom: 14px; }
+.row > div { min-width: 0; }
+.tool label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; line-height: 1.3; color: var(--ink-soft); }
+.tool input, .tool select { display: block; width: 100%; max-width: 100%; min-height: 44px; padding: 8px 12px; font: inherit; font-family: var(--sans); font-size: 16px; line-height: 1.3; color: var(--ink); background: var(--white); border: 1px solid var(--ink-muted); border-radius: 3px; }
+.tool input::placeholder { color: var(--ink-muted); opacity: 1; }
+.tool details { margin: 2px 0 14px; }
+/* Açılır alan başlığı: 44 px dokunma hedefi, koyu altı çizili yazı (bağlantı dili); işaret tarayıcının kendi üçgeni */
+.tool summary { padding: 11px 0; font-size: 15px; font-weight: 600; line-height: 1.45; color: var(--ink); cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: rgba(10, 14, 26, 0.42); text-underline-offset: 3px; }
+.tool summary:hover { text-decoration-color: var(--cta); text-decoration-thickness: 2px; }
+.tool details[open] summary { margin-bottom: 2px; }
+.sayfa-govde .tool p.note { margin: 14px 0 0; }
+
+/* Sonuç kutusu (aria-live): betik sınıfı 'out', 'out ok' ya da 'out warn' yapar */
+.out { margin-top: 4px; padding: 14px 16px; min-height: 22px; font-size: 15px; line-height: 1.55; color: var(--ink-soft); background: var(--white); border: 1px solid var(--line-strong); overflow-x: auto; overflow-wrap: anywhere; }
+.out.ok { border-top: 2px solid var(--ink); }
+.out.warn { border-left: 3px solid var(--red); }
+.out strong { color: var(--ink); }
+.out .big { display: block; margin: 4px 0 8px; font-size: 26px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: normal; }
+.out table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; overflow-wrap: normal; }
+.out th { padding: 8px 10px 8px 0; text-align: left; font-size: 12px; font-weight: 600; line-height: 1.35; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); border-bottom: 1px solid var(--line-strong); }
+.out td { padding: 7px 10px 7px 0; color: var(--ink-soft); border-bottom: 1px solid var(--line); }
+.out th:last-child, .out td:last-child { padding-right: 0; }
+.out tr:last-child td { border-bottom: 0; }
+.out td.num { text-align: right; white-space: nowrap; color: var(--ink); }
+.out th:not(:first-child) { text-align: right; }
+.sayfa-govde .out p.note { max-width: none; margin: 12px 0 0; }
+@media (max-width: 560px) {
+  .row { grid-template-columns: 1fr; }
+  .tool { padding: 16px 16px 14px; }
+}
+@media (max-width: 400px) {
+  .out { padding: 12px 12px; }
+  .out table { font-size: 13.5px; }
+  .out th, .out td { padding-right: 6px; }
+}
+@media (forced-colors: active) { .out.ok, .out.warn { border: 2px solid CanvasText; } }
+@media print { .tool { break-inside: avoid; } }

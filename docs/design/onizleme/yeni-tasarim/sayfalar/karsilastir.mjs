@@ -1,4 +1,5 @@
-// Önce/sonra karşılaştırması: canlı sayfa (önce) ↔ cikti/ (sonra). Depoya yalnız sonuclar/karsilastirma.txt yazılır.
+// Önce/sonra karşılaştırması: canlı sayfa (önce) ↔ cikti/ (sonra), cikti/ altındaki bütün sayfalar (1. + 2. aşama, 29).
+// Depoya yalnız sonuclar/karsilastirma.txt yazılır.
 // Ne denetlenir (her sayfa için):
 //  B  <head>: <style>…</style> bloğu çıkarılınca bayt bayt aynı mı
 //  I  içerik: canlı <div class="page"> içi (eski alt satır hariç) ile yeni sayfanın içerik izi + sayfa başı + gövdesi
@@ -9,8 +10,13 @@
 //  R  SSR çıktısı: iki fonksiyon önce ve sonra kabuğuyla gerçekten çalıştırılır (sahte veri; ağ yok); üretilen içerik
 //     bölgesi bayt bayt aynı mı
 //  T  kabuk metinleri: üst bant, menü, alt bilgi ve atlama bağlantısındaki her görünür metin yeni ana sayfa gövdesinde var mı
+//  A  menü / alt bilgi aria-current: rehberler "Rehber" (true), dizin "Rehber" (page), canlı PTF (page), kurumsal ve hukuki
+//     metinler alt bilgide (page); başka sayfada yok
+//  Q  üst banttaki "Teklif Al": sayfanın kendi kaynak etiketi (sayfada zaten geçen; yeni etiket yok); teklif düğmesi
+//     olmayan sayfada düğme yok
+//  O  404: oyun sahnesinin stil kuralları canlıdan aynen; yedek, teşhis satırı ve oyun sahnesi işaretlemesi bayt bayt
 // Kullanım (depo dışındaki bir dizinden): node <bu dosya>
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const KOK = new URL('../../../../../', import.meta.url);
 const BURASI = new URL('./', import.meta.url);
@@ -19,7 +25,9 @@ const { CAPA, onRequestGet } = await import(new URL('functions/dengesizlik-maliy
 const { inject } = await import(new URL('functions/canli-ptf.js', KOK));
 const { sahteProxy, SAHTE_ENV, sahteGun } = await import(new URL('docs/qa/dengesizlik-test-verisi.mjs', KOK));
 
-const SAYFALAR = ['rehber/tekstil-elektrik.html', 'canli-ptf.html', 'kurumsal.html', 'dengesizlik-maliyeti.html'];
+const SAYFALAR = [...readdirSync(new URL('cikti/', BURASI)).filter((f) => f.endsWith('.html')), ...readdirSync(new URL('cikti/rehber/', BURASI)).map((f) => 'rehber/' + f)].sort();
+const GECERLI = (yol) => (yol.startsWith('rehber/') ? [['/rehber', 'true'], ['/rehber', 'true']] : { 'rehber.html': [['/rehber', 'page'], ['/rehber', 'page']], 'canli-ptf.html': [['/canli-ptf', 'page'], ['/canli-ptf', 'page']], 'kurumsal.html': [['/kurumsal', 'page']], 'kvkk.html': [['/kvkk', 'page']], 'cerez-politikasi.html': [['/cerez-politikasi', 'page']], 'kullanim-kosullari.html': [['/kullanim-kosullari', 'page']] }[yol] || []);
+const DONDURULMUS = ['rehber/ptf-nedir.html', 'rehber/serbest-tuketici.html', 'rehber/tedarikci-degistirme.html'];
 const GOVDE_ANA = oku(new URL('../yapi/govde.html', BURASI));
 const INDEX = oku(new URL('index.html', KOK));
 const cikti = [];
@@ -34,6 +42,18 @@ const say = (h, re) => { const s = new Map(); for (const m of h.matchAll(re)) s.
 const farkMulti = (a, b) => [...a].filter(([k, n]) => (b.get(k) || 0) < n).map(([k, n]) => `${k}×${n - (b.get(k) || 0)}`);
 function arasi(h, a, b) { const i = h.indexOf(a); if (i < 0) return null; const j = h.indexOf(b, i + a.length); return j < 0 ? null : h.slice(i + a.length, j); }
 
+/** 404: yedek (<main id="gFallback"> içi, eski alt satır hariç) + teşhis satırı + oyun sahnesi. */
+function eski404(h) {
+  const ana = h.slice(h.indexOf('<main id="gFallback">'), h.indexOf('\n</main>\n') + 8);
+  const alt = /\n  <footer>.*?<\/footer>/.exec(ana)[0];
+  return { ic: ana.replace(alt, '') + '\n' + h.slice(h.indexOf('<p id="gDiag"'), h.indexOf('</p>', h.indexOf('<p id="gDiag"')) + 4) + '\n' + h.slice(h.indexOf('<div id="gStage">'), h.indexOf('\n\n<script src="/g404/game.js"')), mainVar: false, altSatir: alt.slice(1) };
+}
+function yeni404(h) {
+  const a = h.indexOf('<div class="sayfa-404 on-dark" id="icerik" tabindex="-1">\n<div class="wrap">\n');
+  if (a < 0) return null;
+  const ana = h.slice(h.indexOf('<main id="gFallback">'), h.indexOf('\n</main>\n') + 8);
+  return ana + '\n' + h.slice(h.indexOf('<p id="gDiag"'), h.indexOf('</p>', h.indexOf('<p id="gDiag"')) + 4) + '\n' + h.slice(h.indexOf('<div id="gStage">'), h.indexOf('\n\n<script src="/g404/game.js"'));
+}
 /** Canlı biçim: <div class="page"> içi, eski alt satıra kadar; dengesizlikte kendi <main> satırları çıkar. */
 function eskiIcerik(h) {
   const g = h.slice(h.search(/<body[^>]*>\n<div class="page">\n/));
@@ -57,11 +77,15 @@ for (const yol of SAYFALAR) {
   const sonra = oku(new URL('cikti/' + yol, BURASI));
   yaz(`\n=== ${yol} (önce ${Buffer.byteLength(once)} B → sonra ${Buffer.byteLength(sonra)} B; stil ${Buffer.byteLength(arasi(once, '<style>', '</style>'))} → ${Buffer.byteLength(arasi(sonra, '<style>', '</style>'))} B)`);
   ok('B <head> (stil bloğu hariç) bayt bayt aynı', bas(once) === bas(sonra));
-  ok('B tek <style> bloğu; <html lang="tr"> ve belge başı aynı', (sonra.match(/<style>/g) || []).length === 1 && sonra.startsWith('<!DOCTYPE html>\n<html lang="tr">\n<head>\n'));
-  const e = eskiIcerik(once), y = yeniIcerik(sonra);
-  ok('I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı', y !== null && e.ic === y, e.mainVar ? 'izinli tek fark: sayfanın kendi <main>/</main> satırları kabuğun yalın <main> öğesine taşındı' : '');
-  ok('I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında', (sonra.match(/<h1[\s>]/g) || []).length === 1 && (sonra.match(/<main>/g) || []).length === 1 && !/<main\s/.test(sonra)
-    && sonra.indexOf('<nav class="crumbs"') < sonra.indexOf('<main>') && sonra.indexOf('</main>') < sonra.indexOf('<footer>'));
+  const basOnek = (h) => h.slice(0, h.indexOf('<head>\n') + 7);
+  ok('B tek <style> bloğu; <html lang="tr"> ve belge başı (doctype, varsa TASLAK yorumu) aynı', (sonra.match(/<style>/g) || []).length === 1 && basOnek(sonra) === basOnek(once) && basOnek(sonra).includes('<html lang="tr">'));
+  const d404 = yol === '404.html';
+  const e = d404 ? eski404(once) : eskiIcerik(once), y = d404 ? yeni404(sonra) : yeniIcerik(sonra);
+  ok(d404 ? 'I yedek içerik (eski alt satır hariç), teşhis satırı ve oyun sahnesi bayt bayt aynı' : 'I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı', y !== null && e.ic === y, e.mainVar ? 'izinli tek fark: sayfanın kendi <main>/</main> satırları kabuğun yalın <main> öğesine taşındı' : '');
+  if (d404) ok('I 404: tek <main id="gFallback">, H1 yok (canlıdaki gibi); yedek → teşhis → alt bilgi → oyun sahnesi; noindex korunuyor', (sonra.match(/<main[\s>]/g) || []).length === 1 && !/<h1[\s>]/.test(sonra)
+    && sonra.indexOf('<main id="gFallback">') < sonra.indexOf('<p id="gDiag"') && sonra.indexOf('<p id="gDiag"') < sonra.indexOf('<footer>') && sonra.indexOf('<footer>') < sonra.indexOf('<div id="gStage">') && sonra.includes('<meta name="robots" content="noindex, follow">'));
+  else ok('I tek <h1>, tek yalın <main>; içerik izi <main> dışında, alt bilgi <main> sonrasında', (sonra.match(/<h1[\s>]/g) || []).length === 1 && (sonra.match(/<main>/g) || []).length === 1 && !/<main\s/.test(sonra)
+    && sonra.indexOf('<div class="sayfa-iz on-dark">') < sonra.indexOf('<main>') && sonra.indexOf('</main>') < sonra.indexOf('<footer>'));
   const bo = betikler(once), bs = betikler(sonra);
   const menu = '<script>\n' + "(function(){\n  var btn = document.getElementById('mobileMenuBtn');" + arasi(INDEX, "<script>\n(function(){\n  var btn = document.getElementById('mobileMenuBtn');", '</script>') + '</script>';
   ok(`S ${bo.length} betik bloğu aynı sırayla bayt bayt; eklenen tek blok ana sayfanın menü betiği`, bs.length === bo.length + 1 && bo.every((b, i) => bs[i] === b) && bs[bs.length - 1] === menu);
@@ -75,13 +99,41 @@ for (const yol of SAYFALAR) {
   const denetim = (h) => [...h.matchAll(/<(?:input|select|textarea|button|form|option|label)\b[^>]*>/g)].map((m) => m[0]).filter((t) => !/mobileMenuBtn/.test(t));
   ok(`K form denetimleri (${denetim(once).length} etiket) bayt bayt ve aynı sırada`, JSON.stringify(denetim(once)) === JSON.stringify(denetim(sonra)));
   // Kabuk metinleri yeni ana sayfa gövdesinde (yeni metin yok)
-  const kabuk = sonra.slice(sonra.indexOf('<body>'), sonra.indexOf('<div class="sayfa-iz')) + sonra.slice(sonra.indexOf('<footer>'), sonra.indexOf('</footer>'));
+  const kabuk = sonra.slice(sonra.indexOf('<body>'), sonra.indexOf(d404 ? '<!-- Statik yedek' : '<div class="sayfa-iz')) + sonra.slice(sonra.indexOf('<footer>'), sonra.indexOf('</footer>'));
   const anaMetin = new Set(metinler(GOVDE_ANA));
   const yabanci = metinler(kabuk).filter((t) => !anaMetin.has(t));
   ok(`T kabuktaki ${metinler(kabuk).length} görünür metnin hepsi yeni ana sayfada var`, yabanci.length === 0, yabanci.join(' | '));
+  // A: aria-current (yalnız kabukta; içerikte yok)
+  const gecerli = [...kabuk.matchAll(/<a href="([^"]+)"[^>]*? aria-current="([^"]+)"/g)].map((m) => [m[1], m[2]]);
+  ok(`A geçerli sayfa işareti: ${JSON.stringify(GECERLI(yol))}`, JSON.stringify(gecerli) === JSON.stringify(GECERLI(yol)) && !/aria-current/.test(once) && (sonra.slice(sonra.indexOf('</head>')).match(/aria-current=/g) || []).length === gecerli.length, JSON.stringify(gecerli));
+  // Q: üst bant teklif düğmesi
+  const etiketler = new Set([...once.matchAll(/href="\/\?kaynak=([a-z0-9-]+)#leadForm"/g)].map((m) => m[1]));
+  const cta = /<a href="([^"]*)" class="btn nav-cta">Teklif Al<\/a>/.exec(kabuk);
+  const ctaEtiket = cta && /^\/\?kaynak=([a-z0-9-]+)#leadForm$/.exec(cta[1]);
+  const beklenen = etiketler.size === 0 ? null : etiketler.size === 1 ? [...etiketler][0] : yol.replace(/\.html$/, '');
+  ok(`Q üst bant "Teklif Al": ${beklenen ? `kaynak=${beklenen} (sayfada geçen etiketler: ${[...etiketler].join(', ')})` : 'sayfada teklif düğmesi yok → bantta da yok, yeri boş korunur'}`,
+    beklenen ? !!ctaEtiket && ctaEtiket[1] === beklenen && etiketler.has(beklenen) : !cta && kabuk.includes('<div class="nav-right" aria-hidden="true"></div>'));
+  if (DONDURULMUS.includes(yol)) yaz('  bilgi  DONDURULMUŞ rehber (SEO ölçümü 10.12): canlı dosyaya dokunulmadı; yalnız bu üretilmiş kopya var. Yayın 10.12 ölçümü ve sahip onayından sonra.');
   const eskiAltMetin = metinler(e.altSatir).join(' ');
   yaz(`  bilgi  kaldırılan eski alt satır metni: "${eskiAltMetin}"`);
   yaz(`  bilgi  yasak numara (216 479 05 10) yok: ${!/216\s*479\s*05\s*10|2164790510/.test(sonra)}`);
+}
+
+// ---- O: 404 oyun stili ----
+yaz('\n=== 404 oyun sahnesi stili (canlıdan aynen)');
+{
+  const o = oku(new URL('404.html', KOK)), s = oku(new URL('cikti/404.html', BURASI));
+  const stilO = arasi(o, '<style>', '</style>'), stilS = arasi(s, '<style>', '</style>');
+  const oyun = stilO.slice(stilO.indexOf('/* ---- Oyun sahnesi ---- */'), stilO.indexOf('/* ---- Statik yedek'));
+  const dokun = stilO.slice(stilO.indexOf('/* ---- Dokunmatik'));
+  const gdiag = /body\.g-on #gDiag \{[^}]*\}/.exec(stilO)[0];
+  ok('O oyun sahnesi kuralları (intro, HUD, paneller, lider tablosu, bildirim), oyun açıkken teşhis satırı ve dokunmatik kuralları bayt bayt yeni stilde', stilS.includes(oyun.trimEnd()) && stilS.includes(dokun.trimEnd()) && stilS.includes(gdiag), `${Buffer.byteLength(oyun)} B oyun + ${Buffer.byteLength(dokun)} B dokunmatik`);
+  const kok = /:root \{([^}]*)\}/.exec(stilO)[1];
+  const sahne = /#gStage, body\.g-on #gDiag \{([^}]*)\}/.exec(stilS)[1];
+  const belirtec = [...kok.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map((m) => `${m[1]}: ${m[2].trim()};`);
+  ok(`O sahne belirteçleri (${belirtec.length}) canlı :root ile aynı değerlerde, yalnız sahneye sınırlı`, belirtec.length === 8 && belirtec.every((b) => sahne.includes(b)) && !/:root\s*\{[^}]*--cyan/.test(stilS));
+  ok('O oyun açıkken kabuk gizli, yedek gizli (canlıdaki kural)', stilS.includes('body.g-on .skip, body.g-on .site-header, body.g-on .mobile-menu, body.g-on .sayfa-404, body.g-on > footer { display: none; }') && stilS.includes('body.g-on #gFallback { display: none; }'));
+  ok('O betik: /g404/game.js aynen ve yerinde (oyun sahnesinin ardında, defer)', /<\/div>\n\n<script src="\/g404\/game\.js" defer><\/script>\n\n<script>\n\(function\(\)\{\n  var btn = document\.getElementById\('mobileMenuBtn'\);/.test(s));
 }
 
 // ---- M: SSR çapaları ----
@@ -124,7 +176,7 @@ for (const [ad, yol] of [['bugün (11/24 dönem yayımlanmış)', '/dengesizlik-
 }
 
 yaz(`\nSONUÇ: ${hata === 0 ? 'hepsi geçti' : hata + ' denetim kaldı'}`);
-const metin = `# Alt sayfa 1. aşama — önce/sonra karşılaştırması (node ${process.version}, ${new Date().toISOString().slice(0, 16)}Z)\n` + cikti.join('\n') + '\n';
+const metin = `# Alt sayfalar (1. + 2. aşama, ${SAYFALAR.length} sayfa) — önce/sonra karşılaştırması (node ${process.version}, ${new Date().toISOString().slice(0, 16)}Z)\n` + cikti.join('\n') + '\n';
 writeFileSync(new URL('sonuclar/karsilastirma.txt', BURASI), metin);
 process.stdout.write(metin);
 process.exit(hata ? 1 : 0);

@@ -15,9 +15,4 @@
   .id-card th { padding: 12px 0 2px; border-bottom: 0; }
   .id-card td { padding-top: 0; }
 }
-
-.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px var(--g); margin: 24px 0 18px; }
-.col { padding-top: 16px; border-top: 1px solid var(--line-strong); }
-.sayfa-govde .col h3 { margin-top: 0; }
-.col ul { margin-bottom: 0; font-size: 16px; }
-@media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+/* .cols / .col: stil/sutunlar.css */

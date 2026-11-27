@@ -159,6 +159,9 @@ body.menu-open .site-header{position:fixed;inset:0 0 auto 0}
 .sayfa-kurumsal{--sutun:860px}
 .sayfa-veri{--sutun:880px}
 .sayfa-arac{--sutun:1080px}
+.sayfa-dizin{--sutun:1080px}
+.sayfa-hizmet{--sutun:860px}
+.sayfa-hesap,.sayfa-yasal{--sutun:760px}
 .sayfa-govde .wrap > *{max-width:var(--sutun,760px)}
 .sayfa-govde p{margin-bottom:16px;max-width:44em;text-wrap:pretty}
 .sayfa-govde h2{margin:clamp(40px,4vw,56px) 0 14px;max-width:28em;font-size:clamp(24px,2.1vw,30px);font-weight:600;line-height:1.2;letter-spacing:-.02em;color:var(--ink);text-wrap:balance}
@@ -199,6 +202,14 @@ p.note{margin:0 0 28px;padding-left:14px;border-left:2px solid var(--line-strong
 @media print{.site-header,.mobile-menu,.skip{display:none}
 .sayfa-bas{background:none;color:#000}
 .sayfa-bas .crumbs,.sayfa-bas .crumbs a,.sayfa-bas .updated,.sayfa-bas .lede{color:#000}}
+/* ===== 3) Sayfaya özgü: sayfalar/stil/sutunlar.css ===== */
+/* İki sütunlu karşılaştırma (kurumsal: ne yapıyoruz / ne yapmıyoruz; sanayi: yaptığımız iş / yapmadığımız): ana sayfanın
+   hizmet listesi dili — üstte ince çizgi, kutu ve zemin yok. kurumsal ve sanayi-elektrik-tedariki ortak. */
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px var(--g); margin: 24px 0 18px; }
+.col { padding-top: 16px; border-top: 1px solid var(--line-strong); }
+.sayfa-govde .col h3 { margin-top: 0; }
+.col ul { margin-bottom: 0; font-size: 16px; }
+@media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
 /* ===== 3) Sayfaya özgü: sayfalar/stil/kurumsal.css ===== */
 /* /kurumsal — sayfaya özgü: tescil işareti, logo künyesi, kimlik tablosu, "ne yapıyoruz / ne yapmıyoruz" sütunları.
    Ana sayfanın künye dili: kalın üst çizgi, satır çizgileri, küçük büyük harf etiketler; kutu, gölge, krem kart yok. */
@@ -217,12 +228,7 @@ p.note{margin:0 0 28px;padding-left:14px;border-left:2px solid var(--line-strong
   .id-card th { padding: 12px 0 2px; border-bottom: 0; }
   .id-card td { padding-top: 0; }
 }
-
-.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px var(--g); margin: 24px 0 18px; }
-.col { padding-top: 16px; border-top: 1px solid var(--line-strong); }
-.sayfa-govde .col h3 { margin-top: 0; }
-.col ul { margin-bottom: 0; font-size: 16px; }
-@media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+/* .cols / .col: stil/sutunlar.css */
 </style>
 </head>
 <body>

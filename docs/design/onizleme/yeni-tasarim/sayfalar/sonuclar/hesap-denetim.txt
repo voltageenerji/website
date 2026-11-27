@@ -1,0 +1,46 @@
+# /elektrik-faturasi-hesaplama — önce/sonra davranış denetimi (Chromium 157.0.8103.78, 2026-11-27T11:17Z)
+# önce: canlı elektrik-faturasi-hesaplama.html · sonra: cikti/elektrik-faturasi-hesaplama.html · CSP: _headers (/*)
+
+=== H aynı girdi → aynı çıktı (sonuç kutularının sınıfı ve HTML'i, 2. aracın birim alanı)
+  GEÇTİ  H boş sayfa (ilk hâl) — sınıflar: out / out / out
+  GEÇTİ  H 1. araç: 2.450,80 TL / 520 kWh → 2. araca aktarma — sınıflar: out ok / out ok / out
+  GEÇTİ  H 1. araç: noktalı ondalık 2450.80 — sınıflar: out ok / out ok / out
+  GEÇTİ  H 1. araç: binlik ayraç 1.000 TL / 250 kWh — sınıflar: out ok / out ok / out
+  GEÇTİ  H 1. araç: sıfır kWh → uyarı — sınıflar: out warn / out / out
+  GEÇTİ  H 1. araç: geçersiz tutar → uyarı — sınıflar: out warn / out / out
+  GEÇTİ  H 1. araç: kalem dağılımı (dört kalem, toplam farkı notu) — sınıflar: out ok / out ok / out
+  GEÇTİ  H 1. araç: kalemler toplamı tutar — sınıflar: out ok / out ok / out
+  GEÇTİ  H 1. araç: geçersiz kalem — sınıflar: out ok / out ok / out
+  GEÇTİ  H 1. araç: aktarılan değer, kWh silinince 2. araçtan geri alınır — sınıflar: out / out / out
+  GEÇTİ  H 1. araç: olağandışı yüksek birim (1. araçtan) → 2. araçta uyarı — sınıflar: out ok / out warn / out
+  GEÇTİ  H 2. araç: elle 4,71 TL/kWh ve 1000 kWh — sınıflar: out / out ok / out
+  GEÇTİ  H 2. araç: elle 471 → ondalık virgül uyarısı — sınıflar: out / out warn / out
+  GEÇTİ  H 2. araç: sıfır birim → uyarı — sınıflar: out / out warn / out
+  GEÇTİ  H 2. araç: geçersiz tüketim yok sayılır — sınıflar: out / out ok / out
+  GEÇTİ  H 3. araç: mesken 300 kWh — sınıflar: out / out / out
+  GEÇTİ  H 3. araç: mesken 500 kWh (eşik dahil değil) — sınıflar: out / out / out
+  GEÇTİ  H 3. araç: mesken 501 kWh — sınıflar: out / out / out ok
+  GEÇTİ  H 3. araç: mesken 4.000 kWh — sınıflar: out / out / out ok
+  GEÇTİ  H 3. araç: mesken 4.001 kWh — sınıflar: out / out / out warn
+  GEÇTİ  H 3. araç: diğer 15.000 kWh — sınıflar: out / out / out ok
+  GEÇTİ  H 3. araç: diğer 15.001 kWh — sınıflar: out / out / out warn
+  GEÇTİ  H 3. araç: diğer 1.000.000 kWh — sınıflar: out / out / out warn
+  GEÇTİ  H 3. araç: ondalık 450,5 kWh — sınıflar: out / out / out
+  GEÇTİ  H 3. araç: geçersiz → uyarı, sonra silinir — sınıflar: out / out / out
+  GEÇTİ  H 3. araç: grup sonradan değişir (5.000 kWh mesken → diğer) — sınıflar: out / out / out ok
+  GEÇTİ  H 2. aracın sonucunda "doğrusal bir hesaptır … fiyat teklifi veya taahhüdü değildir" notu
+
+=== Y yalnız klavye (1280 px)
+  GEÇTİ  Y Tab sırası (form denetimleri ve açılır alan) önce ve sonra aynı — t1Tutar → t1Kwh → summary → t1Enerji → t1Dagitim → t1Etv → t1Kdv → t2Birim → t2Kwh → t3Grup → t3Kwh
+  GEÇTİ  Y klavyeyle: açılır alan Enter ile açıldı, abone grubu ok tuşuyla "diğer" oldu
+  GEÇTİ  Y klavyeyle girilen değerlerin sonucu önce ve sonra aynı
+  GEÇTİ  Y klavye sonucu = fare (fill) sonucu
+  GEÇTİ  Y sonra: 24 odak durağının hepsinde görünür çerçeve (≥ 2 px) ve öğe ekranda — []
+
+=== T yatay taşma (bütün sonuçlar dolu, açılır alan açık)
+  GEÇTİ  T 320px sonra: sayfada yatay taşma yok — scrollWidth 320; sonuç kutusu içinde kayma: t1Out 285/252 · önce: sayfa taşması VAR (407)
+  GEÇTİ  T 390px sonra: sayfada yatay taşma yok — scrollWidth 390; sonuç kutusu içinde kayma: yok · önce: sayfa taşması VAR (407)
+  GEÇTİ  T 768px sonra: sayfada yatay taşma yok — scrollWidth 768; sonuç kutusu içinde kayma: yok · önce: sayfa taşması yok
+  GEÇTİ  T 1440px sonra: sayfada yatay taşma yok — scrollWidth 1440; sonuç kutusu içinde kayma: yok · önce: sayfa taşması yok
+
+SONUÇ: hepsi geçti (36)

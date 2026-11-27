@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Alt sayfaları yeni tasarım sistemine taşır (1. aşama: ortak kabuk + dört örnek sayfa).
+"""Alt sayfaları yeni tasarım sistemine taşır (1. aşama: ortak kabuk + dört örnek sayfa; 2. aşama: kalan bütün herkese açık
+sayfalar — 19 rehber daha, rehber dizini, sanayi, fatura hesaplama, üç hukuki metin, 404; panel.html kapsam dışı).
 
 Canlı sayfa dosyaları yalnız OKUNUR, hiçbirine yazılmaz. Çıktı: bu klasördeki cikti/<aynı göreli yol>.
 
@@ -17,9 +18,16 @@ Ne nereden gelir:
 - Stil: (1) yeni ana sayfa stilinden (../yapi/stil.css) süzülen kabuk kuralları, (2) kabuk.css (alt sayfa kabuğu ve ortak
   içerik dizgisi), (3) stil/<sayfa>.css. Üçü satır içi tek <style> bloğuna yazılır (karar: NOTLAR.md).
 
-Kayma olursa (canlı sayfa ya da ana sayfa kaynağı değişirse) doğrulama satırları durur ve neyin değiştiğini söyler.
+Kayma olursa (canlı sayfa ya da ana sayfa kaynağı değişirse) doğrulama satırları durur ve neyin değiştiğini söyler:
+- yapı (belge başı, tek <style>, <div class="page">, içerik izi / geri bağlantısı, tek H1, eski alt satır, sayfa kabı);
+- sınıf kapısı: içerikte ve sayfa betiklerinde geçen her sınıfın yeni stilde bir kuralı olmalı (ya da SINIFSIZ listesinde
+  gerekçeli olmalı) — canlı sayfaya kabukta karşılığı olmayan yeni bir bileşen eklenirse üretim durur;
+- dondurulmuş üç rehberin (SEO ölçümü 10.12) canlı dosyası bayt bayt bilinen hâlinde olmalı (sha256);
+- 404: oyun sahnesinin stil kuralları canlıdan aynen alınır; değiştirilen her parça tam bir kez bulunmalı.
+404 (yalnız yedek içeriğe kabuk): bkz. kur_404().
 Kullanım: python3 kur-sayfalar.py [çıktı dizini]
 """
+import hashlib
 import os
 import re
 import sys
@@ -214,43 +222,153 @@ def kabuk(ayar):
     alt = degistir(alt, '\n</footer>', '\n</div>\n</footer>')
     alt = gecerli(alt, ayar['alt_etkin'], 'page')
     atla = dil_ozniteligi_sil(ATLA)
+    for parca in (atla, ust, menu, alt):
+        # Kabukta yeni sayfaya bağlantı yok (test-dengesizlik: mevcut sayfalardan /dengesizlik-maliyeti'ne bağlantı yok);
+        # tasarruf ifadesi ve yayımlanmayacak numara yok
+        assert 'dengesizlik-maliyeti' not in parca and 'tasarruf' not in parca.lower() and '216 479' not in parca
     return atla, ust, menu, alt
 
 
 # ============================================================================
 # 3) SAYFALAR
 # ============================================================================
+# tur: gövde sütunu (kabuk.css .sayfa-<tur>). ust_etkin: menüde geçerli bağlantı (içerik izi Rehber'den geçen sayfalarda
+# "Rehber" aria-current="true"; dizinin kendisinde "page"). alt_etkin: menüde olmayıp alt bilgide olan sayfa ("page").
+# kaynak: sayfada birden çok teklif etiketi varsa üst banttaki düğmenin kullanacağı, sayfanın KENDİ etiketi (yeni etiket yok).
+def rehber(ad, stil=(), **k):
+    return dict(yol='rehber/%s.html' % ad, tur='rehber', ust_etkin='/rehber', ust_etkin_deger='true', alt_etkin=None, stil=list(stil), **k)
+
+
 SAYFALAR = [
-    dict(yol='rehber/tekstil-elektrik.html', tur='rehber', ust_etkin='/rehber', ust_etkin_deger='true', alt_etkin=None, stil=[]),
-    dict(yol='canli-ptf.html', tur='veri', ust_etkin='/canli-ptf', ust_etkin_deger='page', alt_etkin=None, stil=['veri-bandi.css', 'canli-ptf.css']),
-    dict(yol='kurumsal.html', tur='kurumsal', ust_etkin=None, ust_etkin_deger=None, alt_etkin='/kurumsal', stil=['kurumsal.css']),
+    # ---- 1. aşama ----
+    rehber('tekstil-elektrik'),
+    dict(yol='canli-ptf.html', tur='veri', ust_etkin='/canli-ptf', ust_etkin_deger='page', alt_etkin=None, stil=['veri-bandi.css', 'sema.css', 'canli-ptf.css']),
+    dict(yol='kurumsal.html', tur='kurumsal', ust_etkin=None, ust_etkin_deger=None, alt_etkin='/kurumsal', stil=['sutunlar.css', 'kurumsal.css']),
     dict(yol='dengesizlik-maliyeti.html', tur='arac', ust_etkin=None, ust_etkin_deger=None, alt_etkin=None, stil=['veri-bandi.css', 'dengesizlik-maliyeti.css']),
+    # ---- 2. aşama: rehberler ----
+    rehber('15-dakikalik-uzlastirma', ['icerik.css']),
+    rehber('cam-seramik-elektrik'),
+    rehber('demir-celik-elektrik'),
+    rehber('elektrik-faturasi-neden-yuksek'),
+    rehber('elektrik-tedarikcisi-nasil-secilir', ['icerik.css']),
+    rehber('i-rec-nedir'),
+    rehber('kapsam-2-elektrik-emisyonu', ['icerik.css']),
+    rehber('kimya-elektrik'),
+    rehber('osb-elektrik-tedariki'),
+    rehber('ptf-nedir', ['icerik.css', 'sema.css'], dondurulmus='857fd2a8bca818075a6e25b92cbedbeb5996399b8971c47c81180d0c0a4af5e0'),
+    rehber('serbest-tuketici', ['icerik.css'], dondurulmus='398a5c06b7c6ea485d6a2c2637f290e77980301d3e181a11102e3c860dc7c2a4'),
+    rehber('skdm-elektrik-sertifika', ['icerik.css']),
+    rehber('sktt', ['icerik.css']),
+    rehber('soguk-zincir-elektrik'),
+    rehber('tedarikci-degistirme', ['sema.css', 'tedarikci-degistirme.css'], dondurulmus='cafe6fbfa1e36cc6ec3f4e3d80af99edc8713dad542eda03c5b507e205c35b95'),
+    rehber('veri-merkezi-elektrik'),
+    rehber('yek-g-i-rec-farki', ['icerik.css']),
+    rehber('yek-g-nedir'),
+    # ---- 2. aşama: dizin, hizmet, araç, hukuki metinler, 404 ----
+    dict(yol='rehber.html', tur='dizin', ust_etkin='/rehber', ust_etkin_deger='page', alt_etkin=None, stil=['rehber-dizin.css']),
+    dict(yol='sanayi-elektrik-tedariki.html', tur='hizmet', ust_etkin=None, ust_etkin_deger=None, alt_etkin=None, stil=['icerik.css', 'sutunlar.css']),
+    dict(yol='elektrik-faturasi-hesaplama.html', tur='hesap', ust_etkin=None, ust_etkin_deger=None, alt_etkin=None, kaynak='elektrik-faturasi-hesaplama',
+         stil=['icerik.css', 'elektrik-faturasi-hesaplama.css'], betik_siniflari=['ok', 'warn']),
+    dict(yol='kvkk.html', tur='yasal', ust_etkin=None, ust_etkin_deger=None, alt_etkin='/kvkk', stil=['yasal.css']),
+    dict(yol='cerez-politikasi.html', tur='yasal', ust_etkin=None, ust_etkin_deger=None, alt_etkin='/cerez-politikasi', stil=['yasal.css']),
+    dict(yol='kullanim-kosullari.html', tur='yasal', ust_etkin=None, ust_etkin_deger=None, alt_etkin='/kullanim-kosullari', stil=['yasal.css']),
+    dict(yol='404.html', tur='404', ust_etkin=None, ust_etkin_deger=None, alt_etkin=None, stil=['404.css']),
 ]
+assert len({s['yol'] for s in SAYFALAR}) == len(SAYFALAR) == 29  # 19 rehber + 10 sayfa
+# Kapsam: kökteki ve rehber/ altındaki her herkese açık HTML sayfası listede; panel.html (iç araç) ve index.html (ana sayfa
+# hazırlığı ayrı) hariç. Canlıya yeni sayfa eklenirse üretim durur.
+_canli = sorted([f for f in os.listdir(KOK) if f.endswith('.html')] + ['rehber/' + f for f in os.listdir(os.path.join(KOK, 'rehber')) if f.endswith('.html')])
+assert sorted(s['yol'] for s in SAYFALAR) == sorted(set(_canli) - {'index.html', 'panel.html'}), set(_canli) ^ {s['yol'] for s in SAYFALAR}
 
 KABUK_CSS = oku(os.path.join(BURASI, 'kabuk.css'))
 
+# Sınıf kapısı istisnaları: içerikte geçip bilerek stil kuralı olmayan sınıflar (gerekçeli). Başka her sınıfın stilde kuralı olmalı.
+SINIFSIZ = {
+    # şu an boş: 29 sayfadaki her sınıfın stilde kuralı var
+}
 
-def stil(ayar):
+
+def stil(ayar, ek=None):
     parcalar = ['/* ===== 1) Ana sayfa kabuğu: yeni ana sayfa stilinden (yapi/stil.css) süzüldü, bildirimler aynen ===== */',
                 KABUK_ANA,
                 '/* ===== 2) Alt sayfa kabuğu ve ortak içerik dizgisi (sayfalar/kabuk.css) ===== */',
                 KABUK_CSS]
-    sayfa = ['/* ===== 3) Sayfaya özgü: sayfalar/stil/%s ===== */\n%s' % (d, oku(os.path.join(BURASI, 'stil', d)).rstrip('\n')) for d in ayar['stil']]
+    sayfa = ([ek] if ek else []) + ['/* ===== 3) Sayfaya özgü: sayfalar/stil/%s ===== */\n%s' % (d, oku(os.path.join(BURASI, 'stil', d)).rstrip('\n')) for d in ayar['stil']]
     # Kabuk sıkıştırılır (her sayfada aynı); sayfaya özgü stil okunur biçimde kalır: QA testleri bazı kuralları metin
     # olarak arar (test-dengesizlik.mjs R6, R9, R10) ve sayfa düzeltmeleri tek dosyada elle yapılabilir.
     return '\n'.join([sikistir('\n'.join(parcalar))] + sayfa)
 
 
-def kur(ayar):
-    canli = oku(os.path.join(KOK, ayar['yol']))
-    assert canli.startswith('<!DOCTYPE html>\n<html lang="tr">\n<head>\n'), 'belge başı beklenen gibi değil'
-    # ---- baş: <style> bloğu dışında bayt bayt aynı ----
+def sinif_kapisi(ayar, parcalar, css):
+    """İçerikte (ve sayfa betiklerinin yazdığı işaretlemede) geçen her sınıf için yeni stilde bir seçici olmalı."""
+    siniflar = set()
+    for p in parcalar:
+        for m in re.finditer(r'class="([^"]*)"', p):
+            # betiklerdeki birleştirilmiş dizgilerden yalnız geçerli sınıf adları (ör. 'yon-' + d.yon parçaları atlanır)
+            siniflar.update(s for s in m.group(1).split() if re.fullmatch(r'-?[A-Za-z_][\w-]*', s) and not s.endswith('-'))
+        for m in re.finditer(r"classList\.(?:add|toggle|remove)\('([\w-]+)'", p):
+            siniflar.add(m.group(1))
+    for s in ayar.get('betik_siniflari', []):
+        assert any("'%s'" % s in p for p in parcalar), ('betik sınıfı betikte yok', s)
+        siniflar.add(s)
+    css_temiz = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+    eksik = sorted(s for s in siniflar if s not in SINIFSIZ and not re.search(r'\.%s(?![\w-])' % re.escape(s), css_temiz))
+    assert not eksik, ('stilde karşılığı olmayan sınıf (yeni bileşen? stil/ altına kural yazın)', ayar['yol'], eksik)
+    return len(siniflar)
+
+
+def bas_ve_stil(canli, ayar, ek=None):
+    """Belge başı: <style> bloğu dışında bayt bayt aynı. cerez-politikasi'nde <!DOCTYPE> ile <html> arasında TASLAK yorumu var."""
+    assert canli.startswith('<!DOCTYPE html>\n'), 'belge başı beklenen gibi değil'
+    tek(canli, '<html lang="tr">\n<head>\n', 'html/head açılışı')
+    assert re.fullmatch(r'<!DOCTYPE html>\n(<!--.*?-->\n)?', canli[:canli.index('<html lang="tr">\n<head>\n')], re.S), 'doctype ile <html> arası'
     tek(canli, '<style>', 'style açılışı')
     tek(canli, '</style>\n', 'style kapanışı')
-    tek(canli, '</head>\n<body>\n<div class="page">\n', 'gövde başı')
+    tek(canli, '</head>\n', 'head kapanışı')
     bas_bolum = canli[:canli.index('</head>\n') + len('</head>\n')]
     eski_stil = arasi(bas_bolum, '<style>', '</style>\n', dahil=True)
-    yeni_bas = bas_bolum.replace(eski_stil, '<style>\n' + stil(ayar) + '\n</style>\n')
+    yeni_css = stil(ayar, ek)
+    return bas_bolum.replace(eski_stil, '<style>\n' + yeni_css + '\n</style>\n'), yeni_css
+
+
+def dondurulmus_mu(ayar, canli):
+    if ayar.get('dondurulmus'):
+        ozet = hashlib.sha256(canli.encode('utf-8')).hexdigest()
+        assert ozet == ayar['dondurulmus'], ('DONDURULMUŞ rehberin canlı dosyası değişmiş (SEO ölçümü 10.12) — '
+                                             'değişikliği inceleyip özeti güncelleyin', ayar['yol'], ozet)
+
+
+def kaynak_sec(ayar, canli):
+    """Üst banttaki "Teklif Al": sayfanın kendi teklif düğmeleriyle aynı kaynak etiketi (yeni etiket yok). Sayfada teklif
+    düğmesi yoksa üst bantta da olmaz. Birden çok etiket varsa sayfanın kendi etiketi açıkça verilir ve sayfada olmalıdır."""
+    kaynaklar = set(re.findall(r'href="/\?kaynak=([a-z0-9-]+)#leadForm"', canli))
+    if ayar.get('kaynak'):
+        assert ayar['kaynak'] in kaynaklar, ('verilen kaynak etiketi sayfada yok', ayar['kaynak'], kaynaklar)
+        return ayar['kaynak']
+    assert len(kaynaklar) <= 1, ('sayfada birden çok kaynak etiketi; ayarda kaynak verin', kaynaklar)
+    return kaynaklar.pop() if kaynaklar else None
+
+
+def yaz(ayar, cikti):
+    tek(cikti, '<body>', '<body> (SSR çapası)')
+    assert cikti.index('<body>') > cikti.index('</head>')
+    assert cikti.count('<style>') == 1 and cikti.count('<main') == 1
+    assert '216 479' not in cikti and '2164790510' not in cikti and '479 05 10' not in cikti, 'yayımlanmayacak numara'
+    hedef = os.path.join(CIKTI, ayar['yol'])
+    os.makedirs(os.path.dirname(hedef), exist_ok=True)
+    with open(hedef, 'w', encoding='utf-8') as f:
+        f.write(cikti)
+    return hedef
+
+
+def kur(ayar):
+    if ayar['yol'] == '404.html':
+        return kur_404(ayar)
+    canli = oku(os.path.join(KOK, ayar['yol']))
+    dondurulmus_mu(ayar, canli)
+    # ---- baş: <style> bloğu dışında bayt bayt aynı ----
+    tek(canli, '</head>\n<body>\n<div class="page">\n', 'gövde başı')
+    yeni_bas, yeni_css = bas_ve_stil(canli, ayar)
     # ---- gövde ----
     govde = canli[canli.index('<body>\n<div class="page">\n') + len('<body>\n<div class="page">\n'):]
     tek(govde, '\n  <footer>', 'eski alt satır')
@@ -261,29 +379,32 @@ def kur(ayar):
     kalan = kalan[len('</div>\n'):]
     assert kalan.endswith('</body>\n</html>\n'), 'belge sonu beklenen gibi değil'
     betikler = kalan[:-len('</body>\n</html>\n')]
-    # Üst banttaki "Teklif Al": sayfanın kendi teklif düğmeleriyle aynı kaynak etiketi (yeni etiket yok). Sayfada teklif
-    # düğmesi yoksa üst bantta da olmaz.
-    kaynaklar = set(re.findall(r'href="/\?kaynak=([a-z0-9-]+)#leadForm"', canli))
-    assert len(kaynaklar) <= 1, ('sayfada birden çok kaynak etiketi', kaynaklar)
-    ayar = dict(ayar, kaynak=kaynaklar.pop() if kaynaklar else None)
-    # dengesizlik: eski <main> sarmalayıcısı (kabuğun <main id="icerik"> öğesi onun yerini alır)
+    assert not betikler.strip() or (betikler.lstrip('\n').startswith('<script') and betikler.rstrip().endswith('</script>')), betikler[:80]
+    ayar = dict(ayar, kaynak=kaynak_sec(ayar, canli))
+    # dengesizlik: eski <main> sarmalayıcısı (kabuğun <main> öğesi onun yerini alır)
     if '\n  <main>\n' in icerik:
         icerik = degistir(icerik, '\n  <main>\n', '\n')
         icerik = degistir(icerik, '\n  </main>\n', '\n')
         assert icerik.endswith('\n'), icerik[-40:]
-    assert '<main' not in icerik and '<footer' not in icerik
-    # ---- sayfa başı: içerik izi + H1 (+ hemen ardındaki güncelleme satırı ya da giriş paragrafı) ----
+    assert '<main' not in icerik and '<footer' not in icerik and '<header' not in icerik
+    # ---- sayfa başı: içerik izi (hukuki metinlerde "← ana sayfa" bağlantısı) + H1 (+ güncelleme satırı ya da giriş) ----
     satirlar = icerik.split('\n')
-    assert satirlar[0].startswith('  <nav class="crumbs" aria-label="Breadcrumb">') and satirlar[0].endswith('</nav>'), satirlar[0]
+    iz_crumbs = satirlar[0].startswith('  <nav class="crumbs" aria-label="Breadcrumb">') and satirlar[0].endswith('</nav>')
+    iz_geri = satirlar[0] == '  <a class="back" href="/">← voltage.com.tr ana sayfa</a>'
+    assert iz_crumbs or (iz_geri and ayar['tur'] == 'yasal'), satirlar[0]
+    if ayar['ust_etkin'] == '/rehber' and ayar['ust_etkin_deger'] == 'true':
+        assert '<a href="/rehber">Rehber</a>' in satirlar[0], ('rehber sayfasının içerik izi Rehber\'den geçmiyor', satirlar[0])
     assert satirlar[1].startswith('  <h1>') and satirlar[1].endswith('</h1>'), satirlar[1]
     k = 2
     if satirlar[2].startswith('  <div class="updated">') or satirlar[2].startswith('  <p class="lede">'):
         assert satirlar[2].endswith('</div>') or satirlar[2].endswith('</p>'), satirlar[2]
         k = 3
+    assert ayar['tur'] not in ('rehber', 'yasal', 'dizin', 'hizmet', 'hesap') or k == 3, 'güncelleme satırı yok'
     iz = satirlar[0]
     bant = '\n'.join(satirlar[1:k])
     govde_ic = '\n'.join(satirlar[k:]).rstrip('\n')  # baştaki boş satır korunur (bayt karşılaştırması)
     assert icerik.count('<h1') == 1
+    sinif_kapisi(ayar, [iz, bant, govde_ic, betikler], yeni_css)
 
     atla, ust, menu, alt = kabuk(ayar)
     cikti = (yeni_bas + '<body>\n' + atla + '\n\n<!-- ÜST BANT -->\n' + ust + '\n\n' + menu + '\n\n'
@@ -295,20 +416,102 @@ def kur(ayar):
              + '\n<script>\n' + MENU_JS + '</script>\n</body>\n</html>\n')
 
     # ---- doğrulamalar (sürüklenme kapısı) ----
-    tek(cikti, '<body>', '<body> (SSR çapası)')
-    assert cikti.index('<body>') > cikti.index('</head>')
-    assert cikti.count('<h1') == 1 and cikti.count('<main') == 1 and cikti.count('<style>') == 1
+    assert cikti.count('<h1') == 1 and cikti.count('<main>') == 1
     assert betikler in cikti and iz in cikti and bant in cikti and govde_ic in cikti
     assert cikti.index(iz) < cikti.index('<main>') < cikti.index('<h1') < cikti.index('</main>') < cikti.index('<footer>')
-    assert '216 479' not in cikti and '2164790510' not in cikti, 'yayımlanmayacak numara'
-    hedef = os.path.join(CIKTI, ayar['yol'])
-    os.makedirs(os.path.dirname(hedef), exist_ok=True)
-    with open(hedef, 'w', encoding='utf-8') as f:
-        f.write(cikti)
-    return hedef, len(cikti.encode('utf-8')), len(stil(ayar).encode('utf-8')), eski_alt
+    hedef = yaz(ayar, cikti)
+    return hedef, len(cikti.encode('utf-8')), len(yeni_css.encode('utf-8')), eski_alt
+
+
+# ============================================================================
+# 4) 404: oyun sayfası. Oyun (body.g-on) canlıdaki gibi tam ekran; kabuk (üst bant, mobil menü, alt bilgi) yalnız statik
+#    yedeğin (JS kapalı, WebGL yok, hareket azaltma, bağlam kaybı) çevresinde. İşaretleme: yedek <main id="gFallback"> içi
+#    (eski alt satır hariç), teşhis satırı, oyun sahnesi ve betik canlıdan bayt bayt. Oyun stili canlıdan aynen; yalnız
+#    sahnenin renk belirteçleri :root'tan sahneye taşınır (kabuğun --ink/--line belirteçleriyle çakışmasın) ve yedeğin
+#    kuralları stil/404.css ile yeni belirteçlerle yazılır.
+# ============================================================================
+OYUN_BAS = '/* ---- Oyun sahnesi ---- */'
+OYUN_YEDEK = '/* ---- Statik yedek (JS/WebGL yoksa veya hareket azaltılmışsa) ---- */'
+OYUN_TESHIS = '/* ---- Teşhis satırı (?tani=1) — yalnız ekranda, hiçbir yere gönderilmez ---- */'
+OYUN_DOKUN = '/* ---- Dokunmatik: kaydırma/çift dokunma yakınlaştırma/uzun basma menüsü oyunu bölmesin ---- */'
+
+
+def oyun_stili(eski, sayfa_css):
+    ic = eski[len('<style>\n'):-len('</style>\n')]
+    for isaret in (OYUN_BAS, OYUN_YEDEK, OYUN_TESHIS, OYUN_DOKUN):
+        tek(ic, isaret, '404 stil bölümü')
+    a, b, c, d = (ic.index(x) for x in (OYUN_BAS, OYUN_YEDEK, OYUN_TESHIS, OYUN_DOKUN))
+    assert a < b < c < d
+    bas, oyun, yedek, teshis, dokun = ic[:a], ic[a:b], ic[b:c], ic[c:d], ic[d:]
+    # Baş: :root belirteçleri stil/404.css'te sahneye sınırlı ve AYNI değerlerle; sıfırlama, gövde, bağlantı, .mono karşılanır
+    kok = arasi(bas, ':root {', '}')
+    belirtec = dict(re.findall(r'(--[\w-]+):\s*([^;]+);', kok))
+    assert set(belirtec) == {'--bg', '--ink', '--dim', '--cyan', '--cyan-deep', '--amber', '--line', '--glass'}, belirtec
+    sahne = arasi(sayfa_css, '#gStage, body.g-on #gDiag {', '}')
+    for ad, deger in belirtec.items():
+        assert '%s: %s;' % (ad, deger.strip()) in sahne, ('404 sahne belirteci stil/404.css ile aynı değil', ad, deger)
+    for parca in ('* { box-sizing: border-box; margin: 0; padding: 0; }', 'html, body { height: 100%; }',
+                  'a { color: var(--cyan); text-underline-offset: 3px; }', ".mono { font-family: 'IBM Plex Mono', Consolas, monospace; }",
+                  'background: radial-gradient(120% 90% at 50% 0%, #0a1226 0%, var(--bg) 55%, #020409 100%);', 'overflow-x: hidden;'):
+        tek(bas, parca, '404 baş kuralı')
+    assert 'body.g-on { background: radial-gradient(120% 90% at 50% 0%, #0a1226 0%, #04060e 55%, #020409 100%);' in sayfa_css
+    # Yedek bölümü bütünüyle stil/404.css'e geçer; oyun açıkken yedeği gizleyen kural orada da aynen olmalı
+    tek(yedek, 'body.g-on #gFallback { display: none; }', 'yedeği gizleyen kural')
+    tek(sayfa_css, 'body.g-on #gFallback { display: none; }', 'yedeği gizleyen kural (404.css)')
+    # Teşhis: oyun açıkkenki kural aynen kalır; kapalıyken stil/404.css
+    oyun_teshis = arasi(teshis, 'body.g-on #gDiag {', '}', dahil=True)
+    tek(teshis, '#gDiag { max-width: 720px; margin: -48px auto 40px;', 'teşhis satırı (yedek hâli)')
+    for secici in ('#gCanvas', '#gIntro', '#gHud', '.g-panel', '.g-card', '.g-cta', '#gLb', '#gToast', '#gEgg', 'body.g-on #gStage'):
+        assert secici in oyun, ('oyun stili beklenen kuralı taşımıyor', secici)
+    return ('/* ===== 3) Oyun sahnesi: canlı 404.html stilinden AYNEN (yalnız :root belirteçleri, sıfırlama, gövde ve yedek '
+            'kuralları çıkarıldı; bunlar kabukta ve sayfalar/stil/404.css içinde) ===== */\n'
+            + oyun.rstrip('\n') + '\n' + OYUN_TESHIS + '\n' + oyun_teshis + '\n\n' + dokun.rstrip('\n'))
+
+
+def kur_404(ayar):
+    canli = oku(os.path.join(KOK, ayar['yol']))
+    tek(canli, '<meta name="robots" content="noindex, follow">', '404 noindex')
+    tek(canli, '</head>\n<body>\n', '404 gövde başı')
+    sayfa_css = oku(os.path.join(BURASI, 'stil', '404.css'))
+    eski_stil = arasi(canli, '<style>', '</style>\n', dahil=True)
+    yeni_bas, yeni_css = bas_ve_stil(canli, ayar, oyun_stili(eski_stil, sayfa_css))
+    govde = canli[canli.index('</head>\n<body>\n') + len('</head>\n<body>\n'):]
+    yorum = arasi(govde, '\n<!-- Statik yedek:', '-->\n', dahil=True)[1:]
+    assert govde.startswith('\n' + yorum), govde[:80]
+    govde = govde[1 + len(yorum):]
+    ana = arasi(govde, '<main id="gFallback">\n', '\n</main>\n', dahil=True)
+    assert govde.startswith(ana), govde[:80]
+    kalan = govde[len(ana):]
+    teshis = '<p id="gDiag" role="status" hidden></p>\n'
+    assert kalan.startswith(teshis), kalan[:80]
+    kalan = kalan[len(teshis):]
+    assert kalan.startswith('\n<!-- Oyun sahnesi -->\n<div id="gStage">\n'), kalan[:80]
+    assert kalan.endswith('</div>\n\n<script src="/g404/game.js" defer></script>\n</body>\n</html>\n'), kalan[-120:]
+    sahne = kalan[1:-len('</body>\n</html>\n')]
+    # Eski alt satır (yedeğin içindeki <footer> satırı) kabuğun alt bilgisine yer bırakır
+    alt_satir = re.search(r'\n  <footer>.*?</footer>', ana)
+    assert alt_satir and ana.count('<footer>') == 1, 'yedekte eski alt satır'
+    eski_alt = alt_satir.group(0)[1:]
+    ana = ana.replace(alt_satir.group(0), '')
+    assert '<h1' not in ana and '<main id="gFallback">' in ana and 'id="icerik"' not in canli
+    ayar = dict(ayar, kaynak=kaynak_sec(ayar, canli))
+    assert ayar['kaynak'] == '404'
+    sinif_kapisi(ayar, [ana, teshis, sahne], yeni_css)
+
+    atla, ust, menu, alt = kabuk(ayar)
+    cikti = (yeni_bas + '<body>\n' + atla + '\n\n<!-- ÜST BANT -->\n' + ust + '\n\n' + menu + '\n\n'
+             + yorum
+             + '<div class="sayfa-404 on-dark" id="icerik" tabindex="-1">\n<div class="wrap">\n' + ana + '</div>\n</div>\n'
+             + teshis + '\n<!-- KAPANIŞ -->\n' + alt + '\n\n' + sahne
+             + '\n<script>\n' + MENU_JS + '</script>\n</body>\n</html>\n')
+    assert cikti.count('<h1') == 0 and cikti.count('<main id="gFallback">') == 1
+    assert cikti.index('<main id="gFallback">') < cikti.index('<p id="gDiag"') < cikti.index('<footer>') < cikti.index('<div id="gStage">')
+    hedef = yaz(ayar, cikti)
+    return hedef, len(cikti.encode('utf-8')), len(yeni_css.encode('utf-8')), eski_alt
 
 
 if __name__ == '__main__':
     for ayar in SAYFALAR:
         hedef, boy, css, _ = kur(ayar)
-        sys.stdout.write('yazıldı: %s  %d bayt (stil %d)\n' % (os.path.relpath(hedef, BURASI), boy, css))
+        sys.stdout.write('yazıldı: %s  %d bayt (stil %d)%s\n' % (os.path.relpath(hedef, BURASI), boy, css,
+                                                                 '  [DONDURULMUŞ: yayın 10.12 ölçümü ve sahip onayından sonra]' if ayar.get('dondurulmus') else ''))
