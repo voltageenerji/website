@@ -1,0 +1,29 @@
+name: gecici-onizleme
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-onizleme.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      B: https://e0ef20cd.website-dh5.pages.dev
+    steps:
+      - name: Tüm sayfalar (yalnız durum kodları ve sayılar)
+        shell: bash {0}
+        run: |
+          ok=0; bad=0
+          for p in / /rehber /rehber/15-dakikalik-uzlastirma /rehber/cam-seramik-elektrik /rehber/demir-celik-elektrik /rehber/elektrik-faturasi-neden-yuksek /rehber/elektrik-tedarikcisi-nasil-secilir /rehber/i-rec-nedir /rehber/kapsam-2-elektrik-emisyonu /rehber/kimya-elektrik /rehber/osb-elektrik-tedariki /rehber/ptf-nedir /rehber/serbest-tuketici /rehber/skdm-elektrik-sertifika /rehber/sktt /rehber/soguk-zincir-elektrik /rehber/tedarikci-degistirme /rehber/tekstil-elektrik /rehber/veri-merkezi-elektrik /rehber/yek-g-i-rec-farki /rehber/yek-g-nedir /sanayi-elektrik-tedariki /elektrik-faturasi-hesaplama /canli-ptf /dengesizlik-maliyeti /kurumsal /kvkk /cerez-politikasi /kullanim-kosullari; do
+            k=$(curl -sS -o b.html -D h.txt -m 30 -w '%{http_code}' "$B$p")
+            x=$(grep -ci '^x-robots-tag: noindex' h.txt); n=$(grep -c 'class="nav-links' b.html); f=$(grep -c '<footer' b.html)
+            if [ "$k" = 200 ] && [ "$x" -ge 1 ] && [ "$n" -ge 1 ] && [ "$f" -ge 1 ]; then ok=$((ok+1)); else bad=$((bad+1)); echo "SORUN $p http=$k noindex=$x kabuk=$n footer=$f"; fi
+          done
+          echo "sayfa: $ok geçti, $bad sorunlu"
+          k=$(curl -sS -o b.html -D h.txt -m 30 -w '%{http_code}' "$B/olmayan-sayfa-xyz"); echo "404 http=$k kabuk=$(grep -c 'class="nav-links' b.html) noindex_meta=$(grep -c 'noindex' b.html)"
+          curl -sS -m 30 "$B/" -o a.html; echo "anasayfa aktarıcı=$(grep -c "PTF_PROXY = '/onizleme-ptf'" a.html) bahar=$(grep -c 'bahar' a.html)"
+          echo "canli-ptf ssr=$(curl -sS -m 30 "$B/canli-ptf" | grep -c 'data-ssr="1"') dengesizlik ssr=$(curl -sS -m 30 "$B/dengesizlik-maliyeti" | grep -c 'data-ssr="1"')"
+          curl -sS -m 30 "$B/onizleme-ptf/ptf/today" -o t.json -w 'aktarici http=%{http_code}\n'
+          python3 -c "import json;d=json.load(open('t.json'));it=d.get('items') or d.get('data') or [];print('aktarici saat sayisi',len(it))" || echo "aktarici json okunamadi"
+          for p in /img/kapak-1600.webp /img/sektor-kimya-800.webp; do curl -sS -o /dev/null -m 30 -w "$p %{http_code}\n" "$B$p"; done
