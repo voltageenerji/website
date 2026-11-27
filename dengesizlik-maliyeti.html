@@ -31,405 +31,202 @@
 {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://voltage.com.tr/#organization","name":"Voltage Enerji","legalName":"Voltan Elektrik Toptan Satış İthalat ve İhracat Anonim Şirketi","url":"https://voltage.com.tr/","logo":"https://voltage.com.tr/logo.png","sameAs":["https://www.linkedin.com/company/voltage-enerji/","https://www.facebook.com/voltageenerji/"]},{"@type":"BreadcrumbList","@id":"https://voltage.com.tr/dengesizlik-maliyeti#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Ana Sayfa","item":"https://voltage.com.tr/"},{"@type":"ListItem","position":2,"name":"Dengesizlik Maliyeti"}]},{"@type":"WebPage","@id":"https://voltage.com.tr/dengesizlik-maliyeti#webpage","image":"https://voltage.com.tr/og-image.jpg","name":"Dengesizlik Maliyeti Hesaplama: Dengesizlik Fiyatı ve SMF","url":"https://voltage.com.tr/dengesizlik-maliyeti","description":"Bugünün pozitif ve negatif dengesizlik fiyatı, SMF, PTF ve sistem yönü EPİAŞ verisiyle tek tabloda. Formül, k ve l katsayıları, hesaplayıcı, CSV ve Excel.","inLanguage":"tr-TR","datePublished":"2026-11-24","dateModified":"2026-11-24","isPartOf":{"@id":"https://voltage.com.tr/#website"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"breadcrumb":{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#breadcrumb"},"creditText":"Veri: EPİAŞ Şeffaflık Platformu. Sunum, türetilmiş gösterge ve hesaplayıcı: Voltage Enerji","isBasedOn":{"@type":"CreativeWork","name":"EPİAŞ Şeffaflık Platformu: PTF, SMF ve SDF Listeleme raporu","url":"https://seffaflik.epias.com.tr/","publisher":{"@type":"Organization","name":"Enerji Piyasaları İşletme A.Ş. (EPİAŞ)","url":"https://www.epias.com.tr/"}},"about":{"@type":"Thing","name":"Enerji dengesizlik fiyatı"},"mainEntity":{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#dataset"},"hasPart":[{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#hesaplayici"},{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#sss"}]},{"@type":"Dataset","@id":"https://voltage.com.tr/dengesizlik-maliyeti#dataset","identifier":"https://voltage.com.tr/dengesizlik-maliyeti#dataset","name":"Türkiye elektrik piyasası: dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları","alternateName":["PTF, SMF ve dengesizlik fiyatları","Pozitif ve negatif dengesizlik fiyatı serisi"],"description":"1 Ocak 2026'dan bugüne her uzlaştırma dönemi için Piyasa Takas Fiyatı (PTF), Sistem Marjinal Fiyatı (SMF), sistem yönü, EPİAŞ'ın yayımladığı pozitif ve negatif dengesizlik fiyatı ile bunlardan hesaplanan birim dengesizlik maliyeti (PTF'ye göre). Değerler EPİAŞ Şeffaflık Platformu'nda yayımlandığı hâliyle aktarılır; yayımlanmamış değer boş kalır. Dosyalar parametresiz istendiğinde içinde bulunulan günü verir; başka bir gün için tarih, aralık için bas ve bit parametreleri kullanılır (tek istekte en çok 31 gün).","url":"https://voltage.com.tr/dengesizlik-maliyeti","inLanguage":"tr-TR","isAccessibleForFree":true,"datePublished":"2026-11-24","dateModified":"2026-11-24","creator":{"@type":"Organization","name":"Enerji Piyasaları İşletme A.Ş. (EPİAŞ)","url":"https://www.epias.com.tr/"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"isBasedOn":{"@type":"CreativeWork","name":"EPİAŞ Şeffaflık Platformu: PTF, SMF ve SDF Listeleme raporu","url":"https://seffaflik.epias.com.tr/","publisher":{"@type":"Organization","name":"Enerji Piyasaları İşletme A.Ş. (EPİAŞ)","url":"https://www.epias.com.tr/"}},"keywords":["dengesizlik fiyatı","pozitif dengesizlik fiyatı","negatif dengesizlik fiyatı","sistem marjinal fiyatı","SMF","PTF","sistem yönü","dengeleme güç piyasası","EPİAŞ"],"citation":"Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı. Veri: EPİAŞ Şeffaflık Platformu.","measurementTechnique":"PTF, SMF, sistem yönü ve dengesizlik fiyatları EPİAŞ Şeffaflık Platformu'nun \"PTF, SMF ve SDF Listeleme\" raporundan olduğu gibi aktarılır. Birim dengesizlik maliyeti (PTF'ye göre) bu değerlerden Voltage Enerji tarafından hesaplanır: negatif dengesizlik fiyatı eksi PTF ve PTF eksi pozitif dengesizlik fiyatı.","spatialCoverage":{"@type":"Country","name":"Türkiye"},"temporalCoverage":"2026-01-01/..","variableMeasured":[{"@type":"PropertyValue","name":"PTF","description":"Piyasa Takas Fiyatı","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"SMF","description":"Sistem Marjinal Fiyatı","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"Sistem yönü","description":"Enerji açığı, enerji fazlası ya da dengede"},{"@type":"PropertyValue","name":"Pozitif dengesizlik fiyatı","description":"EPİAŞ'ın yayımladığı pozitif dengesizlik fiyatı","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"Negatif dengesizlik fiyatı","description":"EPİAŞ'ın yayımladığı negatif dengesizlik fiyatı","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"Pozitif dengesizlik maliyeti (PTF'ye göre)","description":"PTF eksi pozitif dengesizlik fiyatı; Voltage Enerji türetimi","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"Negatif dengesizlik maliyeti (PTF'ye göre)","description":"Negatif dengesizlik fiyatı eksi PTF; Voltage Enerji türetimi","unitText":"TL/MWh"}],"distribution":[{"@type":"DataDownload","name":"CSV","encodingFormat":"text/csv","contentUrl":"https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=csv"},{"@type":"DataDownload","name":"Excel (.xlsx)","encodingFormat":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","contentUrl":"https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=xlsx"},{"@type":"DataDownload","name":"JSON","encodingFormat":"application/json","contentUrl":"https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=json"}]},{"@type":"WebApplication","@id":"https://voltage.com.tr/dengesizlik-maliyeti#hesaplayici","name":"Dengesizlik maliyeti hesaplayıcı","url":"https://voltage.com.tr/dengesizlik-maliyeti#hesaplayici","description":"Bir uzlaştırma dönemindeki dengesizlik miktarı için dengesizlik tutarını, aynı miktarın PTF üzerinden değerini ve aradaki farkı hesaplar. Sonuçlar tahminidir; teklif ya da taahhüt değildir.","applicationCategory":"BusinessApplication","operatingSystem":"Web","browserRequirements":"JavaScript gerektirir","inLanguage":"tr-TR","isAccessibleForFree":true,"provider":{"@id":"https://voltage.com.tr/#organization"}},{"@type":"FAQPage","@id":"https://voltage.com.tr/dengesizlik-maliyeti#sss","mainEntity":[{"@type":"Question","name":"Dengesizlik maliyeti nedir?","acceptedAnswer":{"@type":"Answer","text":"Dengesizlik maliyeti, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır. Mevzuatta tanımlı bir terim değildir; Voltage Enerji tarafından EPİAŞ Şeffaflık Platformu verisinden türetilir."}},{"@type":"Question","name":"Pozitif ve negatif dengesizlik fiyatı nasıl hesaplanır?","acceptedAnswer":{"@type":"Answer","text":"Pozitif dengesizlik fiyatı min(PTF; SMF) × (1 − çarpan), negatif dengesizlik fiyatı max(PTF; SMF) × (1 + çarpan) formülüyle hesaplanır. Çarpan sistem yönüne göre %3 ya da %6'dır. Çok düşük fiyatlı saatlerde ve azami fiyat limitinde yönetmelikteki ek kurallar uygulanır; tabloda EPİAŞ'ın yayımladığı değer gösterilir. Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı."}},{"@type":"Question","name":"Sistem yönü neyi değiştirir?","acceptedAnswer":{"@type":"Answer","text":"Sistem yönü çarpanı belirler. Sistem enerji fazlasındaysa (arz fazlası) pozitif dengesizlikte çarpan %6, negatif dengesizlikte %3'tür. Sistem enerji açığındaysa (talep fazlası) negatif dengesizlikte çarpan %6, pozitif dengesizlikte %3'tür. Sistem dengedeyse ikisi de %3'tür. Tabloda EPİAŞ'ın yayımladığı sistem yönü gösterilir."}},{"@type":"Question","name":"Veriyi nasıl indiririm?","acceptedAnswer":{"@type":"Answer","text":"Tablonun üstündeki bağlantılar seçili günü CSV, Excel (.xlsx) ve JSON olarak indirir. Tarih aralığı formu en çok 31 günlük veriyi tek dosyada verir. Aynı veri https://voltage.com.tr/dengesizlik-maliyeti/veri adresinden tarih ve biçim parametreleriyle de alınabilir. Veri alınamadığında boş dosya üretilmez."}}]}]}
 </script>
 <style>
-/* ===== 1) Ana sayfa kabuğu: yeni ana sayfa stilinden (yapi/stil.css) süzüldü, bildirimler aynen ===== */
-:root{--ink:#0A0E1A;--ink-soft:#1E2536;--ink-muted:#4A5264;--line:#E2DFD6;--line-strong:#CBC7BA;--paper:#F5F3EC;--white:#FFFFFF;--night:#0A1122;--cta:#F5B41C;--cta-hover:#FFC84A;--red:#8E221B;--green:#2F7A44;--green-bright:#5BC489;--on-dark:rgba(255,255,255,.88);--on-dark-muted:rgba(255,255,255,.72);--hair-dark:rgba(255,255,255,.18);--serif:'Newsreader',Georgia,serif;--sans:'Archivo',-apple-system,'Segoe UI',sans-serif;--mono:'IBM Plex Mono',Consolas,monospace;--ease:cubic-bezier(.25,.46,.45,.94);--pad:clamp(16px,5vw,72px);--sec:clamp(40px,5.6vw,80px);--g:clamp(20px,2.3vw,32px);--header-h:80px;--nav-h:68px;--focus:var(--ink);--fp:40px}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:var(--sans);font-size:16px;line-height:1.55;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
-img{max-width:100%;display:block}
-svg{display:block}
-ul,ol{list-style:none}
-a{color:inherit;text-decoration:none}
-button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
-table{border-collapse:collapse}
-a:focus-visible,button:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
-main:focus{outline:none}
-.wrap{width:100%;max-width:calc(1240px + 2 * var(--pad));margin-inline:auto;padding-inline:var(--pad)}
-.on-dark{--focus:var(--cta);color:var(--white)}
-.mono{font-family:var(--mono);font-size:.93em}
-.skip{position:absolute;left:16px;top:-72px;z-index:200;padding:12px 18px;background:var(--cta);color:var(--ink);font-weight:600;border-radius:3px}
-.skip:focus{top:12px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 28px;font-size:16px;font-weight:600;line-height:1;white-space:nowrap;border:1.5px solid transparent;border-radius:3px;transition:background-color .2s,border-color .2s,color .2s}
-.btn-primary{background:var(--cta);color:var(--ink)}
-.btn-primary:hover{background:var(--cta-hover)}
-.site-header{position:fixed;inset:0 0 auto 0;z-index:100;color:var(--white);border-bottom:1px solid transparent;transition:background-color .25s var(--ease),border-color .25s var(--ease)}
-body.menu-open .site-header{background:var(--night);border-bottom-color:var(--hair-dark)}
-.header-in{display:flex;align-items:center;gap:clamp(16px,2.4vw,36px);height:var(--header-h);transition:height .25s var(--ease)}
-.nav-logo{display:flex;align-items:center;gap:12px;flex:none;min-height:44px}
-.nav-logo-mark{width:32px;height:32px;display:flex;align-items:center;justify-content:center}
-.nav-logo-mark svg{width:100%;height:100%}
-.nav-logo-text,.cl-name{display:flex;align-items:baseline;gap:.5em;font-family:var(--sans);font-size:17px;line-height:1;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
-.nav-logo-name,.cl-word{font-weight:600}
-.nav-logo-sub,.cl-sub{font-weight:400;color:var(--on-dark)}
-.nav-links{flex:1;display:flex;justify-content:center;gap:clamp(18px,2.4vw,38px);min-width:0}
-.nav-links a{padding:12px 0;font-size:15.5px;font-weight:500;color:var(--on-dark);white-space:nowrap;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
-.nav-links a:hover{color:var(--white);border-bottom-color:var(--cta)}
-.nav-right{display:flex;align-items:center;gap:clamp(12px,1.6vw,22px);flex:none}
-.nav-cta{min-height:44px;padding:0 20px;font-size:15px;border-color:rgba(255,255,255,.8);color:var(--white);background:rgba(8,13,28,.6)}
-.nav-cta:hover{background:var(--cta);border-color:var(--cta);color:var(--ink)}
-.mobile-menu-btn,.mobile-menu{display:none}
-body.menu-open{overflow:hidden}
-.label{font-size:12.5px;font-weight:600;line-height:1.4;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted)}
-.footer{background:#070B16;padding-block:clamp(52px,6vw,80px) 28px}
-.cl-head{display:flex;justify-content:space-between;align-items:center;gap:20px 24px;flex-wrap:wrap}
-.cl-brand{display:flex;align-items:center;gap:12px}
-.cl-mark-svg{width:32px;height:32px;flex:none}
-.cl-mark-svg svg{width:100%;height:100%}
-.cl-subwrap{display:inline-flex;align-items:flex-start}
-.cl-reg{font-size:9px;line-height:1;letter-spacing:0;margin-left:2px;opacity:.8}
-.cl-nav{display:flex;gap:0 28px;flex-wrap:wrap}
-.cl-nav a,.cl-legal a{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:15px;color:var(--on-dark-muted);transition:color .2s}
-.cl-nav a:hover,.cl-legal a:hover,.cl-v a:hover{color:var(--cta)}
-.cl-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 40px;margin-top:36px;padding-top:34px;border-top:1px solid var(--hair-dark)}
-.cl-k{margin-bottom:8px;color:var(--on-dark-muted)}
-.cl-v{font-size:15px;line-height:1.65;color:var(--on-dark);overflow-wrap:anywhere}
-.cl-v a{display:inline-flex;align-items:center;min-height:44px;margin:-10px 0;color:var(--white);text-decoration:underline;text-decoration-color:var(--cta);text-underline-offset:4px}
-.cl-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px 24px;flex-wrap:wrap;margin-top:40px;padding-top:14px;border-top:1px solid var(--hair-dark)}
-.cl-copy,.cl-markline{font-size:12.5px;letter-spacing:.04em;color:var(--on-dark-muted)}
-.cl-legal{display:flex;flex-wrap:wrap;gap:0 22px}
-.cl-legal a{font-size:14px}
-@media (max-width: 1039px){:root{--header-h:64px;--nav-h:64px}
-.nav-links{display:none}
-.nav-right{margin-left:auto}
-.nav-cta,.nav-cta:hover{padding:0 16px;background:var(--cta);border-color:var(--cta);color:var(--ink)}
-.mobile-menu-btn{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;padding:0 10px;border:1px solid rgba(255,255,255,.4);border-radius:3px;background:rgba(8,13,28,.6)}
-.mobile-menu-btn span{display:block;height:1.5px;background:var(--white);transition:transform .2s var(--ease),opacity .2s}
-.mobile-menu-btn.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
-.mobile-menu-btn.open span:nth-child(2){opacity:0}
-.mobile-menu-btn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
-.mobile-menu{position:fixed;inset:0;z-index:90;overflow-y:auto;display:flex;flex-direction:column;padding:calc(var(--header-h) + 8px) var(--pad) 28px;background:var(--night);color:var(--white)}
-.mobile-menu[hidden]{display:none}
-.mobile-menu > a{display:flex;align-items:center;min-height:56px;font-size:18px;font-weight:500;border-bottom:1px solid var(--hair-dark)}
-.cl-grid{grid-template-columns:1fr 1fr}}
-@media (max-width: 759px){.cl-head,.cl-bottom{flex-direction:column;align-items:flex-start}}
-@media (max-width: 700px){.cl-grid{grid-template-columns:1fr 1fr;gap:20px 24px;margin-top:26px;padding-top:26px}
-.cl-grid > :nth-child(-n+2){grid-column:1 / -1}
-.cl-bottom{margin-top:28px}}
-@media (max-width: 640px){:root{--fp:22px}}
-@media (max-width: 479px){.cl-nav{gap:0 12px}
-.nav-logo-sub{display:none}}
-@media (max-width: 359px){:root{--fp:16px}
-.nav-logo{gap:9px}
-.nav-logo-text{font-size:15px;letter-spacing:.12em}}
-@media (forced-colors: active){.btn{border:1px solid CanvasText}}
-/* ===== 2) Alt sayfa kabuğu ve ortak içerik dizgisi (sayfalar/kabuk.css) ===== */
-/* Alt sayfa kabuğu: üst bant ana sayfanın kaydırılmış hâliyle aynıdır (koyu zemin, 68 px; 1039 px ve altında 64 px;
-   sarı "Teklif Al"). Alt sayfada kapak fotoğrafı olmadığı için bant baştan koyudur ve sayfa akışındadır (yapışkan
-   değildir): uzun okuma ve veri sayfalarında dikey alan içeriğe kalır, tablo başlığı sayfa kayarken ekranın en üstünde
-   durabilir, klavye odağı sabit bir bandın altında kalmaz (WCAG 2.4.11). Menü açıkken bant ekrana sabitlenir.
-   Ana sayfadaki yumuşak kaydırma burada kapalıdır: klavyeyle gezinirken odaklanan öğe hemen görünür. */
-html{scroll-behavior:auto;scroll-padding-top:16px}
-body{background:var(--white)}
-:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
-#icerik:focus{outline:none}
-.site-header{position:relative;inset:auto;background:var(--night);border-bottom-color:var(--hair-dark)}
-body.menu-open .site-header{position:fixed;inset:0 0 auto 0}
-.header-in{height:var(--nav-h)}
-.nav-cta{background:var(--cta);border-color:var(--cta);color:var(--ink)}
-.nav-cta:hover{background:var(--cta-hover);border-color:var(--cta-hover);color:var(--ink)}
-/* Teklif düğmesi olmayan sayfada sağ kutu düğme genişliğini korur: menü her sayfada aynı yerde */
-@media (min-width: 1040px){.nav-right:empty{width:96px}}
-/* Geçerli sayfa / bölüm: menüde sarı alt çizgi, mobil menüde sarı yazı, alt bilgide beyaz */
-.nav-links a[aria-current]{color:var(--white);border-bottom-color:var(--cta)}
-.cl-legal a[aria-current]{color:var(--white)}
-@media (max-width: 1039px){.nav-logo{margin-right:auto}
-.mobile-menu > a[aria-current]{color:var(--cta)}}
-/* Betik kapalıyken menü düğmesi çalışmaz: gösterilmez (bağlantılar alt bilgide) */
-@media (scripting: none){.mobile-menu-btn{display:none !important}}
-/* ============ SAYFA BAŞI — koyu: içerik izi şeridi (ana içerik bölgesi dışında) + H1 bandı (içinde); ikisi tek yüzey ============ */
-.sayfa-iz{background:var(--night);padding-top:clamp(20px,2.8vw,40px)}
-.sayfa-bas{background:var(--night);padding-block:clamp(12px,1.4vw,18px) clamp(30px,4vw,58px)}
-.crumbs{font-size:14px;line-height:1.5;color:var(--on-dark-muted)}
-.crumbs a{display:inline-block;padding-block:2px;color:var(--on-dark);text-decoration:underline;text-decoration-color:rgba(255,255,255,.36);text-decoration-thickness:1px;text-underline-offset:4px}
-.crumbs a:hover{color:var(--white);text-decoration-color:var(--cta)}
-.sayfa-bas h1{max-width:21em;font-family:var(--serif);font-weight:500;font-size:clamp(30px,3.5vw,50px);line-height:1.1;letter-spacing:-.018em;text-wrap:balance}
-.sayfa-bas .updated{margin-top:16px;font-size:14.5px;line-height:1.5;color:var(--on-dark-muted)}
-.sayfa-bas .lede{margin-top:18px;max-width:46em;font-size:clamp(16px,1.25vw,18px);line-height:1.6;color:var(--on-dark);text-wrap:pretty}
-.sayfa-bas .lede strong{font-weight:600;color:var(--white)}
-/* ============ SAYFA GÖVDESİ — beyaz zemin, sola hizalı tek sütun (ana sayfa ızgarasının sol kenarı) ============ */
-.sayfa-govde{padding-block:clamp(34px,4.2vw,60px) clamp(56px,6.4vw,96px);background:var(--white);font-size:17px;line-height:1.7;color:var(--ink-soft)}
-.sayfa-rehber{--sutun:760px}
-.sayfa-kurumsal{--sutun:860px}
-.sayfa-veri{--sutun:880px}
-.sayfa-arac{--sutun:1080px}
-.sayfa-govde .wrap > *{max-width:var(--sutun,760px)}
-.sayfa-govde p{margin-bottom:16px;max-width:44em;text-wrap:pretty}
-.sayfa-govde h2{margin:clamp(40px,4vw,56px) 0 14px;max-width:28em;font-size:clamp(24px,2.1vw,30px);font-weight:600;line-height:1.2;letter-spacing:-.02em;color:var(--ink);text-wrap:balance}
-.sayfa-govde h3{margin:28px 0 6px;font-size:19px;font-weight:600;line-height:1.3;letter-spacing:-.008em;color:var(--ink)}
-.sayfa-govde h2 + h3{margin-top:16px}
-.sayfa-govde strong{font-weight:600;color:var(--ink)}
-.sayfa-govde ul,.sayfa-govde ol{margin:0 0 18px;padding-left:1.3em;max-width:44em}
-.sayfa-govde ul{list-style:disc}
-.sayfa-govde ol{list-style:decimal}
-.sayfa-govde li{margin-bottom:8px;padding-left:.2em}
-.sayfa-govde li::marker{color:var(--ink-muted)}
-/* Metin bağlantıları: koyu yazı + ince alt çizgi; üzerine gelince sarı, kalın çizgi */
-.sayfa-govde a{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-decoration-color:rgba(10,14,26,.42);text-underline-offset:3px;transition:text-decoration-color .2s}
-.sayfa-govde a:hover{text-decoration-color:var(--cta);text-decoration-thickness:2px}
-.sayfa-govde .sr-only,.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-/* Teklif kutusu: krem bant, üstte koyu çizgi (ana sayfadaki ana hizmet bandı gibi); düğme ana sayfanın sarı düğmesi */
-.cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 32px;margin:40px 0;padding:24px 28px;background:var(--paper);border-top:2px solid var(--ink)}
-.cta p{margin:0;max-width:34em;font-size:17.5px;line-height:1.55;color:var(--ink-soft)}
-.sayfa-govde a.btn-primary{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:14px 28px;font-size:16px;font-weight:600;line-height:1.25;text-align:center;color:var(--ink);background:var(--cta);border-radius:3px;text-decoration:none;transition:background-color .2s}
-.sayfa-govde a.btn-primary:hover{background:var(--cta-hover)}
-/* Bilgi notu, kaynak alıntısı, "bu sayfa hakkında" */
-p.note{margin:0 0 28px;padding-left:14px;border-left:2px solid var(--line-strong);font-size:14.5px;line-height:1.65;color:var(--ink-muted)}
-.sayfa-govde p.note{max-width:50em}
-.sayfa-govde blockquote{margin:18px 0 22px;padding:16px 20px;background:var(--paper);border-left:3px solid var(--cta);font-size:15.5px;line-height:1.6;color:var(--ink-soft);overflow-wrap:anywhere}
-.about{margin-top:56px;padding-top:18px;border-top:1px solid var(--line-strong);font-size:14.5px;line-height:1.65;color:var(--ink-muted)}
-.sayfa-govde .about p{margin-bottom:8px;max-width:52em;color:var(--ink-muted)}
-.about strong{color:var(--ink-soft)}
-@media (max-width: 759px){.sayfa-govde{font-size:16.5px;line-height:1.65}
-.sayfa-govde h3{font-size:18px}
-/* Teklif kutusu telefonda kenardan kenara; düğme tam genişlik */
-.cta{margin-inline:calc(var(--pad) * -1);padding:20px var(--pad)}
-.cta .btn-primary{width:100%}
-.about{margin-top:44px}}
-/* ============ HAREKET AZALTMA ve ZORUNLU RENK ============ */
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}
-*,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
-@media (forced-colors: active){.sayfa-govde a.btn-primary,.nav-cta{border:1px solid CanvasText}}
-@media print{.site-header,.mobile-menu,.skip{display:none}
-.sayfa-bas{background:none;color:#000}
-.sayfa-bas .crumbs,.sayfa-bas .crumbs a,.sayfa-bas .updated,.sayfa-bas .lede{color:#000}}
-/* ===== 3) Sayfaya özgü: sayfalar/stil/veri-bandi.css ===== */
-/* Piyasa veri bandı (.live): iki piyasa verisi sayfasının ortak dili. Ana sayfanın kapak PTF kartıyla aynı yüzey
-   (#0B1226, ince açık çizgi, 4 px köşe); ızgara deseni yok. Rakamlar tabular; durum ve damga monospace (piyasa verisi),
-   etiketler düz yazı. Betiğin yazdığı sınıflar (live-mode / live-stamp + stale / waiting) aynen kullanılır. */
-.live { --focus: var(--cta); margin: 32px 0 14px; padding: 22px 26px 16px; color: var(--white); background: #0B1226; border: 1px solid var(--hair-dark); border-radius: 4px; }
-.live-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; padding-bottom: 14px; border-bottom: 1px solid var(--hair-dark); }
-.live-t { font-size: 13px; font-weight: 500; line-height: 1.4; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-dark); }
-.live-mode { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--green-bright); }
-.live-mode.stale { color: var(--cta); }
-.live-mode.waiting { color: var(--on-dark-muted); }
-.live-now { padding: 20px 0 16px; border-bottom: 1px solid var(--hair-dark); }
-.live-now-num { font-size: clamp(38px, 5.4vw, 54px); font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.live-now-num .u { margin-left: 12px; font-size: 15px; font-weight: 400; letter-spacing: 0; color: var(--on-dark-muted); white-space: nowrap; }
-.live-now-k { margin-top: 8px; font-size: 14.5px; line-height: 1.45; color: var(--on-dark-muted); }
-.live-cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--hair-dark); }
-.live-cells .cell { min-width: 0; padding: 16px 16px 14px; border-left: 1px solid var(--hair-dark); }
-.live-cells .cell:first-child { padding-left: 0; border-left: 0; }
-.cv { font-family: var(--mono); font-size: clamp(17px, 1.9vw, 21px); font-weight: 500; line-height: 1.25; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.ck { margin-top: 6px; font-size: 13.5px; line-height: 1.4; color: var(--on-dark-muted); }
-.live-foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 16px; padding-top: 12px; font-size: 13px; line-height: 1.45; color: var(--on-dark-muted); }
-.live-stamp { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--green-bright); }
-.live-stamp.stale { color: var(--cta); }
-.live-stamp.waiting { color: var(--on-dark-muted); }
-.sayfa-govde .day-sum { font-size: 15.5px; line-height: 1.65; color: var(--ink-soft); }
-@media (max-width: 640px) {
-  .live { padding: 18px 18px 14px; }
-  .live-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .live-cells .cell { padding-left: 14px; }
-  .live-cells .cell:nth-child(odd) { padding-left: 0; border-left: 0; }
-  .live-cells .cell:nth-child(n+3) { border-top: 1px solid var(--hair-dark); }
-}
-/* ===== 3) Sayfaya özgü: sayfalar/stil/dengesizlik-maliyeti.css ===== */
-/* /dengesizlik-maliyeti — sayfaya özgü: tarih ve indirme araç çubukları, dönem tablosu (telefonda dört sütun), özet
-   bandı eki, formül kutusu, hesaplayıcı, sonuç kutuları. Bütün seçiciler, kimlikler ve sınıflar canlıdakiyle aynıdır
-   (functions/dengesizlik-maliyeti.js çapaları ve sayfa betiği bunlara yazar). Sabitlenmiş iki test rengi: maliyet
-   sütunlarının zemini #F3EBD3 / başlığı #E9DEBF (test-dengesizlik-tarayici.mjs R9 bu değerleri bekler). */
+:root { --ink:#0A0E1A; --ink-soft:#1A2032; --ink-muted:#4A5264; --line:#E4E2DC; --line-strong:#D6D2C6; --paper:#F5F3EC; --paper-warm:#EDEAE0; --accent:#C9A961; --accent-dark:#A68A44; --accent-ink:#826829; --green:#2F7A44; --green-bright:#5FBF7F; --red-ink:#9A3B2E; --now:#EFE6CF; --mono:'IBM Plex Mono',Consolas,monospace; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Archivo', -apple-system, sans-serif; background: var(--paper); color: var(--ink); font-size: 15.5px; line-height: 1.75; }
+.page { max-width: 840px; margin: 0 auto; padding: 48px 24px 96px; }
+a { color: var(--accent-ink); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.live :focus-visible { outline-color: var(--paper); }
+.crumbs { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 40px; }
+.crumbs a { color: var(--ink-muted); text-decoration: none; }
+.crumbs a:hover { color: var(--ink); }
+h1 { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: clamp(30px, 4.5vw, 44px); letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 14px; }
+h2 { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: clamp(23px, 3vw, 30px); letter-spacing: -0.01em; line-height: 1.2; margin: 44px 0 14px; }
+h3 { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 16px; margin: 26px 0 6px; }
+.lede { font-size: 16.5px; margin-bottom: 14px; }
+.updated { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 30px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+p { color: var(--ink-soft); margin-bottom: 14px; max-width: 720px; }
+ul.liste { margin: 0 0 14px 20px; max-width: 700px; color: var(--ink-soft); }
+ul.liste li { margin-bottom: 8px; }
+strong { color: var(--ink); }
+blockquote { margin: 18px 0 20px; padding: 16px 20px; border-left: 2px solid var(--accent); background: var(--paper-warm); font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--ink-soft); overflow-wrap: anywhere; }
+blockquote a { color: var(--ink-soft); } /* koyu zeminde --accent-ink 4,4:1 kalıyor; metin rengi + altı çizili */
 var { font-family: var(--mono); font-style: normal; }
-.sayfa-govde code { padding: 1px 5px; font-family: var(--mono); font-size: 14px; background: var(--paper); overflow-wrap: anywhere; }
-.sayfa-govde ul.liste { max-width: 44em; }
-.sayfa-govde .uyari { margin: 0 0 20px; padding: 12px 16px; font-size: 15px; line-height: 1.55; color: var(--ink); background: #FBEFC9; border-left: 3px solid var(--cta); }
-.sayfa-govde .uyari:empty { display: none; }
-.sayfa-govde p.uyari { max-width: none; }
-.sayfa-govde .updated { margin: 0 0 8px; padding: 12px 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-muted); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.sayfa-govde .day-sum { margin: 0 0 22px; min-height: 8.75em; }
-@media (max-width: 640px) { .sayfa-govde .day-sum { min-height: 17.5em; } }
+code { font-family: var(--mono); font-size: 13px; background: var(--paper-warm); padding: 1px 5px; overflow-wrap: anywhere; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.note { font-size: 12.5px; line-height: 1.65; color: var(--ink-muted); max-width: 720px; margin: 0 0 30px; padding-left: 12px; border-left: 2px solid var(--line-strong); }
+.uyari { font-size: 13.5px; margin: 0 0 20px; padding: 12px 16px; border: 1px solid var(--accent-dark); background: var(--paper-warm); color: var(--ink); }
+.uyari:empty { display: none; }
 
-/* ---- Özet bandı eki: yön sayıları ---- */
-.live-yon { display: flex; flex-wrap: wrap; gap: 6px 24px; padding: 12px 0; font-size: 14px; line-height: 1.45; color: var(--on-dark-muted); border-bottom: 1px solid var(--hair-dark); }
-.live-yon b { font-family: var(--mono); font-weight: 500; color: var(--white); font-variant-numeric: tabular-nums; }
+/* ---- ÖZET BANDI (canli-ptf ile aynı dil) ---- */
+.live { background: var(--ink); color: var(--paper); padding: 26px 26px 20px; margin: 30px 0 10px; background-image: linear-gradient(rgba(245,243,236,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,243,236,0.05) 1px, transparent 1px); background-size: 56px 56px; }
+.live-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; padding-bottom: 16px; border-bottom: 1px solid rgba(245,243,236,0.14); }
+.live-t { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(245,243,236,0.66); }
+.live-mode { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; color: var(--green-bright); }
+.live-mode.stale { color: var(--accent); }
+.live-mode.waiting { color: rgba(245,243,236,0.62); }
+.live-now { padding: 22px 0 18px; border-bottom: 1px solid rgba(245,243,236,0.14); }
+.live-now-num { font-family: var(--mono); font-weight: 500; font-size: clamp(34px, 7vw, 56px); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.live-now-num .u { font-size: 14px; letter-spacing: 0.04em; color: rgba(245,243,236,0.66); margin-left: 12px; white-space: nowrap; }
+.live-now-k { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,243,236,0.62); margin-top: 12px; }
+.live-cells { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(245,243,236,0.14); border-bottom: 1px solid rgba(245,243,236,0.14); }
+.live-cells .cell { background: var(--ink); padding: 18px 14px 16px; min-width: 0; }
+.cv { font-family: var(--mono); font-weight: 500; font-size: clamp(16px, 2.3vw, 21px); line-height: 1.2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ck { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,243,236,0.62); margin-top: 8px; line-height: 1.5; }
+.live-yon { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: rgba(245,243,236,0.72); padding: 14px 0; border-bottom: 1px solid rgba(245,243,236,0.14); display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.live-yon b { color: var(--paper); font-weight: 500; font-variant-numeric: tabular-nums; }
+.live-foot { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 14px; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,243,236,0.62); }
+.live-stamp { color: var(--green-bright); }
+.live-stamp.stale { color: var(--accent); }
+.live-stamp.waiting { color: rgba(245,243,236,0.62); }
+@media (max-width: 640px) { .live-cells { grid-template-columns: repeat(2, 1fr); } .live { padding: 20px 18px 16px; } }
+/* Bekleme hâlinde de yer ayrılır: veri gelince sayfa aşağı kaymasın (CLS). */
+.day-sum { font-size: 14.5px; margin: 0 0 22px; min-height: 8.75em; }
+@media (max-width: 640px) { .day-sum { min-height: 17.5em; } }
 
-/* ---- Araç çubukları (gün seçimi, indirme, aralık formu) ---- */
-.arac { margin: 0 0 22px; padding: 14px 18px; background: var(--paper); border: 1px solid var(--line-strong); border-radius: 4px; }
+/* ---- ARAÇ ÇUBUĞU ---- */
+.arac { border: 1px solid var(--line-strong); background: var(--paper-warm); padding: 16px 18px; margin: 0 0 22px; }
 .arac form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 12px; }
 .arac-satir { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-strong); }
-.arac-satir.arac-ilk { margin-top: 0; padding-top: 0; border-top: 0; }
-.etiket { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; line-height: 1.3; color: var(--ink-soft); }
-.arac-baslik { font-size: 12.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); }
-.sayfa-arac input[type="date"], .sayfa-arac input[type="text"], .sayfa-arac select { max-width: 100%; min-height: 44px; padding: 8px 12px; font: inherit; font-family: var(--sans); font-size: 16px; line-height: 1.3; color: var(--ink); background: var(--white); border: 1px solid var(--ink-muted); border-radius: 3px; }
-.sayfa-arac input[aria-invalid="true"] { border-color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
-/* İşlem düğmeleri: koyu (sarı yalnız teklif düğmesinde); ikincil düğmeler çerçeveli */
-.sayfa-arac .btn { min-height: 44px; padding: 0 18px; font-size: 15px; font-weight: 600; line-height: 1.2; color: var(--white); background: var(--night); border: 1px solid var(--night); border-radius: 3px; cursor: pointer; text-decoration: none; transition: background-color 0.2s, border-color 0.2s; }
-.sayfa-arac .btn:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
-.btn-ikincil { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; font: inherit; font-size: 15px; font-weight: 500; line-height: 1.2; color: var(--ink); background: var(--white); border: 1px solid var(--ink-muted); border-radius: 3px; cursor: pointer; text-decoration: none; white-space: nowrap; }
-.sayfa-govde a.btn-ikincil { color: var(--ink); text-decoration: none; }
-a.btn-ikincil:hover, button.btn-ikincil:hover { border-color: var(--ink); background: var(--paper); }
-.sayfa-govde a.btn-ikincil[aria-disabled="true"], .btn-ikincil[aria-disabled="true"] { color: var(--ink-muted); background: var(--white); border-color: var(--line-strong); cursor: default; }
-.sayfa-arac .btn[disabled], .btn-ikincil[disabled] { color: var(--ink-muted); background: var(--paper); border-color: var(--line-strong); cursor: default; }
-.indir-not { font-size: 14px; color: var(--ink-muted); }
+.etiket { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); display: block; margin-bottom: 4px; }
+.arac-baslik { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); }
+input[type="date"], input[type="text"], select { font: inherit; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--ink-muted); border-radius: 0; padding: 8px 10px; min-height: 40px; max-width: 100%; }
+input[aria-invalid="true"] { border-color: var(--red-ink); box-shadow: inset 0 0 0 1px var(--red-ink); }
+.btn { font: inherit; font-size: 13.5px; font-weight: 500; letter-spacing: 0.02em; color: var(--paper); background: var(--ink); border: 1px solid var(--ink); padding: 8px 16px; min-height: 40px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: background 0.2s, border-color 0.2s; }
+.btn:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
+.btn-ikincil { font: inherit; font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--ink-muted); padding: 8px 12px; min-height: 40px; text-decoration: none; display: inline-flex; align-items: center; cursor: pointer; }
+a.btn-ikincil:hover, button.btn-ikincil:hover { border-color: var(--ink); background: #fff; }
+.btn-ikincil[aria-disabled="true"] { color: var(--ink-muted); border-color: var(--line-strong); cursor: default; }
+.btn[disabled], .btn-ikincil[disabled] { opacity: 1; color: var(--ink-muted); background: var(--paper-warm); border-color: var(--line-strong); cursor: default; }
+.indir-not { font-size: 12.5px; color: var(--ink-muted); }
 .indir-not[hidden] { display: none; }
-.fark { font-weight: 600; color: var(--red); }
+.fark { color: var(--red-ink); font-weight: 600; }
 .adimlar { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
-.arac-tarih { margin-bottom: 12px; padding: 10px 14px; }
-.sayfa-govde .hata { margin: 6px 0 0; max-width: none; font-size: 14px; line-height: 1.45; color: var(--red); }
-.sayfa-govde .hata:empty { display: none; }
-.sayfa-govde .yardim { flex-basis: 100%; margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: var(--ink-muted); }
-.sayfa-govde h2#tablo { margin: 22px 0 12px; font-size: clamp(21px, 1.9vw, 25px); }
+/* R9: tablo ilk ekranda — üstteki tarih satırı sıkı; tablo başlığına yakın boşluk */
+.arac-tarih { padding: 10px 14px; margin-bottom: 12px; }
+.arac-satir.arac-ilk { margin-top: 0; padding-top: 0; border-top: 0; }
+h2#tablo { margin: 18px 0 10px; font-size: clamp(20px, 2.4vw, 24px); }
+.page > main > .lede { margin-bottom: 16px; }
 @media (max-width: 640px) {
+  .page { padding-top: 28px; }
+  .crumbs { margin-bottom: 22px; }
   .arac-tarih .adimlar { flex-wrap: nowrap; gap: 6px; }
-  .arac-tarih .adimlar .btn-ikincil { padding-left: 9px; padding-right: 9px; font-size: 14.5px; }
+  .arac-tarih .adimlar .btn-ikincil { padding-left: 9px; padding-right: 9px; }
   .dm-tablo thead th { padding-top: 6px; padding-bottom: 6px; }
-  .adimlar { flex-basis: 100%; margin-left: 0; }
 }
-@media (max-width: 379px) { .arac-tarih .adimlar { flex-wrap: wrap; } }
+.hata { font-size: 13px; color: var(--red-ink); margin: 6px 0 0; max-width: none; }
+.hata:empty { display: none; }
+.yardim { font-size: 12.5px; color: var(--ink-muted); margin: 8px 0 0; flex-basis: 100%; }
+@media (max-width: 640px) { .adimlar { margin-left: 0; flex-basis: 100%; } }
 
-/* ---- Dönem tablosu: monospace rakamlar; başlık satırı yapışkan; geniş ekranda kap kaymaz ---- */
-.tablo-sar { min-height: 420px; max-height: 76vh; margin: 0 0 14px; overflow: auto; background: var(--white); border: 1px solid var(--line-strong); -webkit-overflow-scrolling: touch; }
-.dm-tablo { width: 100%; min-width: 780px; border-collapse: separate; border-spacing: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
-.dm-tablo caption { caption-side: top; padding: 11px 12px; text-align: left; font-family: var(--sans); font-size: 14px; line-height: 1.45; color: var(--ink-soft); border-bottom: 1px solid var(--line-strong); }
-.dm-tablo thead th { position: sticky; top: 0; z-index: 2; padding: 10px; text-align: right; vertical-align: bottom; font-family: var(--sans); font-size: 12px; font-weight: 600; line-height: 1.35; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); background: var(--paper); border-bottom: 1px solid var(--line-strong); }
-.dm-tablo thead th:first-child { left: 0; z-index: 3; text-align: left; }
+/* ---- TABLO ---- */
+.tablo-sar { margin: 0 0 14px; border: 1px solid var(--line-strong); background: var(--paper); overflow: auto; max-height: 76vh; min-height: 420px; -webkit-overflow-scrolling: touch; }
+.dm-tablo { width: 100%; min-width: 780px; border-collapse: separate; border-spacing: 0; font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.dm-tablo caption { caption-side: top; text-align: left; padding: 11px 12px; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); border-bottom: 1px solid var(--line-strong); }
+.dm-tablo thead th { position: sticky; top: 0; z-index: 2; background: var(--paper-warm); font-weight: 500; font-size: 9.5px; line-height: 1.45; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); text-align: right; vertical-align: bottom; padding: 10px 10px; border-bottom: 1px solid var(--line-strong); }
+.dm-tablo thead th:first-child { text-align: left; left: 0; z-index: 3; }
 .dm-tablo thead th.sol { text-align: left; }
-.dm-tablo tbody th { position: sticky; left: 0; z-index: 1; padding: 8px 10px; text-align: left; font-weight: 400; white-space: nowrap; color: var(--ink); background: var(--white); border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); }
-.dm-tablo td { padding: 8px 10px; text-align: right; white-space: nowrap; color: var(--ink-soft); border-bottom: 1px solid var(--line); }
+.dm-tablo tbody th { position: sticky; left: 0; z-index: 1; background: var(--paper); font-weight: 400; text-align: left; white-space: nowrap; padding: 8px 10px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); color: var(--ink); }
+.dm-tablo td { text-align: right; white-space: nowrap; padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--ink-soft); }
 .dm-tablo td.yon { text-align: left; }
-/* İki maliyet sütunu vurgulu: kalın değer + hafif zemin (değerler test tarafından sabitlenmiştir) */
+/* R9: iki maliyet sütunu vurgulu (kalın değer + hafif zemin; kontrast ≥ 4,5:1) */
 .dm-tablo thead th:nth-child(7), .dm-tablo thead th:nth-child(8) { background: #E9DEBF; color: var(--ink); }
 .dm-tablo td:nth-child(7), .dm-tablo td:nth-child(8) { background: #F3EBD3; color: var(--ink); font-weight: 600; }
 .dm-tablo tr:last-child td, .dm-tablo tr:last-child th { border-bottom: 0; }
-.dm-tablo tr.simdi td, .dm-tablo tr.simdi th { font-weight: 600; color: var(--ink); background: #FBEFC9; }
+.dm-tablo tr.simdi td, .dm-tablo tr.simdi th { background: var(--now); color: var(--ink); font-weight: 500; }
 .dm-tablo .bos, .dm-tablo .bekle { color: var(--ink-muted); }
-.dm-tablo td.bekle { padding: 14px 12px; text-align: left; font-family: var(--sans); }
-.dm-tablo td.yon-acik { color: #7A5A00; }
+.dm-tablo td.bekle { text-align: left; padding: 14px 12px; }
+.dm-tablo td.yon-acik { color: var(--accent-ink); }
 .dm-tablo td.yon-fazla { color: var(--green); }
 .dm-tablo td.yon-denge { color: var(--ink-muted); }
 .dm-tablo tr.simdi td.yon { color: var(--ink); }
-/* Geniş ekranda tablo sütuna sığar: kap kaymaz, başlık satırı sayfa kayarken ekranın üstünde durur */
 @media (min-width: 1000px) {
-  .tablo-sar { max-height: none; overflow: visible; }
-  .dm-tablo { font-size: 13.5px; }
+  .tablo-sar { overflow: visible; max-height: none; margin-left: -60px; margin-right: -60px; }
+  .dm-tablo { font-size: 13px; }
 }
 
-/* ---- Küçük tablolar (betik taştıklarında bölge yapar) ---- */
-.kucuk-sar { margin: 0 0 20px; overflow-x: auto; border: 1px solid var(--line-strong); }
-.kucuk { width: 100%; font-size: 15px; }
-.kucuk caption { caption-side: top; padding: 10px 12px; text-align: left; font-size: 14px; color: var(--ink-soft); border-bottom: 1px solid var(--line-strong); }
-.kucuk th, .kucuk td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
-.kucuk thead th { font-size: 12.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); background: var(--paper); }
+/* ---- KÜÇÜK TABLOLAR ---- */
+.kucuk-sar { overflow-x: auto; margin: 0 0 20px; border: 1px solid var(--line-strong); }
+.kucuk { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.kucuk caption { caption-side: top; text-align: left; padding: 10px 12px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); border-bottom: 1px solid var(--line-strong); }
+.kucuk th, .kucuk td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.kucuk thead th { font-family: var(--mono); font-weight: 500; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); background: var(--paper-warm); }
 .kucuk tbody th { font-weight: 600; white-space: nowrap; }
 .kucuk tr:last-child th, .kucuk tr:last-child td { border-bottom: 0; }
 .kucuk .sayi { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-/* ---- Formül kutusu (teknik ifade: monospace) ---- */
-.formul { margin: 14px 0 18px; padding: 16px 20px; overflow-x: auto; font-family: var(--mono); font-size: 14.5px; line-height: 1.9; color: var(--ink); background: var(--paper); border-left: 3px solid var(--cta); }
+/* ---- FORMÜL ---- */
+.formul { margin: 14px 0 18px; padding: 16px 20px; border-left: 2px solid var(--accent); background: var(--paper-warm); font-family: var(--mono); font-size: 13.5px; line-height: 1.9; color: var(--ink); overflow-x: auto; }
 .formul p { margin: 0; max-width: none; color: var(--ink); white-space: nowrap; }
 .formul .nw { white-space: nowrap; }
-.formul .kosul { color: var(--ink-muted); }
-/* Dar ekranda formül satırları sarar, ifade parçaları (.nw) bölünmez; iOS odakta yakınlaştırmasın (16 px girdi) */
+/* D-A1: dar ekranda formül satırları kaymaz, sarar; ifade parçaları (.nw) bölünmez */
 @media (max-width: 640px) { .formul p { white-space: normal; } }
+/* D-M1: iOS odakta yakınlaştırmasın (16 px altı girdi metni) */
 @media (max-width: 640px) { input[type="date"], input[type="text"], select { font-size: 16px; } }
+.formul .kosul { color: var(--ink-muted); }
 
-/* ---- Hesaplayıcı ---- */
-.hesap { margin: 0 0 14px; padding: 20px 22px 8px; background: var(--paper); border: 1px solid var(--line-strong); border-radius: 4px; }
-.hesap fieldset { min-width: 0; margin: 0 0 16px; border: 0; }
-.hesap legend { margin-bottom: 6px; padding: 0; font-size: 12.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); }
-.secenek { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 16px; line-height: 1.45; cursor: pointer; }
-.secenek input { flex: none; width: 18px; height: 18px; margin-top: 2px; accent-color: var(--ink); }
+/* ---- HESAPLAYICI ---- */
+.hesap { border: 1px solid var(--line-strong); background: var(--paper-warm); padding: 20px 20px 6px; margin: 0 0 14px; }
+.hesap fieldset { border: 0; min-width: 0; margin: 0 0 16px; }
+.hesap legend { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; padding: 0; }
+.secenek { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 14.5px; cursor: pointer; }
+.secenek input { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--ink); flex: none; }
 .secenek input:disabled + span { color: var(--ink-muted); }
-.hesap-izgara { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px 16px; margin-bottom: 16px; }
+.hesap-izgara { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 16px; margin-bottom: 16px; }
 .hesap-izgara input, .hesap-izgara select { width: 100%; }
-.hesap form { margin-bottom: 14px; padding-top: 16px; border-top: 1px solid var(--line-strong); }
+.hesap form { padding-top: 16px; border-top: 1px solid var(--line-strong); margin-bottom: 14px; }
 .hesap form[hidden] { display: none; }
-.sayfa-govde .kural-notu { margin: 0 0 14px; max-width: none; font-size: 14.5px; line-height: 1.55; color: var(--ink-muted); }
-.sayfa-govde .hesap p.note { margin-bottom: 14px; }
+.kural-notu { font-size: 13px; color: var(--ink-muted); margin: 0 0 14px; max-width: none; }
+.hesap a, .arac a:not(.btn-ikincil) { color: var(--ink-soft); } /* koyu zeminde --accent-ink 4,4:1 kalıyor */
 .sonuc { margin: 0 0 14px; }
 .sonuc:empty { display: none; }
-.sonuc-kutu { margin-bottom: 12px; padding: 16px 18px; background: var(--white); border: 1px solid var(--line-strong); border-top: 2px solid var(--ink); }
-.sayfa-govde .sonuc-kutu h3 { margin: 0 0 10px; font-size: 17px; }
-.sonuc-kutu dl { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); font-size: 15px; }
-.sonuc-kutu dt { padding: 7px 10px 7px 0; color: var(--ink-soft); border-top: 1px solid var(--line); }
-.sonuc-kutu dd { padding: 7px 0; text-align: right; font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.sonuc-kutu { background: var(--paper); border: 1px solid var(--line-strong); padding: 16px 18px; margin-bottom: 12px; }
+.sonuc-kutu h3 { margin: 0 0 10px; font-size: 15px; }
+.sonuc-kutu dl { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 0; font-size: 14px; }
+.sonuc-kutu dt { color: var(--ink-soft); padding: 7px 10px 7px 0; border-top: 1px solid var(--line); }
+.sonuc-kutu dd { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; padding: 7px 0; border-top: 1px solid var(--line); color: var(--ink); overflow-wrap: anywhere; }
 .sonuc-kutu dt.vurgu, .sonuc-kutu dd.vurgu { font-weight: 600; color: var(--ink); border-top-color: var(--ink-muted); }
-.sayfa-govde .sonuc-kutu p { margin: 10px 0 0; font-size: 14.5px; }
-@media (max-width: 480px) { .sonuc-kutu dl { grid-template-columns: 1fr; } .sonuc-kutu dd { padding-top: 0; text-align: left; border-top: 0; } }
+.sonuc-kutu p { font-size: 13.5px; margin: 10px 0 0; }
+@media (max-width: 480px) { .sonuc-kutu dl { grid-template-columns: 1fr; } .sonuc-kutu dd { text-align: left; border-top: 0; padding-top: 0; } }
 
-/* ---- Telefonda (≤ 640 px) tablo dört sütun: Dönem, Sistem yönü, iki maliyet; dört fiyat satıra dokununca açılan
-   ayrıntıda. YALNIZ betik çalışınca (html.dm-js): betik yokken tüm sütunlar kayan kapta görünür. Sunucu HTML'i her zaman
-   8 sütunun tamamını taşır. Kırılma noktası betiğin matchMedia('(max-width: 640px)') değeriyle aynıdır. ---- */
+.about { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-muted); }
+.about p { color: var(--ink-muted); margin-bottom: 8px; max-width: none; }
+footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-muted); }
+/* R10: telefonda (≤ 640 px) tablo dört sütun — Dönem, Sistem yönü, iki maliyet; dört fiyat sütunu satıra
+   dokununca açılan ayrıntıda. YALNIZ JS çalışınca (html.dm-js): JS yokken tüm sütunlar kayan kapta görünür.
+   Sunucu HTML'i her zaman 8 sütunun tamamını taşır (SEO / tarayıcısız okuyucu). */
 .dm-tablo .kisa, .mobil-lejant, .dm-tablo .satir-ok { display: none; }
-.dm-tablo tr.detay td { padding: 8px 10px 10px; text-align: left; white-space: normal; background: var(--paper); }
+.dm-tablo tr.detay td { text-align: left; white-space: normal; background: var(--paper-warm); padding: 8px 10px 10px; }
 .detay-dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; margin: 0; }
 .detay-dl div { display: flex; flex-direction: column; }
-.detay-dl dt { font-family: var(--sans); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.detay-dl dt { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
 .detay-dl dd { margin: 0; color: var(--ink); }
-.satir-ac { display: inline-flex; align-items: center; gap: 4px; width: 100%; min-height: 44px; margin: 0; padding: 0 2px; font: inherit; text-align: left; color: inherit; background: none; border: 0; cursor: pointer; }
+.satir-ac { font: inherit; color: inherit; background: none; border: 0; padding: 0 2px; margin: 0; min-height: 44px; width: 100%; display: inline-flex; align-items: center; gap: 4px; text-align: left; cursor: pointer; }
 .satir-ac:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 @media (max-width: 640px) {
-  .dm-js .mobil-lejant { display: block; margin: 0 0 6px; font-size: 13.5px; color: var(--ink-muted); }
-  .dm-js .dm-tablo { min-width: 0; font-size: 12.5px; }
+  .dm-js .mobil-lejant { display: block; font-family: var(--mono); font-size: 11px; color: var(--ink-muted); margin: 0 0 6px; }
+  .dm-js .dm-tablo { min-width: 0; font-size: 12px; }
   .dm-js .dm-tablo tr > :nth-child(2), .dm-js .dm-tablo tr > :nth-child(3), .dm-js .dm-tablo tr > :nth-child(5), .dm-js .dm-tablo tr > :nth-child(6) { display: none; }
   .dm-js .dm-tablo th, .dm-js .dm-tablo td { padding-left: 6px; padding-right: 6px; }
   .dm-js .dm-tablo tbody th { padding-top: 0; padding-bottom: 0; }
   .dm-js .dm-tablo td.yon { white-space: normal; }
-  .dm-js .dm-tablo .uzun { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  .dm-js .dm-tablo .uzun { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   .dm-js .dm-tablo .kisa { display: inline; }
   .dm-js .dm-tablo .satir-ok { display: inline; color: var(--ink-muted); }
   .dm-js .satir-ac[aria-expanded="true"] .satir-ok { transform: rotate(90deg); }
 }
-@media print { .arac, .hesap { display: none; } .tablo-sar { max-height: none; margin: 0 0 14px; overflow: visible; } .dm-tablo thead th, .dm-tablo tbody th { position: static; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+@media print { .arac, .hesap { display: none; } .tablo-sar { overflow: visible; max-height: none; margin: 0 0 14px; } .dm-tablo thead th, .dm-tablo tbody th { position: static; } }
 </style>
 <script>document.documentElement.classList.add('dm-js');</script>
 </head>
 <body>
-<a class="skip" href="#icerik">İçeriğe atla</a>
-
-<!-- ÜST BANT -->
-<header class="site-header on-dark" id="nav">
-  <div class="wrap header-in">
-    <a href="/" class="nav-logo">
-      <div class="nav-logo-mark">
-        <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
-          <circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1" opacity="0.25"/>
-          <path d="M11 10 L18 26 L25 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <circle cx="18" cy="18" r="1.4" fill="currentColor"/>
-        </svg>
-      </div>
-      <span class="nav-logo-text">
-        <span class="nav-logo-name">Voltage</span>
-        <span class="nav-logo-sub">ENERJİ</span>
-      </span>
-    </a>
-    <nav class="nav-links" aria-label="Ana menü">
-      <a href="/#hakkimizda">Hakkımızda</a>
-      <a href="/#hizmetler">Hizmetler</a>
-      <a href="/#yaklasim">Yaklaşım</a>
-      <a href="/rehber">Rehber</a>
-      <a href="/canli-ptf">Canlı PTF</a>
-      <a href="/#iletisim">İletişim</a>
-    </nav>
-    <div class="nav-right" aria-hidden="true"></div>
-    <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
-
-<div class="mobile-menu" id="mobileMenu" hidden>
-  <a href="/#hakkimizda">Hakkımızda</a>
-  <a href="/#hizmetler">Hizmetler</a>
-  <a href="/#yaklasim">Yaklaşım</a>
-  <a href="/rehber">Rehber</a>
-  <a href="/canli-ptf">Canlı PTF</a>
-  <a href="/#iletisim">İletişim</a>
-</div>
-
-<div class="sayfa-iz on-dark">
-<div class="wrap">
+<div class="page">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › Dengesizlik Maliyeti</nav>
-</div>
-</div>
-<main>
-<div class="sayfa-bas on-dark" id="icerik" tabindex="-1">
-<div class="wrap">
+  <main>
   <h1>Dengesizlik Maliyeti: Pozitif ve Negatif Dengesizlik Fiyatı</h1>
   <p class="lede"><strong>Dengesizlik maliyeti</strong>, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır.</p>
-</div>
-</div>
-<div class="sayfa-govde sayfa-arac">
-<div class="wrap">
 
   <div class="arac arac-tarih" id="dArac">
     <form method="get" action="/dengesizlik-maliyeti" id="dTarihForm">
@@ -674,64 +471,10 @@ a.btn-ikincil:hover, button.btn-ikincil:hover { border-color: var(--ink); backgr
   <div class="about">
     <p><strong>Bu sayfa hakkında:</strong> Veri kaynağı: EPİAŞ Şeffaflık Platformu ("PTF, SMF ve SDF Listeleme" raporu). Sayfa metninin yayın/güncelleme tarihi: 24.11.2026. Bu sayfada temsili veya sentetik veri gösterilmez; veri alınamadığında alanlar boş kalır. Veride ya da metinde hata olduğunu düşünüyorsanız <a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a> adresine bildirin; düzeltmeler bu sayfada tarihiyle belirtilir. Yayıncı: Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (Voltage Enerji), ETS/3424-8/2074 numaralı EPDK tedarik lisansıyla 19 Eylül 2011'den bu yana serbest piyasada faaliyet gösterir; GÖP ve GİP'te aktif katılımcıdır.</p>
   </div>
-</div>
-</div>
-</main>
+  </main>
 
-<!-- KAPANIŞ -->
-<footer>
-<div class="footer on-dark">
-  <div class="wrap">
-    <div class="cl-head">
-      <div class="cl-brand">
-        <div class="cl-mark-svg">
-          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-            <circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1" opacity="0.25"></circle>
-            <path d="M14 13 L24 35 L34 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-            <circle cx="24" cy="24" r="1.8" fill="currentColor"></circle>
-          </svg>
-        </div>
-        <div class="cl-name"><span class="cl-word">Voltage</span> <span class="cl-subwrap"><span class="cl-sub">ENERJİ</span><span class="cl-reg" aria-hidden="true">®</span></span></div>
-      </div>
-      <nav class="cl-nav" aria-label="Footer">
-        <a href="/#hakkimizda">Hakkımızda</a>
-        <a href="/#hizmetler">Hizmetler</a>
-        <a href="/#yaklasim">Yaklaşım</a>
-        <a href="/rehber">Rehber</a>
-        <a href="/#iletisim">İletişim</a>
-      </nav>
-    </div>
-    <div class="cl-grid">
-      <div>
-        <div class="label cl-k">Şirket</div>
-        <div class="cl-v">Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.<br><span>EPDK Tedarik Lisansı</span> <span class="mono">ETS/3424-8/2074</span></div>
-      </div>
-      <div>
-        <div class="label cl-k">Merkez</div>
-        <div class="cl-v">Acıbadem Mah. Elysium Elit Koşuyolu B-18<br><span>34718 Kadıköy · İstanbul · Türkiye</span></div>
-      </div>
-      <div>
-        <div class="label cl-k">İletişim</div>
-        <div class="cl-v"><a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a><br><span>voltage.com.tr</span></div>
-      </div>
-      <div>
-        <div class="label cl-k">Kayıt</div>
-        <div class="cl-v"><span>Ticaret Sicil</span> <span class="mono">786882-0 · İstanbul</span><br><span>Est. 2011 · EPİAŞ Üyesi</span></div>
-      </div>
-    </div>
-    <div class="cl-bottom">
-      <span class="cl-copy">© 2026 VOLTAN ELEKTRİK TOPTAN SATIŞ İTHALAT VE İHRACAT A.Ş.</span>
-      <div class="cl-legal">
-        <a href="/kurumsal">Kurumsal</a>
-        <a href="/kvkk">KVKK</a>
-        <a href="/cerez-politikasi">Çerez Politikası</a>
-        <a href="/kullanim-kosullari">Kullanım Koşulları</a>
-      </div>
-      <span class="cl-markline">VOLTAGE ENERJİ<span class="cl-reg" aria-hidden="true">®</span></span>
-    </div>
-  </div>
+  <footer>© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · <a href="/">Ana sayfa</a> · <a href="/kurumsal">Kurumsal</a> · <a href="/rehber">Rehber</a> · <a href="/kvkk">KVKK</a> · <a href="/cerez-politikasi">Çerez Politikası</a> · <a href="/kullanim-kosullari">Kullanım Koşulları</a></footer>
 </div>
-</footer>
 
 <script type="application/json" id="dKurallar">{"dogrulama":"2026-11-24","kurallar":[{"bas":"2026-01-01","bit":"2026-10-31","dogrulama":"birincil","dogrulamaTarihi":"2026-11-25","V":150,"B":100,"tavanCarpani":1.05,"k":{"acik":0.06,"fazla":0.03,"denge":0.03},"l":{"acik":0.03,"fazla":0.06,"denge":0.03},"kaynak":{"formul":"DUY m.110(1) (RG 29/12/2025-33122 ile değişik)","katsayi":"11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122)","V":"DUY m.110(2): başlangıç değeri","B":"DUY m.110(2): başlangıç değeri"}},{"bas":"2026-11-01","bit":"2026-12-31","dogrulama":"birincil","dogrulamaTarihi":"2026-11-24","V":100,"B":100,"tavanCarpani":1.05,"k":{"acik":0.06,"fazla":0.03,"denge":0.03},"l":{"acik":0.03,"fazla":0.06,"denge":0.03},"kaynak":{"formul":"DUY m.110(1) (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik)","katsayi":"11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122)","V":"24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405)","B":"DUY m.110(2): başlangıç değeri"}}],"tavanlar":[{"bas":"2026-01-01","bit":"2026-04-03","dogrulama":"birincil","dogrulamaTarihi":"2026-11-25","azami":3400,"asgari":0,"kaynak":"27/3/2025 tarihli ve 13423 sayılı Kurul Kararı (RG 5/4/2025-32861)"},{"bas":"2026-04-04","bit":"2026-10-31","dogrulama":"birincil","dogrulamaTarihi":"2026-11-25","azami":4500,"asgari":0,"kaynak":"2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)"},{"bas":"2026-11-01","bit":null,"dogrulama":"birincil","dogrulamaTarihi":"2026-11-24","azami":4500,"asgari":0,"kaynak":"2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)"}],"dogrulanmis":[{"bas":"2026-01-01","bit":"2026-12-31"}],"istisnalar":[],"notlar":{}}</script>
 <script>
@@ -1388,23 +1131,6 @@ a.btn-ikincil:hover, button.btn-ikincil:hover { border-color: var(--ink); backgr
     setInterval(senkron, YENILEME_MS);
     setInterval(simdiIsaretle, 60 * 1000);
   }
-})();
-</script>
-
-<script>
-(function(){
-  var btn = document.getElementById('mobileMenuBtn');
-  var menu = document.getElementById('mobileMenu');
-  if (!btn || !menu) return;
-  function setOpen(open){
-    menu.hidden = !open;
-    btn.classList.toggle('open', open);
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    document.body.classList.toggle('menu-open', open);
-  }
-  btn.addEventListener('click', function(){ setOpen(menu.hidden); });
-  menu.addEventListener('click', function(e){ if (e.target.closest('a')) setOpen(false); });
-  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !menu.hidden) setOpen(false); });
 })();
 </script>
 </body>

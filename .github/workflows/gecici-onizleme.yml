@@ -1,0 +1,31 @@
+name: gecici-onizleme
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-onizleme.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      B: https://6da52819.website-dh5.pages.dev
+    steps:
+      - name: HTTP, noindex, SSR, aktarıcı (yalnız durum kodları ve sayılar)
+        run: |
+          set -u
+          for p in / /rehber/tekstil-elektrik /canli-ptf /kurumsal /dengesizlik-maliyeti /img/kapak-1600.webp /img/sektor-tekstil-800.webp; do
+            k=$(curl -sS -o b.html -D h.txt -m 30 -w '%{http_code}' "$B$p")
+            r=$(grep -ci '^x-robots-tag: noindex' h.txt)
+            m=$(grep -c 'name="robots" content="noindex' b.html || true)
+            echo "$p http=$k xrobots_noindex=$r meta_noindex=$m bayt=$(wc -c < b.html)"
+          done
+          curl -sS -m 30 "$B/" -o a.html; echo "anasayfa: PTF_PROXY_onizleme=$(grep -c "PTF_PROXY = '/onizleme-ptf'" a.html) nav-cta=$(grep -c 'nav-cta' a.html)"
+          for p in /rehber/tekstil-elektrik /canli-ptf /kurumsal /dengesizlik-maliyeti; do
+            curl -sS -m 30 "$B$p" -o s.html
+            echo "$p kabuk_ust=$(grep -c 'class="nav-links' s.html) footer=$(grep -c '<footer' s.html) main=$(grep -c '<main' s.html) teklif=$(grep -c 'nav-cta' s.html) bos_sag=$(grep -c 'nav-right" aria-hidden' s.html) ssr=$(grep -o 'data-ssr="[^"]*"' s.html | head -1)"
+          done
+          curl -sS -m 30 "$B/canli-ptf" -o c.html; echo "canli-ptf: sayisal_saat_hucresi=$(grep -oE '[0-9]{1,2}\.[0-9]{3},[0-9]{2}' c.html | wc -l)"
+          curl -sS -m 30 "$B/dengesizlik-maliyeti" -o d.html; echo "dengesizlik: tablo_satiri=$(grep -c '<tr' d.html) tire=$(grep -c '>—<' d.html)"
+          curl -sS -m 30 "$B/onizleme-ptf/ptf/today" -o t.json -w 'aktarici http=%{http_code}\n'
+          python3 -c "import json;d=json.load(open('t.json'));it=d.get('items') or d.get('data') or [];print('aktarici saat sayisi',len(it))" || echo "aktarici json okunamadi"
