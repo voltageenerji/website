@@ -218,6 +218,13 @@ for (const [w, h] of [[375, 667], [390, 844], [320, 568], [430, 932]]) {
   const ds = await p.evaluate(() => { const e = document.getElementById('mcpRail'); const r = e.getBoundingClientRect(); const k = document.getElementById('ptfKart').getBoundingClientRect(); const hb = document.getElementById('kapak').getBoundingClientRect(); return [e.hidden, Math.round(r.height), Math.round(hb.bottom - r.bottom), Math.round(r.top - k.bottom), e.querySelectorAll('.cell').length]; });
   ok(`D3 ${w}px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)`, ds[0] === false && ds[1] === 44 && ds[2] === 0 && ds[3] >= 24 && ds[4] === 48, JSON.stringify(ds));
   const dd = await p.evaluate(() => { const b = document.getElementById('mcpDur').getBoundingClientRect(); return [Math.round(b.width), Math.round(b.height), Math.round(innerWidth - b.right)]; });
+  { // 27.11: iz telefonda da gerçekten yer değiştirir; durdurulunca yerinde kalır
+    const izX = () => p.evaluate(() => document.getElementById('mcpTrack').getBoundingClientRect().left);
+    const x0 = await izX(); await p.waitForTimeout(1500); const x1 = await izX();
+    await p.click('#mcpDur'); const y0 = await izX(); await p.waitForTimeout(800); const y1 = await izX(); await p.click('#mcpDur');
+    await p.mouse.move(1, 1); const z0 = await izX(); await p.waitForTimeout(800); const z1 = await izX();
+    ok(`D3 ${w}px şerit gerçekten kayıyor (1,5 sn’de ≥ 25 px), durdur düğmesiyle yerinde kalıyor, devam edince yine kayıyor`, x0 - x1 >= 25 && Math.abs(y0 - y1) < 1 && z0 - z1 >= 12, JSON.stringify([(x0 - x1).toFixed(1), (y0 - y1).toFixed(2), (z0 - z1).toFixed(1)]));
+  }
   await p.click('#mcpDur'); const dt = await p.evaluate(() => getComputedStyle(document.getElementById('mcpTrack')).animationPlayState + ',' + document.getElementById('mcpDur').getAttribute('aria-pressed')); await p.click('#mcpDur');
   ok(`D3 ${w}px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur`, dd[0] === 44 && dd[1] === 44 && dd[2] === 0 && dt === 'paused,true', JSON.stringify([dd, dt]));
   ok(`D4 ${w}px ilk ekranda “Teklif Al” (kapak düğmesi) görünür`, d.birincil.alt <= d.vh, d.birincil.alt + '/' + d.vh);
@@ -308,7 +315,15 @@ const kartYuk = {}, bolumYuk = {};
     const s2 = await baglam({ w: 1440, h: 900 }); const q = s2.p; await ac(q);
     const oyn = () => q.evaluate(() => [getComputedStyle(document.getElementById('mcpTrack')).animationPlayState, document.getElementById('mcpDur').getAttribute('aria-pressed'), localStorage.getItem('voltage-serit-durdu')].join());
     const kosuyor = await q.evaluate(() => document.getAnimations().filter(a => a.animationName === 'rail' && a.playState === 'running').length);
-    await q.hover('#mcpRail a'); const durdu = (await oyn()).split(',')[0]; await q.mouse.move(5, 5);
+    // 27.11 (sahip: "kaymıyor, sabit duruyor"): yalnız animasyonun varlığı değil, izin gerçekten yer değiştirdiği ölçülür
+    const izX = () => q.evaluate(() => document.getElementById('mcpTrack').getBoundingClientRect().left);
+    const kx0 = await izX(); await q.waitForTimeout(2000); const kx1 = await izX();
+    ok('E1 şerit gerçekten kayıyor (1440 px): 2 sn’de en az 40 px sola (140 sn’de yarım iz)', kx0 - kx1 >= 40, (kx0 - kx1).toFixed(1) + ' px');
+    await q.hover('#mcpRail a'); const durdu = (await oyn()).split(',')[0];
+    const hx0 = await izX(); await q.waitForTimeout(800); const hx1 = await izX(); await q.mouse.move(5, 5);
+    ok('E1 şerit üstüne gelince yerinde durur (0,8 sn’de < 1 px)', Math.abs(hx0 - hx1) < 1, (hx0 - hx1).toFixed(2));
+    await q.focus('#mcpRail a'); const fx0 = await izX(); await q.waitForTimeout(800); const fx1 = await izX(); await q.evaluate(() => document.activeElement.blur());
+    ok('E1 şerit klavye odağında yerinde durur', Math.abs(fx0 - fx1) < 1, (fx0 - fx1).toFixed(2));
     ok('E1 şerit hareketli (1 animasyon) ve üstüne gelince durur', kosuyor === 1 && durdu === 'paused', kosuyor + ' ' + durdu);
     const d0 = await oyn(); await q.click('#mcpDur'); await q.mouse.move(5, 5); const d1 = await oyn(); await q.focus('#mcpDur'); await q.keyboard.press('Enter'); const d2 = await oyn();
     ok('E1 şerit düğmesi: basınca durur (aria-pressed=true, tercih saklanır), klavyeyle yeniden basınca devam eder', d0 === 'running,false,' && d1 === 'paused,true,1' && d2 === 'running,false,0', [d0, d1, d2].join(' → '));
@@ -503,6 +518,105 @@ for (const w of [1280, 375]) {
   const geri = await k.p.evaluate(() => { const f = document.getElementById('leadForm'); return [f.classList.contains('yesil'), getComputedStyle(document.getElementById('leadSubmit')).backgroundColor, getComputedStyle(f.querySelector('.fl-d')).opacity]; });
   ok('F5 kutucuk kaldırılınca form eski görünüme döner', geri[0] === false && geri[1] === 'rgb(245, 180, 28)' && geri[2] === '0', JSON.stringify(geri));
   await k.ctx.close();
+}
+// F8 Bahar anı (27.11, sahip isteği): yeşil kutucuk işaretlenince ≈4,5 sn çiçek + kelebek; süs, tıklamayı engellemez, temizlenir
+const BH = '.bh-cicek, .bh-kat, .bh-kelebek';
+const bahar = (p) => p.evaluate((BH) => ({ n: document.querySelectorAll(BH).length, cicek: document.querySelectorAll('.bh-cicek').length, kelebek: document.querySelectorAll('.bh-kelebek').length, kat: document.querySelectorAll('.bh-kat').length }), BH);
+/* Etki boyunca her karede kelebeğin, çiçeklerin ve formun ölçüsünü kaydeder: içerik kutusuna girme, taşma, yerleşim kayması */
+const kaydet = (p, sure) => p.evaluate(({ sure, BH }) => new Promise((coz) => {
+  const f = document.getElementById('leadForm'), cs = getComputedStyle(f), fr0 = f.getBoundingClientRect(), boy0 = document.documentElement.scrollHeight;
+  const icSag = () => f.getBoundingClientRect().right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight);
+  const gonder = document.getElementById('leadSubmit');
+  const k = { kare: 0, kelebekKare: 0, ihlal: [], tasma: 0, kayma: 0, hareket: new Set(), pe: new Set(), aria: new Set(), konum: new Set(), maxN: 0 };
+  const t0 = performance.now();
+  (function tur(){
+    k.kare++;
+    const ogeler = [...document.querySelectorAll(BH)]; k.maxN = Math.max(k.maxN, ogeler.length);
+    ogeler.forEach(e => { const c = getComputedStyle(e); k.pe.add(c.pointerEvents); k.konum.add(c.position); if (!e.classList.contains('bh-kelebek')) k.aria.add(e.getAttribute('aria-hidden')); });
+    const kb = document.querySelector('.bh-kelebek');
+    if (kb && +getComputedStyle(kb).opacity > 0) {
+      const r = kb.getBoundingClientRect(), kat = document.querySelector('.bh-kat').getBoundingClientRect();
+      const gor = r.right > kat.left && r.left < kat.right && r.bottom > kat.top && r.top < kat.bottom && r.left < innerWidth;
+      if (gor) { k.kelebekKare++; k.hareket.add(Math.round(r.left) + ',' + Math.round(r.top));
+        const fr = f.getBoundingClientRect();
+        if (r.bottom > fr.top && r.top < fr.bottom && r.left < icSag() - 0.5) k.ihlal.push('kelebek ' + Math.round(r.left) + '<' + Math.round(icSag())); }
+    }
+    document.querySelectorAll('.bh-cicek').forEach((c, i) => { const r = c.getBoundingClientRect();
+      if (i === 0 && r.left < icSag() - 0.5) k.ihlal.push('dal çiçeği ' + Math.round(r.left));
+      if (i === 1 && r.top < gonder.getBoundingClientRect().bottom - 0.5) k.ihlal.push('çim çiçeği ' + Math.round(r.top)); });
+    k.tasma = Math.max(k.tasma, document.documentElement.scrollWidth - innerWidth);
+    const fr = f.getBoundingClientRect(); k.kayma = Math.max(k.kayma, Math.abs(fr.height - fr0.height), Math.abs(fr.width - fr0.width), Math.abs(document.documentElement.scrollHeight - boy0), f.scrollLeft);
+    if (performance.now() - t0 < sure) requestAnimationFrame(tur);
+    else coz({ ...k, hareket: k.hareket.size, pe: [...k.pe], aria: [...k.aria], konum: [...k.konum], ihlal: k.ihlal.slice(0, 5) });
+  })();
+}), { sure, BH });
+for (const [w, h] of [[1440, 900], [390, 844], [320, 568]]) {
+  const { ctx, p, durum } = await baglam({ w, h });
+  await ac(p);
+  ok(`F8 ${w}px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)`, (await bahar(p)).n === 0);
+  await p.locator('#lead-yesil').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, 120));
+  await p.check('#lead-yesil');
+  const kayit = await kaydet(p, 4200);
+  const ilk = kayit.maxN;
+  ok(`F8 ${w}px işaretlenince ${w >= 360 ? 'iki çiçek' : 'dal çiçeği (alt boşluk dar)'} ve bir kelebek; hepsi aria-hidden, pointer-events: none, mutlak konumlu`, ilk === (w >= 360 ? 4 : 3) && kayit.pe.join() === 'none' && kayit.aria.join() === 'true' && kayit.konum.join() === 'absolute', JSON.stringify(kayit));
+  ok(`F8 ${w}px kelebek uçuyor (en az 40 ayrı konum) ve formun içerik kutusuna hiç girmiyor; çiçekler iç boşlukta`, kayit.hareket >= 40 && kayit.ihlal.length === 0, JSON.stringify([kayit.hareket, kayit.ihlal]));
+  ok(`F8 ${w}px etki boyunca yatay taşma yok, form ve sayfa boyu değişmiyor, form içeriği yana kaymıyor`, kayit.tasma === 0 && kayit.kayma < 0.5, JSON.stringify([kayit.tasma, kayit.kayma]));
+  await p.waitForTimeout(700);
+  const son = await bahar(p);
+  ok(`F8 ${w}px ≈4,5 sn sonra öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır`, son.n === 0 && await p.evaluate(() => document.getElementById('leadForm').classList.contains('yesil') && +getComputedStyle(document.querySelector('.form-flora-kutu .fl-d')).opacity > 0.7), JSON.stringify(son));
+  await p.uncheck('#lead-yesil'); await p.waitForTimeout(400);
+  ok(`F8 ${w}px kutucuk kaldırılınca bahar anı başlamaz`, (await bahar(p)).n === 0);
+  ok(`F8 ${w}px konsol ve sayfa hatası yok`, durum.konsol.filter(k => !/Failed to load resource|requestfailed/.test(k)).length === 0, durum.konsol.join(' | '));
+  await ctx.close();
+}
+{ // F8 hızlı aç-kapa: gösterimler üst üste binmez; ortada kaldırılınca hızla söner
+  const { ctx, p } = await baglam({ w: 1280, h: 900 });
+  await ac(p);
+  await p.locator('#lead-yesil').scrollIntoViewIfNeeded();
+  const say = () => p.evaluate(() => [document.querySelectorAll('.bh-kelebek').length, document.querySelectorAll('.bh-cicek').length]);
+  let enCok = [0, 0];
+  for (let i = 0; i < 4; i++) { await p.click('#lead-yesil'); const s = await say(); enCok = [Math.max(enCok[0], s[0]), Math.max(enCok[1], s[1])]; }
+  await p.check('#lead-yesil'); await p.waitForTimeout(150); await p.click('#lead-yesil'); await p.click('#lead-yesil');
+  const s2 = await say(); enCok = [Math.max(enCok[0], s2[0]), Math.max(enCok[1], s2[1])];
+  ok('F8 hızlı aç-kapa: aynı anda en çok bir kelebek ve iki çiçek', enCok[0] <= 1 && enCok[1] <= 2, JSON.stringify(enCok));
+  await p.waitForTimeout(5000); await p.uncheck('#lead-yesil'); await p.waitForTimeout(400);
+  await p.check('#lead-yesil'); await p.waitForTimeout(1200);
+  const orta = await bahar(p); await p.uncheck('#lead-yesil'); await p.waitForTimeout(500);
+  ok('F8 gösterim ortasında kutucuk kaldırılınca öğeler 0,5 sn içinde silinir', orta.n === 4 && (await bahar(p)).n === 0, JSON.stringify(orta));
+  await ctx.close();
+}
+{ // F8 etki sürerken form kullanılabilir: alanlara yazılır, KVKK işaretlenir, gönderilir
+  const { ctx, p, durum } = await baglam({ w: 390, h: 844 });
+  await ac(p);
+  await doldur(p); await p.uncheck('#lead-kvkk');
+  await p.locator('#lead-yesil').scrollIntoViewIfNeeded();
+  await p.check('#lead-yesil'); await p.waitForTimeout(900);
+  const ust = await p.evaluate(() => { const al = []; document.querySelectorAll('.bh-cicek, .bh-kelebek').forEach(e => { const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x >= 0 && x < innerWidth && y >= 0 && y < innerHeight) { const h = document.elementFromPoint(x, y); al.push(h ? (h.closest('.bh-cicek, .bh-kelebek, .bh-kat') ? 'SÜS' : 'alt') : 'yok'); } }); return al; });
+  await p.fill('#lead-mesaj', 'Bahar sırasında yazıldı'); await p.check('#lead-kvkk');
+  const n = (await bahar(p)).n;
+  await p.click('#leadSubmit'); await p.waitForSelector('.form-success', { timeout: 5000 });
+  ok('F8 etki sürerken: süs tıklamayı yakalamaz (elementFromPoint), alan doldurulur, KVKK işaretlenir, form gönderilir (yesil:true)', n === 4 && ust.length > 0 && !ust.includes('SÜS') && durum.gonderiler.length === 1 && durum.gonderiler[0].govde.yesil === true && durum.gonderiler[0].govde.mesaj === 'Bahar sırasında yazıldı', JSON.stringify([n, ust, durum.gonderiler.length]));
+  await p.waitForTimeout(4200);
+  ok('F8 gönderimden sonra da süs öğeleri silinir, hata yok', (await bahar(p)).n === 0 && durum.konsol.filter(k => !/Failed to load resource|requestfailed/.test(k)).length === 0, durum.konsol.join(' | '));
+  await ctx.close();
+}
+{ // F8 hareket azaltma: kelebek yok, açılma yok; tek çiçek yerinde belirip söner
+  const { ctx, p, durum } = await baglam({ w: 390, h: 844, azalt: true });
+  await ac(p);
+  await p.locator('#lead-yesil').scrollIntoViewIfNeeded();
+  await p.check('#lead-yesil'); await p.waitForTimeout(1500);
+  const r = await p.evaluate(() => { const c = document.querySelector('.bh-cicek'); return { ...{ n: document.querySelectorAll('.bh-cicek').length, kelebek: document.querySelectorAll('.bh-kelebek, .bh-kat').length }, css: c ? c.querySelectorAll('*').length && [...c.querySelectorAll('*')].reduce((t, e) => t + e.getAnimations().length, 0) : -1, waapi: c ? c.getAnimations().map(a => Object.keys(a.effect.getKeyframes()[0]).filter(k => !['offset', 'easing', 'composite', 'computedOffset'].includes(k)).join()) : [], tac: c ? getComputedStyle(c.querySelector('.bh-tac')).transform : '' }; });
+  ok('F8 hareket azaltma: kelebek yok; tek çiçek, yalnız saydamlıkla belirir (yer değiştiren ya da açılan animasyon yok)', r.n === 1 && r.kelebek === 0 && r.css === 0 && r.waapi.join() === 'opacity' && r.tac === 'none', JSON.stringify(r));
+  await p.waitForTimeout(2300);
+  ok('F8 hareket azaltma: çiçek ≈3,5 sn sonra silinir, hata yok', (await bahar(p)).n === 0 && durum.konsol.filter(k => !/Failed to load resource|requestfailed/.test(k)).length === 0);
+  await ctx.close();
+}
+{ // F8 betik kapalı: süs yok
+  const { ctx, p } = await baglam({ w: 1280, h: 900, js: false });
+  await ac(p);
+  await p.locator('#lead-yesil').scrollIntoViewIfNeeded(); await p.check('#lead-yesil'); await p.waitForTimeout(600);
+  ok('F8 betik kapalıyken kutucuk işaretlenir, bahar anı öğesi oluşmaz', (await bahar(p)).n === 0 && await p.isChecked('#lead-yesil'));
+  await ctx.close();
 }
 { // F6 fatura yükleme denetimi
   const { ctx, p, durum } = await baglam({ w: 1280, h: 900 });

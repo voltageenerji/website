@@ -351,7 +351,9 @@ summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; bo
 .contact-form { min-width: 0; }
 .form-capa { display: block; height: 0; }
 
-.form { position: relative; overflow: hidden; padding: var(--fp); background: var(--white); border: 1px solid var(--line-strong); border-radius: 4px; transition: background-color 0.9s var(--ease), border-color 0.9s var(--ease); }
+/* overflow: clip (27.11): 640 px'lik çim çizimi formu kaydırılabilir yapıyordu; yeşil kutucuğa dokununca form içeriği yana
+   kayıyordu (390 px'te 22 px). clip kaydırma kabı kurmaz; desteklemeyen tarayıcıda hidden kalır. */
+.form { position: relative; overflow: hidden; overflow: clip; padding: var(--fp); background: var(--white); border: 1px solid var(--line-strong); border-radius: 4px; transition: background-color 0.9s var(--ease), border-color 0.9s var(--ease); }
 .form > * { position: relative; z-index: 1; }
 .form-title { font-size: 25px; font-weight: 600; line-height: 1.2; letter-spacing: -0.018em; margin-bottom: 6px; }
 .form-subtitle { font-size: 15px; color: var(--ink-muted); margin-bottom: 24px; }
@@ -433,6 +435,37 @@ p.form-hint { margin: -8px 0 20px; }
   .form.yesil .fl-sal { animation: flSal 7s ease-in-out var(--f, 0s) infinite alternate; }
   .form.yesil .flora-cim { animation: cimSal 5s ease-in-out infinite alternate; }
 }
+
+/* ============ BAHAR ANI (sahip isteği 27.11) — yeşil enerji kutucuğu İŞARETLENİNCE ≈4,5 sn: dalın dibinde bir çiçek açar,
+   çimde bir çiçek daha; sağdan bir kelebek gelip çiçeğe konar, uçup gider. Öğeleri betik ekler ve bitince siler (// 9).
+   Yalnız süs: aria-hidden, tıklamayı engellemez, mutlak konumlu (yerleşim kaymaz), yalnız transform ve opacity değişir.
+   Hareket azaltma tercihinde kelebek yok; dalın dibindeki çiçek açık hâlde belirip söner. ============ */
+.form > .bh-cicek { position: absolute; z-index: 1; pointer-events: none; }
+.bh-cicek svg, .bh-kelebek svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.bh-p { fill: #FCF8EE; stroke: #3F7F4C; stroke-width: 0.7; transform-box: view-box; transform-origin: 0 0; }
+.bh-gb { fill: #E3A72F; stroke: #A9761A; stroke-width: 0.5; transform-box: view-box; transform-origin: 0 0; }
+.bh-tac { transform-box: view-box; transform-origin: 0 0; }
+.bh-sap { fill: none; stroke: #3F7F4C; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+.bh-kat { position: absolute; left: 0; width: 100%; overflow: hidden; pointer-events: none; z-index: 60; }
+.bh-kelebek { position: absolute; left: 0; top: 0; width: 30px; height: 25px; margin: -12.5px 0 0 -15px; }
+.bh-ks, .bh-kg { transform-box: view-box; transform-origin: 0 0; }
+.bh-ku { fill: #E9AC33; } .bh-ka { fill: #D7962A; } .bh-ku, .bh-ka { stroke: #7A520F; stroke-width: 0.45; stroke-linejoin: round; }
+.bh-kc { fill: #1E2536; } .bh-kn { fill: none; stroke: #1E2536; stroke-width: 0.55; stroke-linecap: round; }
+@keyframes bhTac { from { transform: scale(0.25) rotate(-55deg); opacity: 0; } 40% { opacity: 1; } to { transform: none; opacity: 1; } }
+@keyframes bhYap { from { transform: scale(0.35, 0.12); } to { transform: none; } }
+@keyframes bhGb { from { transform: scale(0); } to { transform: none; } }
+@keyframes bhSap { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes bhCirp { from { transform: none; } to { transform: scaleX(0.28); } }
+@media (prefers-reduced-motion: no-preference) {
+  .bh-cicek .bh-tac { animation: bhTac 1.1s cubic-bezier(0.2, 0.7, 0.25, 1) var(--bd, 0.15s) both; }
+  .bh-cicek .bh-p { animation: bhYap 0.9s cubic-bezier(0.2, 0.7, 0.25, 1) calc(var(--bd, 0.15s) + var(--i) * 70ms) both; }
+  .bh-cicek .bh-gb { animation: bhGb 0.5s ease-out calc(var(--bd, 0.15s) + 0.55s) both; }
+  .bh-cicek .bh-sap { animation: bhSap 0.8s cubic-bezier(0.45, 0, 0.25, 1) both; }
+  .bh-cicek .bh-sap + .bh-sap { animation-delay: 0.35s; animation-duration: 0.6s; }
+  .bh-ks, .bh-kg { animation: bhCirp 0.14s ease-in-out infinite alternate; }
+  .bh-kelebek.konar .bh-ks, .bh-kelebek.konar .bh-kg { animation-duration: 0.8s; }
+}
+@media (max-width: 640px) { .bh-kelebek { width: 22px; height: 19px; margin: -9.5px 0 0 -11px; } }
 
 /* KVKK onayı, tuzak alan, gönderim durumları */
 .form-consent { display: flex; align-items: flex-start; gap: 12px; margin-top: 2px; padding: 11px 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); cursor: pointer; }

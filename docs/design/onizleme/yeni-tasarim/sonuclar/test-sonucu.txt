@@ -77,6 +77,7 @@ GEÇTİ  D1 375px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü d�
 GEÇTİ  D2 375px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
 GEÇTİ  D3 375px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
 GEÇTİ  D3 375px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
+GEÇTİ  D3 375px şerit gerçekten kayıyor (1,5 sn’de ≥ 25 px), durdur düğmesiyle yerinde kalıyor, devam edince yine kayıyor
 GEÇTİ  D3 375px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur
 GEÇTİ  D4 375px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
        375×667: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
@@ -89,6 +90,7 @@ GEÇTİ  D1 390px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü d�
 GEÇTİ  D2 390px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
 GEÇTİ  D3 390px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
 GEÇTİ  D3 390px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
+GEÇTİ  D3 390px şerit gerçekten kayıyor (1,5 sn’de ≥ 25 px), durdur düğmesiyle yerinde kalıyor, devam edince yine kayıyor
 GEÇTİ  D3 390px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur
 GEÇTİ  D4 390px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
        390×844: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
@@ -96,6 +98,7 @@ GEÇTİ  D1 320px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü d�
 GEÇTİ  D2 320px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
 GEÇTİ  D3 320px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
 GEÇTİ  D3 320px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
+GEÇTİ  D3 320px şerit gerçekten kayıyor (1,5 sn’de ≥ 25 px), durdur düğmesiyle yerinde kalıyor, devam edince yine kayıyor
 GEÇTİ  D3 320px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur
 GEÇTİ  D4 320px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
        320×568: kapak yüksekliği 811 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 463 px
@@ -103,6 +106,7 @@ GEÇTİ  D1 430px üst bant: logo, “Teklif Al” (sarı, ≥44 px) ve menü d�
 GEÇTİ  D2 430px kapak sırası: H1 → alt metin → Teklif Al → ikinci düğme → küçük PTF kartı (grafik yok)
 GEÇTİ  D3 430px kapak gereğinden uzun değil: karttan sonra en çok 48 px + 44 px şerit yeri; kart düğme çiftinden kısa; yapışkan alt çubuk yok
 GEÇTİ  D3 430px şerit telefonda da var: 44 px (dokunma hedefi), kapağın alt kenarında, kartla çakışmıyor (≥ 24 px)
+GEÇTİ  D3 430px şerit gerçekten kayıyor (1,5 sn’de ≥ 25 px), durdur düğmesiyle yerinde kalıyor, devam edince yine kayıyor
 GEÇTİ  D3 430px şeritte durdur/devam düğmesi: 44×44, sağ uçta, dokununca durur
 GEÇTİ  D4 430px ilk ekranda “Teklif Al” (kapak düğmesi) görünür
        430×932: kapak yüksekliği 746 px, PTF kartı 176 px, kapak “Teklif Al” alt kenarı 398 px
@@ -120,6 +124,9 @@ GEÇTİ  E1 şerit: veriyle göründü, 24 saat × 2 (kesintisiz döngü), 00:00
 GEÇTİ  E1 şerit değerleri proxy yanıtındaki saatlik fiyatların yuvarlanmışı; günün ilk saatinde fark yazılmaz
 GEÇTİ  E1 şerit kapağın alt kenarında (40 px), kart ve düğmelerle çakışmıyor (≥ 24 px boşluk), yatay taşma yok
 GEÇTİ  E1 hareket azaltma tercihinde şerit durur ve durdur düğmesi gösterilmez
+GEÇTİ  E1 şerit gerçekten kayıyor (1440 px): 2 sn’de en az 40 px sola (140 sn’de yarım iz)
+GEÇTİ  E1 şerit üstüne gelince yerinde durur (0,8 sn’de < 1 px)
+GEÇTİ  E1 şerit klavye odağında yerinde durur
 GEÇTİ  E1 şerit hareketli (1 animasyon) ve üstüne gelince durur
 GEÇTİ  E1 şerit düğmesi: basınca durur (aria-pressed=true, tercih saklanır), klavyeyle yeniden basınca devam eder
 GEÇTİ  E1 şerit düğmesi: durdurma tercihi sayfa yenilenince korunur
@@ -169,6 +176,34 @@ GEÇTİ  F4 375px 429: hız sınırı mesajı
 GEÇTİ  F5 yeşil kutucuk: form “yesil” sınıfı, yeşil düğme ve kenar, zemin yeşerir, yaprak dalı çizilir
 GEÇTİ  F5 yeşil seçim gövdede yesil:true
 GEÇTİ  F5 kutucuk kaldırılınca form eski görünüme döner
+GEÇTİ  F8 1440px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)
+GEÇTİ  F8 1440px işaretlenince iki çiçek ve bir kelebek; hepsi aria-hidden, pointer-events: none, mutlak konumlu
+GEÇTİ  F8 1440px kelebek uçuyor (en az 40 ayrı konum) ve formun içerik kutusuna hiç girmiyor; çiçekler iç boşlukta
+GEÇTİ  F8 1440px etki boyunca yatay taşma yok, form ve sayfa boyu değişmiyor, form içeriği yana kaymıyor
+GEÇTİ  F8 1440px ≈4,5 sn sonra öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
+GEÇTİ  F8 1440px kutucuk kaldırılınca bahar anı başlamaz
+GEÇTİ  F8 1440px konsol ve sayfa hatası yok
+GEÇTİ  F8 390px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)
+GEÇTİ  F8 390px işaretlenince iki çiçek ve bir kelebek; hepsi aria-hidden, pointer-events: none, mutlak konumlu
+GEÇTİ  F8 390px kelebek uçuyor (en az 40 ayrı konum) ve formun içerik kutusuna hiç girmiyor; çiçekler iç boşlukta
+GEÇTİ  F8 390px etki boyunca yatay taşma yok, form ve sayfa boyu değişmiyor, form içeriği yana kaymıyor
+GEÇTİ  F8 390px ≈4,5 sn sonra öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
+GEÇTİ  F8 390px kutucuk kaldırılınca bahar anı başlamaz
+GEÇTİ  F8 390px konsol ve sayfa hatası yok
+GEÇTİ  F8 320px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)
+GEÇTİ  F8 320px işaretlenince dal çiçeği (alt boşluk dar) ve bir kelebek; hepsi aria-hidden, pointer-events: none, mutlak konumlu
+GEÇTİ  F8 320px kelebek uçuyor (en az 40 ayrı konum) ve formun içerik kutusuna hiç girmiyor; çiçekler iç boşlukta
+GEÇTİ  F8 320px etki boyunca yatay taşma yok, form ve sayfa boyu değişmiyor, form içeriği yana kaymıyor
+GEÇTİ  F8 320px ≈4,5 sn sonra öğeler DOM’dan silinir; yeşil görünüm (sınıf, dal) yerinde kalır
+GEÇTİ  F8 320px kutucuk kaldırılınca bahar anı başlamaz
+GEÇTİ  F8 320px konsol ve sayfa hatası yok
+GEÇTİ  F8 hızlı aç-kapa: aynı anda en çok bir kelebek ve iki çiçek
+GEÇTİ  F8 gösterim ortasında kutucuk kaldırılınca öğeler 0,5 sn içinde silinir
+GEÇTİ  F8 etki sürerken: süs tıklamayı yakalamaz (elementFromPoint), alan doldurulur, KVKK işaretlenir, form gönderilir (yesil:true)
+GEÇTİ  F8 gönderimden sonra da süs öğeleri silinir, hata yok
+GEÇTİ  F8 hareket azaltma: kelebek yok; tek çiçek, yalnız saydamlıkla belirir (yer değiştiren ya da açılan animasyon yok)
+GEÇTİ  F8 hareket azaltma: çiçek ≈3,5 sn sonra silinir, hata yok
+GEÇTİ  F8 betik kapalıyken kutucuk işaretlenir, bahar anı öğesi oluşmaz
 GEÇTİ  F6 geçersiz tür (.txt): “Lütfen PDF, JPG, PNG, WEBP ya da HEIC yükleyin.”, istek yok, mesaj odakta
 GEÇTİ  F6 dört dosya: “En fazla 3 fatura dosyası yükleyebilirsiniz.”, istek yok
 GEÇTİ  F6 8 MB üstü dosya: “Her dosya en fazla 8 MB olabilir.”, istek yok
@@ -351,10 +386,10 @@ GEÇTİ  L11 sayfa önceki hazırlık sürümünden kısa (içerik silinmeden): 
 GEÇTİ  M1 1440x900 ilk ekran (bekleme durumu): üst bant, kapak ve bilgi satırı önceki hazırlık sürümüyle piksel piksel aynı (0 farklı piksel, ilk 729 px)
        1440x900: kapak alt kenarı 630 px, bilgi satırı alt kenarı 729 px; karşılaştırılan 1440×900 piksel; ilk 729 px içinde farklı piksel 0; altında farklı piksel 17561 (satır 815–887: yeniden düzenlenen Hizmetler bölümünün başı)
 GEÇTİ  M1 390x844 ilk ekran (bekleme durumu): üst bant, başlık, alt metin, düğmeler ve PTF kartı önceki hazırlık sürümüyle aynı yerde ve ölçüde; kapak yalnız şerit yeri kadar (44 px) uzadı
-       390x844: kapak alt kenarı 811 px, bilgi satırı alt kenarı 966 px; karşılaştırılan 390×844 piksel; ilk 844 px içinde farklı piksel 201431; altında farklı piksel 0 (ekranın tamamı aynı)
+       390x844: kapak alt kenarı 811 px, bilgi satırı alt kenarı 966 px; karşılaştırılan 390×844 piksel; ilk 844 px içinde farklı piksel 202535; altında farklı piksel 0 (ekranın tamamı aynı)
 GEÇTİ  M1 390x844@2x ilk ekran (bekleme durumu): üst bant, başlık, alt metin, düğmeler ve PTF kartı önceki hazırlık sürümüyle aynı yerde ve ölçüde; kapak yalnız şerit yeri kadar (44 px) uzadı
        390x844@2x: kapak alt kenarı 811 px, bilgi satırı alt kenarı 966 px; karşılaştırılan 780×1688 piksel; ilk 844 px içinde farklı piksel 800508; altında farklı piksel 0 (ekranın tamamı aynı)
 GEÇTİ  N1 390px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 GEÇTİ  N1 1440px PTF üç durum art arda: canlı → önbellek (“SON SENKRON”) → bekleme; hiçbirinde konsol ya da sayfa hatası yok (yalnız kapalı proxy isteği düşer)
 
-TOPLAM: 330 geçti, 0 kaldı
+TOPLAM: 365 geçti, 0 kaldı

@@ -441,7 +441,9 @@ summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-r
 .contact-form{min-width:0}
 .form-capa{display:block;height:0}
 
-.form{position:relative;overflow:hidden;padding:var(--fp);background:var(--white);border:1px solid var(--line-strong);border-radius:4px;transition:background-color .9s var(--ease),border-color .9s var(--ease)}
+/* overflow: clip (27.11): 640 px'lik çim çizimi formu kaydırılabilir yapıyordu; yeşil kutucuğa dokununca form içeriği yana
+   kayıyordu (390 px'te 22 px). clip kaydırma kabı kurmaz; desteklemeyen tarayıcıda hidden kalır. */
+.form{position:relative;overflow:hidden;overflow:clip;padding:var(--fp);background:var(--white);border:1px solid var(--line-strong);border-radius:4px;transition:background-color .9s var(--ease),border-color .9s var(--ease)}
 .form > *{position:relative;z-index:1}
 .form-title{font-size:25px;font-weight:600;line-height:1.2;letter-spacing:-.018em;margin-bottom:6px}
 .form-subtitle{font-size:15px;color:var(--ink-muted);margin-bottom:24px}
@@ -519,6 +521,35 @@ p.form-hint{margin:-8px 0 20px}
 @keyframes flSal{from{transform:rotate(-2.2deg)} to{transform:rotate(2.2deg)}}
 @media (prefers-reduced-motion:no-preference){.form.yesil .fl-sal{animation:flSal 7s ease-in-out var(--f,0s) infinite alternate}
 .form.yesil .flora-cim{animation:cimSal 5s ease-in-out infinite alternate}}
+
+/* ============ BAHAR ANI (sahip isteği 27.11) — yeşil enerji kutucuğu İŞARETLENİNCE ≈4,5 sn: dalın dibinde bir çiçek açar,
+   çimde bir çiçek daha; sağdan bir kelebek gelip çiçeğe konar, uçup gider. Öğeleri betik ekler ve bitince siler (// 9).
+   Yalnız süs: aria-hidden, tıklamayı engellemez, mutlak konumlu (yerleşim kaymaz), yalnız transform ve opacity değişir.
+   Hareket azaltma tercihinde kelebek yok; dalın dibindeki çiçek açık hâlde belirip söner. ============ */
+.form > .bh-cicek{position:absolute;z-index:1;pointer-events:none}
+.bh-cicek svg,.bh-kelebek svg{display:block;width:100%;height:100%;overflow:visible}
+.bh-p{fill:#FCF8EE;stroke:#3F7F4C;stroke-width:.7;transform-box:view-box;transform-origin:0 0}
+.bh-gb{fill:#E3A72F;stroke:#A9761A;stroke-width:.5;transform-box:view-box;transform-origin:0 0}
+.bh-tac{transform-box:view-box;transform-origin:0 0}
+.bh-sap{fill:none;stroke:#3F7F4C;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1}
+.bh-kat{position:absolute;left:0;width:100%;overflow:hidden;pointer-events:none;z-index:60}
+.bh-kelebek{position:absolute;left:0;top:0;width:30px;height:25px;margin:-12.5px 0 0 -15px}
+.bh-ks,.bh-kg{transform-box:view-box;transform-origin:0 0}
+.bh-ku{fill:#E9AC33} .bh-ka{fill:#D7962A} .bh-ku,.bh-ka{stroke:#7A520F;stroke-width:.45;stroke-linejoin:round}
+.bh-kc{fill:#1E2536} .bh-kn{fill:none;stroke:#1E2536;stroke-width:.55;stroke-linecap:round}
+@keyframes bhTac{from{transform:scale(.25) rotate(-55deg);opacity:0} 40%{opacity:1} to{transform:none;opacity:1}}
+@keyframes bhYap{from{transform:scale(.35,.12)} to{transform:none}}
+@keyframes bhGb{from{transform:scale(0)} to{transform:none}}
+@keyframes bhSap{from{stroke-dashoffset:1} to{stroke-dashoffset:0}}
+@keyframes bhCirp{from{transform:none} to{transform:scaleX(.28)}}
+@media (prefers-reduced-motion:no-preference){.bh-cicek .bh-tac{animation:bhTac 1.1s cubic-bezier(.2,.7,.25,1) var(--bd,.15s) both}
+.bh-cicek .bh-p{animation:bhYap .9s cubic-bezier(.2,.7,.25,1) calc(var(--bd,.15s) + var(--i) * 70ms) both}
+.bh-cicek .bh-gb{animation:bhGb .5s ease-out calc(var(--bd,.15s) + .55s) both}
+.bh-cicek .bh-sap{animation:bhSap .8s cubic-bezier(.45,0,.25,1) both}
+.bh-cicek .bh-sap + .bh-sap{animation-delay:.35s;animation-duration:.6s}
+.bh-ks,.bh-kg{animation:bhCirp .14s ease-in-out infinite alternate}
+.bh-kelebek.konar .bh-ks,.bh-kelebek.konar .bh-kg{animation-duration:.8s}}
+@media (max-width:640px){.bh-kelebek{width:22px;height:19px;margin:-9.5px 0 0 -11px}}
 
 /* KVKK onayı, tuzak alan, gönderim durumları */
 .form-consent{display:flex;align-items:flex-start;gap:12px;margin-top:2px;padding:11px 0;font-size:14.5px;line-height:1.55;color:var(--ink-soft);cursor:pointer}
@@ -2226,6 +2257,69 @@ async function fetchPtfLive(){
   window.addEventListener('languagechange', yaz);
   kutu.classList.add('hazir');
   yaz();
+})();
+
+// 9) Bahar anı (sahip isteği 27.11): yeşil enerji kutucuğu İŞARETLENİNCE ≈4,5 sn. Dalın dibinde bir çiçek açar, çimde bir
+//    çiçek daha; sağdan bir kelebek gelip çiçeğe konar ve uçup gider. Mevcut yeşil görünüme dokunmaz, yalnız ekler.
+//    Süs: aria-hidden, pointer-events yok, mutlak konum; kelebek yalnız formun sağ iç boşluğunda ve sayfa kenarında uçar
+//    (alanların üstüne girmez). Aynı anda tek gösterim; kutucuk kaldırılınca hızla söner; bitince öğeler DOM'dan silinir.
+//    Hareket azaltma tercihinde kelebek ve açılma yok: dalın dibindeki çiçek açık hâlde belirip söner (yalnız saydamlık).
+(function(){
+  var kutu = document.getElementById('lead-yesil'), form = document.getElementById('leadForm');
+  if(!kutu || !form || !form.animate) return;
+  var az = window.matchMedia('(prefers-reduced-motion: reduce)'), g = null;
+  var TAC = '<g class="bh-tac">' + [0, 72, 144, 216, 288].map(function(a, i){ return '<g transform="rotate(' + a + ')"><ellipse class="bh-p" style="--i:' + i + '" cy="-5" rx="3.1" ry="5"/></g>'; }).join('') + '<circle class="bh-gb" r="2.3"/></g>';
+  var KANAT = '<path class="bh-ku" d="M-.6 -1.5C-3 -8.5 -9.5 -10.8 -12 -8.2C-13.4 -6.4 -11.2 -2 -6.5 -.4C-4.2 .4 -1.8 0 -.6 -1.5Z"/><path class="bh-kc" d="M-12 -8.2C-11 -9.6 -9.2 -9.9 -7.6 -9.2C-9 -8.2 -10.2 -7 -10.8 -5.4C-11.7 -6.1 -12.4 -7.2 -12 -8.2Z"/><path class="bh-ka" d="M-.6 .8C-3.5 .6 -8.6 2.4 -8.4 6C-8.2 8.6 -5.2 9 -3.6 6.6C-2.4 4.8 -1.2 2.6 -.6 .8Z"/>';
+  function oge(kap, sinif, stil, kutuDeger, ic){
+    var d = document.createElement('div'); d.className = sinif; d.setAttribute('aria-hidden', 'true'); d.style.cssText = stil;
+    d.innerHTML = '<svg viewBox="' + kutuDeger + '" focusable="false">' + ic + '</svg>'; kap.appendChild(d); return d;
+  }
+  function sondur(hizli){
+    var b = g; if(!b || b.son) return; b.son = true; b.zaman.forEach(clearTimeout);
+    b.ogeler.forEach(function(e){ e.animate([{ opacity: getComputedStyle(e).opacity }, { opacity: 0 }], { duration: hizli ? 300 : 800, fill: 'forwards' }); });
+    setTimeout(function(){ b.ogeler.forEach(function(e){ e.remove(); }); if(g === b) g = null; }, hizli ? 350 : 850);
+  }
+  function basla(){
+    var fr = form.getBoundingClientRect(), cs = getComputedStyle(form), dal = form.querySelector('.form-flora-kutu .flora-dal');
+    if(!dal || !fr.width) return;
+    var bl = parseFloat(cs.borderLeftWidth) || 0, bt = parseFloat(cs.borderTopWidth) || 0, pr = parseFloat(cs.paddingRight) || 0, pl = parseFloat(cs.paddingLeft) || 0;
+    var W = form.clientWidth, H = form.clientHeight, dr = dal.getBoundingClientRect();
+    /* dalın dibi: viewBox (-152 -6 172 232) içinde (8, 4) noktası; çiçek formun sağ iç boşluğunda kalır */
+    var s = Math.max(12, Math.min(22, pr - 3));
+    var x = Math.min(Math.max(dr.left + 160 / 172 * dr.width - fr.left - bl, W - pr + s / 2 + 1), W - s / 2 - 1);
+    var y = dr.top + 10 / 232 * dr.height - fr.top - bt;
+    g = { ogeler: [], zaman: [] };
+    var b = g;
+    b.ogeler.push(oge(form, 'bh-cicek', 'left:' + (x - s / 2) + 'px;top:' + (y - s / 2) + 'px;width:' + s + 'px;height:' + s + 'px', '-11 -11 22 22', TAC));
+    if(az.matches){
+      b.ogeler[0].animate([{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 3500, fill: 'both' });
+      b.zaman.push(setTimeout(function(){ b.ogeler.forEach(function(e){ e.remove(); }); if(g === b) g = null; }, 3550));
+      return;
+    }
+    /* çimdeki çiçek: gönder düğmesinin altındaki iç boşlukta; yer yoksa çizilmez */
+    var alt = 0;
+    for(var i = 0; i < form.children.length; i++){ var c = form.children[i], r = c.getBoundingClientRect(); if(r.height && !/flora|hp-field|bh-/.test(c.className)) alt = Math.max(alt, r.bottom); }
+    var h = Math.min(34, fr.bottom - bt - alt - 3);
+    if(h >= 16) b.ogeler.push(oge(form, 'bh-cicek', '--bd:.55s;left:' + (pl + (W - pl - pr) * 0.16) + 'px;top:' + (H - h) + 'px;width:' + (h * 2 / 3) + 'px;height:' + h + 'px', '-12 -34 24 36',
+      '<path class="bh-sap" pathLength="1" d="M0 2Q-1.6 -9 0 -19"/><path class="bh-sap" pathLength="1" d="M-.4 -7Q4.5 -11.5 8 -9.2Q4.6 -5.6 -.4 -7"/><g transform="translate(0 -23)">' + TAC + '</g>'));
+    /* kelebek: sayfa genişliğinde, taşmayı kesen mutlak bir şeritte; yolu formun içerik kenarının sağında kalır */
+    var sx = window.scrollX, sy = window.scrollY, R = document.documentElement.clientWidth, yari = R <= 640 ? 11 : 15;
+    var lx = Math.max(fr.left + bl + x, fr.right - pr + yari + 1) + sx, ly = fr.top + bt + y - s * 0.15 + sy;
+    var T = Math.max(0, ly - 260), kat = document.createElement('div');
+    kat.className = 'bh-kat'; kat.setAttribute('aria-hidden', 'true'); kat.style.cssText = 'top:' + T + 'px;height:' + (ly - T + 40) + 'px';
+    document.body.appendChild(kat); b.ogeler.push(kat); ly -= T;
+    var k = oge(kat, 'bh-kelebek', 'opacity:0', '-13 -11 26 22', '<g class="bh-ks">' + KANAT + '</g><g transform="scale(-1 1)"><g class="bh-kg">' + KANAT + '</g></g><ellipse class="bh-kc" rx=".9" ry="5.2" cy=".5"/><path class="bh-kn" d="M-.3 -4.5Q-1.5 -8 -3.2 -9.2M.3 -4.5Q1.5 -8 3.2 -9.2"/>');
+    var d = R - lx, n = function(px, py, a){ return { transform: 'translate(' + px + 'px,' + py + 'px) rotate(' + a + 'deg)', opacity: 1 }; };
+    var yol = [n(R + 20, ly - 170, -25), n(lx + d * 0.75, ly - 120, -10), n(lx + Math.min(26, d * 0.5), ly - 64, 12), n(lx + Math.min(6, d * 0.2), ly - 16, -6), n(lx, ly, 0),
+               n(lx, ly, 0), n(lx + Math.min(14, d * 0.3), ly - 40, 14), n(lx + d * 0.6, ly - 130, 20), n(R + 30, ly - 230, 24)];
+    [0, 0.14, 0.28, 0.4, 0.466, 0.644, 0.73, 0.86, 1].forEach(function(o, i){ yol[i].offset = o; yol[i].easing = 'ease-in-out'; });
+    k.animate(yol, { duration: 3650, delay: 350, fill: 'both' });
+    b.zaman.push(setTimeout(function(){ k.classList.add('konar'); }, 2050), setTimeout(function(){ k.classList.remove('konar'); }, 2700),
+                 setTimeout(function(){ sondur(false); }, 3600));
+  }
+  kutu.addEventListener('change', function(){
+    if(kutu.checked){ if(!g) basla(); } else sondur(true);
+  });
 })();
 </script>
 
