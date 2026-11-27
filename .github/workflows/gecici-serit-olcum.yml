@@ -23,7 +23,7 @@ jobs:
           import pw from 'playwright';
           const hedefler = [['onizleme', 'https://6da52819.website-dh5.pages.dev/'], ['canli', 'https://voltage.com.tr/']];
           const X = (p) => p.evaluate(() => { const t = document.getElementById('mcpTrack'); return t ? t.getBoundingClientRect().left : null; });
-          for (const tarayici of ['chromium', 'webkit']) {
+          for (const tarayici of ['webkit']) {
             const b = await pw[tarayici].launch();
             for (const [ad, url] of hedefler) {
               // 1) masaüstü: imleç şeridin üstündeyken hareket
@@ -37,7 +37,7 @@ jobs:
               { const d = tarayici === 'webkit' ? pw.devices['iPhone 13'] : pw.devices['Pixel 7']; const c = await b.newContext({ ...d }); const p = await c.newPage(); const hata = []; p.on('pageerror', e => hata.push(String(e.message).slice(0, 140)));
                 await p.goto(url, { waitUntil: 'load', timeout: 45000 }); await p.waitForTimeout(4000);
                 const a0 = await X(p); await p.waitForTimeout(2000); const a1 = await X(p);
-                await p.mouse.wheel(0, 1500); await p.waitForTimeout(600); await p.mouse.wheel(0, -1500); await p.waitForTimeout(600);
+                await p.evaluate(() => scrollTo(0, 1500)); await p.waitForTimeout(600); await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(600);
                 const k0 = await X(p); await p.waitForTimeout(2000); const k1 = await X(p);
                 const rm = await p.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
                 console.log(tarayici, ad, 'telefon', 'rm=' + rm, 'serbest_2sn_px=' + (a0 - a1).toFixed(1), 'kaydirma_sonrasi_2sn_px=' + (k0 - k1).toFixed(1), 'hatalar=' + JSON.stringify(hata));
