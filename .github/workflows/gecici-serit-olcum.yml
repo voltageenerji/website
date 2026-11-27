@@ -1,0 +1,47 @@
+# GEÇİCİ — canlı ana sayfada PTF şeridinin hareket ölçümü (27.11, sahip: "kaymıyor"). Yalnız sayılar yazdırılır
+# (CLAUDE.md kural 6). Bir sonraki commit'te silinir.
+name: gecici-serit-olcum
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: ['.github/workflows/gecici-serit-olcum.yml']
+permissions: {}
+jobs:
+  olc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Playwright kur
+        run: |
+          mkdir -p /tmp/o && cd /tmp/o && npm init -y >/dev/null && npm i playwright@1.49.1 >/dev/null 2>&1
+          npx playwright install --with-deps chromium webkit >/dev/null 2>&1; echo kuruldu
+      - name: Olc
+        shell: bash {0}
+        run: |
+          cd /tmp/o
+          cat > olc.mjs <<'EOF'
+          import { chromium, webkit, devices } from 'playwright';
+          const senaryo = [
+            ['chromium masaustu 1440', chromium, { viewport: { width: 1440, height: 900 } }],
+            ['chromium Pixel 7', chromium, devices['Pixel 7']],
+            ['webkit iPhone 13', webkit, devices['iPhone 13']],
+            ['webkit masaustu 1280', webkit, { viewport: { width: 1280, height: 800 } }],
+          ];
+          for (const [ad, tur, cihaz] of senaryo) for (const rm of ['no-preference', 'reduce']) {
+            const b = await tur.launch(); const c = await b.newContext({ ...cihaz, reducedMotion: rm }); const p = await c.newPage();
+            const hatalar = []; p.on('pageerror', e => hatalar.push(String(e.message).slice(0, 80)));
+            await p.goto('https://voltage.com.tr/?olcum=' + Date.now(), { waitUntil: 'load', timeout: 45000 });
+            const gorundu = await p.waitForFunction(() => !document.getElementById('mcpRail').hidden, null, { timeout: 20000 }).then(() => true, () => false);
+            const r = await p.evaluate(async () => {
+              const t = document.getElementById('mcpTrack'), rail = document.getElementById('mcpRail');
+              const x0 = t.getBoundingClientRect().left; await new Promise(z => setTimeout(z, 4000)); const x1 = t.getBoundingClientRect().left;
+              const a = t.getAnimations(); const cs = getComputedStyle(t);
+              return { hucre: t.querySelectorAll('.cell').length, genislik: Math.round(t.scrollWidth), dx4sn: Math.round(x1 - x0),
+                anim: a.length, durum: a.map(x => x.playState).join(','), sure: cs.animationDuration, ad: cs.animationName, oynatma: cs.animationPlayState,
+                durdu: rail.classList.contains('durdu'), dugme: getComputedStyle(document.getElementById('mcpDur')).display };
+            });
+            console.log(`${ad} | hareket=${rm} | gorundu=${gorundu} | ${JSON.stringify(r)} | sayfa-hatasi=${hatalar.length}${hatalar.length ? ' ' + JSON.stringify(hatalar) : ''}`);
+            await b.close();
+          }
+          EOF
+          node olc.mjs
