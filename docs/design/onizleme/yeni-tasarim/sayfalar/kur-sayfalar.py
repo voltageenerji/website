@@ -220,10 +220,13 @@ def kabuk(ayar):
         # ama yerini korur (kabuk.css .nav-right:empty), menü öbür sayfalarla aynı konumda durur
         ust = degistir(ust, '    <div class="nav-right">\n' + cta + '    </div>\n', '    <div class="nav-right" aria-hidden="true"></div>\n')
     ust = capalari_kok(dil_ozniteligi_sil(ust))
+    # Alt sayfalar yalnız Türkçe: ana sayfadan gelen İngilizce erişilebilir adlar Türkçeye çevrilir (Hukuk 27.11; davranış aynı)
+    ust = degistir(ust, 'aria-label="Menu"', 'aria-label="Menü"')
     ust = gecerli(ust, ayar['ust_etkin'], ayar['ust_etkin_deger'])
     menu = capalari_kok(dil_ozniteligi_sil(dil_seciciyi_sil(MENU, '  ')))
     menu = gecerli(menu, ayar['ust_etkin'], ayar['ust_etkin_deger'])
     alt = capalari_kok(dil_ozniteligi_sil(ALT))
+    alt = degistir(alt, 'aria-label="Footer"', 'aria-label="Alt bilgi"')
     alt = degistir(alt, '<footer class="footer on-dark">\n', '<footer>\n<div class="footer on-dark">\n')
     alt = degistir(alt, '\n</footer>', '\n</div>\n</footer>')
     alt = gecerli(alt, ayar['alt_etkin'], 'page')
