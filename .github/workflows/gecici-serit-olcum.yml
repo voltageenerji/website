@@ -1,0 +1,44 @@
+name: gecici-serit-olcum
+# GEÇİCİ: önizleme ana sayfasındaki saatlik PTF şeridinin hareketini ölçer. Yalnız sayılar ve durumlar yazdırılır
+# (sayfa gövdesi, veri değeri yazdırılmaz). Bir sonraki commit'te silinir.
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-serit-olcum.yml]
+permissions: {}
+jobs:
+  olcum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Playwright kur
+        shell: bash {0}
+        run: |
+          mkdir o && cd o && npm init -y >/dev/null && npm i playwright@1.49.1 >/dev/null 2>&1 && npx playwright install --with-deps chromium webkit firefox >/dev/null 2>&1; echo "kurulum=$?"
+      - name: Şerit hareketi (yalnız sayılar)
+        shell: bash {0}
+        working-directory: o
+        run: |
+          cat > o.mjs <<'JS'
+          import pw from 'playwright';
+          const hedefler = [['onizleme', 'https://6da52819.website-dh5.pages.dev/'], ['canli', 'https://voltage.com.tr/']];
+          for (const tarayici of ['chromium', 'webkit', 'firefox']) {
+            const b = await pw[tarayici].launch();
+            for (const [ad, url] of hedefler) for (const [w, h] of [[1440, 900], [390, 844]]) for (const rm of ['no-preference', 'reduce']) {
+              const c = await b.newContext({ viewport: { width: w, height: h }, reducedMotion: rm });
+              const p = await c.newPage(); let hata = 0; p.on('pageerror', () => hata++);
+              let ptf = [];
+              p.on('response', r => { if (/ptf\/(today|stats)/.test(r.url())) ptf.push(new URL(r.url()).pathname.split('/').pop() + ':' + r.status()); });
+              try {
+                await p.goto(url, { waitUntil: 'load', timeout: 45000 }); await p.waitForTimeout(4000);
+                const olc = () => p.evaluate(() => { const t = document.getElementById('mcpTrack'), r = document.getElementById('mcpRail'); if (!t || !r) return null; const cs = getComputedStyle(t); let ls = null; try { ls = localStorage.getItem('voltage-serit-durdu'); } catch (e) {} return { x: t.getBoundingClientRect().left, w: Math.round(t.getBoundingClientRect().width), gizli: r.hidden, gorunur: r.getBoundingClientRect().height > 0, hucre: t.querySelectorAll('.cell').length, an: cs.animationName, sure: cs.animationDuration, ps: cs.animationPlayState, anim: t.getAnimations().length, durdu: r.classList.contains('durdu'), ls, rm: matchMedia('(prefers-reduced-motion: reduce)').matches }; });
+                const a = await olc(); await p.waitForTimeout(3000); const z = await olc();
+                if (!a) { console.log(tarayici, ad, w, rm, 'ray_yok'); }
+                else console.log([tarayici, ad, w, rm, 'gizli=' + a.gizli, 'gorunur=' + a.gorunur, 'hucre=' + a.hucre, 'genislik=' + a.w, 'anim=' + a.an + '/' + a.sure + '/' + a.ps + '/n' + a.anim, 'durdu=' + a.durdu, 'ls=' + a.ls, 'rm_mq=' + a.rm, 'hareket_3sn_px=' + (a.x - z.x).toFixed(1), 'ptf=' + ptf.join(','), 'hata=' + hata].join(' '));
+              } catch (e) { console.log(tarayici, ad, w, rm, 'yuklenemedi', String(e.message).split('\n')[0].slice(0, 80)); }
+              await c.close();
+            }
+            await b.close();
+          }
+          JS
+          node o.mjs
