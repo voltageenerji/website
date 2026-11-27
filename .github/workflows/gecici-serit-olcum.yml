@@ -1,6 +1,6 @@
 name: gecici-serit-olcum
-# GEÇİCİ: önizleme ana sayfasındaki saatlik PTF şeridinin hareketini ölçer. Yalnız sayılar ve durumlar yazdırılır
-# (sayfa gövdesi, veri değeri yazdırılmaz). Bir sonraki commit'te silinir.
+# GEÇİCİ: önizleme ana sayfasındaki saatlik PTF şeridinin hareketini ölçer. Yalnız sayılar, durumlar ve betik hata
+# iletilerinin ilk 140 karakteri yazdırılır (sayfa gövdesi, veri değeri yazdırılmaz). Bir sonraki commit'te silinir.
 on:
   push:
     branches: [claude/voltan-orchestrator-agent-a30dgt]
@@ -14,29 +14,34 @@ jobs:
       - name: Playwright kur
         shell: bash {0}
         run: |
-          mkdir o && cd o && npm init -y >/dev/null; npm i playwright@latest 2>&1 | tail -3; npx playwright install --with-deps chromium webkit firefox 2>&1 | tail -5; echo "kurulum=$?"
-      - name: Şerit hareketi (yalnız sayılar)
+          mkdir o && cd o && npm init -y >/dev/null; npm i playwright@latest 2>&1 | tail -1; npx playwright install --with-deps chromium webkit 2>&1 | tail -1
+      - name: Şerit — üstüne gelme, telefon öykünmesi, WebKit hata iletisi (yalnız sayılar)
         shell: bash {0}
         working-directory: o
         run: |
           cat > o.mjs <<'JS'
           import pw from 'playwright';
           const hedefler = [['onizleme', 'https://6da52819.website-dh5.pages.dev/'], ['canli', 'https://voltage.com.tr/']];
-          for (const tarayici of ['chromium', 'webkit', 'firefox']) {
-            let b; try { b = await pw[tarayici].launch(); } catch (e) { console.log(tarayici, 'baslatilamadi', String(e.message).split('\n')[0].slice(0, 100)); continue; }
-            for (const [ad, url] of hedefler) for (const [w, h] of [[1440, 900], [390, 844]]) for (const rm of ['no-preference', 'reduce']) {
-              const c = await b.newContext({ viewport: { width: w, height: h }, reducedMotion: rm });
-              const p = await c.newPage(); let hata = 0; p.on('pageerror', () => hata++);
-              let ptf = [];
-              p.on('response', r => { if (/ptf\/(today|stats)/.test(r.url())) ptf.push(new URL(r.url()).pathname.split('/').pop() + ':' + r.status()); });
-              try {
+          const X = (p) => p.evaluate(() => { const t = document.getElementById('mcpTrack'); return t ? t.getBoundingClientRect().left : null; });
+          for (const tarayici of ['chromium', 'webkit']) {
+            const b = await pw[tarayici].launch();
+            for (const [ad, url] of hedefler) {
+              // 1) masaüstü: imleç şeridin üstündeyken hareket
+              { const c = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await c.newPage(); const hata = []; p.on('pageerror', e => hata.push(String(e.message).slice(0, 140)));
                 await p.goto(url, { waitUntil: 'load', timeout: 45000 }); await p.waitForTimeout(4000);
-                const olc = () => p.evaluate(() => { const t = document.getElementById('mcpTrack'), r = document.getElementById('mcpRail'); if (!t || !r) return null; const cs = getComputedStyle(t); let ls = null; try { ls = localStorage.getItem('voltage-serit-durdu'); } catch (e) {} return { x: t.getBoundingClientRect().left, w: Math.round(t.getBoundingClientRect().width), gizli: r.hidden, gorunur: r.getBoundingClientRect().height > 0, hucre: t.querySelectorAll('.cell').length, an: cs.animationName, sure: cs.animationDuration, ps: cs.animationPlayState, anim: t.getAnimations().length, durdu: r.classList.contains('durdu'), ls, rm: matchMedia('(prefers-reduced-motion: reduce)').matches }; });
-                const a = await olc(); await p.waitForTimeout(3000); const z = await olc();
-                if (!a) { console.log(tarayici, ad, w, rm, 'ray_yok'); }
-                else console.log([tarayici, ad, w, rm, 'gizli=' + a.gizli, 'gorunur=' + a.gorunur, 'hucre=' + a.hucre, 'genislik=' + a.w, 'anim=' + a.an + '/' + a.sure + '/' + a.ps + '/n' + a.anim, 'durdu=' + a.durdu, 'ls=' + a.ls, 'rm_mq=' + a.rm, 'hareket_3sn_px=' + (a.x - z.x).toFixed(1), 'ptf=' + ptf.join(','), 'hata=' + hata].join(' '));
-              } catch (e) { console.log(tarayici, ad, w, rm, 'yuklenemedi', String(e.message).split('\n')[0].slice(0, 80)); }
-              await c.close();
+                const a0 = await X(p); await p.waitForTimeout(2000); const a1 = await X(p);
+                await p.hover('#mcpRail'); const h0 = await X(p); await p.waitForTimeout(2000); const h1 = await X(p);
+                console.log(tarayici, ad, '1440 serbest_2sn_px=' + (a0 - a1).toFixed(1), 'imlec_ustunde_2sn_px=' + (h0 - h1).toFixed(1), 'hatalar=' + JSON.stringify(hata));
+                await c.close(); }
+              // 2) telefon öykünmesi (dokunmatik), şeride dokunmadan ve sayfayı kaydırıp geri gelince
+              { const d = tarayici === 'webkit' ? pw.devices['iPhone 13'] : pw.devices['Pixel 7']; const c = await b.newContext({ ...d }); const p = await c.newPage(); const hata = []; p.on('pageerror', e => hata.push(String(e.message).slice(0, 140)));
+                await p.goto(url, { waitUntil: 'load', timeout: 45000 }); await p.waitForTimeout(4000);
+                const a0 = await X(p); await p.waitForTimeout(2000); const a1 = await X(p);
+                await p.mouse.wheel(0, 1500); await p.waitForTimeout(600); await p.mouse.wheel(0, -1500); await p.waitForTimeout(600);
+                const k0 = await X(p); await p.waitForTimeout(2000); const k1 = await X(p);
+                const rm = await p.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
+                console.log(tarayici, ad, 'telefon', 'rm=' + rm, 'serbest_2sn_px=' + (a0 - a1).toFixed(1), 'kaydirma_sonrasi_2sn_px=' + (k0 - k1).toFixed(1), 'hatalar=' + JSON.stringify(hata));
+                await c.close(); }
             }
             await b.close();
           }
