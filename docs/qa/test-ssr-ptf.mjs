@@ -118,6 +118,15 @@ ok('kalici hatada 503 (500 patlamasi degil)', r.status === 503);
 r = await onRequestGet({ request: new Request('https://voltage.com.tr/canli-ptf?ptfoff=1'), next: async () => new Response(SHELL, { status: 200 }) });
 body = await r.text();
 ok('?ptfoff SSR atlar', body.includes('Veri bekleniyor') && !body.includes('<body data-ssr'));
+
+// Önizleme hostu dizine girmez (27.11: SSR yanıtına _headers'taki pages.dev kuralı uygulanmıyordu)
+r = await onRequestGet({ request: new Request('https://6da52819.website-dh5.pages.dev/canli-ptf'), next: async () => new Response(SHELL, { status: 200 }) });
+body = await r.text();
+ok('onizleme hostu: X-Robots-Tag noindex, nofollow', r.headers.get('X-Robots-Tag') === 'noindex, nofollow', `-> ${r.headers.get('X-Robots-Tag')}`);
+ok('onizleme hostu: robots meta noindex, SSR tablo yerinde', body.includes('<meta name="robots" content="noindex, nofollow">') && body.includes('<body data-ssr'));
+r = await onRequestGet(ctx(async () => new Response(SHELL, { status: 200 })));
+body = await r.text();
+ok('uretim hostu: X-Robots-Tag yok, robots meta degismez', r.headers.get('X-Robots-Tag') === null && !body.includes('noindex'));
 globalThis.fetch = realFetch;
 
 // --- Phase 2: tarihli günlük özet ---
