@@ -1,0 +1,701 @@
+# GEÇİCİ QA iş akışı — yeni tasarım yayın adayı (RC 0879f2b, önizleme https://9c79718b.website-dh5.pages.dev):
+# gerçek Safari (safaridriver), iOS Simülatörü'nde Mobile Safari, Firefox ve WebKit (iPhone 15 öykünmesi).
+# İş bitince bu dosya bir sonraki commit ile SİLİNİR (CLAUDE.md kural 6). Form GÖNDERİLMEZ. Günlüğe yalnız denetim
+# adları, geçti/kaldı ve sayılar basılır (sayfa gövdesi yok). Ekran görüntüleri (herkese açık sayfalar, kişisel veri
+# yok) 1 günlük artefakt.
+name: gecici-qa-yayin
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: ['.github/workflows/gecici-qa-yayin.yml']
+permissions: {}
+concurrency:
+  group: gecici-qa-yayin
+  cancel-in-progress: true
+env:
+  TABAN: https://9c79718b.website-dh5.pages.dev
+  PW_SURUM: 1.64.1
+  SELENIUM_SURUM: 4.52.0
+
+jobs:
+  linux-firefox-webkit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Betikler ve Playwright (geçici dizinde)
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir -p qa && cd qa && npm init -y >/dev/null
+          cat > olcum.js <<'QAEOF'
+          /* QA ölçüm modülü (sayfaya executeScript ile eklenir; sayfa içeriği döndürmez, yalnız sayılar ve doğru/yanlış) */
+          (function () {
+            if (window.__qa) return;
+            var D = document, W = window;
+            function gor(e) { if (!e) return false; var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 0 && r.height > 0 && c.visibility !== 'hidden' && c.display !== 'none'; }
+            function tx(e) { var m = getComputedStyle(e).transform; if (!m || m === 'none') return 0; var v = m.match(/matrix(3d)?\(([^)]+)\)/); if (!v) return 0; var a = v[2].split(',').map(parseFloat); return v[1] ? a[12] : a[4]; }
+            var KONTROL = '#leadForm input:not([type=hidden]):not([type=file]), #leadForm select, #leadForm textarea, #leadSubmit, #leadForm .dosya-dugme';
+            function kontroller() { return [].slice.call(D.querySelectorAll(KONTROL)).filter(function (e) { return !e.closest('.hp-field') && gor(e); }); }
+            /* Denetimin isabet hedefi: kendisi, içindekiler ya da kendi etiketi (gizli kutucuklarda etiket tıklanır) */
+            function isabet(e) {
+              var r = e.getBoundingClientRect(); var x = r.left + r.width / 2, y = r.top + r.height / 2;
+              if (y < 0 || y > innerHeight || x < 0 || x > innerWidth) return null;
+              var h = D.elementFromPoint(x, y); if (!h) return false;
+              if (h.closest && h.closest('.bh-kat')) return 'sus';
+              if (h === e || e.contains(h)) return true;
+              var l = h.closest('label'); if (l && (l.htmlFor === e.id || l.contains(e))) return true;
+              return false;
+            }
+            var qa = {
+              durum: function () {
+                var de = D.documentElement, f = D.querySelector('footer'), s = D.querySelector('a.skip');
+                var ua = navigator.userAgent, ios = (ua.match(/OS (\d+)_(\d+)/) || []), saf = (ua.match(/Version\/([\d.]+)/) || []), ff = (ua.match(/Firefox\/([\d.]+)/) || []);
+                return {
+                  w: innerWidth, cw: de.clientWidth, dpr: devicePixelRatio, tasma: de.scrollWidth - de.clientWidth,
+                  motor: ff[1] ? 'Firefox ' + ff[1] : (ios[1] ? 'iOS ' + ios[1] + '.' + ios[2] + ' Safari ' + (saf[1] || '?') : 'Safari ' + (saf[1] || '?')),
+                  h1: D.querySelectorAll('h1').length, nav: !!D.querySelector('.nav-links'), menuDugme: !!D.getElementById('mobileMenuBtn'),
+                  kunye: !!f && /Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı|Est\. 2011 · EPIAS Market Participant/.test(f.textContent.replace(/\s+/g, ' ')),
+                  atla: !!s && s.getAttribute('href') === '#icerik' && /^(İçeriğe atla|Skip to content)$/.test(s.textContent.trim()) && !!D.getElementById('icerik'),
+                  hata: (W.__qaHata || []).length
+                };
+              },
+              menu: function () { var b = D.getElementById('mobileMenuBtn'), m = D.getElementById('mobileMenu'); return { dugmeGorunur: gor(b), acik: !!m && !m.hidden && gor(m), aria: b ? b.getAttribute('aria-expanded') : null, baglanti: m ? [].slice.call(m.querySelectorAll('a')).filter(gor).length : 0 }; },
+              ana: function () {
+                var k = D.getElementById('kfPtf'), st = D.getElementById('kfStamp'), kart = D.getElementById('ptfKart'), rail = D.getElementById('mcpRail'), tr = D.getElementById('mcpTrack');
+                var t = k ? k.textContent.replace(/\s+/g, ' ').trim() : '';
+                var hucre = [].slice.call(D.querySelectorAll('#saatTablo tbody td')).map(function (c) { return c.textContent.trim(); });
+                var sayi = /^\d{1,3}(\.\d{3})*(,\d{1,2})?$/;
+                var sifir = function (v) { return /^0+([.,]0+)?$/.test(v.replace(/[^\d.,]/g, '')) && /\d/.test(v); };
+                var bolum = ['kapak', 'hizmetler', 'yaklasim', 'canli-piyasa', 'hakkimizda', 'leadForm', 'iletisim'].map(function (i) { var e = D.getElementById(i); return !!e && e.getBoundingClientRect().height > 40; });
+                return {
+                  kart: kart ? kart.getAttribute('data-state') : null,
+                  ptfBicim: t === '—' ? 'tire' : (sayi.test(t.replace(/\s*(₺|TL).*$/, '').replace(/[^\d.,]/g, '')) ? 'sayi' : 'diger'), ptfSifir: sifir(t),
+                  damga: st ? (/^(SAAT \d\d:00 · EPİAŞ|HOUR \d\d:00 · EPİAŞ)$/.test(st.textContent.trim()) ? 'canli' : (/^(SON SENKRON|LAST SYNC)/.test(st.textContent.trim()) ? 'son-senkron' : (/BEKLEN|AWAITING/.test(st.textContent) ? 'bekleme' : 'diger'))) : null,
+                  saat: { toplam: hucre.length, tire: hucre.filter(function (v) { return v === '—'; }).length, sayi: hucre.filter(function (v) { return sayi.test(v); }).length, sifir: hucre.filter(sifir).length },
+                  serit: { gizli: rail ? rail.hidden : null, hucre: tr ? tr.querySelectorAll('.cell').length : 0, sifirHucre: tr ? [].slice.call(tr.querySelectorAll('.cell b')).filter(function (b) { return sifir(b.textContent); }).length : 0, dugme: !!D.getElementById('mcpDur') },
+                  bolum: bolum.filter(Boolean).length + '/' + bolum.length
+                };
+              },
+              serit: function (ms, bitti) { var tr = D.getElementById('mcpTrack'); if (!tr) return bitti({ yol: 0 }); var a = tx(tr), t0 = performance.now(); setTimeout(function () { bitti({ yol: Math.round(Math.abs(tx(tr) - a)), sure: Math.round(performance.now() - t0) }); }, ms); },
+              /* Bahar ölçümü: her karede süs sayısı, kare aralıkları, denetimlerin örtülmesi, denetim/form kayması, yatay taşma */
+              baharBasla: function (sure) {
+                var f = D.getElementById('leadForm'); var k0 = kontroller(); var ilk = k0.map(function (e) { var r = e.getBoundingClientRect(); return [r.left + scrollX, r.top + scrollY, r.width, r.height]; });
+                var fr0 = f.getBoundingClientRect(), fy0 = fr0.top + scrollY, fh0 = fr0.height, boy0 = D.documentElement.scrollHeight;
+                var S = W.__qaB = { kesisim: 0, kesisimOrnek: 0, kesisimOge: {}, kare: 0, enUzun: 0, uzun50: 0, uzun100: 0, enCokSus: 0, katMax: 0, ortulu: 0, ortuluOrnek: 0, kontrol: k0.length, kayma: 0, formKayma: 0, boyFark: 0, tasma: 0, sx: 0, bitti: false, t0: performance.now() };
+                var son = performance.now();
+                (function tur(simdi) {
+                  var g = simdi - son; son = simdi; S.kare++; if (g > S.enUzun) S.enUzun = g; if (g > 50) S.uzun50++; if (g > 100) S.uzun100++;
+                  var n = D.querySelectorAll('.bh-kat [class^="bh-"], .bh-kat [class*=" bh-"]').length; if (n > S.enCokSus) S.enCokSus = n;
+                  var kat = D.querySelectorAll('.bh-kat').length; if (kat > S.katMax) S.katMax = kat;
+                  if (S.kare % 3 === 0) {
+                    var sus = [].slice.call(D.querySelectorAll('.bh-kat > div')).map(function (x) { var q = x.getBoundingClientRect(); return [q.left, q.top, q.right, q.bottom, x.className]; }).filter(function (q) { return q[2] > q[0]; });
+                    k0.concat([].slice.call(D.querySelectorAll('#leadForm label, #leadForm .form-label'))).forEach(function (e) { var q = e.getBoundingClientRect(); if (q.width === 0) return; sus.forEach(function (z) { S.kesisimOrnek++; var ix = Math.min(q.right, z[2]) - Math.max(q.left, z[0]), iy = Math.min(q.bottom, z[3]) - Math.max(q.top, z[1]); if (ix > 2 && iy > 2) { S.kesisim++; var ad = (e.id || e.className.split(' ')[0]) + '×' + z[4].split(' ')[0]; S.kesisimOge[ad] = (S.kesisimOge[ad] || 0) + 1; } }); });
+                    k0.forEach(function (e, i) { var h = isabet(e); if (h === null) return; S.ortuluOrnek++; if (h === 'sus') S.ortulu++; else if (h === false) S.digerOrtu = (S.digerOrtu || 0) + 1; var r = e.getBoundingClientRect(); var d = Math.max(Math.abs(r.left + scrollX - ilk[i][0]), Math.abs(r.top + scrollY - ilk[i][1]), Math.abs(r.width - ilk[i][2]), Math.abs(r.height - ilk[i][3])); if (d > S.kayma) S.kayma = d; }); }
+                  var fr = f.getBoundingClientRect(); S.formKayma = Math.max(S.formKayma, Math.abs(fr.top + scrollY - fy0), Math.abs(fr.height - fh0)); S.boyFark = Math.max(S.boyFark, Math.abs(D.documentElement.scrollHeight - boy0));
+                  S.tasma = Math.max(S.tasma, D.documentElement.scrollWidth - D.documentElement.clientWidth); S.sx = Math.max(S.sx, f.scrollLeft, D.documentElement.scrollLeft);
+                  if (simdi - S.t0 < sure) requestAnimationFrame(tur); else S.bitti = true;
+                })(performance.now());
+                return k0.length;
+              },
+              baharSonuc: function () {
+                var S = W.__qaB || {}; var f = D.getElementById('leadForm'), b = D.getElementById('leadSubmit');
+                b.scrollIntoView({ block: 'center', behavior: 'instant' }); var r = b.getBoundingClientRect(); var h = D.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                return { kare: S.kare, enUzunMs: Math.round(S.enUzun), uzun50: S.uzun50, uzun100: S.uzun100, enCokSus: S.enCokSus, katMax: S.katMax, ortulu: S.ortulu, ortuluOrnek: S.ortuluOrnek, digerOrtu: S.digerOrtu || 0, kesisim: S.kesisim, kesisimOrnek: S.kesisimOrnek, kesisimOge: S.kesisimOge, kontrol: S.kontrol, kaymaPx: +S.kayma.toFixed(1), formKaymaPx: +S.formKayma.toFixed(1), boyFark: S.boyFark, tasma: S.tasma, sx: S.sx, bitti: S.bitti,
+                  sonraSus: D.querySelectorAll('[class^="bh-"], [class*=" bh-"]').length, sonraKat: D.querySelectorAll('.bh-kat').length, yesil: f.classList.contains('yesil'), gonderUlasilir: !!h && (h === b || b.contains(h)), gonderEtkin: !b.disabled };
+              },
+              deger: function (id) { var e = D.getElementById(id); return e ? e.value.length : -1; },
+              hesap: function () { /* fatura hesaplama: 1. araç sonucu (yalnız birim maliyet sayısı biçimi ve ok/warn sınıfı) */
+                var o = D.getElementById('t1Out'), o2 = D.getElementById('t2Out'), o3 = D.getElementById('t3Out');
+                var t = o ? o.textContent.replace(/\s+/g, ' ') : '';
+                return { t1Sinif: o ? o.className : null, t1Birim: (t.match(/(\d+,\d{2,4})\s*(TL|₺)\s*\/\s*kWh/) || [])[1] || null, t2Satir: o2 ? o2.querySelectorAll('tr, li').length : 0, t3Sinif: o3 ? o3.className : null };
+              }
+            };
+            W.__qa = qa;
+          })();
+          QAEOF
+          cat > gercek.mjs <<'QAEOF'
+          #!/usr/bin/env node
+          // Gerçek tarayıcı turu (yayın adayı): Safari (safaridriver), iOS Simülatörü Safari (safaridriver useSimulator) ya da
+          // Firefox (Playwright). Çıktı YALNIZ denetim adları, geçti/kaldı ve sayılar; sayfa metni basılmaz. Form gönderilmez.
+          //   MOD=safari|ios|firefox TABAN=<adres> [MODUL=<node_modules>] node gercek.mjs
+          import { createRequire } from 'node:module';
+          import { readFileSync } from 'node:fs';
+          const MOD = process.env.MOD || 'safari';
+          const TABAN = (process.env.TABAN || '').replace(/\/$/, '');
+          const req = createRequire((process.env.MODUL || process.cwd() + '/node_modules').replace(/\/?$/, '/'));
+          const OLCUM = readFileSync(new URL('./olcum.js', import.meta.url), 'utf8');
+          let gecti = 0, kaldi = 0;
+          const ok = (ad, kosul, sayi) => { if (kosul) gecti++; else kaldi++; console.log(`  ${kosul ? 'GECTI' : 'KALDI'} ${ad}${sayi !== undefined ? ' · ' + JSON.stringify(sayi) : ''}`); };
+          const not = (s) => console.log(`  NOT ${s}`);
+          const bekle = (ms) => new Promise(r => setTimeout(r, ms));
+
+          // --- sürücü bağdaştırıcısı: ortak işlemler ---
+          let A, A0;
+          const PW = ['firefox', 'chromium', 'webkit'].includes(MOD);
+          if (PW) {
+            const pw = req('playwright');
+            const b = await pw[MOD].launch();
+            const ctx = await b.newContext(MOD === 'webkit' ? { ...pw.devices['iPhone 15'], locale: 'tr-TR' } : { viewport: { width: 1280, height: 900 }, locale: 'tr-TR' });
+            A0 = { b, pw };
+            if (process.env.YEREL_TAKLIT) { // yalnız yerel hata ayıklama: UYDURMA 24 saat (eksik 5. saat)
+              await ctx.route('https://epias-proxy.emirhantan-ku.workers.dev/**', (r) => { const u = r.request().url(); const it = []; for (let h = 0; h < 24; h++) if (h !== 5) it.push({ hour: h, price: 2000 + h * 10 }); return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(u.endsWith('/ptf/stats') ? { monthAvg: 2345.67, monthRange: '2026-11-01..26' } : { items: it, date: new Date().toISOString().slice(0, 10) }) }); });
+              await ctx.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
+            }
+            const p = await ctx.newPage();
+            p.on('pageerror', () => { p.__hata = (p.__hata || 0) + 1; });
+            A = {
+              ad: MOD, get: async (u) => { await p.goto(u, { waitUntil: 'load', timeout: 45000 }); await p.evaluate(OLCUM); },
+              js: (f, ...a) => p.evaluate(([f, a]) => (0, eval)('(' + f + ')').apply(null, a), [f.toString(), a]),
+              jsAsync: (f, ...a) => p.evaluate(([f, a]) => new Promise(r => (0, eval)('(' + f + ')').apply(null, [...a, r])), [f.toString(), a]),
+              tikla: (s) => p.click(s, { timeout: 5000 }), yaz: (s, t) => p.locator(s).pressSequentially(t, { timeout: 5000 }), tus: (k) => p.keyboard.press(k),
+              boyut: (w, h) => p.setViewportSize({ width: w, height: h }), kapat: () => b.close(), sayfaHata: () => p.__hata || 0,
+              dosya: (s, f) => p.setInputFiles(s, f)
+            };
+          } else {
+            const { Builder, By, Key } = req('selenium-webdriver');
+            const safari = req('selenium-webdriver/safari');
+            const o = new safari.Options();
+            if (MOD === 'ios') { o.set('platformName', 'iOS'); o.set('safari:useSimulator', true); o.set('safari:deviceType', 'iPhone'); if (process.env.IOS_UDID) o.set('safari:deviceUDID', process.env.IOS_UDID); }
+            const d = await new Builder().forBrowser('safari').setSafariOptions(o).build();
+            await d.manage().setTimeouts({ script: 30000, pageLoad: 60000 });
+            const bul = (s) => d.findElement(By.css(s));
+            A = {
+              ad: MOD === 'ios' ? 'iOS Simülatörü Safari' : 'Safari', get: async (u) => { await d.get(u); await d.executeScript(OLCUM); },
+              js: (f, ...a) => d.executeScript('return (' + f.toString() + ').apply(null, arguments)', ...a),
+              jsAsync: (f, ...a) => d.executeAsyncScript('var a=[].slice.call(arguments);(' + f.toString() + ').apply(null, a)', ...a),
+              tikla: async (s) => { await d.executeScript('arguments[0].scrollIntoView({block:"center",behavior:"instant"})', await bul(s)); await (await bul(s)).click(); },
+              yaz: async (s, t) => (await bul(s)).sendKeys(t), tus: async (k) => d.actions().sendKeys(Key[k.toUpperCase()] || k).perform(),
+              boyut: async (w, h) => { if (MOD !== 'ios') await d.manage().window().setRect({ width: w, height: h }); }, kapat: () => d.quit(), sayfaHata: () => 0,
+              caps: () => d.getCapabilities()
+            };
+          }
+
+          try {
+            if (A.caps) { const c = await A.caps(); console.log(`# ${A.ad} ${c.get('browserVersion')} · ${c.get('platformName')}`); }
+            const genislik = (MOD === 'ios' || MOD === 'webkit') ? [null] : [1280, 390];
+            // 1) Ana sayfa
+            for (const w of genislik) {
+              if (w) await A.boyut(w, 900);
+              await A.get(TABAN + '/');
+              await bekle(7000); // canlı veri ve şerit
+              const d0 = await A.js(() => window.__qa.durum());
+              console.log(`# ana sayfa · ${d0.motor} · pencere ${d0.w} px (istemci ${d0.cw}) · dpr ${d0.dpr}`);
+              const etiket = `ana ${d0.cw}px`;
+              ok(`${etiket}: yatay taşma yok`, d0.tasma <= 0, d0.tasma);
+              ok(`${etiket}: tek h1, atla bağlantısı (#icerik), künye "Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı"`, d0.h1 === 1 && d0.atla && d0.kunye, [d0.h1, d0.atla, d0.kunye]);
+              const a = await A.js(() => window.__qa.ana());
+              ok(`${etiket}: bölümler görünür`, a.bolum === '7/7', a.bolum);
+              ok(`${etiket}: PTF kartı dürüst (canlı→sayı, değilse "—"; sıfır yok)`, !a.ptfSifir && ((a.kart === 'live' && a.ptfBicim === 'sayi' && a.damga === 'canli') || (a.kart === 'cached' && a.ptfBicim === 'sayi' && a.damga === 'son-senkron') || (a.kart === 'waiting' && a.ptfBicim === 'tire' && a.damga === 'bekleme')), [a.kart, a.ptfBicim, a.damga]);
+              ok(`${etiket}: saatlik tablo 24 hücre, yalnız sayı ya da "—", sıfır yok`, a.saat.toplam === 24 && a.saat.tire + a.saat.sayi === 24 && a.saat.sifir === 0, a.saat);
+              if (a.serit.gizli === false) {
+                const s = await A.jsAsync((ms, bitti) => window.__qa.serit(ms, bitti), 2000);
+                ok(`${etiket}: şerit görünür ve akıyor (2 sn'de ≥ 20 px), sıfır fiyat yok`, s.yol >= 20 && a.serit.sifirHucre === 0, [a.serit.hucre, s.yol, a.serit.sifirHucre]);
+              } else not(`${etiket}: şerit gizli (canlı veri yok → dürüst: ray gösterilmez) hücre=${a.serit.hucre}`);
+              // Menü (dar ekranda)
+              const m0 = await A.js(() => window.__qa.menu());
+              if (m0.dugmeGorunur) {
+                await A.tikla('#mobileMenuBtn'); await bekle(400);
+                const m1 = await A.js(() => window.__qa.menu());
+                await A.tus('Escape'); await bekle(300);
+                const m2 = await A.js(() => window.__qa.menu());
+                ok(`${etiket}: mobil menü açılır (aria-expanded), bağlantılar görünür, Esc kapatır`, m1.acik && m1.aria === 'true' && m1.baglanti >= 4 && !m2.acik && m2.aria === 'false', [m1.acik, m1.aria, m1.baglanti, m2.acik]);
+              } else not(`${etiket}: menü düğmesi bu genişlikte görünmüyor (masaüstü gezinme)`);
+              // Teklif formu + bahar anı (gönderilmez)
+              await A.js(() => { const k = document.getElementById('lead-yesil'); k.scrollIntoView({ block: 'center', behavior: 'instant' }); window.scrollBy({ top: 120, behavior: 'instant' }); });
+              await A.tikla('#lead-ad'); await A.yaz('#lead-ad', 'Deneme');
+              await A.yaz('#lead-sirket', 'QA Test');
+              await A.yaz('#lead-eposta', 'qa@example.com');
+              await A.js(() => { const k = document.getElementById('lead-yesil'); k.scrollIntoView({ block: 'center', behavior: 'instant' }); });
+              const kn = await A.js(() => window.__qa.baharBasla(7000));
+              const t0 = Date.now();
+              try { await A.tikla('#lead-yesil'); } catch { await A.tikla('label.form-green'); }
+              const isaret = await A.js(() => [document.getElementById('lead-yesil').checked, document.querySelectorAll('.bh-kat').length]);
+              // etki sürerken yazma ve tıklama
+              const t1 = Date.now(); await A.tikla('#lead-mesaj'); await A.yaz('#lead-mesaj', 'Bahar sirasinda yazi'); const yazMs = Date.now() - t1;
+              await A.tikla('#lead-soyad'); await A.yaz('#lead-soyad', 'Test');
+              const odak = await A.js(() => document.activeElement && document.activeElement.id);
+              await bekle(Math.max(0, 7400 - (Date.now() - t0)));
+              const b = await A.js(() => window.__qa.baharSonuc());
+              const uz = await A.js(() => [window.__qa.deger('lead-mesaj'), window.__qa.deger('lead-soyad'), window.__qa.deger('lead-ad')]);
+              ok(`${etiket}: yeşil kutucuk işaretlendi, bahar anı başladı (tek katman)`, isaret[0] === true && isaret[1] === 1 && b.katMax === 1 && b.enCokSus > 0, [isaret, b.katMax, b.enCokSus]);
+              ok(`${etiket}: etki sürerken yazılan metin tam (mesaj 20, soyad 4 karakter), odak alanda`, uz[0] === 20 && uz[1] === 4 && uz[2] === 6 && odak === 'lead-soyad', [uz, odak, yazMs]);
+              ok(`${etiket}: etki boyunca süs hiçbir denetimin tıklamasını yakalamadı (elementFromPoint)`, b.ortulu === 0 && b.ortuluOrnek > 0, [b.ortulu, b.ortuluOrnek, b.digerOrtu, kn]);
+              ok(`${etiket}: etki boyunca hiçbir süs öğesinin kutusu denetim/etiket kutusuyla kesişmedi (geometri)`, b.kesisim === 0 && b.kesisimOrnek > 0, [b.kesisim, b.kesisimOrnek, b.kesisimOge]);
+              ok(`${etiket}: denetim ve form kaymadı (< 0,5 px), sayfa boyu sabit, yatay taşma yok`, b.kaymaPx < 0.5 && b.formKaymaPx < 0.5 && b.boyFark === 0 && b.tasma <= 0 && b.sx === 0, [b.kaymaPx, b.formKaymaPx, b.boyFark, b.tasma, b.sx]);
+              ok(`${etiket}: ≈5,8 sn sonra süs DOM'dan silindi, yeşil görünüm kaldı, gönder düğmesi etkin ve örtülmüyor`, b.sonraSus === 0 && b.sonraKat === 0 && b.yesil && b.gonderUlasilir && b.gonderEtkin, [b.sonraSus, b.yesil, b.gonderUlasilir]);
+              not(`${etiket}: kare sayısı ${b.kare}, en uzun kare ${b.enUzunMs} ms, >50 ms kare ${b.uzun50}, >100 ms kare ${b.uzun100}, en çok süs öğesi ${b.enCokSus}, yazma ${yazMs} ms`);
+              ok(`${etiket}: sayfa hatası yok`, (d0.hata + A.sayfaHata()) === 0);
+            }
+            // 2) Alt sayfalar
+            const SAYFA = ['/rehber/sktt', '/canli-ptf', '/elektrik-faturasi-hesaplama', '/kurumsal', '/olmayan-sayfa-qa-yayin'];
+            for (const w of genislik) {
+              if (w) await A.boyut(w, 900);
+              for (const yol of SAYFA) {
+                await A.get(TABAN + yol); await bekle(yol === '/canli-ptf' ? 4000 : 1500);
+                const d = await A.js(() => window.__qa.durum());
+                const e = `${yol} ${d.cw}px`;
+                const ozel = yol.startsWith('/olmayan') ? true : d.h1 === 1;
+                ok(`${e}: yatay taşma yok, h1, gezinme, atla bağlantısı, künye`, d.tasma <= 0 && ozel && d.nav && d.atla && d.kunye, [d.tasma, d.h1, d.nav, d.atla, d.kunye]);
+                const m0 = await A.js(() => window.__qa.menu());
+                if (m0.dugmeGorunur) {
+                  await A.tikla('#mobileMenuBtn'); await bekle(400); const m1 = await A.js(() => window.__qa.menu());
+                  await A.tikla('#mobileMenuBtn'); await bekle(300); const m2 = await A.js(() => window.__qa.menu());
+                  ok(`${e}: mobil menü aç/kapa`, m1.acik && m1.aria === 'true' && m1.baglanti >= 4 && !m2.acik, [m1.acik, m1.baglanti, m2.acik]);
+                }
+                if (yol === '/canli-ptf') {
+                  const c = await A.js(() => { const h = [...document.querySelectorAll('#pTable td')].map(x => x.textContent.trim()); const sifir = h.filter(v => /^0+([.,]0+)?$/.test(v)).length; return { hucre: h.length, tire: h.filter(v => v === '—').length, sifir, mod: (document.getElementById('pMode') || {}).textContent ? document.getElementById('pMode').textContent.trim().replace(/[^A-ZÇĞİÖŞÜ ]/g, '').slice(0, 14) : null }; });
+                  ok(`${e}: saatlik tablo dolu, eksik saat "—", sıfır yok`, c.hucre >= 24 && c.sifir === 0, c);
+                }
+                if (yol === '/elektrik-faturasi-hesaplama') {
+                  await A.tikla('#t1Tutar'); await A.yaz('#t1Tutar', '2.450,80'); await A.tikla('#t1Kwh'); await A.yaz('#t1Kwh', '520'); await bekle(800);
+                  const h = await A.js(() => window.__qa.hesap());
+                  ok(`${e}: hesaplayıcı 2.450,80 TL / 520 kWh → 4,71 TL/kWh, 2. araca aktarıldı (10 satır)`, h.t1Birim === '4,71' && /ok/.test(h.t1Sinif) && h.t2Satir === 10, h);
+                }
+              }
+            }
+            // 3) Hareket azaltma (yalnız Playwright motorları): kelebek ve yaprak yok, çiçekler yalnız saydamlıkla, sonra temizlik
+            if (PW) {
+              const c2 = await A0.b.newContext({ ...(MOD === 'webkit' ? A0.pw.devices['iPhone 15'] : { viewport: { width: 390, height: 844 } }), reducedMotion: 'reduce' });
+              const p2 = await c2.newPage(); await p2.goto(TABAN + '/', { waitUntil: 'load' });
+              await p2.evaluate(() => document.getElementById('lead-yesil').scrollIntoView({ block: 'center', behavior: 'instant' }));
+              await p2.click('#lead-yesil');
+              const r = await p2.evaluate(() => new Promise(bitti => { const m = { kelebek: 0, yaprak: 0, cicek: 0, ozellik: new Set() }; const t0 = performance.now(); (function tur() { m.kelebek = Math.max(m.kelebek, document.querySelectorAll('.bh-kelebek').length); m.yaprak = Math.max(m.yaprak, document.querySelectorAll('.bh-yaprak').length); m.cicek = Math.max(m.cicek, document.querySelectorAll('.bh-cicek').length); document.getAnimations().forEach(a => { const e = a.effect && a.effect.target; if (e && e.closest && e.closest('.bh-kat') && a.effect.getKeyframes) a.effect.getKeyframes().forEach(k => Object.keys(k).forEach(o => { if (!['offset', 'easing', 'composite', 'computedOffset'].includes(o)) m.ozellik.add(o); })); }); if (performance.now() - t0 < 4000) requestAnimationFrame(tur); else bitti({ ...m, ozellik: [...m.ozellik] }); })(); }));
+              await p2.waitForTimeout(2200);
+              const son = await p2.evaluate(() => document.querySelectorAll('[class^="bh-"], [class*=" bh-"]').length);
+              ok(`hareket azaltma: kelebek 0, yaprak 0, çiçek > 0, yalnız saydamlık; ≈6 sn'de temizlenir`, r.kelebek === 0 && r.yaprak === 0 && r.cicek > 0 && r.ozellik.every(o => o === 'opacity') && son === 0, { ...r, son });
+              await c2.close();
+            }
+          } catch (e) {
+            kaldi++; console.log('  KALDI beklenmeyen hata: ' + String(e && e.name) + ' ' + String(e && e.message).slice(0, 160).replace(/https?:\S+/g, '<adres>'));
+          } finally {
+            await A.kapat().catch(() => {});
+          }
+          console.log(`${gecti} passed, ${kaldi} failed`);
+          process.exit(kaldi ? 1 : 0);
+          QAEOF
+          npm install --no-audit --no-fund "playwright@${PW_SURUM}" >/dev/null 2>&1; echo "npm $?"
+          npx playwright install --with-deps firefox webkit >/dev/null 2>&1; echo "tarayıcı kurulumu $?"
+      - name: Önizleme durum kodları ve başlıklar (yalnız sayılar)
+        shell: bash {0}
+        run: |
+          ok=0; bad=0
+          for p in / /rehber /rehber/15-dakikalik-uzlastirma /rehber/cam-seramik-elektrik /rehber/demir-celik-elektrik /rehber/elektrik-faturasi-neden-yuksek /rehber/elektrik-tedarikcisi-nasil-secilir /rehber/i-rec-nedir /rehber/kapsam-2-elektrik-emisyonu /rehber/kimya-elektrik /rehber/osb-elektrik-tedariki /rehber/skdm-elektrik-sertifika /rehber/sktt /rehber/soguk-zincir-elektrik /rehber/tekstil-elektrik /rehber/veri-merkezi-elektrik /rehber/yek-g-i-rec-farki /rehber/yek-g-nedir /sanayi-elektrik-tedariki /elektrik-faturasi-hesaplama /canli-ptf /kurumsal /kvkk /cerez-politikasi /kullanim-kosullari; do
+            k=$(curl -sS -o b.html -D h.txt -m 30 -w '%{http_code}' "$TABAN$p")
+            x=$(grep -ci '^x-robots-tag: noindex' h.txt); c=$(grep -ci '^content-security-policy:' h.txt); f=$(grep -c 'Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı' b.html)
+            if [ "$k" = 200 ] && [ "$x" -ge 1 ] && [ "$f" -ge 1 ]; then ok=$((ok+1)); else bad=$((bad+1)); echo "SORUN $p http=$k noindex=$x kunye=$f"; fi
+          done
+          echo "sayfa: $ok geçti, $bad sorunlu"
+          k=$(curl -sS -o b.html -m 30 -w '%{http_code}' "$TABAN/olmayan-sayfa-qa-yayin"); echo "404 http=$k kunye=$(grep -c 'Kuruluş 2011' b.html)"
+          for p in /docs/qa/README.md /CLAUDE.md /lib/admin-auth.js /tools/gsc-export.mjs /.github/workflows/lead-reports.yml; do echo "gizli $p http=$(curl -sS -o /dev/null -m 30 -w '%{http_code}' "$TABAN$p")"; done
+          for p in /img/kapak-1600.webp /img/kapak-mobil-579.webp /img/sektor-kimya-800.webp; do curl -sS -o /dev/null -m 30 -w "$p %{http_code} %{content_type}\n" "$TABAN$p"; done
+          curl -sS -o /dev/null -m 30 -w 'epias-proxy ptf/today http=%{http_code}\n' -H "Origin: $TABAN" https://epias-proxy.emirhantan-ku.workers.dev/ptf/today
+      - name: Firefox (Playwright) ve WebKit (iPhone 15 öykünmesi)
+        working-directory: ${{ runner.temp }}/qa
+        shell: bash {0}
+        run: |
+          H=0
+          for M in firefox webkit; do echo "== $M"; MOD=$M MODUL=$PWD/node_modules timeout 600 node gercek.mjs; k=$?; echo "$M çıkış $k"; [ $k -eq 0 ] || H=1; done
+          exit $H
+
+  macos-safari-ios:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Betikler, selenium, iPhone simülatörü (arka planda önyükleme)
+        working-directory: ${{ runner.temp }}
+        run: |
+          sw_vers | tr '\n' ' '; echo; xcodebuild -version | head -1
+          mkdir -p qa ekran && cd qa && npm init -y >/dev/null
+          cat > olcum.js <<'QAEOF'
+          /* QA ölçüm modülü (sayfaya executeScript ile eklenir; sayfa içeriği döndürmez, yalnız sayılar ve doğru/yanlış) */
+          (function () {
+            if (window.__qa) return;
+            var D = document, W = window;
+            function gor(e) { if (!e) return false; var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 0 && r.height > 0 && c.visibility !== 'hidden' && c.display !== 'none'; }
+            function tx(e) { var m = getComputedStyle(e).transform; if (!m || m === 'none') return 0; var v = m.match(/matrix(3d)?\(([^)]+)\)/); if (!v) return 0; var a = v[2].split(',').map(parseFloat); return v[1] ? a[12] : a[4]; }
+            var KONTROL = '#leadForm input:not([type=hidden]):not([type=file]), #leadForm select, #leadForm textarea, #leadSubmit, #leadForm .dosya-dugme';
+            function kontroller() { return [].slice.call(D.querySelectorAll(KONTROL)).filter(function (e) { return !e.closest('.hp-field') && gor(e); }); }
+            /* Denetimin isabet hedefi: kendisi, içindekiler ya da kendi etiketi (gizli kutucuklarda etiket tıklanır) */
+            function isabet(e) {
+              var r = e.getBoundingClientRect(); var x = r.left + r.width / 2, y = r.top + r.height / 2;
+              if (y < 0 || y > innerHeight || x < 0 || x > innerWidth) return null;
+              var h = D.elementFromPoint(x, y); if (!h) return false;
+              if (h.closest && h.closest('.bh-kat')) return 'sus';
+              if (h === e || e.contains(h)) return true;
+              var l = h.closest('label'); if (l && (l.htmlFor === e.id || l.contains(e))) return true;
+              return false;
+            }
+            var qa = {
+              durum: function () {
+                var de = D.documentElement, f = D.querySelector('footer'), s = D.querySelector('a.skip');
+                var ua = navigator.userAgent, ios = (ua.match(/OS (\d+)_(\d+)/) || []), saf = (ua.match(/Version\/([\d.]+)/) || []), ff = (ua.match(/Firefox\/([\d.]+)/) || []);
+                return {
+                  w: innerWidth, cw: de.clientWidth, dpr: devicePixelRatio, tasma: de.scrollWidth - de.clientWidth,
+                  motor: ff[1] ? 'Firefox ' + ff[1] : (ios[1] ? 'iOS ' + ios[1] + '.' + ios[2] + ' Safari ' + (saf[1] || '?') : 'Safari ' + (saf[1] || '?')),
+                  h1: D.querySelectorAll('h1').length, nav: !!D.querySelector('.nav-links'), menuDugme: !!D.getElementById('mobileMenuBtn'),
+                  kunye: !!f && /Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı|Est\. 2011 · EPIAS Market Participant/.test(f.textContent.replace(/\s+/g, ' ')),
+                  atla: !!s && s.getAttribute('href') === '#icerik' && /^(İçeriğe atla|Skip to content)$/.test(s.textContent.trim()) && !!D.getElementById('icerik'),
+                  hata: (W.__qaHata || []).length
+                };
+              },
+              menu: function () { var b = D.getElementById('mobileMenuBtn'), m = D.getElementById('mobileMenu'); return { dugmeGorunur: gor(b), acik: !!m && !m.hidden && gor(m), aria: b ? b.getAttribute('aria-expanded') : null, baglanti: m ? [].slice.call(m.querySelectorAll('a')).filter(gor).length : 0 }; },
+              ana: function () {
+                var k = D.getElementById('kfPtf'), st = D.getElementById('kfStamp'), kart = D.getElementById('ptfKart'), rail = D.getElementById('mcpRail'), tr = D.getElementById('mcpTrack');
+                var t = k ? k.textContent.replace(/\s+/g, ' ').trim() : '';
+                var hucre = [].slice.call(D.querySelectorAll('#saatTablo tbody td')).map(function (c) { return c.textContent.trim(); });
+                var sayi = /^\d{1,3}(\.\d{3})*(,\d{1,2})?$/;
+                var sifir = function (v) { return /^0+([.,]0+)?$/.test(v.replace(/[^\d.,]/g, '')) && /\d/.test(v); };
+                var bolum = ['kapak', 'hizmetler', 'yaklasim', 'canli-piyasa', 'hakkimizda', 'leadForm', 'iletisim'].map(function (i) { var e = D.getElementById(i); return !!e && e.getBoundingClientRect().height > 40; });
+                return {
+                  kart: kart ? kart.getAttribute('data-state') : null,
+                  ptfBicim: t === '—' ? 'tire' : (sayi.test(t.replace(/\s*(₺|TL).*$/, '').replace(/[^\d.,]/g, '')) ? 'sayi' : 'diger'), ptfSifir: sifir(t),
+                  damga: st ? (/^(SAAT \d\d:00 · EPİAŞ|HOUR \d\d:00 · EPİAŞ)$/.test(st.textContent.trim()) ? 'canli' : (/^(SON SENKRON|LAST SYNC)/.test(st.textContent.trim()) ? 'son-senkron' : (/BEKLEN|AWAITING/.test(st.textContent) ? 'bekleme' : 'diger'))) : null,
+                  saat: { toplam: hucre.length, tire: hucre.filter(function (v) { return v === '—'; }).length, sayi: hucre.filter(function (v) { return sayi.test(v); }).length, sifir: hucre.filter(sifir).length },
+                  serit: { gizli: rail ? rail.hidden : null, hucre: tr ? tr.querySelectorAll('.cell').length : 0, sifirHucre: tr ? [].slice.call(tr.querySelectorAll('.cell b')).filter(function (b) { return sifir(b.textContent); }).length : 0, dugme: !!D.getElementById('mcpDur') },
+                  bolum: bolum.filter(Boolean).length + '/' + bolum.length
+                };
+              },
+              serit: function (ms, bitti) { var tr = D.getElementById('mcpTrack'); if (!tr) return bitti({ yol: 0 }); var a = tx(tr), t0 = performance.now(); setTimeout(function () { bitti({ yol: Math.round(Math.abs(tx(tr) - a)), sure: Math.round(performance.now() - t0) }); }, ms); },
+              /* Bahar ölçümü: her karede süs sayısı, kare aralıkları, denetimlerin örtülmesi, denetim/form kayması, yatay taşma */
+              baharBasla: function (sure) {
+                var f = D.getElementById('leadForm'); var k0 = kontroller(); var ilk = k0.map(function (e) { var r = e.getBoundingClientRect(); return [r.left + scrollX, r.top + scrollY, r.width, r.height]; });
+                var fr0 = f.getBoundingClientRect(), fy0 = fr0.top + scrollY, fh0 = fr0.height, boy0 = D.documentElement.scrollHeight;
+                var S = W.__qaB = { kesisim: 0, kesisimOrnek: 0, kesisimOge: {}, kare: 0, enUzun: 0, uzun50: 0, uzun100: 0, enCokSus: 0, katMax: 0, ortulu: 0, ortuluOrnek: 0, kontrol: k0.length, kayma: 0, formKayma: 0, boyFark: 0, tasma: 0, sx: 0, bitti: false, t0: performance.now() };
+                var son = performance.now();
+                (function tur(simdi) {
+                  var g = simdi - son; son = simdi; S.kare++; if (g > S.enUzun) S.enUzun = g; if (g > 50) S.uzun50++; if (g > 100) S.uzun100++;
+                  var n = D.querySelectorAll('.bh-kat [class^="bh-"], .bh-kat [class*=" bh-"]').length; if (n > S.enCokSus) S.enCokSus = n;
+                  var kat = D.querySelectorAll('.bh-kat').length; if (kat > S.katMax) S.katMax = kat;
+                  if (S.kare % 3 === 0) {
+                    var sus = [].slice.call(D.querySelectorAll('.bh-kat > div')).map(function (x) { var q = x.getBoundingClientRect(); return [q.left, q.top, q.right, q.bottom, x.className]; }).filter(function (q) { return q[2] > q[0]; });
+                    k0.concat([].slice.call(D.querySelectorAll('#leadForm label, #leadForm .form-label'))).forEach(function (e) { var q = e.getBoundingClientRect(); if (q.width === 0) return; sus.forEach(function (z) { S.kesisimOrnek++; var ix = Math.min(q.right, z[2]) - Math.max(q.left, z[0]), iy = Math.min(q.bottom, z[3]) - Math.max(q.top, z[1]); if (ix > 2 && iy > 2) { S.kesisim++; var ad = (e.id || e.className.split(' ')[0]) + '×' + z[4].split(' ')[0]; S.kesisimOge[ad] = (S.kesisimOge[ad] || 0) + 1; } }); });
+                    k0.forEach(function (e, i) { var h = isabet(e); if (h === null) return; S.ortuluOrnek++; if (h === 'sus') S.ortulu++; else if (h === false) S.digerOrtu = (S.digerOrtu || 0) + 1; var r = e.getBoundingClientRect(); var d = Math.max(Math.abs(r.left + scrollX - ilk[i][0]), Math.abs(r.top + scrollY - ilk[i][1]), Math.abs(r.width - ilk[i][2]), Math.abs(r.height - ilk[i][3])); if (d > S.kayma) S.kayma = d; }); }
+                  var fr = f.getBoundingClientRect(); S.formKayma = Math.max(S.formKayma, Math.abs(fr.top + scrollY - fy0), Math.abs(fr.height - fh0)); S.boyFark = Math.max(S.boyFark, Math.abs(D.documentElement.scrollHeight - boy0));
+                  S.tasma = Math.max(S.tasma, D.documentElement.scrollWidth - D.documentElement.clientWidth); S.sx = Math.max(S.sx, f.scrollLeft, D.documentElement.scrollLeft);
+                  if (simdi - S.t0 < sure) requestAnimationFrame(tur); else S.bitti = true;
+                })(performance.now());
+                return k0.length;
+              },
+              baharSonuc: function () {
+                var S = W.__qaB || {}; var f = D.getElementById('leadForm'), b = D.getElementById('leadSubmit');
+                b.scrollIntoView({ block: 'center', behavior: 'instant' }); var r = b.getBoundingClientRect(); var h = D.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                return { kare: S.kare, enUzunMs: Math.round(S.enUzun), uzun50: S.uzun50, uzun100: S.uzun100, enCokSus: S.enCokSus, katMax: S.katMax, ortulu: S.ortulu, ortuluOrnek: S.ortuluOrnek, digerOrtu: S.digerOrtu || 0, kesisim: S.kesisim, kesisimOrnek: S.kesisimOrnek, kesisimOge: S.kesisimOge, kontrol: S.kontrol, kaymaPx: +S.kayma.toFixed(1), formKaymaPx: +S.formKayma.toFixed(1), boyFark: S.boyFark, tasma: S.tasma, sx: S.sx, bitti: S.bitti,
+                  sonraSus: D.querySelectorAll('[class^="bh-"], [class*=" bh-"]').length, sonraKat: D.querySelectorAll('.bh-kat').length, yesil: f.classList.contains('yesil'), gonderUlasilir: !!h && (h === b || b.contains(h)), gonderEtkin: !b.disabled };
+              },
+              deger: function (id) { var e = D.getElementById(id); return e ? e.value.length : -1; },
+              hesap: function () { /* fatura hesaplama: 1. araç sonucu (yalnız birim maliyet sayısı biçimi ve ok/warn sınıfı) */
+                var o = D.getElementById('t1Out'), o2 = D.getElementById('t2Out'), o3 = D.getElementById('t3Out');
+                var t = o ? o.textContent.replace(/\s+/g, ' ') : '';
+                return { t1Sinif: o ? o.className : null, t1Birim: (t.match(/(\d+,\d{2,4})\s*(TL|₺)\s*\/\s*kWh/) || [])[1] || null, t2Satir: o2 ? o2.querySelectorAll('tr, li').length : 0, t3Sinif: o3 ? o3.className : null };
+              }
+            };
+            W.__qa = qa;
+          })();
+          QAEOF
+          cat > gercek.mjs <<'QAEOF'
+          #!/usr/bin/env node
+          // Gerçek tarayıcı turu (yayın adayı): Safari (safaridriver), iOS Simülatörü Safari (safaridriver useSimulator) ya da
+          // Firefox (Playwright). Çıktı YALNIZ denetim adları, geçti/kaldı ve sayılar; sayfa metni basılmaz. Form gönderilmez.
+          //   MOD=safari|ios|firefox TABAN=<adres> [MODUL=<node_modules>] node gercek.mjs
+          import { createRequire } from 'node:module';
+          import { readFileSync } from 'node:fs';
+          const MOD = process.env.MOD || 'safari';
+          const TABAN = (process.env.TABAN || '').replace(/\/$/, '');
+          const req = createRequire((process.env.MODUL || process.cwd() + '/node_modules').replace(/\/?$/, '/'));
+          const OLCUM = readFileSync(new URL('./olcum.js', import.meta.url), 'utf8');
+          let gecti = 0, kaldi = 0;
+          const ok = (ad, kosul, sayi) => { if (kosul) gecti++; else kaldi++; console.log(`  ${kosul ? 'GECTI' : 'KALDI'} ${ad}${sayi !== undefined ? ' · ' + JSON.stringify(sayi) : ''}`); };
+          const not = (s) => console.log(`  NOT ${s}`);
+          const bekle = (ms) => new Promise(r => setTimeout(r, ms));
+
+          // --- sürücü bağdaştırıcısı: ortak işlemler ---
+          let A, A0;
+          const PW = ['firefox', 'chromium', 'webkit'].includes(MOD);
+          if (PW) {
+            const pw = req('playwright');
+            const b = await pw[MOD].launch();
+            const ctx = await b.newContext(MOD === 'webkit' ? { ...pw.devices['iPhone 15'], locale: 'tr-TR' } : { viewport: { width: 1280, height: 900 }, locale: 'tr-TR' });
+            A0 = { b, pw };
+            if (process.env.YEREL_TAKLIT) { // yalnız yerel hata ayıklama: UYDURMA 24 saat (eksik 5. saat)
+              await ctx.route('https://epias-proxy.emirhantan-ku.workers.dev/**', (r) => { const u = r.request().url(); const it = []; for (let h = 0; h < 24; h++) if (h !== 5) it.push({ hour: h, price: 2000 + h * 10 }); return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(u.endsWith('/ptf/stats') ? { monthAvg: 2345.67, monthRange: '2026-11-01..26' } : { items: it, date: new Date().toISOString().slice(0, 10) }) }); });
+              await ctx.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
+            }
+            const p = await ctx.newPage();
+            p.on('pageerror', () => { p.__hata = (p.__hata || 0) + 1; });
+            A = {
+              ad: MOD, get: async (u) => { await p.goto(u, { waitUntil: 'load', timeout: 45000 }); await p.evaluate(OLCUM); },
+              js: (f, ...a) => p.evaluate(([f, a]) => (0, eval)('(' + f + ')').apply(null, a), [f.toString(), a]),
+              jsAsync: (f, ...a) => p.evaluate(([f, a]) => new Promise(r => (0, eval)('(' + f + ')').apply(null, [...a, r])), [f.toString(), a]),
+              tikla: (s) => p.click(s, { timeout: 5000 }), yaz: (s, t) => p.locator(s).pressSequentially(t, { timeout: 5000 }), tus: (k) => p.keyboard.press(k),
+              boyut: (w, h) => p.setViewportSize({ width: w, height: h }), kapat: () => b.close(), sayfaHata: () => p.__hata || 0,
+              dosya: (s, f) => p.setInputFiles(s, f)
+            };
+          } else {
+            const { Builder, By, Key } = req('selenium-webdriver');
+            const safari = req('selenium-webdriver/safari');
+            const o = new safari.Options();
+            if (MOD === 'ios') { o.set('platformName', 'iOS'); o.set('safari:useSimulator', true); o.set('safari:deviceType', 'iPhone'); if (process.env.IOS_UDID) o.set('safari:deviceUDID', process.env.IOS_UDID); }
+            const d = await new Builder().forBrowser('safari').setSafariOptions(o).build();
+            await d.manage().setTimeouts({ script: 30000, pageLoad: 60000 });
+            const bul = (s) => d.findElement(By.css(s));
+            A = {
+              ad: MOD === 'ios' ? 'iOS Simülatörü Safari' : 'Safari', get: async (u) => { await d.get(u); await d.executeScript(OLCUM); },
+              js: (f, ...a) => d.executeScript('return (' + f.toString() + ').apply(null, arguments)', ...a),
+              jsAsync: (f, ...a) => d.executeAsyncScript('var a=[].slice.call(arguments);(' + f.toString() + ').apply(null, a)', ...a),
+              tikla: async (s) => { await d.executeScript('arguments[0].scrollIntoView({block:"center",behavior:"instant"})', await bul(s)); await (await bul(s)).click(); },
+              yaz: async (s, t) => (await bul(s)).sendKeys(t), tus: async (k) => d.actions().sendKeys(Key[k.toUpperCase()] || k).perform(),
+              boyut: async (w, h) => { if (MOD !== 'ios') await d.manage().window().setRect({ width: w, height: h }); }, kapat: () => d.quit(), sayfaHata: () => 0,
+              caps: () => d.getCapabilities()
+            };
+          }
+
+          try {
+            if (A.caps) { const c = await A.caps(); console.log(`# ${A.ad} ${c.get('browserVersion')} · ${c.get('platformName')}`); }
+            const genislik = (MOD === 'ios' || MOD === 'webkit') ? [null] : [1280, 390];
+            // 1) Ana sayfa
+            for (const w of genislik) {
+              if (w) await A.boyut(w, 900);
+              await A.get(TABAN + '/');
+              await bekle(7000); // canlı veri ve şerit
+              const d0 = await A.js(() => window.__qa.durum());
+              console.log(`# ana sayfa · ${d0.motor} · pencere ${d0.w} px (istemci ${d0.cw}) · dpr ${d0.dpr}`);
+              const etiket = `ana ${d0.cw}px`;
+              ok(`${etiket}: yatay taşma yok`, d0.tasma <= 0, d0.tasma);
+              ok(`${etiket}: tek h1, atla bağlantısı (#icerik), künye "Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı"`, d0.h1 === 1 && d0.atla && d0.kunye, [d0.h1, d0.atla, d0.kunye]);
+              const a = await A.js(() => window.__qa.ana());
+              ok(`${etiket}: bölümler görünür`, a.bolum === '7/7', a.bolum);
+              ok(`${etiket}: PTF kartı dürüst (canlı→sayı, değilse "—"; sıfır yok)`, !a.ptfSifir && ((a.kart === 'live' && a.ptfBicim === 'sayi' && a.damga === 'canli') || (a.kart === 'cached' && a.ptfBicim === 'sayi' && a.damga === 'son-senkron') || (a.kart === 'waiting' && a.ptfBicim === 'tire' && a.damga === 'bekleme')), [a.kart, a.ptfBicim, a.damga]);
+              ok(`${etiket}: saatlik tablo 24 hücre, yalnız sayı ya da "—", sıfır yok`, a.saat.toplam === 24 && a.saat.tire + a.saat.sayi === 24 && a.saat.sifir === 0, a.saat);
+              if (a.serit.gizli === false) {
+                const s = await A.jsAsync((ms, bitti) => window.__qa.serit(ms, bitti), 2000);
+                ok(`${etiket}: şerit görünür ve akıyor (2 sn'de ≥ 20 px), sıfır fiyat yok`, s.yol >= 20 && a.serit.sifirHucre === 0, [a.serit.hucre, s.yol, a.serit.sifirHucre]);
+              } else not(`${etiket}: şerit gizli (canlı veri yok → dürüst: ray gösterilmez) hücre=${a.serit.hucre}`);
+              // Menü (dar ekranda)
+              const m0 = await A.js(() => window.__qa.menu());
+              if (m0.dugmeGorunur) {
+                await A.tikla('#mobileMenuBtn'); await bekle(400);
+                const m1 = await A.js(() => window.__qa.menu());
+                await A.tus('Escape'); await bekle(300);
+                const m2 = await A.js(() => window.__qa.menu());
+                ok(`${etiket}: mobil menü açılır (aria-expanded), bağlantılar görünür, Esc kapatır`, m1.acik && m1.aria === 'true' && m1.baglanti >= 4 && !m2.acik && m2.aria === 'false', [m1.acik, m1.aria, m1.baglanti, m2.acik]);
+              } else not(`${etiket}: menü düğmesi bu genişlikte görünmüyor (masaüstü gezinme)`);
+              // Teklif formu + bahar anı (gönderilmez)
+              await A.js(() => { const k = document.getElementById('lead-yesil'); k.scrollIntoView({ block: 'center', behavior: 'instant' }); window.scrollBy({ top: 120, behavior: 'instant' }); });
+              await A.tikla('#lead-ad'); await A.yaz('#lead-ad', 'Deneme');
+              await A.yaz('#lead-sirket', 'QA Test');
+              await A.yaz('#lead-eposta', 'qa@example.com');
+              await A.js(() => { const k = document.getElementById('lead-yesil'); k.scrollIntoView({ block: 'center', behavior: 'instant' }); });
+              const kn = await A.js(() => window.__qa.baharBasla(7000));
+              const t0 = Date.now();
+              try { await A.tikla('#lead-yesil'); } catch { await A.tikla('label.form-green'); }
+              const isaret = await A.js(() => [document.getElementById('lead-yesil').checked, document.querySelectorAll('.bh-kat').length]);
+              // etki sürerken yazma ve tıklama
+              const t1 = Date.now(); await A.tikla('#lead-mesaj'); await A.yaz('#lead-mesaj', 'Bahar sirasinda yazi'); const yazMs = Date.now() - t1;
+              await A.tikla('#lead-soyad'); await A.yaz('#lead-soyad', 'Test');
+              const odak = await A.js(() => document.activeElement && document.activeElement.id);
+              await bekle(Math.max(0, 7400 - (Date.now() - t0)));
+              const b = await A.js(() => window.__qa.baharSonuc());
+              const uz = await A.js(() => [window.__qa.deger('lead-mesaj'), window.__qa.deger('lead-soyad'), window.__qa.deger('lead-ad')]);
+              ok(`${etiket}: yeşil kutucuk işaretlendi, bahar anı başladı (tek katman)`, isaret[0] === true && isaret[1] === 1 && b.katMax === 1 && b.enCokSus > 0, [isaret, b.katMax, b.enCokSus]);
+              ok(`${etiket}: etki sürerken yazılan metin tam (mesaj 20, soyad 4 karakter), odak alanda`, uz[0] === 20 && uz[1] === 4 && uz[2] === 6 && odak === 'lead-soyad', [uz, odak, yazMs]);
+              ok(`${etiket}: etki boyunca süs hiçbir denetimin tıklamasını yakalamadı (elementFromPoint)`, b.ortulu === 0 && b.ortuluOrnek > 0, [b.ortulu, b.ortuluOrnek, b.digerOrtu, kn]);
+              ok(`${etiket}: etki boyunca hiçbir süs öğesinin kutusu denetim/etiket kutusuyla kesişmedi (geometri)`, b.kesisim === 0 && b.kesisimOrnek > 0, [b.kesisim, b.kesisimOrnek, b.kesisimOge]);
+              ok(`${etiket}: denetim ve form kaymadı (< 0,5 px), sayfa boyu sabit, yatay taşma yok`, b.kaymaPx < 0.5 && b.formKaymaPx < 0.5 && b.boyFark === 0 && b.tasma <= 0 && b.sx === 0, [b.kaymaPx, b.formKaymaPx, b.boyFark, b.tasma, b.sx]);
+              ok(`${etiket}: ≈5,8 sn sonra süs DOM'dan silindi, yeşil görünüm kaldı, gönder düğmesi etkin ve örtülmüyor`, b.sonraSus === 0 && b.sonraKat === 0 && b.yesil && b.gonderUlasilir && b.gonderEtkin, [b.sonraSus, b.yesil, b.gonderUlasilir]);
+              not(`${etiket}: kare sayısı ${b.kare}, en uzun kare ${b.enUzunMs} ms, >50 ms kare ${b.uzun50}, >100 ms kare ${b.uzun100}, en çok süs öğesi ${b.enCokSus}, yazma ${yazMs} ms`);
+              ok(`${etiket}: sayfa hatası yok`, (d0.hata + A.sayfaHata()) === 0);
+            }
+            // 2) Alt sayfalar
+            const SAYFA = ['/rehber/sktt', '/canli-ptf', '/elektrik-faturasi-hesaplama', '/kurumsal', '/olmayan-sayfa-qa-yayin'];
+            for (const w of genislik) {
+              if (w) await A.boyut(w, 900);
+              for (const yol of SAYFA) {
+                await A.get(TABAN + yol); await bekle(yol === '/canli-ptf' ? 4000 : 1500);
+                const d = await A.js(() => window.__qa.durum());
+                const e = `${yol} ${d.cw}px`;
+                const ozel = yol.startsWith('/olmayan') ? true : d.h1 === 1;
+                ok(`${e}: yatay taşma yok, h1, gezinme, atla bağlantısı, künye`, d.tasma <= 0 && ozel && d.nav && d.atla && d.kunye, [d.tasma, d.h1, d.nav, d.atla, d.kunye]);
+                const m0 = await A.js(() => window.__qa.menu());
+                if (m0.dugmeGorunur) {
+                  await A.tikla('#mobileMenuBtn'); await bekle(400); const m1 = await A.js(() => window.__qa.menu());
+                  await A.tikla('#mobileMenuBtn'); await bekle(300); const m2 = await A.js(() => window.__qa.menu());
+                  ok(`${e}: mobil menü aç/kapa`, m1.acik && m1.aria === 'true' && m1.baglanti >= 4 && !m2.acik, [m1.acik, m1.baglanti, m2.acik]);
+                }
+                if (yol === '/canli-ptf') {
+                  const c = await A.js(() => { const h = [...document.querySelectorAll('#pTable td')].map(x => x.textContent.trim()); const sifir = h.filter(v => /^0+([.,]0+)?$/.test(v)).length; return { hucre: h.length, tire: h.filter(v => v === '—').length, sifir, mod: (document.getElementById('pMode') || {}).textContent ? document.getElementById('pMode').textContent.trim().replace(/[^A-ZÇĞİÖŞÜ ]/g, '').slice(0, 14) : null }; });
+                  ok(`${e}: saatlik tablo dolu, eksik saat "—", sıfır yok`, c.hucre >= 24 && c.sifir === 0, c);
+                }
+                if (yol === '/elektrik-faturasi-hesaplama') {
+                  await A.tikla('#t1Tutar'); await A.yaz('#t1Tutar', '2.450,80'); await A.tikla('#t1Kwh'); await A.yaz('#t1Kwh', '520'); await bekle(800);
+                  const h = await A.js(() => window.__qa.hesap());
+                  ok(`${e}: hesaplayıcı 2.450,80 TL / 520 kWh → 4,71 TL/kWh, 2. araca aktarıldı (10 satır)`, h.t1Birim === '4,71' && /ok/.test(h.t1Sinif) && h.t2Satir === 10, h);
+                }
+              }
+            }
+            // 3) Hareket azaltma (yalnız Playwright motorları): kelebek ve yaprak yok, çiçekler yalnız saydamlıkla, sonra temizlik
+            if (PW) {
+              const c2 = await A0.b.newContext({ ...(MOD === 'webkit' ? A0.pw.devices['iPhone 15'] : { viewport: { width: 390, height: 844 } }), reducedMotion: 'reduce' });
+              const p2 = await c2.newPage(); await p2.goto(TABAN + '/', { waitUntil: 'load' });
+              await p2.evaluate(() => document.getElementById('lead-yesil').scrollIntoView({ block: 'center', behavior: 'instant' }));
+              await p2.click('#lead-yesil');
+              const r = await p2.evaluate(() => new Promise(bitti => { const m = { kelebek: 0, yaprak: 0, cicek: 0, ozellik: new Set() }; const t0 = performance.now(); (function tur() { m.kelebek = Math.max(m.kelebek, document.querySelectorAll('.bh-kelebek').length); m.yaprak = Math.max(m.yaprak, document.querySelectorAll('.bh-yaprak').length); m.cicek = Math.max(m.cicek, document.querySelectorAll('.bh-cicek').length); document.getAnimations().forEach(a => { const e = a.effect && a.effect.target; if (e && e.closest && e.closest('.bh-kat') && a.effect.getKeyframes) a.effect.getKeyframes().forEach(k => Object.keys(k).forEach(o => { if (!['offset', 'easing', 'composite', 'computedOffset'].includes(o)) m.ozellik.add(o); })); }); if (performance.now() - t0 < 4000) requestAnimationFrame(tur); else bitti({ ...m, ozellik: [...m.ozellik] }); })(); }));
+              await p2.waitForTimeout(2200);
+              const son = await p2.evaluate(() => document.querySelectorAll('[class^="bh-"], [class*=" bh-"]').length);
+              ok(`hareket azaltma: kelebek 0, yaprak 0, çiçek > 0, yalnız saydamlık; ≈6 sn'de temizlenir`, r.kelebek === 0 && r.yaprak === 0 && r.cicek > 0 && r.ozellik.every(o => o === 'opacity') && son === 0, { ...r, son });
+              await c2.close();
+            }
+          } catch (e) {
+            kaldi++; console.log('  KALDI beklenmeyen hata: ' + String(e && e.name) + ' ' + String(e && e.message).slice(0, 160).replace(/https?:\S+/g, '<adres>'));
+          } finally {
+            await A.kapat().catch(() => {});
+          }
+          console.log(`${gecti} passed, ${kaldi} failed`);
+          process.exit(kaldi ? 1 : 0);
+          QAEOF
+          cat > ios-yedek.mjs <<'QAEOF'
+          #!/usr/bin/env node
+          // iOS Simülatörü yedek yolu (safaridriver simülatöre bağlanamazsa): önizleme adresini 127.0.0.1:8790'dan aktaran küçük
+          // sunucu. HTML'e ölçüm modülü ve kendiliğinden çalışan senaryo eklenir; sonuç /__qa/rapor'a yazılır. EPİAŞ proxy çağrısı
+          // /__ptf üzerinden önizleme kökeniyle aktarılır. Günlüğe sayfa içeriği yazılmaz.
+          //   TABAN=<önizleme> node ios-yedek.mjs      ·  GET /__qa/raporlar → JSON (yalnız sayılar)
+          import http from 'node:http';
+          import { readFileSync } from 'node:fs';
+          const TABAN = process.env.TABAN.replace(/\/$/, '');
+          const PTF = 'https://epias-proxy.emirhantan-ku.workers.dev';
+          const OLCUM = readFileSync(new URL('./olcum.js', import.meta.url), 'utf8');
+          const raporlar = [];
+          const SENARYO = `(function(){
+            var R={yol:location.pathname,olay:[]};var bek=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+            function gonder(){try{navigator.sendBeacon('/__qa/rapor',JSON.stringify(R))}catch(e){}}
+            window.addEventListener('error',function(){R.hata=(R.hata||0)+1});
+            window.addEventListener('load',async function(){
+              await bek(location.pathname==='/'?7000:2500);
+              R.durum=__qa.durum();
+              var m=__qa.menu(); if(m.dugmeGorunur){document.getElementById('mobileMenuBtn').click();await bek(400);R.menuAcik=__qa.menu();document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await bek(300);R.menuKapali=__qa.menu();}
+              if(location.pathname==='/'){
+                R.ana=__qa.ana(); R.serit=await new Promise(function(r){__qa.serit(2000,r)});
+                var k=document.getElementById('lead-yesil'); k.scrollIntoView({block:'center',behavior:'instant'});
+                ['lead-ad','lead-sirket'].forEach(function(id){var e=document.getElementById(id);e.focus();e.value='Deneme';e.dispatchEvent(new Event('input',{bubbles:true}))});
+                await bek(300); R.kontrol=__qa.baharBasla(7000); var t0=performance.now(); k.click(); R.isaret=[k.checked,document.querySelectorAll('.bh-kat').length];
+                var ta=document.getElementById('lead-mesaj'); ta.focus(); var s='Bahar sirasinda yazi', gec=[];
+                for(var i=0;i<s.length;i++){var a=performance.now();ta.value+=s[i];ta.dispatchEvent(new Event('input',{bubbles:true}));await bek(60);gec.push(performance.now()-a-60)}
+                R.yazi=[ta.value.length,Math.round(Math.max.apply(null,gec)),document.activeElement===ta];
+                await bek(Math.max(0,7400-(performance.now()-t0))); R.bahar=__qa.baharSonuc();
+              }
+              if(location.pathname==='/elektrik-faturasi-hesaplama'){var t=document.getElementById('t1Tutar'),w=document.getElementById('t1Kwh');t.value='2.450,80';t.dispatchEvent(new Event('input',{bubbles:true}));w.value='520';w.dispatchEvent(new Event('input',{bubbles:true}));await bek(800);R.hesap=__qa.hesap();}
+              if(location.pathname==='/canli-ptf'){var h=[].slice.call(document.querySelectorAll('#pTable td')).map(function(x){return x.textContent.trim()});R.tablo={hucre:h.length,tire:h.filter(function(v){return v==='\\u2014'}).length,sifir:h.filter(function(v){return /^0+([.,]0+)?$/.test(v)}).length};}
+              R.bitti=true; gonder();
+            });
+          })();`;
+          const EK = `<script>window.__qaHata=[];addEventListener('error',function(){window.__qaHata.push(1)});</script><script>${OLCUM}\n${SENARYO}</script>`;
+
+          http.createServer(async (q, s) => {
+            try {
+              if (q.url === '/__qa/rapor' && q.method === 'POST') { let b = ''; q.on('data', c => b += c); q.on('end', () => { try { raporlar.push(JSON.parse(b)); } catch { } s.end('ok'); }); return; }
+              if (q.url === '/__qa/raporlar') { s.setHeader('content-type', 'application/json'); return s.end(JSON.stringify(raporlar)); }
+              const hedef = q.url.startsWith('/__ptf/') ? PTF + q.url.slice(6) : TABAN + q.url;
+              const r = await fetch(hedef, { headers: { 'user-agent': q.headers['user-agent'] || 'qa', origin: new URL(TABAN).origin, accept: q.headers.accept || '*/*' }, redirect: 'manual' });
+              const tur = r.headers.get('content-type') || '';
+              const bas = { 'content-type': tur, 'cache-control': 'no-store' }; const yer = r.headers.get('location'); if (yer) bas.location = yer.replace(TABAN, '');
+              if (tur.includes('text/html')) {
+                let h = await r.text();
+                h = h.split(PTF).join('/__ptf').replace(/<head>/i, '<head>' + EK);
+                s.writeHead(r.status, bas); return s.end(h);
+              }
+              s.writeHead(r.status, bas); s.end(Buffer.from(await r.arrayBuffer()));
+            } catch (e) { s.writeHead(502); s.end('yedek: ' + e.name); }
+          }).listen(8790, '127.0.0.1', () => console.log('yedek sunucu 8790'));
+          QAEOF
+          cat > ocr.swift <<'QAEOF'
+          // iOS Simülatörü ekran görüntülerinin PİKSELSİZ özeti (macOS Vision OCR).
+          // !!! Görüntülerdeki rakamlar UYDURMA TEST VERİSİDİR. Çıktı yalnız "beklenen ifade var mı" doğru/yanlış
+          // ve tanınan satır sayısıdır; tanınan metnin kendisi basılmaz.
+          //   swift docs/qa/ekran-ocr.swift <görüntü.png> "<ifade1>|<ifade2>|…" ["<olmaması gereken1>|…"]
+          import Foundation
+          import Vision
+          import AppKit
+
+          func katla(_ s: String) -> String {
+            return s.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "tr_TR")).replacingOccurrences(of: " ", with: "")
+          }
+          let a = CommandLine.arguments
+          guard a.count >= 3, let img = NSImage(contentsOfFile: a[1]), let cg = img.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            print("\(a.count > 1 ? (a[1] as NSString).lastPathComponent : "?"): görüntü okunamadı"); exit(1)
+          }
+          let istek = VNRecognizeTextRequest()
+          istek.recognitionLevel = .accurate
+          istek.recognitionLanguages = ["tr-TR", "en-US"]
+          istek.usesLanguageCorrection = false
+          try VNImageRequestHandler(cgImage: cg, options: [:]).perform([istek])
+          let satirlar = (istek.results ?? []).compactMap { $0.topCandidates(1).first?.string }
+          let hepsi = katla(satirlar.joined(separator: " "))
+          let ad = (a[1] as NSString).lastPathComponent
+          var kotu = 0
+          var cikti = "\(ad): \(cg.width)x\(cg.height) px, \(satirlar.count) metin satırı"
+          for i in a[2].split(separator: "|") { let v = hepsi.contains(katla(String(i))); if !v { kotu += 1 }; cikti += " · '\(i)' \(v ? "VAR" : "YOK")" }
+          if a.count > 3 { for i in a[3].split(separator: "|") { let v = hepsi.contains(katla(String(i))); if v { kotu += 1 }; cikti += " · olmamalı '\(i)' \(v ? "VAR!" : "yok")" } }
+          print(cikti)
+          exit(kotu == 0 ? 0 : 1)
+          QAEOF
+          UDID=$(xcrun simctl list devices available --json | python3 -c '
+          import json,sys,re
+          d=json.load(sys.stdin)["devices"]
+          c=[(k,x) for k,v in d.items() if "iOS" in k for x in v if re.match(r"iPhone 1[5-7]$",x["name"])]
+          c.sort(key=lambda t:(t[0],t[1]["name"]))
+          print(c[-1][1]["udid"] if c else "")')
+          xcrun simctl list devices available --json | python3 -c 'import json,sys;d=json.load(sys.stdin)["devices"];[print("simülatör:",x["name"],k.split(".")[-1]) for k,v in d.items() for x in v if x["udid"]=="'"$UDID"'"]'
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID" &
+          npm install --no-audit --no-fund "selenium-webdriver@${SELENIUM_SURUM}" >/dev/null 2>&1; echo "npm $?"
+          sudo safaridriver --enable; echo "safaridriver $?"
+      - name: Gerçek Safari (macOS, safaridriver)
+        working-directory: ${{ runner.temp }}/qa
+        continue-on-error: true
+        run: MOD=safari MODUL=$PWD/node_modules timeout 600 node gercek.mjs
+      - name: iOS Simülatörü — Mobile Safari, safaridriver ile (Uzaktan Otomasyon)
+        id: iossd
+        working-directory: ${{ runner.temp }}/qa
+        continue-on-error: true
+        shell: bash {0}
+        run: |
+          xcrun simctl bootstatus "$UDID" -b > /dev/null; echo "önyükleme $?"
+          for k in RemoteAutomationEnabled WebKitRemoteAutomationEnabled; do xcrun simctl spawn "$UDID" defaults write com.apple.mobilesafari $k -bool true; done
+          xcrun simctl spawn "$UDID" defaults write com.apple.WebInspector RemoteAutomationEnabled -bool true
+          MOD=ios IOS_UDID=$UDID MODUL=$PWD/node_modules timeout 900 node gercek.mjs; k=$?; echo "ios-safaridriver çıkış $k"; exit $k
+      - name: iOS Simülatörü — Mobile Safari, openurl + sayfa içi senaryo + ekran OCR (her durumda)
+        working-directory: ${{ runner.temp }}/qa
+        shell: bash {0}
+        run: |
+          nohup node ios-yedek.mjs > ../yedek.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8790/robots.txt && break; sleep 1; done
+          xcrun simctl status_bar "$UDID" override --time 14:30 2>/dev/null || true
+          xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null
+          B=http://127.0.0.1:8790; E=../ekran
+          xcrun simctl openurl "$UDID" "$B/"; sleep 9; xcrun simctl io "$UDID" screenshot $E/ios-1-ana-ilk.png >/dev/null 2>&1
+          sleep 4.5; xcrun simctl io "$UDID" screenshot $E/ios-2-bahar.png >/dev/null 2>&1
+          sleep 12; xcrun simctl io "$UDID" screenshot $E/ios-3-bahar-sonra.png >/dev/null 2>&1
+          for p in rehber/sktt canli-ptf elektrik-faturasi-hesaplama kurumsal olmayan-sayfa-qa-yayin; do xcrun simctl openurl "$UDID" "$B/$p"; sleep 9; xcrun simctl io "$UDID" screenshot $E/ios-$(echo $p | tr / -).png >/dev/null 2>&1; done
+          sleep 3
+          H="Cannot Open|Cannot Connect|açılamıyor|bağlanamıyor"
+          swift ocr.swift $E/ios-1-ana-ilk.png "Voltage|Teklif" "$H"
+          swift ocr.swift $E/ios-2-bahar.png "Yeşil" "$H"
+          swift ocr.swift $E/ios-rehber-sktt.png "SKTT" "$H"
+          swift ocr.swift $E/ios-canli-ptf.png "PTF" "$H"
+          swift ocr.swift $E/ios-elektrik-faturasi-hesaplama.png "4,71" "$H"
+          swift ocr.swift $E/ios-kurumsal.png "Voltan" "$H"
+          swift ocr.swift $E/ios-olmayan-sayfa-qa-yayin.png "404|Ana Sayfa" "$H"
+          curl -s $B/__qa/raporlar > ../raporlar.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('../raporlar.json'))
+          print('Mobile Safari rapor sayısı:',len(r))
+          for x in r:
+              d=x.get('durum',{}); o={k:x[k] for k in ('menuAcik','menuKapali','ana','serit','isaret','yazi','bahar','hesap','tablo','hata') if k in x}
+              print(' ',x.get('yol'),'·',d.get('motor'),'·',d.get('w'),'px dpr',d.get('dpr'),'· taşma',d.get('tasma'),'· h1',d.get('h1'),'· atla',d.get('atla'),'· künye',d.get('kunye'),'· js hata',d.get('hata'),'·',json.dumps(o,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: ios-ekran, path: '${{ runner.temp }}/ekran', retention-days: 1 }
