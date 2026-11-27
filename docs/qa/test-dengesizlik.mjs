@@ -1274,7 +1274,8 @@ for (const kotu of ['abc', '2026-11-25', '2025-12-31', '2026-02-30', '', '%3Cscr
   const bas = readFileSync(new URL('../../_headers', import.meta.url), 'utf8');
   ok('B _headers: https://:project.pages.dev/* -> X-Robots-Tag: noindex', /\nhttps:\/\/:project\.pages\.dev\/\*\n  X-Robots-Tag: noindex\n/.test(bas));
   ok('B _headers: https://:version.:project.pages.dev/* -> X-Robots-Tag: noindex', /\nhttps:\/\/:version\.:project\.pages\.dev\/\*\n  X-Robots-Tag: noindex\n/.test(bas));
-  ok('B _headers: yorum yalniz pages.dev ve uretime yayinla ulasma', /YALNIZ \*\.pages\.dev/.test(bas) && /voltage\.com\.tr ETKİLENMEZ/.test(bas) && /yayınla \(main\)/.test(bas));
+  // 27.11 yeni tasarım yayınıyla _headers üretimde; yorum artık yalnız kapsamı söyler
+  ok('B _headers: yorum yalniz pages.dev, uretim etkilenmez, Function yanitlari kendi basligini ekler', /YALNIZ \*\.pages\.dev/.test(bas) && /voltage\.com\.tr ETKİLENMEZ/.test(bas) && /dengesizlik-maliyeti/.test(bas));
   ok('B _headers: voltage.com.tr icin X-Robots-Tag kurali YOK', !/^https:\/\/(www\.)?voltage\.com\.tr/m.test(bas) && (bas.match(/^https:\/\//gm) || []).length === 2);
 }
 { // R3-A: belirteç hiçbir yanıtta (gövde, başlık), hata metninde görünmez
@@ -1626,7 +1627,8 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
   ok('R6 D-A1: kucuk tablo kalmadi; tasma deseni istemcide duruyor (gelecekteki tablolar icin)', !KABUK.includes('class="kucuk-sar"') && /querySelectorAll\('\.kucuk-sar'\)/.test(KABUK));
   ok('R6 D-M1: 640 px altinda girdi ve secimler 16 px', KABUK.includes('@media (max-width: 640px) { input[type="date"], input[type="text"], select { font-size: 16px; } }'));
   const diger = readFileSync(new URL('../../canli-ptf.html', import.meta.url), 'utf8');
-  ok('R6 D-A2: diger sayfalara dokunulmadi (canli-ptf main yok)', !diger.includes('<main'));
+  // 27.11 yeni tasarım yayını: canli-ptf artık ortak kabukta (tek <main>); bekçi kabuğun bozulmadığını denetler
+  ok('R6 D-A2: canli-ptf yeni kabukta tek <main> (27.11 yayini)', (diger.match(/<main[ >]/g) || []).length === 1 && diger.includes('class="site-header'));
 }
 
 

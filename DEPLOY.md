@@ -306,6 +306,8 @@ Resmî veriler sitede yayında: EPDK lisansı `ETS/3424-8/2074` ve Ticaret Sicil
 - [ ] Form KV bağlanmadan denenirse dürüst hata + e-posta (mailto) alternatifi gösteriyor (başarı mesajı GÖSTERMİYOR)
 - [ ] Mobil'de sorunsuz (hamburger menü açılıyor/kapanıyor, Teklif Al CTA çalışıyor)
 - [ ] /kvkk, /cerez-politikasi, /kullanim-kosullari açılıyor
+- [ ] Ana sayfa görselleri `/img/` altından 200 dönüyor (ağ sekmesinde kapak ve yedi sektör görselinde 404 yok); `/img/*` yanıtında `Cache-Control: public, max-age=86400, must-revalidate`
+- [ ] Bilinmeyen adres (`/olmayan`) 404 + yedek içerik + `noindex, follow`; `/docs/…` 302
 
 ---
 

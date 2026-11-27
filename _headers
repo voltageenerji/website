@@ -11,9 +11,8 @@
 # Önizleme adresleri arama dizinine girmesin (Cloudflare Pages belgesindeki kalıp:
 # https://developers.cloudflare.com/pages/configuration/headers/).
 # YALNIZ *.pages.dev adresleri (projenin pages.dev adresi, dal ve sürüm önizlemeleri) bu
-# kurallarla eşleşir; üretim alan adı voltage.com.tr ETKİLENMEZ. Bu dosya üretime yalnız
-# yayınla (main) ulaşır; o güne kadar yalnız çalışma dalının önizleme dağıtımında geçerlidir.
-# _headers Pages Function yanıtlarına UYGULANMAZ: Function'lı /dengesizlik-maliyeti ve
+# kurallarla eşleşir; üretim alan adı voltage.com.tr ETKİLENMEZ.
+# _headers Pages Function yanıtlarına UYGULANMAZ: Function'lı /canli-ptf, /dengesizlik-maliyeti ve
 # /dengesizlik-maliyeti/veri aynı başlığı kendileri ekler (functions/_lib/onizleme.js).
 https://:project.pages.dev/*
   X-Robots-Tag: noindex
@@ -73,6 +72,12 @@ https://:version.:project.pages.dev/*
 # 1 gün + revalidate: kartlar sayfa tarafından yüklenmez, yalnız paylaşım robotları
 # çeker; performans etkisi yoktur, tazelik kazanılır.
 /og/*
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# Ana sayfa görselleri (kapak ve sektör fotoğrafları, WebP). Sayfa yükler (masaüstünde kapak LCP öğesidir).
+# Dosya adları içerik hash'i TAŞIMAZ ve görseller aynı adla değiştirilebilir: "immutable"
+# GÜVENLİ DEĞİLDİR. 1 gün + revalidate: tekrar ziyarette istek 304 ile döner.
+/img/*
   Cache-Control: public, max-age=86400, must-revalidate
 
 # Feed (Pages Functions) — köprüler (Zapier/Buffer) okur; kısa cache.
