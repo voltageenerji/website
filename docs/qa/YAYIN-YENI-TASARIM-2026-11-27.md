@@ -8,7 +8,11 @@ de geçerlidir; alt sayfa denetimleri 81e4688'de yeniden koşuldu.
 
 **QA (bağımsız doğrulama), Teknoloji Yöneticisine; nihai yetki Orkestratör.**
 
-## Karar: BLOCK (81e4688)
+> **Son karar (yeniden doğrulama, aynı gün): RC 4bf70d5 — PASS** (önizleme `https://4a382727.website-dh5.pages.dev`).
+> QA-YT-1 kapandı, QA-YT-2 kapandı. Ayrıntı: en alttaki "Yeniden doğrulama — RC 4bf70d5" bölümü. Aşağıdaki BLOCK kararı
+> 81e4688 içindir ve geçmiş kayıt olarak korunur.
+
+## İlk karar: BLOCK (81e4688)
 
 Tek engelleyici bulgu **QA-YT-1: masaüstü CLS kabul ölçütü tutmuyor** (Orkestratörün ölçütü: `/rehber` ve
 `/rehber/tekstil-elektrik`, 7 koşu, medyan ≤ 0,02, hiçbir koşu > 0,1). `/rehber/tekstil-elektrik` her iki ölçümde,
@@ -176,3 +180,63 @@ uydurma değer yok; bu yayında yeni değil. İleride: önceki saat eksikse fark
   yapıldı.
 - Sınırlar: fiziksel iPhone yok (simülatör); macOS koşucusunda varsayılan "hareket azaltma" açık (bir koşu kapatılarak
   tekrarlandı); Firefox'ta canlı veri hâli görülemedi; Lighthouse yerel ve CI'da simüle yavaşlatmayla, alan verisi değil.
+
+## Yeniden doğrulama — RC 4bf70d5 (27.11.2026, akşam)
+
+**Aday:** `claude/yayin-yeni-tasarim` 4bf70d5, önizleme `https://4a382727.website-dh5.pages.dev`. 81e4688'e göre fark
+bağımsız olarak denetlendi (`git diff 81e4688 4bf70d5`): 25 alt sayfanın her birinde yalnız QA-YT-1'deki üç `@font-face`
+ve `--serif` satırı (QA'nın önerdiği değerlerle birebir; başka satır değişmedi); `index.html`'de yalnız bahar anının
+`change` işleyicisi (başlangıç `requestAnimationFrame` + `setTimeout 0` ile bir sonraki kareye, kutucuk kaldırılınca
+bekleyen başlangıç iptal). Görsel, başlık, içerik, sitemap değişmedi.
+
+### Karar: PASS (4bf70d5)
+
+Engelleyici bulgu kalmadı. Kabul ölçütleri iki ölçüm aracıyla da tutuyor. Bahar anının etkileşim maliyeti artık
+ölçülemiyor. Gerçek Safari ve Mobile Safari'de (simülatör) etki görünüyor ve temizleniyor. Açık kalanlar düşük ya da
+bilgi düzeyinde, aşağıda.
+
+| # | Denetim | Sonuç | Kanıt |
+|---|---|---|---|
+| R1 | Masaüstü CLS `/rehber`, 7 koşu (CI, ubuntu, Chromium 1440×900, soğuk önbellek) | GEÇTİ | Playwright medyan **0,0004**, en çok 0,0005 (üretim 0,0169 / 0,0208). Lighthouse 12.6.1 masaüstü medyan **0,0002**, en çok 0,0003 (üretim 0,0190 / 0,0190); skor 98, LCP 954 ms |
+| R1 | Masaüstü CLS `/rehber/tekstil-elektrik`, 7 koşu | GEÇTİ | Playwright medyan **0,0009**, en çok 0,0011 (üretim 0,0105 / 0,0110). Lighthouse medyan **0,0105**, en çok 0,0105 (üretim 0,0129 / 0,0129); 81e4688'de 0,048 / 0,123 idi |
+| R2 | Masaüstü CLS, 25 alt sayfa + ana sayfa, 3 koşu (Playwright, CI) | GEÇTİ* | 22 alt sayfa ≤ 0,0025 (81e4688'de 0,024–0,031 olan demir-celik, kimya, osb, soguk-zincir, elektrik-tedarikcisi-nasil-secilir: 0,0004–0,0013); 20 sayfa üretimden iyi. Ölçüt üstünde ikisi kaldı: `rehber/sktt` 0,045 (üretim 0,073, üretimden iyi) ve `cerez-politikasi` 0,060 (üretim CI'da 0,002; yerelde üretim 0,077 ↔ RC 0,054) — QA-YT-9. Ana sayfa 0,003 |
+| R2 | Yerel karşılaştırma (Chromium, 7 koşu) | GEÇTİ | RC ↔ main: `/rehber` 0,0002 ↔ 0,0130; tekstil 0,0004 ↔ 0,0391; kimya 0,0004 ↔ 0,0186; sktt 0,0004 ↔ 0,0060; elektrik-tedarikcisi 0,0005 ↔ 0,0393; cerez-politikasi 0,054 ↔ 0,077 |
+| R3 | Alt sayfa taşma, menü, odak, kontrast, JS kapalı (26 sayfa + 404, 320/360/375/390/414/768/1024/1280/1440) | GEÇTİ | 230/235; 9 genişlikte taşma **0**, axe renk kontrastı ihlali **0** (52 tarama). Kalan 5 madde ilk turdakilerle birebir aynı ve main'de de var (QA-YT-3 tablo kabı, QA-YT-4 404 oyun katmanı ×3, ana sayfa iki sütun odak sırası) |
+| R3 | Gerçek Safari 27.2 (macOS, hareket azaltma kapatılarak), aktarıcı üzerinden canlı veriyle | GEÇTİ | **45/45**: 1263 ve 373 px taşma 0, canlı kart (24 sayı, 0 sıfır), şerit 2 sn'de 80 / 71 px akıyor, menü, bahar anı 0 / 26 ms'de başladı (149 / 133 öğe), örtülme 0, kesişim 0, kayma 0, ≈5,8 sn sonra 0 öğe, rehber/sktt, canli-ptf (48 hücre, CANLI), hesaplayıcı 4,71, kurumsal, 404. Önizlemeye doğrudan ikinci Safari oturumu açılamadı ("Server terminated early", koşucu sorunu); doğrudan önizleme 81e4688'de 43/43 geçmişti ve alt sayfaların farkı yalnız yazı tipi satırları |
+| R3 | Firefox 157 / WebKit (iPhone 15 öykünmesi) | GEÇTİ | Firefox **45/45**; WebKit 25/26 (tek kalan yine Cloudflare RUM beacon'ı, QA-YT-6); WebKit'te canlı kart ve şerit (71 px) gerçek EPİAŞ yanıtıyla |
+| R4 | Bahar anı INP (Chromium, 390×844 @3, 4× CPU, yavaş 4G, 5 koşu; 3a ile aynı betik ve koşullar) | GEÇTİ | **Açık: INP medyan 144 ms, en çok 168** ↔ bahar çıkarılmış kopya 160 / 176. Kutucuğa dokunuş 96 ↔ 128 ms; etki sürerken tuş medyan 80, en çok 104 ↔ 104 / 112 ms; uzun görev medyanı 0 (en uzun 55 ms) ↔ 1 (95). Önceki RC: 184 / 208 ↔ 136 / 152. Fark artık ölçüm gürültüsü içinde (aynı kapalı kopya iki turda 136 ve 160 ölçüldü); 200 ms eşiğinin altında |
+| R4 | CLS, temizlik, bellek | GEÇTİ | Etki CLS'si 5/5 koşuda 0; DOM 1095 → 1095; etki sonrası süs öğesi 0; 6 ek tam gösterimden sonra DOM ve animasyon artığı yok (yığın +190 KB, ilk turla aynı). Hareket azaltma: INP 128 ms, uzun görev 0, süs artığı 0 |
+| R4 | Etki görünüyor mu (gecikmeli başlangıç) | GEÇTİ | Kutucuktan `.bh-kat`a süre: Firefox 30–37 ms, gerçek Safari 0–26 ms, WebKit (CI, yazılım çizimi) 650 ms. Mobile Safari simülatöründe 4 açık koşunun 4'ünde etki göründü (133 öğe, tek katman) ve temizlendi (0 öğe); başlama süresi 137–771 ms — simülatör VM'i yavaş (bahar kapalıyken de 303–541 ms'lik kareler) |
+| R4 | Mobile Safari (iPhone 17, iOS 26.5, simülatör) diğer | GEÇTİ | 12 sayfa içi rapor: taşma 0, JS hatası 0, menü, canlı kart, şerit 71 px, canli-ptf 48 hücre 0 sıfır, hesaplayıcı 4,71; 7 OCR'da hata sayfası yok |
+
+\* Ölçüt üstündeki iki sayfa bu yayının kabul ölçütüne bağlı değildir; biri üretimden iyi, öteki QA-YT-9.
+
+**Bu turda safaridriver iOS simülatörüne ilk kez bağlandı**, ama WebDriver dokunuşları ve tuşları simülatörde sayfaya
+ulaşmadı (menü düğmesi, kutucuk, metin alanı, hesaplayıcı: 15/25; metin alanına yazılan karakter de 0). Metin alanına
+yazmak sitenin koduna bağlı olmadığı için bu bir otomasyon sınırıdır; aynı işlemler sayfa içi senaryoyla (programatik
+`click()` ve girdi olayları) geçti. Gerçek parmak dokunuşu bu ortamda doğrulanamadı; **sahibin fiziksel iPhone denetimi
+bu açığı kapatan tek adımdır** (önizlemede canlı PTF görünmez: QA-YT-5).
+
+### Yeni bulgu
+
+**QA-YT-9 — `cerez-politikasi` masaüstü CLS 0,05–0,06 (DÜŞÜK, engellemez).** Kaynak: liste içindeki IBM Plex Mono
+`<code>` öğeleri (`voltage-404-progress` vb.) yedek yazı tipinde farklı satır yüksekliği (18 ↔ 20 px) ve bir öğede farklı
+kırılma (47 ↔ 20 px). Main'deki `code` ailesi `monospace` olduğu için CI'da üretim bu sayfada düşük çıkıyor; yerel
+ölçümde main 0,077, RC 0,054. Değer "iyi" eşiğinin (0,1) altında, tek yasal metin sayfası. İzleyen işte: `code` için
+ölçüsü eşitlenmiş yedek (Plex Mono ile Liberation Mono genişliği zaten eşit, 1,000; satır yüksekliği için
+`ascent/descent-override`) ya da bu listede `white-space: nowrap`.
+
+### Kapanan bulgular
+
+- QA-YT-1 (masaüstü CLS): **kapandı** — R1/R2.
+- QA-YT-2 (bahar anı etkileşim maliyeti): **kapandı** — R4.
+- QA-YT-3, -4, -6, -8 açık kalıyor (main'de de var ya da ortamdan); QA-YT-5 sahibe bilgi; QA-YT-7 test2 F8 güncellendi,
+  hazırlık 380/380, RC 380/380 (yayın mühendisi; bu tur QA'nın kendi koşusu değil).
+
+### Yöntem (bu tur)
+
+Geçici iş akışı `.github/workflows/gecici-qa-yayin.yml` yalnız bu tur için eklendi (`8935659`; koşu `46025703045`;
+günlükte yalnız sayılar), `35d6f3b` ile silindi. Yerel ölçümler RC 4bf70d5'in `git archive` kopyasında, bahar
+betiği ve CSS'i çıkarılmış ikinci bir kopyada ve main'de, wrangler pages dev ile. Ölçüm betikleri oturum scratchpad'inde
+(repoya girmedi). `gercek.mjs` ve iOS sayfa içi senaryosu gecikmeli başlangıca göre güncellendi: kutucuktan sonra en çok
+500 ms beklenir, süre ayrıca kaydedilir.
