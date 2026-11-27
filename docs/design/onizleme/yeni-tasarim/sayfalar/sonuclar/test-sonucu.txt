@@ -1,10 +1,10 @@
 # Alt sayfa 1. aşama — mevcut QA paketleri, üretilen sayfalar yerine konmuş kopyada
-# tarih: 2026-11-27T09:16Z · depo HEAD: f13e725 · node v22.23.5
+# tarih: 2026-11-27T09:22Z · depo HEAD: 0f07c1c · node v22.23.5
 # dosya özetleri (sha256, ilk 12):
-#   rehber/tekstil-elektrik.html 17a2bf8619f0
-#   canli-ptf.html a496590d074e
-#   kurumsal.html fcb9e144e9a5
-#   dengesizlik-maliyeti.html 93f8b3edee92
+#   rehber/tekstil-elektrik.html 825db78f433a
+#   canli-ptf.html f3aed2d12c7b
+#   kurumsal.html 24f75d61a147
+#   dengesizlik-maliyeti.html 0ddd8a9b37c9
 
 ## node docs/qa/test-ssr-ptf.mjs
 canli-ptf SSR failed, serving static shell: binding gone

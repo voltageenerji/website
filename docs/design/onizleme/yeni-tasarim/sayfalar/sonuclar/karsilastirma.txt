@@ -1,6 +1,6 @@
-# Alt sayfa 1. aşama — önce/sonra karşılaştırması (node v22.23.5, 2026-11-27T09:13Z)
+# Alt sayfa 1. aşama — önce/sonra karşılaştırması (node v22.23.5, 2026-11-27T09:22Z)
 
-=== rehber/tekstil-elektrik.html (önce 15660 B → sonra 32056 B; stil 2472 → 14010 B)
+=== rehber/tekstil-elektrik.html (önce 15660 B → sonra 32221 B; stil 2472 → 14175 B)
   GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
   GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı aynı
   GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
@@ -13,7 +13,7 @@
   bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Kullanım Koşulları"
   bilgi  yasak numara (216 479 05 10) yok: true
 
-=== canli-ptf.html (önce 39689 B → sonra 56903 B; stil 8479 → 20905 B)
+=== canli-ptf.html (önce 39689 B → sonra 57068 B; stil 8479 → 21070 B)
   GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
   GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı aynı
   GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
@@ -26,7 +26,7 @@
   bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Kurumsal · Rehber · KVKK · Çerez Politikası · Kullanım Koşulları"
   bilgi  yasak numara (216 479 05 10) yok: true
 
-=== kurumsal.html (önce 19749 B → sonra 36021 B; stil 4335 → 15839 B)
+=== kurumsal.html (önce 19749 B → sonra 36186 B; stil 4335 → 16004 B)
   GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
   GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı aynı
   GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı
@@ -39,7 +39,7 @@
   bilgi  kaldırılan eski alt satır metni: "© 2026 Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. · Ana sayfa · Rehber · Canlı PTF · KVKK · Çerez Politikası · Kullanım Koşulları"
   bilgi  yasak numara (216 479 05 10) yok: true
 
-=== dengesizlik-maliyeti.html (önce 92119 B → sonra 109549 B; stil 18372 → 31190 B)
+=== dengesizlik-maliyeti.html (önce 92119 B → sonra 109767 B; stil 18372 → 31355 B)
   GEÇTİ  B <head> (stil bloğu hariç) bayt bayt aynı
   GEÇTİ  B tek <style> bloğu; <html lang="tr"> ve belge başı aynı
   GEÇTİ  I içerik (içerik izi, H1, metin, tablolar, formlar, SSS, "Bu sayfa hakkında") bayt bayt aynı — izinli tek fark: sayfanın kendi <main>/</main> satırları kabuğun yalın <main> öğesine taşındı

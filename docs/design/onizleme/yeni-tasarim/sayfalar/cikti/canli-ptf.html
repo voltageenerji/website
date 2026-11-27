@@ -126,6 +126,8 @@ body.menu-open .site-header{position:fixed;inset:0 0 auto 0}
 .header-in{height:var(--nav-h)}
 .nav-cta{background:var(--cta);border-color:var(--cta);color:var(--ink)}
 .nav-cta:hover{background:var(--cta-hover);border-color:var(--cta-hover);color:var(--ink)}
+/* Teklif düğmesi olmayan sayfada sağ kutu düğme genişliğini korur: menü her sayfada aynı yerde */
+@media (min-width: 1040px){.nav-right:empty{width:96px}}
 /* Geçerli sayfa / bölüm: menüde sarı alt çizgi, mobil menüde sarı yazı, alt bilgide beyaz */
 .nav-links a[aria-current]{color:var(--white);border-bottom-color:var(--cta)}
 .cl-legal a[aria-current]{color:var(--white)}

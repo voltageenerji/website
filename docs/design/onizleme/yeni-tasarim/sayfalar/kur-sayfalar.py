@@ -202,8 +202,9 @@ def kabuk(ayar):
     if ayar['kaynak']:
         ust = ust.replace(cta, cta.replace('href="#teklif"', 'href="/?kaynak=%s#leadForm"' % ayar['kaynak']))
     else:
-        # Ticari düğmesi olmayan sayfa (dengesizlik-maliyeti: Hukuk/Orkestratör kararı, "teklif al" geçmez): sağ kutu boşalır
-        ust = degistir(ust, '    <div class="nav-right">\n' + cta + '    </div>\n', '')
+        # Ticari düğmesi olmayan sayfa (dengesizlik-maliyeti: Hukuk/Orkestratör kararı, "teklif al" geçmez): sağ kutu boş kalır
+        # ama yerini korur (kabuk.css .nav-right:empty), menü öbür sayfalarla aynı konumda durur
+        ust = degistir(ust, '    <div class="nav-right">\n' + cta + '    </div>\n', '    <div class="nav-right" aria-hidden="true"></div>\n')
     ust = capalari_kok(dil_ozniteligi_sil(ust))
     ust = gecerli(ust, ayar['ust_etkin'], ayar['ust_etkin_deger'])
     menu = capalari_kok(dil_ozniteligi_sil(dil_seciciyi_sil(MENU, '  ')))
