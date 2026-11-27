@@ -1,0 +1,93 @@
+/* Alt sayfa kabuğu: üst bant ana sayfanın kaydırılmış hâliyle aynıdır (koyu zemin, 68 px; 1039 px ve altında 64 px;
+   sarı "Teklif Al"). Alt sayfada kapak fotoğrafı olmadığı için bant baştan koyudur ve sayfa akışındadır (yapışkan
+   değildir): uzun okuma ve veri sayfalarında dikey alan içeriğe kalır, tablo başlığı sayfa kayarken ekranın en üstünde
+   durabilir, klavye odağı sabit bir bandın altında kalmaz (WCAG 2.4.11). Menü açıkken bant ekrana sabitlenir.
+   Ana sayfadaki yumuşak kaydırma burada kapalıdır: klavyeyle gezinirken odaklanan öğe hemen görünür. */
+html { scroll-behavior: auto; scroll-padding-top: 16px; }
+body { background: var(--white); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 2px; }
+#icerik:focus { outline: none; }
+.site-header { position: relative; inset: auto; background: var(--night); border-bottom-color: var(--hair-dark); }
+body.menu-open .site-header { position: fixed; inset: 0 0 auto 0; }
+.header-in { height: var(--nav-h); }
+.nav-cta { background: var(--cta); border-color: var(--cta); color: var(--ink); }
+.nav-cta:hover { background: var(--cta-hover); border-color: var(--cta-hover); color: var(--ink); }
+/* Geçerli sayfa / bölüm: menüde sarı alt çizgi, mobil menüde sarı yazı, alt bilgide beyaz */
+.nav-links a[aria-current] { color: var(--white); border-bottom-color: var(--cta); }
+.cl-legal a[aria-current] { color: var(--white); }
+@media (max-width: 1039px) {
+  .nav-logo { margin-right: auto; }
+  .mobile-menu > a[aria-current] { color: var(--cta); }
+}
+/* Betik kapalıyken menü düğmesi çalışmaz: gösterilmez (bağlantılar alt bilgide) */
+@media (scripting: none) { .mobile-menu-btn { display: none !important; } }
+
+/* ============ SAYFA BAŞI — koyu: içerik izi şeridi (ana içerik bölgesi dışında) + H1 bandı (içinde); ikisi tek yüzey ============ */
+.sayfa-iz { background: var(--night); padding-top: clamp(20px, 2.8vw, 40px); }
+.sayfa-bas { background: var(--night); padding-block: clamp(12px, 1.4vw, 18px) clamp(30px, 4vw, 58px); }
+.crumbs { font-size: 14px; line-height: 1.5; color: var(--on-dark-muted); }
+.crumbs a { display: inline-block; padding-block: 2px; color: var(--on-dark); text-decoration: underline; text-decoration-color: rgba(255, 255, 255, 0.36); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.crumbs a:hover { color: var(--white); text-decoration-color: var(--cta); }
+.sayfa-bas h1 { max-width: 21em; font-family: var(--serif); font-weight: 500; font-size: clamp(30px, 3.5vw, 50px); line-height: 1.1; letter-spacing: -0.018em; text-wrap: balance; }
+.sayfa-bas .updated { margin-top: 16px; font-size: 14.5px; line-height: 1.5; color: var(--on-dark-muted); }
+.sayfa-bas .lede { margin-top: 18px; max-width: 46em; font-size: clamp(16px, 1.25vw, 18px); line-height: 1.6; color: var(--on-dark); text-wrap: pretty; }
+.sayfa-bas .lede strong { font-weight: 600; color: var(--white); }
+
+/* ============ SAYFA GÖVDESİ — beyaz zemin, sola hizalı tek sütun (ana sayfa ızgarasının sol kenarı) ============ */
+.sayfa-govde { padding-block: clamp(34px, 4.2vw, 60px) clamp(56px, 6.4vw, 96px); background: var(--white); font-size: 17px; line-height: 1.7; color: var(--ink-soft); }
+.sayfa-rehber { --sutun: 760px; }
+.sayfa-kurumsal { --sutun: 860px; }
+.sayfa-veri { --sutun: 880px; }
+.sayfa-arac { --sutun: 1080px; }
+.sayfa-govde .wrap > * { max-width: var(--sutun, 760px); }
+.sayfa-govde p { margin-bottom: 16px; max-width: 44em; text-wrap: pretty; }
+.sayfa-govde h2 { margin: clamp(40px, 4vw, 56px) 0 14px; max-width: 28em; font-size: clamp(24px, 2.1vw, 30px); font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; color: var(--ink); text-wrap: balance; }
+.sayfa-govde h3 { margin: 28px 0 6px; font-size: 19px; font-weight: 600; line-height: 1.3; letter-spacing: -0.008em; color: var(--ink); }
+.sayfa-govde h2 + h3 { margin-top: 16px; }
+.sayfa-govde strong { font-weight: 600; color: var(--ink); }
+.sayfa-govde ul, .sayfa-govde ol { margin: 0 0 18px; padding-left: 1.3em; max-width: 44em; }
+.sayfa-govde ul { list-style: disc; }
+.sayfa-govde ol { list-style: decimal; }
+.sayfa-govde li { margin-bottom: 8px; padding-left: 0.2em; }
+.sayfa-govde li::marker { color: var(--ink-muted); }
+/* Metin bağlantıları: koyu yazı + ince alt çizgi; üzerine gelince sarı, kalın çizgi */
+.sayfa-govde a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: rgba(10, 14, 26, 0.42); text-underline-offset: 3px; transition: text-decoration-color 0.2s; }
+.sayfa-govde a:hover { text-decoration-color: var(--cta); text-decoration-thickness: 2px; }
+.sayfa-govde .sr-only, .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* Teklif kutusu: krem bant, üstte koyu çizgi (ana sayfadaki ana hizmet bandı gibi); düğme ana sayfanın sarı düğmesi */
+.cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; margin: 40px 0; padding: 24px 28px; background: var(--paper); border-top: 2px solid var(--ink); }
+.cta p { margin: 0; max-width: 34em; font-size: 17.5px; line-height: 1.55; color: var(--ink-soft); }
+.sayfa-govde a.btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 14px 28px; font-size: 16px; font-weight: 600; line-height: 1.25; text-align: center; color: var(--ink); background: var(--cta); border-radius: 3px; text-decoration: none; transition: background-color 0.2s; }
+.sayfa-govde a.btn-primary:hover { background: var(--cta-hover); }
+
+/* Bilgi notu, kaynak alıntısı, "bu sayfa hakkında" */
+p.note { margin: 0 0 28px; padding-left: 14px; border-left: 2px solid var(--line-strong); font-size: 14.5px; line-height: 1.65; color: var(--ink-muted); }
+.sayfa-govde p.note { max-width: 50em; }
+.sayfa-govde blockquote { margin: 18px 0 22px; padding: 16px 20px; background: var(--paper); border-left: 3px solid var(--cta); font-size: 15.5px; line-height: 1.6; color: var(--ink-soft); overflow-wrap: anywhere; }
+.about { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line-strong); font-size: 14.5px; line-height: 1.65; color: var(--ink-muted); }
+.sayfa-govde .about p { margin-bottom: 8px; max-width: 52em; color: var(--ink-muted); }
+.about strong { color: var(--ink-soft); }
+
+@media (max-width: 759px) {
+  .sayfa-govde { font-size: 16.5px; line-height: 1.65; }
+  .sayfa-govde h3 { font-size: 18px; }
+  /* Teklif kutusu telefonda kenardan kenara; düğme tam genişlik */
+  .cta { margin-inline: calc(var(--pad) * -1); padding: 20px var(--pad); }
+  .cta .btn-primary { width: 100%; }
+  .about { margin-top: 44px; }
+}
+
+/* ============ HAREKET AZALTMA ve ZORUNLU RENK ============ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media (forced-colors: active) {
+  .sayfa-govde a.btn-primary, .nav-cta { border: 1px solid CanvasText; }
+}
+@media print {
+  .site-header, .mobile-menu, .skip { display: none; }
+  .sayfa-bas { background: none; color: #000; }
+  .sayfa-bas .crumbs, .sayfa-bas .crumbs a, .sayfa-bas .updated, .sayfa-bas .lede { color: #000; }
+}

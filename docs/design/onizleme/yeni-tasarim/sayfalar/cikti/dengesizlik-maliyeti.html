@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dengesizlik Maliyeti Hesaplama: Dengesizlik Fiyatı ve SMF</title>
+<meta name="description" content="Bugünün pozitif ve negatif dengesizlik fiyatı, SMF, PTF ve sistem yönü EPİAŞ verisiyle tek tabloda. Formül, k ve l katsayıları, hesaplayıcı, CSV ve Excel.">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link rel="canonical" href="https://voltage.com.tr/dengesizlik-maliyeti">
+<link rel="alternate" type="application/json" href="https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=json" title="Dengesizlik maliyeti verisi (JSON)">
+<link rel="alternate" type="text/csv" href="https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=csv" title="Dengesizlik maliyeti verisi (CSV)">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" sizes="48x48 32x32 16x16" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://voltage.com.tr/dengesizlik-maliyeti">
+<meta property="og:title" content="Dengesizlik Maliyeti Hesaplama: Dengesizlik Fiyatı ve SMF">
+<meta property="og:description" content="Bugünün pozitif ve negatif dengesizlik fiyatı, SMF, PTF ve sistem yönü EPİAŞ verisiyle tek tabloda. Formül, k ve l katsayıları, hesaplayıcı, CSV ve Excel.">
+<meta property="og:image" content="https://voltage.com.tr/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Voltage Enerji paylaşım görseli">
+<meta property="og:site_name" content="Voltage Enerji">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://voltage.com.tr/og-image.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json" id="dJsonLd">
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://voltage.com.tr/#organization","name":"Voltage Enerji","legalName":"Voltan Elektrik Toptan Satış İthalat ve İhracat Anonim Şirketi","url":"https://voltage.com.tr/","logo":"https://voltage.com.tr/logo.png","sameAs":["https://www.linkedin.com/company/voltage-enerji/","https://www.facebook.com/voltageenerji/"]},{"@type":"BreadcrumbList","@id":"https://voltage.com.tr/dengesizlik-maliyeti#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Ana Sayfa","item":"https://voltage.com.tr/"},{"@type":"ListItem","position":2,"name":"Dengesizlik Maliyeti"}]},{"@type":"WebPage","@id":"https://voltage.com.tr/dengesizlik-maliyeti#webpage","image":"https://voltage.com.tr/og-image.jpg","name":"Dengesizlik Maliyeti Hesaplama: Dengesizlik Fiyatı ve SMF","url":"https://voltage.com.tr/dengesizlik-maliyeti","description":"Bugünün pozitif ve negatif dengesizlik fiyatı, SMF, PTF ve sistem yönü EPİAŞ verisiyle tek tabloda. Formül, k ve l katsayıları, hesaplayıcı, CSV ve Excel.","inLanguage":"tr-TR","datePublished":"2026-11-24","dateModified":"2026-11-24","isPartOf":{"@id":"https://voltage.com.tr/#website"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"breadcrumb":{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#breadcrumb"},"creditText":"Veri: EPİAŞ Şeffaflık Platformu. Sunum, türetilmiş gösterge ve hesaplayıcı: Voltage Enerji","isBasedOn":{"@type":"CreativeWork","name":"EPİAŞ Şeffaflık Platformu: PTF, SMF ve SDF Listeleme raporu","url":"https://seffaflik.epias.com.tr/","publisher":{"@type":"Organization","name":"Enerji Piyasaları İşletme A.Ş. (EPİAŞ)","url":"https://www.epias.com.tr/"}},"about":{"@type":"Thing","name":"Enerji dengesizlik fiyatı"},"mainEntity":{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#dataset"},"hasPart":[{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#hesaplayici"},{"@id":"https://voltage.com.tr/dengesizlik-maliyeti#sss"}]},{"@type":"Dataset","@id":"https://voltage.com.tr/dengesizlik-maliyeti#dataset","identifier":"https://voltage.com.tr/dengesizlik-maliyeti#dataset","name":"Türkiye elektrik piyasası: dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları","alternateName":["PTF, SMF ve dengesizlik fiyatları","Pozitif ve negatif dengesizlik fiyatı serisi"],"description":"1 Ocak 2026'dan bugüne her uzlaştırma dönemi için Piyasa Takas Fiyatı (PTF), Sistem Marjinal Fiyatı (SMF), sistem yönü, EPİAŞ'ın yayımladığı pozitif ve negatif dengesizlik fiyatı ile bunlardan hesaplanan birim dengesizlik maliyeti (PTF'ye göre). Değerler EPİAŞ Şeffaflık Platformu'nda yayımlandığı hâliyle aktarılır; yayımlanmamış değer boş kalır. Dosyalar parametresiz istendiğinde içinde bulunulan günü verir; başka bir gün için tarih, aralık için bas ve bit parametreleri kullanılır (tek istekte en çok 31 gün).","url":"https://voltage.com.tr/dengesizlik-maliyeti","inLanguage":"tr-TR","isAccessibleForFree":true,"datePublished":"2026-11-24","dateModified":"2026-11-24","creator":{"@type":"Organization","name":"Enerji Piyasaları İşletme A.Ş. (EPİAŞ)","url":"https://www.epias.com.tr/"},"publisher":{"@id":"https://voltage.com.tr/#organization"},"isBasedOn":{"@type":"CreativeWork","name":"EPİAŞ Şeffaflık Platformu: PTF, SMF ve SDF Listeleme raporu","url":"https://seffaflik.epias.com.tr/","publisher":{"@type":"Organization","name":"Enerji Piyasaları İşletme A.Ş. (EPİAŞ)","url":"https://www.epias.com.tr/"}},"keywords":["dengesizlik fiyatı","pozitif dengesizlik fiyatı","negatif dengesizlik fiyatı","sistem marjinal fiyatı","SMF","PTF","sistem yönü","dengeleme güç piyasası","EPİAŞ"],"citation":"Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı. Veri: EPİAŞ Şeffaflık Platformu.","measurementTechnique":"PTF, SMF, sistem yönü ve dengesizlik fiyatları EPİAŞ Şeffaflık Platformu'nun \"PTF, SMF ve SDF Listeleme\" raporundan olduğu gibi aktarılır. Birim dengesizlik maliyeti (PTF'ye göre) bu değerlerden Voltage Enerji tarafından hesaplanır: negatif dengesizlik fiyatı eksi PTF ve PTF eksi pozitif dengesizlik fiyatı.","spatialCoverage":{"@type":"Country","name":"Türkiye"},"temporalCoverage":"2026-01-01/..","variableMeasured":[{"@type":"PropertyValue","name":"PTF","description":"Piyasa Takas Fiyatı","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"SMF","description":"Sistem Marjinal Fiyatı","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"Sistem yönü","description":"Enerji açığı, enerji fazlası ya da dengede"},{"@type":"PropertyValue","name":"Pozitif dengesizlik fiyatı","description":"EPİAŞ'ın yayımladığı pozitif dengesizlik fiyatı","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"Negatif dengesizlik fiyatı","description":"EPİAŞ'ın yayımladığı negatif dengesizlik fiyatı","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"Pozitif dengesizlik maliyeti (PTF'ye göre)","description":"PTF eksi pozitif dengesizlik fiyatı; Voltage Enerji türetimi","unitText":"TL/MWh"},{"@type":"PropertyValue","name":"Negatif dengesizlik maliyeti (PTF'ye göre)","description":"Negatif dengesizlik fiyatı eksi PTF; Voltage Enerji türetimi","unitText":"TL/MWh"}],"distribution":[{"@type":"DataDownload","name":"CSV","encodingFormat":"text/csv","contentUrl":"https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=csv"},{"@type":"DataDownload","name":"Excel (.xlsx)","encodingFormat":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","contentUrl":"https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=xlsx"},{"@type":"DataDownload","name":"JSON","encodingFormat":"application/json","contentUrl":"https://voltage.com.tr/dengesizlik-maliyeti/veri?bicim=json"}]},{"@type":"WebApplication","@id":"https://voltage.com.tr/dengesizlik-maliyeti#hesaplayici","name":"Dengesizlik maliyeti hesaplayıcı","url":"https://voltage.com.tr/dengesizlik-maliyeti#hesaplayici","description":"Bir uzlaştırma dönemindeki dengesizlik miktarı için dengesizlik tutarını, aynı miktarın PTF üzerinden değerini ve aradaki farkı hesaplar. Sonuçlar tahminidir; teklif ya da taahhüt değildir.","applicationCategory":"BusinessApplication","operatingSystem":"Web","browserRequirements":"JavaScript gerektirir","inLanguage":"tr-TR","isAccessibleForFree":true,"provider":{"@id":"https://voltage.com.tr/#organization"}},{"@type":"FAQPage","@id":"https://voltage.com.tr/dengesizlik-maliyeti#sss","mainEntity":[{"@type":"Question","name":"Dengesizlik maliyeti nedir?","acceptedAnswer":{"@type":"Answer","text":"Dengesizlik maliyeti, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır. Mevzuatta tanımlı bir terim değildir; Voltage Enerji tarafından EPİAŞ Şeffaflık Platformu verisinden türetilir."}},{"@type":"Question","name":"Pozitif ve negatif dengesizlik fiyatı nasıl hesaplanır?","acceptedAnswer":{"@type":"Answer","text":"Pozitif dengesizlik fiyatı min(PTF; SMF) × (1 − çarpan), negatif dengesizlik fiyatı max(PTF; SMF) × (1 + çarpan) formülüyle hesaplanır. Çarpan sistem yönüne göre %3 ya da %6'dır. Çok düşük fiyatlı saatlerde ve azami fiyat limitinde yönetmelikteki ek kurallar uygulanır; tabloda EPİAŞ'ın yayımladığı değer gösterilir. Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı."}},{"@type":"Question","name":"Sistem yönü neyi değiştirir?","acceptedAnswer":{"@type":"Answer","text":"Sistem yönü çarpanı belirler. Sistem enerji fazlasındaysa (arz fazlası) pozitif dengesizlikte çarpan %6, negatif dengesizlikte %3'tür. Sistem enerji açığındaysa (talep fazlası) negatif dengesizlikte çarpan %6, pozitif dengesizlikte %3'tür. Sistem dengedeyse ikisi de %3'tür. Tabloda EPİAŞ'ın yayımladığı sistem yönü gösterilir."}},{"@type":"Question","name":"Veriyi nasıl indiririm?","acceptedAnswer":{"@type":"Answer","text":"Tablonun üstündeki bağlantılar seçili günü CSV, Excel (.xlsx) ve JSON olarak indirir. Tarih aralığı formu en çok 31 günlük veriyi tek dosyada verir. Aynı veri https://voltage.com.tr/dengesizlik-maliyeti/veri adresinden tarih ve biçim parametreleriyle de alınabilir. Veri alınamadığında boş dosya üretilmez."}}]}]}
+</script>
+<style>
+/* ===== 1) Ana sayfa kabuğu: yeni ana sayfa stilinden (yapi/stil.css) süzüldü, bildirimler aynen ===== */
+:root{--ink:#0A0E1A;--ink-soft:#1E2536;--ink-muted:#4A5264;--line:#E2DFD6;--line-strong:#CBC7BA;--paper:#F5F3EC;--white:#FFFFFF;--night:#0A1122;--cta:#F5B41C;--cta-hover:#FFC84A;--red:#8E221B;--green:#2F7A44;--green-bright:#5BC489;--on-dark:rgba(255,255,255,.88);--on-dark-muted:rgba(255,255,255,.72);--hair-dark:rgba(255,255,255,.18);--serif:'Newsreader',Georgia,serif;--sans:'Archivo',-apple-system,'Segoe UI',sans-serif;--mono:'IBM Plex Mono',Consolas,monospace;--ease:cubic-bezier(.25,.46,.45,.94);--pad:clamp(16px,5vw,72px);--sec:clamp(40px,5.6vw,80px);--g:clamp(20px,2.3vw,32px);--header-h:80px;--nav-h:68px;--focus:var(--ink);--fp:40px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);font-size:16px;line-height:1.55;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+svg{display:block}
+ul,ol{list-style:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+table{border-collapse:collapse}
+a:focus-visible,button:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+main:focus{outline:none}
+.wrap{width:100%;max-width:calc(1240px + 2 * var(--pad));margin-inline:auto;padding-inline:var(--pad)}
+.on-dark{--focus:var(--cta);color:var(--white)}
+.mono{font-family:var(--mono);font-size:.93em}
+.skip{position:absolute;left:16px;top:-72px;z-index:200;padding:12px 18px;background:var(--cta);color:var(--ink);font-weight:600;border-radius:3px}
+.skip:focus{top:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 28px;font-size:16px;font-weight:600;line-height:1;white-space:nowrap;border:1.5px solid transparent;border-radius:3px;transition:background-color .2s,border-color .2s,color .2s}
+.btn-primary{background:var(--cta);color:var(--ink)}
+.btn-primary:hover{background:var(--cta-hover)}
+.site-header{position:fixed;inset:0 0 auto 0;z-index:100;color:var(--white);border-bottom:1px solid transparent;transition:background-color .25s var(--ease),border-color .25s var(--ease)}
+body.menu-open .site-header{background:var(--night);border-bottom-color:var(--hair-dark)}
+.header-in{display:flex;align-items:center;gap:clamp(16px,2.4vw,36px);height:var(--header-h);transition:height .25s var(--ease)}
+.nav-logo{display:flex;align-items:center;gap:12px;flex:none;min-height:44px}
+.nav-logo-mark{width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.nav-logo-mark svg{width:100%;height:100%}
+.nav-logo-text,.cl-name{display:flex;align-items:baseline;gap:.5em;font-family:var(--sans);font-size:17px;line-height:1;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.nav-logo-name,.cl-word{font-weight:600}
+.nav-logo-sub,.cl-sub{font-weight:400;color:var(--on-dark)}
+.nav-links{flex:1;display:flex;justify-content:center;gap:clamp(18px,2.4vw,38px);min-width:0}
+.nav-links a{padding:12px 0;font-size:15.5px;font-weight:500;color:var(--on-dark);white-space:nowrap;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.nav-links a:hover{color:var(--white);border-bottom-color:var(--cta)}
+.nav-right{display:flex;align-items:center;gap:clamp(12px,1.6vw,22px);flex:none}
+.nav-cta{min-height:44px;padding:0 20px;font-size:15px;border-color:rgba(255,255,255,.8);color:var(--white);background:rgba(8,13,28,.6)}
+.nav-cta:hover{background:var(--cta);border-color:var(--cta);color:var(--ink)}
+.mobile-menu-btn,.mobile-menu{display:none}
+body.menu-open{overflow:hidden}
+.label{font-size:12.5px;font-weight:600;line-height:1.4;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted)}
+.footer{background:#070B16;padding-block:clamp(52px,6vw,80px) 28px}
+.cl-head{display:flex;justify-content:space-between;align-items:center;gap:20px 24px;flex-wrap:wrap}
+.cl-brand{display:flex;align-items:center;gap:12px}
+.cl-mark-svg{width:32px;height:32px;flex:none}
+.cl-mark-svg svg{width:100%;height:100%}
+.cl-subwrap{display:inline-flex;align-items:flex-start}
+.cl-reg{font-size:9px;line-height:1;letter-spacing:0;margin-left:2px;opacity:.8}
+.cl-nav{display:flex;gap:0 28px;flex-wrap:wrap}
+.cl-nav a,.cl-legal a{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:15px;color:var(--on-dark-muted);transition:color .2s}
+.cl-nav a:hover,.cl-legal a:hover,.cl-v a:hover{color:var(--cta)}
+.cl-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 40px;margin-top:36px;padding-top:34px;border-top:1px solid var(--hair-dark)}
+.cl-k{margin-bottom:8px;color:var(--on-dark-muted)}
+.cl-v{font-size:15px;line-height:1.65;color:var(--on-dark);overflow-wrap:anywhere}
+.cl-v a{display:inline-flex;align-items:center;min-height:44px;margin:-10px 0;color:var(--white);text-decoration:underline;text-decoration-color:var(--cta);text-underline-offset:4px}
+.cl-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px 24px;flex-wrap:wrap;margin-top:40px;padding-top:14px;border-top:1px solid var(--hair-dark)}
+.cl-copy,.cl-markline{font-size:12.5px;letter-spacing:.04em;color:var(--on-dark-muted)}
+.cl-legal{display:flex;flex-wrap:wrap;gap:0 22px}
+.cl-legal a{font-size:14px}
+@media (max-width: 1039px){:root{--header-h:64px;--nav-h:64px}
+.nav-links{display:none}
+.nav-right{margin-left:auto}
+.nav-cta,.nav-cta:hover{padding:0 16px;background:var(--cta);border-color:var(--cta);color:var(--ink)}
+.mobile-menu-btn{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;padding:0 10px;border:1px solid rgba(255,255,255,.4);border-radius:3px;background:rgba(8,13,28,.6)}
+.mobile-menu-btn span{display:block;height:1.5px;background:var(--white);transition:transform .2s var(--ease),opacity .2s}
+.mobile-menu-btn.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.mobile-menu-btn.open span:nth-child(2){opacity:0}
+.mobile-menu-btn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.mobile-menu{position:fixed;inset:0;z-index:90;overflow-y:auto;display:flex;flex-direction:column;padding:calc(var(--header-h) + 8px) var(--pad) 28px;background:var(--night);color:var(--white)}
+.mobile-menu[hidden]{display:none}
+.mobile-menu > a{display:flex;align-items:center;min-height:56px;font-size:18px;font-weight:500;border-bottom:1px solid var(--hair-dark)}
+.cl-grid{grid-template-columns:1fr 1fr}}
+@media (max-width: 759px){.cl-head,.cl-bottom{flex-direction:column;align-items:flex-start}}
+@media (max-width: 700px){.cl-grid{grid-template-columns:1fr 1fr;gap:20px 24px;margin-top:26px;padding-top:26px}
+.cl-grid > :nth-child(-n+2){grid-column:1 / -1}
+.cl-bottom{margin-top:28px}}
+@media (max-width: 640px){:root{--fp:22px}}
+@media (max-width: 479px){.cl-nav{gap:0 12px}
+.nav-logo-sub{display:none}}
+@media (max-width: 359px){:root{--fp:16px}
+.nav-logo{gap:9px}
+.nav-logo-text{font-size:15px;letter-spacing:.12em}}
+@media (forced-colors: active){.btn{border:1px solid CanvasText}}
+/* ===== 2) Alt sayfa kabuğu ve ortak içerik dizgisi (sayfalar/kabuk.css) ===== */
+/* Alt sayfa kabuğu: üst bant ana sayfanın kaydırılmış hâliyle aynıdır (koyu zemin, 68 px; 1039 px ve altında 64 px;
+   sarı "Teklif Al"). Alt sayfada kapak fotoğrafı olmadığı için bant baştan koyudur ve sayfa akışındadır (yapışkan
+   değildir): uzun okuma ve veri sayfalarında dikey alan içeriğe kalır, tablo başlığı sayfa kayarken ekranın en üstünde
+   durabilir, klavye odağı sabit bir bandın altında kalmaz (WCAG 2.4.11). Menü açıkken bant ekrana sabitlenir.
+   Ana sayfadaki yumuşak kaydırma burada kapalıdır: klavyeyle gezinirken odaklanan öğe hemen görünür. */
+html{scroll-behavior:auto;scroll-padding-top:16px}
+body{background:var(--white)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+#icerik:focus{outline:none}
+.site-header{position:relative;inset:auto;background:var(--night);border-bottom-color:var(--hair-dark)}
+body.menu-open .site-header{position:fixed;inset:0 0 auto 0}
+.header-in{height:var(--nav-h)}
+.nav-cta{background:var(--cta);border-color:var(--cta);color:var(--ink)}
+.nav-cta:hover{background:var(--cta-hover);border-color:var(--cta-hover);color:var(--ink)}
+/* Geçerli sayfa / bölüm: menüde sarı alt çizgi, mobil menüde sarı yazı, alt bilgide beyaz */
+.nav-links a[aria-current]{color:var(--white);border-bottom-color:var(--cta)}
+.cl-legal a[aria-current]{color:var(--white)}
+@media (max-width: 1039px){.nav-logo{margin-right:auto}
+.mobile-menu > a[aria-current]{color:var(--cta)}}
+/* Betik kapalıyken menü düğmesi çalışmaz: gösterilmez (bağlantılar alt bilgide) */
+@media (scripting: none){.mobile-menu-btn{display:none !important}}
+/* ============ SAYFA BAŞI — koyu: içerik izi şeridi (ana içerik bölgesi dışında) + H1 bandı (içinde); ikisi tek yüzey ============ */
+.sayfa-iz{background:var(--night);padding-top:clamp(20px,2.8vw,40px)}
+.sayfa-bas{background:var(--night);padding-block:clamp(12px,1.4vw,18px) clamp(30px,4vw,58px)}
+.crumbs{font-size:14px;line-height:1.5;color:var(--on-dark-muted)}
+.crumbs a{display:inline-block;padding-block:2px;color:var(--on-dark);text-decoration:underline;text-decoration-color:rgba(255,255,255,.36);text-decoration-thickness:1px;text-underline-offset:4px}
+.crumbs a:hover{color:var(--white);text-decoration-color:var(--cta)}
+.sayfa-bas h1{max-width:21em;font-family:var(--serif);font-weight:500;font-size:clamp(30px,3.5vw,50px);line-height:1.1;letter-spacing:-.018em;text-wrap:balance}
+.sayfa-bas .updated{margin-top:16px;font-size:14.5px;line-height:1.5;color:var(--on-dark-muted)}
+.sayfa-bas .lede{margin-top:18px;max-width:46em;font-size:clamp(16px,1.25vw,18px);line-height:1.6;color:var(--on-dark);text-wrap:pretty}
+.sayfa-bas .lede strong{font-weight:600;color:var(--white)}
+/* ============ SAYFA GÖVDESİ — beyaz zemin, sola hizalı tek sütun (ana sayfa ızgarasının sol kenarı) ============ */
+.sayfa-govde{padding-block:clamp(34px,4.2vw,60px) clamp(56px,6.4vw,96px);background:var(--white);font-size:17px;line-height:1.7;color:var(--ink-soft)}
+.sayfa-rehber{--sutun:760px}
+.sayfa-kurumsal{--sutun:860px}
+.sayfa-veri{--sutun:880px}
+.sayfa-arac{--sutun:1080px}
+.sayfa-govde .wrap > *{max-width:var(--sutun,760px)}
+.sayfa-govde p{margin-bottom:16px;max-width:44em;text-wrap:pretty}
+.sayfa-govde h2{margin:clamp(40px,4vw,56px) 0 14px;max-width:28em;font-size:clamp(24px,2.1vw,30px);font-weight:600;line-height:1.2;letter-spacing:-.02em;color:var(--ink);text-wrap:balance}
+.sayfa-govde h3{margin:28px 0 6px;font-size:19px;font-weight:600;line-height:1.3;letter-spacing:-.008em;color:var(--ink)}
+.sayfa-govde h2 + h3{margin-top:16px}
+.sayfa-govde strong{font-weight:600;color:var(--ink)}
+.sayfa-govde ul,.sayfa-govde ol{margin:0 0 18px;padding-left:1.3em;max-width:44em}
+.sayfa-govde ul{list-style:disc}
+.sayfa-govde ol{list-style:decimal}
+.sayfa-govde li{margin-bottom:8px;padding-left:.2em}
+.sayfa-govde li::marker{color:var(--ink-muted)}
+/* Metin bağlantıları: koyu yazı + ince alt çizgi; üzerine gelince sarı, kalın çizgi */
+.sayfa-govde a{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-decoration-color:rgba(10,14,26,.42);text-underline-offset:3px;transition:text-decoration-color .2s}
+.sayfa-govde a:hover{text-decoration-color:var(--cta);text-decoration-thickness:2px}
+.sayfa-govde .sr-only,.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* Teklif kutusu: krem bant, üstte koyu çizgi (ana sayfadaki ana hizmet bandı gibi); düğme ana sayfanın sarı düğmesi */
+.cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 32px;margin:40px 0;padding:24px 28px;background:var(--paper);border-top:2px solid var(--ink)}
+.cta p{margin:0;max-width:34em;font-size:17.5px;line-height:1.55;color:var(--ink-soft)}
+.sayfa-govde a.btn-primary{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:14px 28px;font-size:16px;font-weight:600;line-height:1.25;text-align:center;color:var(--ink);background:var(--cta);border-radius:3px;text-decoration:none;transition:background-color .2s}
+.sayfa-govde a.btn-primary:hover{background:var(--cta-hover)}
+/* Bilgi notu, kaynak alıntısı, "bu sayfa hakkında" */
+p.note{margin:0 0 28px;padding-left:14px;border-left:2px solid var(--line-strong);font-size:14.5px;line-height:1.65;color:var(--ink-muted)}
+.sayfa-govde p.note{max-width:50em}
+.sayfa-govde blockquote{margin:18px 0 22px;padding:16px 20px;background:var(--paper);border-left:3px solid var(--cta);font-size:15.5px;line-height:1.6;color:var(--ink-soft);overflow-wrap:anywhere}
+.about{margin-top:56px;padding-top:18px;border-top:1px solid var(--line-strong);font-size:14.5px;line-height:1.65;color:var(--ink-muted)}
+.sayfa-govde .about p{margin-bottom:8px;max-width:52em;color:var(--ink-muted)}
+.about strong{color:var(--ink-soft)}
+@media (max-width: 759px){.sayfa-govde{font-size:16.5px;line-height:1.65}
+.sayfa-govde h3{font-size:18px}
+/* Teklif kutusu telefonda kenardan kenara; düğme tam genişlik */
+.cta{margin-inline:calc(var(--pad) * -1);padding:20px var(--pad)}
+.cta .btn-primary{width:100%}
+.about{margin-top:44px}}
+/* ============ HAREKET AZALTMA ve ZORUNLU RENK ============ */
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}
+*,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+@media (forced-colors: active){.sayfa-govde a.btn-primary,.nav-cta{border:1px solid CanvasText}}
+@media print{.site-header,.mobile-menu,.skip{display:none}
+.sayfa-bas{background:none;color:#000}
+.sayfa-bas .crumbs,.sayfa-bas .crumbs a,.sayfa-bas .updated,.sayfa-bas .lede{color:#000}}
+/* ===== 3) Sayfaya özgü: sayfalar/stil/veri-bandi.css ===== */
+/* Piyasa veri bandı (.live): iki piyasa verisi sayfasının ortak dili. Ana sayfanın kapak PTF kartıyla aynı yüzey
+   (#0B1226, ince açık çizgi, 4 px köşe); ızgara deseni yok. Rakamlar tabular; durum ve damga monospace (piyasa verisi),
+   etiketler düz yazı. Betiğin yazdığı sınıflar (live-mode / live-stamp + stale / waiting) aynen kullanılır. */
+.live { --focus: var(--cta); margin: 32px 0 14px; padding: 22px 26px 16px; color: var(--white); background: #0B1226; border: 1px solid var(--hair-dark); border-radius: 4px; }
+.live-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; padding-bottom: 14px; border-bottom: 1px solid var(--hair-dark); }
+.live-t { font-size: 13px; font-weight: 500; line-height: 1.4; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-dark); }
+.live-mode { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--green-bright); }
+.live-mode.stale { color: var(--cta); }
+.live-mode.waiting { color: var(--on-dark-muted); }
+.live-now { padding: 20px 0 16px; border-bottom: 1px solid var(--hair-dark); }
+.live-now-num { font-size: clamp(38px, 5.4vw, 54px); font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.live-now-num .u { margin-left: 12px; font-size: 15px; font-weight: 400; letter-spacing: 0; color: var(--on-dark-muted); white-space: nowrap; }
+.live-now-k { margin-top: 8px; font-size: 14.5px; line-height: 1.45; color: var(--on-dark-muted); }
+.live-cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--hair-dark); }
+.live-cells .cell { min-width: 0; padding: 16px 16px 14px; border-left: 1px solid var(--hair-dark); }
+.live-cells .cell:first-child { padding-left: 0; border-left: 0; }
+.cv { font-family: var(--mono); font-size: clamp(17px, 1.9vw, 21px); font-weight: 500; line-height: 1.25; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ck { margin-top: 6px; font-size: 13.5px; line-height: 1.4; color: var(--on-dark-muted); }
+.live-foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 16px; padding-top: 12px; font-size: 13px; line-height: 1.45; color: var(--on-dark-muted); }
+.live-stamp { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--green-bright); }
+.live-stamp.stale { color: var(--cta); }
+.live-stamp.waiting { color: var(--on-dark-muted); }
+.sayfa-govde .day-sum { font-size: 15.5px; line-height: 1.65; color: var(--ink-soft); }
+@media (max-width: 640px) {
+  .live { padding: 18px 18px 14px; }
+  .live-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .live-cells .cell { padding-left: 14px; }
+  .live-cells .cell:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .live-cells .cell:nth-child(n+3) { border-top: 1px solid var(--hair-dark); }
+}
+/* ===== 3) Sayfaya özgü: sayfalar/stil/dengesizlik-maliyeti.css ===== */
+/* /dengesizlik-maliyeti — sayfaya özgü: tarih ve indirme araç çubukları, dönem tablosu (telefonda dört sütun), özet
+   bandı eki, formül kutusu, hesaplayıcı, sonuç kutuları. Bütün seçiciler, kimlikler ve sınıflar canlıdakiyle aynıdır
+   (functions/dengesizlik-maliyeti.js çapaları ve sayfa betiği bunlara yazar). Sabitlenmiş iki test rengi: maliyet
+   sütunlarının zemini #F3EBD3 / başlığı #E9DEBF (test-dengesizlik-tarayici.mjs R9 bu değerleri bekler). */
+var { font-family: var(--mono); font-style: normal; }
+.sayfa-govde code { padding: 1px 5px; font-family: var(--mono); font-size: 14px; background: var(--paper); overflow-wrap: anywhere; }
+.sayfa-govde ul.liste { max-width: 44em; }
+.sayfa-govde .uyari { margin: 0 0 20px; padding: 12px 16px; font-size: 15px; line-height: 1.55; color: var(--ink); background: #FBEFC9; border-left: 3px solid var(--cta); }
+.sayfa-govde .uyari:empty { display: none; }
+.sayfa-govde p.uyari { max-width: none; }
+.sayfa-govde .updated { margin: 0 0 8px; padding: 12px 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-muted); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.sayfa-govde .day-sum { margin: 0 0 22px; min-height: 8.75em; }
+@media (max-width: 640px) { .sayfa-govde .day-sum { min-height: 17.5em; } }
+
+/* ---- Özet bandı eki: yön sayıları ---- */
+.live-yon { display: flex; flex-wrap: wrap; gap: 6px 24px; padding: 12px 0; font-size: 14px; line-height: 1.45; color: var(--on-dark-muted); border-bottom: 1px solid var(--hair-dark); }
+.live-yon b { font-family: var(--mono); font-weight: 500; color: var(--white); font-variant-numeric: tabular-nums; }
+
+/* ---- Araç çubukları (gün seçimi, indirme, aralık formu) ---- */
+.arac { margin: 0 0 22px; padding: 14px 18px; background: var(--paper); border: 1px solid var(--line-strong); border-radius: 4px; }
+.arac form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 12px; }
+.arac-satir { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-strong); }
+.arac-satir.arac-ilk { margin-top: 0; padding-top: 0; border-top: 0; }
+.etiket { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; line-height: 1.3; color: var(--ink-soft); }
+.arac-baslik { font-size: 12.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); }
+.sayfa-arac input[type="date"], .sayfa-arac input[type="text"], .sayfa-arac select { max-width: 100%; min-height: 44px; padding: 8px 12px; font: inherit; font-family: var(--sans); font-size: 16px; line-height: 1.3; color: var(--ink); background: var(--white); border: 1px solid var(--ink-muted); border-radius: 3px; }
+.sayfa-arac input[aria-invalid="true"] { border-color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
+/* İşlem düğmeleri: koyu (sarı yalnız teklif düğmesinde); ikincil düğmeler çerçeveli */
+.sayfa-arac .btn { min-height: 44px; padding: 0 18px; font-size: 15px; font-weight: 600; line-height: 1.2; color: var(--white); background: var(--night); border: 1px solid var(--night); border-radius: 3px; cursor: pointer; text-decoration: none; transition: background-color 0.2s, border-color 0.2s; }
+.sayfa-arac .btn:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
+.btn-ikincil { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; font: inherit; font-size: 15px; font-weight: 500; line-height: 1.2; color: var(--ink); background: var(--white); border: 1px solid var(--ink-muted); border-radius: 3px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.sayfa-govde a.btn-ikincil { color: var(--ink); text-decoration: none; }
+a.btn-ikincil:hover, button.btn-ikincil:hover { border-color: var(--ink); background: var(--paper); }
+.sayfa-govde a.btn-ikincil[aria-disabled="true"], .btn-ikincil[aria-disabled="true"] { color: var(--ink-muted); background: var(--white); border-color: var(--line-strong); cursor: default; }
+.sayfa-arac .btn[disabled], .btn-ikincil[disabled] { color: var(--ink-muted); background: var(--paper); border-color: var(--line-strong); cursor: default; }
+.indir-not { font-size: 14px; color: var(--ink-muted); }
+.indir-not[hidden] { display: none; }
+.fark { font-weight: 600; color: var(--red); }
+.adimlar { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.arac-tarih { margin-bottom: 12px; padding: 10px 14px; }
+.sayfa-govde .hata { margin: 6px 0 0; max-width: none; font-size: 14px; line-height: 1.45; color: var(--red); }
+.sayfa-govde .hata:empty { display: none; }
+.sayfa-govde .yardim { flex-basis: 100%; margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: var(--ink-muted); }
+.sayfa-govde h2#tablo { margin: 22px 0 12px; font-size: clamp(21px, 1.9vw, 25px); }
+@media (max-width: 640px) {
+  .arac-tarih .adimlar { flex-wrap: nowrap; gap: 6px; }
+  .arac-tarih .adimlar .btn-ikincil { padding-left: 9px; padding-right: 9px; font-size: 14.5px; }
+  .dm-tablo thead th { padding-top: 6px; padding-bottom: 6px; }
+  .adimlar { flex-basis: 100%; margin-left: 0; }
+}
+@media (max-width: 379px) { .arac-tarih .adimlar { flex-wrap: wrap; } }
+
+/* ---- Dönem tablosu: monospace rakamlar; başlık satırı yapışkan; geniş ekranda kap kaymaz ---- */
+.tablo-sar { min-height: 420px; max-height: 76vh; margin: 0 0 14px; overflow: auto; background: var(--white); border: 1px solid var(--line-strong); -webkit-overflow-scrolling: touch; }
+.dm-tablo { width: 100%; min-width: 780px; border-collapse: separate; border-spacing: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.dm-tablo caption { caption-side: top; padding: 11px 12px; text-align: left; font-family: var(--sans); font-size: 14px; line-height: 1.45; color: var(--ink-soft); border-bottom: 1px solid var(--line-strong); }
+.dm-tablo thead th { position: sticky; top: 0; z-index: 2; padding: 10px; text-align: right; vertical-align: bottom; font-family: var(--sans); font-size: 12px; font-weight: 600; line-height: 1.35; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); background: var(--paper); border-bottom: 1px solid var(--line-strong); }
+.dm-tablo thead th:first-child { left: 0; z-index: 3; text-align: left; }
+.dm-tablo thead th.sol { text-align: left; }
+.dm-tablo tbody th { position: sticky; left: 0; z-index: 1; padding: 8px 10px; text-align: left; font-weight: 400; white-space: nowrap; color: var(--ink); background: var(--white); border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); }
+.dm-tablo td { padding: 8px 10px; text-align: right; white-space: nowrap; color: var(--ink-soft); border-bottom: 1px solid var(--line); }
+.dm-tablo td.yon { text-align: left; }
+/* İki maliyet sütunu vurgulu: kalın değer + hafif zemin (değerler test tarafından sabitlenmiştir) */
+.dm-tablo thead th:nth-child(7), .dm-tablo thead th:nth-child(8) { background: #E9DEBF; color: var(--ink); }
+.dm-tablo td:nth-child(7), .dm-tablo td:nth-child(8) { background: #F3EBD3; color: var(--ink); font-weight: 600; }
+.dm-tablo tr:last-child td, .dm-tablo tr:last-child th { border-bottom: 0; }
+.dm-tablo tr.simdi td, .dm-tablo tr.simdi th { font-weight: 600; color: var(--ink); background: #FBEFC9; }
+.dm-tablo .bos, .dm-tablo .bekle { color: var(--ink-muted); }
+.dm-tablo td.bekle { padding: 14px 12px; text-align: left; font-family: var(--sans); }
+.dm-tablo td.yon-acik { color: #7A5A00; }
+.dm-tablo td.yon-fazla { color: var(--green); }
+.dm-tablo td.yon-denge { color: var(--ink-muted); }
+.dm-tablo tr.simdi td.yon { color: var(--ink); }
+/* Geniş ekranda tablo sütuna sığar: kap kaymaz, başlık satırı sayfa kayarken ekranın üstünde durur */
+@media (min-width: 1000px) {
+  .tablo-sar { max-height: none; overflow: visible; }
+  .dm-tablo { font-size: 13.5px; }
+}
+
+/* ---- Küçük tablolar (betik taştıklarında bölge yapar) ---- */
+.kucuk-sar { margin: 0 0 20px; overflow-x: auto; border: 1px solid var(--line-strong); }
+.kucuk { width: 100%; font-size: 15px; }
+.kucuk caption { caption-side: top; padding: 10px 12px; text-align: left; font-size: 14px; color: var(--ink-soft); border-bottom: 1px solid var(--line-strong); }
+.kucuk th, .kucuk td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.kucuk thead th { font-size: 12.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); background: var(--paper); }
+.kucuk tbody th { font-weight: 600; white-space: nowrap; }
+.kucuk tr:last-child th, .kucuk tr:last-child td { border-bottom: 0; }
+.kucuk .sayi { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---- Formül kutusu (teknik ifade: monospace) ---- */
+.formul { margin: 14px 0 18px; padding: 16px 20px; overflow-x: auto; font-family: var(--mono); font-size: 14.5px; line-height: 1.9; color: var(--ink); background: var(--paper); border-left: 3px solid var(--cta); }
+.formul p { margin: 0; max-width: none; color: var(--ink); white-space: nowrap; }
+.formul .nw { white-space: nowrap; }
+.formul .kosul { color: var(--ink-muted); }
+/* Dar ekranda formül satırları sarar, ifade parçaları (.nw) bölünmez; iOS odakta yakınlaştırmasın (16 px girdi) */
+@media (max-width: 640px) { .formul p { white-space: normal; } }
+@media (max-width: 640px) { input[type="date"], input[type="text"], select { font-size: 16px; } }
+
+/* ---- Hesaplayıcı ---- */
+.hesap { margin: 0 0 14px; padding: 20px 22px 8px; background: var(--paper); border: 1px solid var(--line-strong); border-radius: 4px; }
+.hesap fieldset { min-width: 0; margin: 0 0 16px; border: 0; }
+.hesap legend { margin-bottom: 6px; padding: 0; font-size: 12.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); }
+.secenek { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 16px; line-height: 1.45; cursor: pointer; }
+.secenek input { flex: none; width: 18px; height: 18px; margin-top: 2px; accent-color: var(--ink); }
+.secenek input:disabled + span { color: var(--ink-muted); }
+.hesap-izgara { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px 16px; margin-bottom: 16px; }
+.hesap-izgara input, .hesap-izgara select { width: 100%; }
+.hesap form { margin-bottom: 14px; padding-top: 16px; border-top: 1px solid var(--line-strong); }
+.hesap form[hidden] { display: none; }
+.sayfa-govde .kural-notu { margin: 0 0 14px; max-width: none; font-size: 14.5px; line-height: 1.55; color: var(--ink-muted); }
+.sayfa-govde .hesap p.note { margin-bottom: 14px; }
+.sonuc { margin: 0 0 14px; }
+.sonuc:empty { display: none; }
+.sonuc-kutu { margin-bottom: 12px; padding: 16px 18px; background: var(--white); border: 1px solid var(--line-strong); border-top: 2px solid var(--ink); }
+.sayfa-govde .sonuc-kutu h3 { margin: 0 0 10px; font-size: 17px; }
+.sonuc-kutu dl { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); font-size: 15px; }
+.sonuc-kutu dt { padding: 7px 10px 7px 0; color: var(--ink-soft); border-top: 1px solid var(--line); }
+.sonuc-kutu dd { padding: 7px 0; text-align: right; font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.sonuc-kutu dt.vurgu, .sonuc-kutu dd.vurgu { font-weight: 600; color: var(--ink); border-top-color: var(--ink-muted); }
+.sayfa-govde .sonuc-kutu p { margin: 10px 0 0; font-size: 14.5px; }
+@media (max-width: 480px) { .sonuc-kutu dl { grid-template-columns: 1fr; } .sonuc-kutu dd { padding-top: 0; text-align: left; border-top: 0; } }
+
+/* ---- Telefonda (≤ 640 px) tablo dört sütun: Dönem, Sistem yönü, iki maliyet; dört fiyat satıra dokununca açılan
+   ayrıntıda. YALNIZ betik çalışınca (html.dm-js): betik yokken tüm sütunlar kayan kapta görünür. Sunucu HTML'i her zaman
+   8 sütunun tamamını taşır. Kırılma noktası betiğin matchMedia('(max-width: 640px)') değeriyle aynıdır. ---- */
+.dm-tablo .kisa, .mobil-lejant, .dm-tablo .satir-ok { display: none; }
+.dm-tablo tr.detay td { padding: 8px 10px 10px; text-align: left; white-space: normal; background: var(--paper); }
+.detay-dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; margin: 0; }
+.detay-dl div { display: flex; flex-direction: column; }
+.detay-dl dt { font-family: var(--sans); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.detay-dl dd { margin: 0; color: var(--ink); }
+.satir-ac { display: inline-flex; align-items: center; gap: 4px; width: 100%; min-height: 44px; margin: 0; padding: 0 2px; font: inherit; text-align: left; color: inherit; background: none; border: 0; cursor: pointer; }
+.satir-ac:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+@media (max-width: 640px) {
+  .dm-js .mobil-lejant { display: block; margin: 0 0 6px; font-size: 13.5px; color: var(--ink-muted); }
+  .dm-js .dm-tablo { min-width: 0; font-size: 12.5px; }
+  .dm-js .dm-tablo tr > :nth-child(2), .dm-js .dm-tablo tr > :nth-child(3), .dm-js .dm-tablo tr > :nth-child(5), .dm-js .dm-tablo tr > :nth-child(6) { display: none; }
+  .dm-js .dm-tablo th, .dm-js .dm-tablo td { padding-left: 6px; padding-right: 6px; }
+  .dm-js .dm-tablo tbody th { padding-top: 0; padding-bottom: 0; }
+  .dm-js .dm-tablo td.yon { white-space: normal; }
+  .dm-js .dm-tablo .uzun { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  .dm-js .dm-tablo .kisa { display: inline; }
+  .dm-js .dm-tablo .satir-ok { display: inline; color: var(--ink-muted); }
+  .dm-js .satir-ac[aria-expanded="true"] .satir-ok { transform: rotate(90deg); }
+}
+@media print { .arac, .hesap { display: none; } .tablo-sar { max-height: none; margin: 0 0 14px; overflow: visible; } .dm-tablo thead th, .dm-tablo tbody th { position: static; } }
+</style>
+<script>document.documentElement.classList.add('dm-js');</script>
+</head>
+<body>
+<a class="skip" href="#icerik">İçeriğe atla</a>
+
+<!-- ÜST BANT -->
+<header class="site-header on-dark" id="nav">
+  <div class="wrap header-in">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1" opacity="0.25"/>
+          <path d="M11 10 L18 26 L25 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="18" cy="18" r="1.4" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">
+        <span class="nav-logo-name">Voltage</span>
+        <span class="nav-logo-sub">ENERJİ</span>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Ana menü">
+      <a href="/#hakkimizda">Hakkımızda</a>
+      <a href="/#hizmetler">Hizmetler</a>
+      <a href="/#yaklasim">Yaklaşım</a>
+      <a href="/rehber">Rehber</a>
+      <a href="/canli-ptf">Canlı PTF</a>
+      <a href="/#iletisim">İletişim</a>
+    </nav>
+    <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <a href="/#hakkimizda">Hakkımızda</a>
+  <a href="/#hizmetler">Hizmetler</a>
+  <a href="/#yaklasim">Yaklaşım</a>
+  <a href="/rehber">Rehber</a>
+  <a href="/canli-ptf">Canlı PTF</a>
+  <a href="/#iletisim">İletişim</a>
+</div>
+
+<div class="sayfa-iz on-dark">
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Ana Sayfa</a> › Dengesizlik Maliyeti</nav>
+</div>
+</div>
+<main>
+<div class="sayfa-bas on-dark" id="icerik" tabindex="-1">
+<div class="wrap">
+  <h1>Dengesizlik Maliyeti: Pozitif ve Negatif Dengesizlik Fiyatı</h1>
+  <p class="lede"><strong>Dengesizlik maliyeti</strong>, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır.</p>
+</div>
+</div>
+<div class="sayfa-govde sayfa-arac">
+<div class="wrap">
+
+  <div class="arac arac-tarih" id="dArac">
+    <form method="get" action="/dengesizlik-maliyeti" id="dTarihForm">
+      <div>
+        <label class="etiket" for="dTarih">Gün</label>
+        <input type="date" id="dTarih" name="tarih" min="2026-01-01" required>
+      </div>
+      <button type="submit" class="btn">Göster</button>
+      <div class="adimlar">
+        <a class="btn-ikincil" id="dOnceki" rel="nofollow" aria-disabled="true">‹ Önceki gün</a>
+        <a class="btn-ikincil" id="dSonraki" rel="nofollow" aria-disabled="true">Sonraki gün ›</a>
+        <a class="btn-ikincil" id="dBugun" href="/dengesizlik-maliyeti">Bugün</a>
+      </div>
+    </form>
+  </div>
+
+  <p class="uyari" id="dUyari" role="status"></p>
+
+  <h2 id="tablo">Dönem bazında PTF, SMF, pozitif ve negatif dengesizlik fiyatı</h2>
+  <p class="uyari" id="dKuralUyari" role="status"></p>
+  <p class="mobil-lejant" id="dLejant">Maliyetler TL/MWh, PTF'ye göre</p>
+  <div class="tablo-sar" id="dTabloSar" role="region" aria-labelledby="dTabloBaslik" tabindex="0">
+    <table class="dm-tablo">
+      <caption id="dTabloBaslik">Dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · saatler Türkiye saatiyle (UTC+03:00) · tüm değerler TL/MWh</caption>
+      <thead>
+        <tr>
+          <th scope="col">Dönem</th>
+          <th scope="col">PTF<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col">SMF<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col" class="sol">Sistem yönü</th>
+          <th scope="col">Pozitif dengesizlik fiyatı<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col">Negatif dengesizlik fiyatı<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col" title="Pozitif dengesizlik maliyeti (PTF'ye göre), TL/MWh"><span class="uzun">Pozitif dengesizlik maliyeti (PTF'ye göre)</span><span class="kisa" aria-hidden="true">Pozitif maliyet</span><span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col" title="Negatif dengesizlik maliyeti (PTF'ye göre), TL/MWh"><span class="uzun">Negatif dengesizlik maliyeti (PTF'ye göre)</span><span class="kisa" aria-hidden="true">Negatif maliyet</span><span class="sr-only"> (TL/MWh)</span></th>
+        </tr>
+      </thead>
+      <tbody id="dTablo">
+        <tr><td colspan="8" class="bekle">Veri bekleniyor…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Her satır bir uzlaştırma dönemidir. Pozitif ve negatif dengesizlik fiyatı EPİAŞ'ın yayımladığı değerdir; bu sayfada yeniden hesaplanmaz. Değeri yayımlanmamış hücre "—" olarak kalır; tahmini ya da önceki dönemden taşınmış rakam gösterilmez.</p>
+  <p class="note">Tüm değerler TL/MWh'tir. Birim dengesizlik maliyeti mevzuatta tanımlı bir terim değildir; bu sayfada EPİAŞ'ın yayımladığı fiyatlardan Voltage Enerji tarafından hesaplanır. Veriler bilgilendirme amaçlıdır; gecikmeli, eksik veya hatalı olabilir. Ticari karar ve işlemlerde EPİAŞ'ın resmî yayınları ve uzlaştırma bildirimleri esas alınmalıdır.</p>
+
+  <section class="live" aria-label="Seçili günün dengesizlik özeti">
+    <div class="live-head">
+      <span class="live-t">Dengesizlik · <span id="dBantGun">—</span> · TL/MWh</span>
+      <span class="live-mode waiting" id="dMod">VERİ BEKLENİYOR</span>
+    </div>
+    <div class="live-now">
+      <div class="live-now-num"><span id="dYayim">—</span><span class="u">dönem yayımlandı</span></div>
+      <div class="live-now-k">Dengesizlik fiyatı yayımlanan dönem / günün dönem sayısı</div>
+    </div>
+    <div class="live-cells">
+      <div class="cell">
+        <div class="cv" id="dPtfOrt">—</div>
+        <div class="ck">Ort. PTF · yayımlanan dönemler</div>
+      </div>
+      <div class="cell">
+        <div class="cv" id="dSmfOrt">—</div>
+        <div class="ck">Ort. SMF · yayımlanan dönemler</div>
+      </div>
+      <div class="cell">
+        <div class="cv" id="dMalPoz">—</div>
+        <div class="ck">Ort. pozitif dengesizlik maliyeti · PTF'ye göre</div>
+      </div>
+      <div class="cell">
+        <div class="cv" id="dMalNeg">—</div>
+        <div class="ck">Ort. negatif dengesizlik maliyeti · PTF'ye göre</div>
+      </div>
+    </div>
+    <div class="live-yon">
+      <span>Enerji açığı: <b id="dYonAcik">—</b> dönem</span>
+      <span>Enerji fazlası: <b id="dYonFazla">—</b> dönem</span>
+      <span>Dengede: <b id="dYonDenge">—</b> dönem</span>
+    </div>
+    <div class="live-foot">
+      <span>Kaynak: EPİAŞ Şeffaflık Platformu · Aritmetik (ağırlıksız) ortalama, yalnız yayımlanan dönemler</span>
+      <span class="live-stamp waiting" id="dDamga">EPİAŞ VERİSİ BEKLENİYOR</span>
+    </div>
+  </section>
+  <p class="day-sum" id="dOzet"></p>
+
+  <div class="arac" id="dIndirKutu">
+    <div class="arac-satir arac-ilk" id="dIndir">
+      <span class="arac-baslik">Seçili günü indir</span>
+      <a class="btn-ikincil" id="dCsv" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">CSV</a>
+      <a class="btn-ikincil" id="dXlsx" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">Excel (.xlsx)</a>
+      <a class="btn-ikincil" id="dJson" rel="nofollow" role="link" tabindex="0" aria-disabled="true" aria-describedby="dIndirNot">JSON</a>
+      <span class="indir-not" id="dIndirNot">Veri alınamadığı için indirme şu an kapalı</span>
+    </div>
+    <div class="arac-satir">
+      <form method="get" action="/dengesizlik-maliyeti/veri" id="dAralikForm">
+        <span class="arac-baslik" style="flex-basis:100%">Tarih aralığını indir</span>
+        <div>
+          <label class="etiket" for="dBas">Başlangıç</label>
+          <input type="date" id="dBas" name="bas" min="2026-01-01" required>
+        </div>
+        <div>
+          <label class="etiket" for="dBit">Bitiş</label>
+          <input type="date" id="dBit" name="bit" min="2026-01-01" required>
+        </div>
+        <div>
+          <label class="etiket" for="dBicim">Biçim</label>
+          <select id="dBicim" name="bicim">
+            <option value="csv">CSV</option>
+            <option value="xlsx">Excel (.xlsx)</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-ikincil">İndir</button>
+        <p class="yardim">Tek dosyada en çok 31 gün. Veri alınamazsa boş dosya üretilmez.</p>
+        <p class="hata" id="dAralikHata" role="alert" style="flex-basis:100%"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="updated">Sayfa metni: 24.11.2026 · Veri günü: <span id="dGun">—</span> · Veri: EPİAŞ Şeffaflık Platformu</div>
+
+  <h2 id="hesaplayici">Dengesizlik maliyeti hesaplama</h2>
+  <p>Bir dönemdeki dengesizlik miktarınızı girin. İlk seçenek seçili günün EPİAŞ verisini kullanır. İkinci seçenek, girdiğiniz PTF, SMF ve sistem yönüyle, seçtiğiniz teslim gününde yürürlükte olan yönetmelik ve Kurul kararı değerlerine göre hesap yapar; o günün değerleri bu sayfada birincil kaynaklardan doğrulanmamışsa hesap yapılmaz. Hesap tek bir dönem ve tek bir piyasa katılımcısı içindir.</p>
+  <div class="hesap" id="dHesap">
+    <fieldset>
+      <legend>Hesap türü</legend>
+      <label class="secenek"><input type="radio" name="hMod" id="hModGun" value="gun" checked><span>Seçili günün verisiyle</span></label>
+      <label class="secenek"><input type="radio" name="hMod" id="hModSenaryo" value="senaryo"><span>Kendi senaryom</span></label>
+    </fieldset>
+
+    <form id="hGun" novalidate>
+      <div class="hesap-izgara">
+        <div>
+          <label class="etiket" for="hDonem">Dönem</label>
+          <select id="hDonem"><option value="">Veri bekleniyor</option></select>
+        </div>
+        <div>
+          <label class="etiket" for="hMiktar">Dengesizlik miktarı (MWh)</label>
+          <input type="text" id="hMiktar" inputmode="decimal" autocomplete="off" aria-describedby="hMiktarHata">
+          <p class="hata" id="hMiktarHata" role="alert"></p>
+        </div>
+      </div>
+      <p class="kural-notu">Miktarda ondalık ayırıcı virgüldür (örnek: 0,125); binleri noktasız yazın (örnek: 2800).</p>
+      <fieldset>
+        <legend>Dengesizliğinizin yönü</legend>
+        <label class="secenek"><input type="radio" name="hYon" value="negatif" checked><span>Negatif (eksik verdim ya da fazla çektim)</span></label>
+        <label class="secenek"><input type="radio" name="hYon" value="pozitif"><span>Pozitif (fazla verdim ya da az çektim)</span></label>
+      </fieldset>
+      <button type="submit" class="btn" disabled>Hesapla</button>
+    </form>
+
+    <form id="hSenaryo" novalidate hidden>
+      <p class="kural-notu" id="hKural" role="status"></p>
+      <div class="hesap-izgara">
+        <div>
+          <label class="etiket" for="sGun">Teslim günü</label>
+          <input type="date" id="sGun" name="teslim" min="2026-01-01" aria-describedby="hKural">
+        </div>
+        <div>
+          <label class="etiket" for="sPtf">PTF (TL/MWh)</label>
+          <input type="text" id="sPtf" inputmode="decimal" autocomplete="off" aria-describedby="sPtfHata">
+          <p class="hata" id="sPtfHata" role="alert"></p>
+        </div>
+        <div>
+          <label class="etiket" for="sSmf">SMF (TL/MWh)</label>
+          <input type="text" id="sSmf" inputmode="decimal" autocomplete="off" aria-describedby="sSmfHata">
+          <p class="hata" id="sSmfHata" role="alert"></p>
+        </div>
+        <div>
+          <label class="etiket" for="sYon">Sistem yönü</label>
+          <select id="sYon">
+            <option value="acik">Enerji açığı</option>
+            <option value="fazla">Enerji fazlası</option>
+            <option value="denge">Dengede</option>
+          </select>
+        </div>
+        <div>
+          <label class="etiket" for="sMiktar">Dengesizlik miktarı (MWh)</label>
+          <input type="text" id="sMiktar" inputmode="decimal" autocomplete="off" aria-describedby="sMiktarHata">
+          <p class="hata" id="sMiktarHata" role="alert"></p>
+        </div>
+      </div>
+      <button type="submit" class="btn" disabled>Hesapla</button>
+    </form>
+
+    <div class="sonuc" id="hSonuc" role="status" aria-live="polite"></div>
+    <p class="note" style="margin-bottom:14px">Sonuç tahminidir ve yalnızca bilgilendirme amaçlıdır; yatırım, ticari karar ya da hukuki tavsiye değildir. Kesin tutar EPİAŞ uzlaştırma bildirimiyle belirlenir. Teklif ya da taahhüt değildir. Sitenin kullanımı <a href="/kullanim-kosullari">Kullanım Koşulları</a>'na tabidir.</p>
+    <noscript><p class="note" style="margin-bottom:14px">Hesaplayıcı JavaScript gerektirir; JavaScript kapalıyken "Hesapla" düğmeleri kapalıdır. Tablo, yöntem ve indirme bağlantıları JavaScript olmadan da çalışır.</p></noscript>
+  </div>
+
+  <h2 id="yontem">Dengesizlik fiyatı formülü ve hesaplama yöntemi</h2>
+  <ul class="liste">
+    <li>Sistem enerji fazlasındaysa (arz fazlası) pozitif dengesizlikte çarpan %6, negatif dengesizlikte %3'tür.</li>
+    <li>Sistem enerji açığındaysa (talep fazlası) negatif dengesizlikte çarpan %6, pozitif dengesizlikte %3'tür.</li>
+    <li>Sistem dengedeyse ikisi de %3'tür.</li>
+  </ul>
+  <div class="formul">
+    <p>Pozitif dengesizlik fiyatı = <span class="nw">min(PTF; SMF) × (1 − çarpan)</span></p>
+    <p>Negatif dengesizlik fiyatı = <span class="nw">max(PTF; SMF) × (1 + çarpan)</span></p>
+  </div>
+  <p>Çok düşük fiyatlı saatlerde ve azami fiyat limitinde yönetmelikteki ek kurallar uygulanır; tabloda EPİAŞ'ın yayımladığı değer gösterilir.</p>
+  <p>Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı.</p>
+
+  <h2 id="sss">Sık sorulan sorular</h2>
+  <div id="dSss">
+  <h3>Dengesizlik maliyeti nedir?</h3>
+  <p>Dengesizlik maliyeti, dengesizliğe düşen 1 MWh enerjinin PTF'ye göre ne kadar farklı fiyatlandığını TL/MWh olarak gösteren bir göstergedir. Negatif dengesizlikte negatif dengesizlik fiyatı eksi PTF, pozitif dengesizlikte PTF eksi pozitif dengesizlik fiyatı olarak hesaplanır. Mevzuatta tanımlı bir terim değildir; Voltage Enerji tarafından EPİAŞ Şeffaflık Platformu verisinden türetilir.</p>
+  <h3>Pozitif ve negatif dengesizlik fiyatı nasıl hesaplanır?</h3>
+  <p>Pozitif dengesizlik fiyatı min(PTF; SMF) × (1 − çarpan), negatif dengesizlik fiyatı max(PTF; SMF) × (1 + çarpan) formülüyle hesaplanır. Çarpan sistem yönüne göre %3 ya da %6'dır. Çok düşük fiyatlı saatlerde ve azami fiyat limitinde yönetmelikteki ek kurallar uygulanır; tabloda EPİAŞ'ın yayımladığı değer gösterilir. Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı.</p>
+  <h3>Sistem yönü neyi değiştirir?</h3>
+  <p>Sistem yönü çarpanı belirler. Sistem enerji fazlasındaysa (arz fazlası) pozitif dengesizlikte çarpan %6, negatif dengesizlikte %3'tür. Sistem enerji açığındaysa (talep fazlası) negatif dengesizlikte çarpan %6, pozitif dengesizlikte %3'tür. Sistem dengedeyse ikisi de %3'tür. Tabloda EPİAŞ'ın yayımladığı sistem yönü gösterilir.</p>
+  <h3>Veriyi nasıl indiririm?</h3>
+  <p>Tablonun üstündeki bağlantılar seçili günü CSV, Excel (.xlsx) ve JSON olarak indirir. Tarih aralığı formu en çok 31 günlük veriyi tek dosyada verir. Aynı veri https://voltage.com.tr/dengesizlik-maliyeti/veri adresinden tarih ve biçim parametreleriyle de alınabilir. Veri alınamadığında boş dosya üretilmez.</p>
+  </div>
+
+  <h2 id="kapsam">Kapsam ve sınırlar</h2>
+  <ul class="liste">
+    <li>Bu sayfa bilgilendirme amaçlıdır; yatırım, ticari karar ya da hukuki tavsiye, teklif ya da taahhüt değildir.</li>
+    <li>Kesin tutar EPİAŞ uzlaştırma bildirimiyle belirlenir.</li>
+    <li>Bu sayfa, Voltage Enerji'nin müşterilerine uyguladığı ya da uygulayacağı bir fiyatı, bedeli veya sözleşme koşulunu göstermez.</li>
+    <li>Voltage Enerji, standart teklif ve sözleşmelerinde dengesizlik bedelini müşteriye yansıtmaz.</li>
+  </ul>
+
+  <h2 id="kaynak">Kaynak ve dayanak</h2>
+  <blockquote id="dAtif">Dayanak: Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği m.110; katsayılar: 11/12/2025 tarihli ve 14030 sayılı Kurul Kararı. Veri: EPİAŞ Şeffaflık Platformu.</blockquote>
+  <p>Resmî metinler:</p>
+  <ul class="liste">
+    <li><a href="https://www.mevzuat.gov.tr/MevzuatMetin/yonetmelik/7.5.12985.pdf" rel="noopener">Elektrik Piyasası Dengeleme ve Uzlaştırma Yönetmeliği, güncel metin (mevzuat.gov.tr, PDF)</a></li>
+    <li><a href="https://www.resmigazete.gov.tr/eskiler/2025/12/20251229-19.pdf" rel="noopener">14030 sayılı Kurul Kararı (PDF)</a></li>
+    <li>EPİAŞ Şeffaflık Platformu teknik belgeleri: <a href="https://seffaflik.epias.com.tr/reporting-service/technical/en/index.html" rel="noopener">raporlama servisi</a> ("PTF, SMF ve SDF Listeleme") ve <a href="https://seffaflik.epias.com.tr/electricity-service/technical/tr/index.html" rel="noopener">elektrik servisi</a></li>
+  </ul>
+  <p>Bu sayfadaki verinin kaynağı <a href="https://seffaflik.epias.com.tr/" rel="noopener">EPİAŞ Şeffaflık Platformu</a>'dur. Tablo düzeni, özet, türetilmiş "birim dengesizlik maliyeti (PTF'ye göre)" göstergesi ve hesaplayıcı Voltage Enerji tarafından hazırlanmıştır. EPİAŞ Şeffaflık Platformu, sunduğu içerik ve verilerin kaynak gösterilmek suretiyle çoğaltılabileceğini ve kullanılabileceğini, bu verilerden doğabilecek kayıp ve zararlardan sorumluluk kabul etmediğini belirtir (24 Kasım 2026 itibarıyla). Bu veriyi kullanırken kaynağı "EPİAŞ Şeffaflık Platformu" olarak gösterin; bu sayfaya da kaynak göstererek atıfta bulunabilirsiniz. Atıf için:</p>
+  <blockquote>Kaynak: Voltage Enerji — Dengesizlik Maliyeti (<a href="https://voltage.com.tr/dengesizlik-maliyeti">https://voltage.com.tr/dengesizlik-maliyeti</a>), veri: EPİAŞ Şeffaflık Platformu.</blockquote>
+  <p>Veri, <code>https://voltage.com.tr/dengesizlik-maliyeti/veri</code> adresinden de alınabilir. Parametreler: <code>tarih=YYYY-AA-GG</code> (tek gün) ya da <code>bas</code> ve <code>bit</code> (en çok 31 günlük aralık); <code>bicim=json</code>, <code>csv</code> ya da <code>xlsx</code>.</p>
+
+
+  <h2 id="ilgili">İlgili sayfalar</h2>
+  <ul class="liste">
+    <li><a href="/canli-ptf">Günlük PTF: bugünün saatlik Gün Öncesi Piyasası fiyatları</a></li>
+    <li><a href="/rehber/ptf-nedir">PTF nedir, nasıl oluşur, SMF'den farkı nedir?</a></li>
+    <li><a href="/rehber/15-dakikalik-uzlastirma">15 dakikalık uzlaştırma: ne değişir?</a></li>
+  </ul>
+
+  <div class="about">
+    <p><strong>Bu sayfa hakkında:</strong> Veri kaynağı: EPİAŞ Şeffaflık Platformu ("PTF, SMF ve SDF Listeleme" raporu). Sayfa metninin yayın/güncelleme tarihi: 24.11.2026. Bu sayfada temsili veya sentetik veri gösterilmez; veri alınamadığında alanlar boş kalır. Veride ya da metinde hata olduğunu düşünüyorsanız <a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a> adresine bildirin; düzeltmeler bu sayfada tarihiyle belirtilir. Yayıncı: Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş. (Voltage Enerji), ETS/3424-8/2074 numaralı EPDK tedarik lisansıyla 19 Eylül 2011'den bu yana serbest piyasada faaliyet gösterir; GÖP ve GİP'te aktif katılımcıdır.</p>
+  </div>
+</div>
+</div>
+</main>
+
+<!-- KAPANIŞ -->
+<footer>
+<div class="footer on-dark">
+  <div class="wrap">
+    <div class="cl-head">
+      <div class="cl-brand">
+        <div class="cl-mark-svg">
+          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1" opacity="0.25"></circle>
+            <path d="M14 13 L24 35 L34 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+            <circle cx="24" cy="24" r="1.8" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="cl-name"><span class="cl-word">Voltage</span> <span class="cl-subwrap"><span class="cl-sub">ENERJİ</span><span class="cl-reg" aria-hidden="true">®</span></span></div>
+      </div>
+      <nav class="cl-nav" aria-label="Footer">
+        <a href="/#hakkimizda">Hakkımızda</a>
+        <a href="/#hizmetler">Hizmetler</a>
+        <a href="/#yaklasim">Yaklaşım</a>
+        <a href="/rehber">Rehber</a>
+        <a href="/#iletisim">İletişim</a>
+      </nav>
+    </div>
+    <div class="cl-grid">
+      <div>
+        <div class="label cl-k">Şirket</div>
+        <div class="cl-v">Voltan Elektrik Toptan Satış İthalat ve İhracat A.Ş.<br><span>EPDK Tedarik Lisansı</span> <span class="mono">ETS/3424-8/2074</span></div>
+      </div>
+      <div>
+        <div class="label cl-k">Merkez</div>
+        <div class="cl-v">Acıbadem Mah. Elysium Elit Koşuyolu B-18<br><span>34718 Kadıköy · İstanbul · Türkiye</span></div>
+      </div>
+      <div>
+        <div class="label cl-k">İletişim</div>
+        <div class="cl-v"><a href="mailto:info@voltage.com.tr">info@voltage.com.tr</a><br><span>voltage.com.tr</span></div>
+      </div>
+      <div>
+        <div class="label cl-k">Kayıt</div>
+        <div class="cl-v"><span>Ticaret Sicil</span> <span class="mono">786882-0 · İstanbul</span><br><span>Est. 2011 · EPİAŞ Üyesi</span></div>
+      </div>
+    </div>
+    <div class="cl-bottom">
+      <span class="cl-copy">© 2026 VOLTAN ELEKTRİK TOPTAN SATIŞ İTHALAT VE İHRACAT A.Ş.</span>
+      <div class="cl-legal">
+        <a href="/kurumsal">Kurumsal</a>
+        <a href="/kvkk">KVKK</a>
+        <a href="/cerez-politikasi">Çerez Politikası</a>
+        <a href="/kullanim-kosullari">Kullanım Koşulları</a>
+      </div>
+      <span class="cl-markline">VOLTAGE ENERJİ<span class="cl-reg" aria-hidden="true">®</span></span>
+    </div>
+  </div>
+</div>
+</footer>
+
+<script type="application/json" id="dKurallar">{"dogrulama":"2026-11-24","kurallar":[{"bas":"2026-01-01","bit":"2026-10-31","dogrulama":"birincil","dogrulamaTarihi":"2026-11-25","V":150,"B":100,"tavanCarpani":1.05,"k":{"acik":0.06,"fazla":0.03,"denge":0.03},"l":{"acik":0.03,"fazla":0.06,"denge":0.03},"kaynak":{"formul":"DUY m.110(1) (RG 29/12/2025-33122 ile değişik)","katsayi":"11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122)","V":"DUY m.110(2): başlangıç değeri","B":"DUY m.110(2): başlangıç değeri"}},{"bas":"2026-11-01","bit":"2026-12-31","dogrulama":"birincil","dogrulamaTarihi":"2026-11-24","V":100,"B":100,"tavanCarpani":1.05,"k":{"acik":0.06,"fazla":0.03,"denge":0.03},"l":{"acik":0.03,"fazla":0.06,"denge":0.03},"kaynak":{"formul":"DUY m.110(1) (RG 29/12/2025-33122 ve RG 19/10/2026-33405 ile değişik)","katsayi":"11/12/2025 tarihli ve 14030 sayılı Kurul Kararı (RG 29/12/2025-33122)","V":"24/9/2026 tarihli ve 14911 sayılı Kurul Kararı (RG 19/10/2026-33405)","B":"DUY m.110(2): başlangıç değeri"}}],"tavanlar":[{"bas":"2026-01-01","bit":"2026-04-03","dogrulama":"birincil","dogrulamaTarihi":"2026-11-25","azami":3400,"asgari":0,"kaynak":"27/3/2025 tarihli ve 13423 sayılı Kurul Kararı (RG 5/4/2025-32861)"},{"bas":"2026-04-04","bit":"2026-10-31","dogrulama":"birincil","dogrulamaTarihi":"2026-11-25","azami":4500,"asgari":0,"kaynak":"2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)"},{"bas":"2026-11-01","bit":null,"dogrulama":"birincil","dogrulamaTarihi":"2026-11-24","azami":4500,"asgari":0,"kaynak":"2/4/2026 tarihli ve 14459 sayılı Kurul Kararı (RG 3/4/2026-33213)"}],"dogrulanmis":[{"bas":"2026-01-01","bit":"2026-12-31"}],"istisnalar":[],"notlar":{}}</script>
+<script>
+/* Dengesizlik Maliyeti — istemci betiği.
+   İLKE: hiçbir kod yolunda sentetik/temsili/yedek sayı üretilmez. Ekrana yazılan
+   her piyasa değeri ya sunucunun bu sayfaya bastığı ya da /dengesizlik-maliyeti/veri
+   ucundan gelen gerçek EPİAŞ verisidir (ya da aynı uçtan daha önce gelip bu
+   tarayıcıda saklanmış gerçek veri: "SON SENKRON"). Veri yoksa alanlar "—" kalır.
+   Yayımlanmamış değer null'dır; 0 yazılmaz, önceki dönemden taşınmaz.
+   Tablo, özet, tek cümlelik özet, dönem seçenekleri ve araç çubuğu sunucudaki
+   (functions/dengesizlik-maliyeti.js) üreticilerle AYNI çıktıyı verir;
+   test: docs/qa/test-dengesizlik-tarayici.mjs.
+   innerHTML'e yalnızca doğrulanmış değerler (biçimi denetlenmiş tarih/saat, sayılar,
+   sabit metinler) girer; dış kaynaklı metin textContent ile yazılır. */
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var VERI = '/dengesizlik-maliyeti/veri';
+  var ONBELLEK = 'voltage-dengesizlik-onbellek';
+  var ILK_GUN = '2026-01-01';
+  var AZAMI_ARALIK = 31;
+  var YENILEME_MS = 5 * 60 * 1000;
+  var YON_ADI = { acik: 'Enerji açığı', fazla: 'Enerji fazlası', denge: 'Dengede' };
+  var YON_KUCUK = { acik: 'enerji açığı', fazla: 'enerji fazlası', denge: 'dengede' };
+  var GECERLI_DK = [5, 10, 15, 20, 30, 60];
+  var NOT_ORTALAMA = 'Ortalamalar dönemlerin aritmetik ortalamasıdır; dengesizlik hacmiyle ağırlıklandırılmamıştır. Bir portföyün gerçekleşen ya da beklenen dengesizlik maliyeti değildir; her dönemde aynı yönde 1 MWh dengesizliği olan düz bir profilin MWh başı ortalamasına karşılık gelir.';
+  var INDIR_KAPALI = 'Veri alınamadığı için indirme şu an kapalı';
+  var elTablo = $('dTablo');
+  if(!elTablo) return;
+  var govde = document.body;
+  var sorgu = new URLSearchParams(location.search);
+  var veriYok = sorgu.has('veriyok'); /* QA kancası: istemci veri çekmez, önbellek okumaz */
+  var ssr = govde.getAttribute('data-ssr') === '1';
+  var K = { kurallar: [], tavanlar: [], dogrulama: '', dogrulanmis: [] };
+  try{ K = JSON.parse($('dKurallar').textContent); }catch(e){}
+
+  /* ---------- tarih (Europe/Istanbul; Türkiye kalıcı UTC+3) ---------- */
+  var iki = function(n){ return String(n).padStart(2, '0'); };
+  function istanbulAni(){ return new Date(Date.now() + 3 * 3600 * 1000); }
+  function istanbulBugun(){ return istanbulAni().toISOString().slice(0, 10); }
+  function istanbulDakika(){ var t = istanbulAni(); return t.getUTCHours() * 60 + t.getUTCMinutes(); }
+  function ymdGecerli(s){
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if(!m) return false;
+    var t = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return t.getUTCFullYear() === +m[1] && t.getUTCMonth() === +m[2] - 1 && t.getUTCDate() === +m[3];
+  }
+  function gunEkle(ymd, n){ var p = ymd.split('-'); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2] + n)).toISOString().slice(0, 10); }
+  function gunFarki(a, b){ var x = a.split('-'), y = b.split('-'); return Math.round((Date.UTC(+y[0], +y[1] - 1, +y[2]) - Date.UTC(+x[0], +x[1] - 1, +x[2])) / 86400000); }
+  function tarihTR(ymd){ var p = ymd.split('-'); return p[2] + '.' + p[1] + '.' + p[0]; }
+  var CEKILDI_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+03:00$/;
+  var BAS_RE = /^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):([0-5]\d):00\+03:00$/;
+
+  /* ---------- biçim ---------- */
+  function temiz(n){ if(!isFinite(n)) return null; var r = Math.round(n * 1e6) / 1e6; return r === 0 ? 0 : r; }
+  function binlik(s){ return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  /* tr-TR, 2 ondalık, gerçek eksi işareti (U+2212); sayı değilse "—" */
+  function bicim(n){
+    if(typeof n !== 'number' || !isFinite(n)) return '—';
+    var s = (Math.round(Math.abs(n) * 100 + 1e-7) / 100).toFixed(2).split('.');
+    var out = binlik(s[0]) + ',' + s[1];
+    return n < 0 && out !== '0,00' ? '−' + out : out;
+  }
+  /* Sabitler için: tam sayıysa ondalıksız ("4.500"), değilse bicim() */
+  function sabit(n){ return Math.floor(n) === n ? binlik(String(n)) : bicim(n); }
+  /* Miktar: en az üç, girilen değeri göstermeye yetecek kadar (en çok altı) ondalık:
+     "1.250,000", "0,125", "0,0004" (çok küçük miktar "0,000" diye görünmez) */
+  function miktarBicim(n){
+    var s = (Math.round(n * 1e6 + 1e-7) / 1e6).toFixed(6).split('.');
+    return binlik(s[0]) + ',' + s[1].replace(/0{1,3}$/, '');
+  }
+  function katsayiBicim(n){ return String(n).replace('.', ','); }
+  function donemDakikasi(d){ return +d.bas.slice(11, 13) * 60 + +d.bas.slice(14, 16); }
+  function donemEtiketi(d){
+    var b = donemDakikasi(d), s = b + d.dk;
+    var f = function(x){ return iki(Math.floor(x / 60)) + ':' + iki(x % 60); };
+    return f(b) + '–' + f(s);
+  }
+  function yayimlandi(d){ return d.pozitif !== null && d.negatif !== null; }
+  function sayiVeri(v){
+    if(v === undefined || v === null || v === '') return null;
+    if(typeof v !== 'number' && !(typeof v === 'string' && /^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(v))) return null;
+    var n = Number(v); return isFinite(n) ? n : null;
+  }
+  /* Dış kaynaklı kayıt (uç yanıtı, localStorage, sunucu satırı) → doğrulanmış dönem; geçersizse null.
+     bas ve dk biçimi burada denetlenir: bu değerler sonradan innerHTML'e girer. */
+  function donemKur(o){
+    if(!o || typeof o.bas !== 'string' || !BAS_RE.test(o.bas) || !ymdGecerli(o.bas.slice(0, 10))) return null;
+    var dk = Number(o.dk);
+    if(GECERLI_DK.indexOf(dk) === -1) return null;
+    var d = { bas: o.bas, dk: dk, ptf: sayiVeri(o.ptf), smf: sayiVeri(o.smf), yon: YON_ADI.hasOwnProperty(o.yon) ? o.yon : null, pozitif: sayiVeri(o.pozitif), negatif: sayiVeri(o.negatif) };
+    d.maliyetNegatif = d.negatif !== null && d.ptf !== null ? temiz(d.negatif - d.ptf) : null;
+    d.maliyetPozitif = d.pozitif !== null && d.ptf !== null ? temiz(d.ptf - d.pozitif) : null;
+    return d;
+  }
+
+  /* ---------- durum ---------- */
+  var bugun = istanbulBugun();
+  var hamTarih = sorgu.get('tarih');
+  var tarihGecersiz = hamTarih !== null && !(ymdGecerli(hamTarih) && hamTarih >= ILK_GUN && hamTarih <= bugun);
+  var ssrTarih = govde.getAttribute('data-tarih');
+  var state = {
+    tarih: ssrTarih && ymdGecerli(ssrTarih) ? ssrTarih : (hamTarih !== null && !tarihGecersiz ? hamTarih : bugun),
+    donemler: null, cekildi: null, bayat: false,
+    indirAcik: false /* yalnız sunucu render'ı ya da bu oturumda BAŞARILI bir uç yanıtından sonra true */
+  };
+
+  /* ---------- kural tablosu (sayfaya gömülü; functions/_lib/dengesizlik.js ile aynı) ----------
+     Formüle dayalı içerik yalnız kural VE tavan girdisi 'birincil' doğrulanmışsa (formulGoster). */
+  function kuralBul(ymd){
+    if(!ymdGecerli(ymd)) return null;
+    for(var i = 0; i < K.kurallar.length; i++){
+      var k = K.kurallar[i];
+      if(ymd >= k.bas && ymd <= k.bit){
+        var t = null;
+        for(var j = 0; j < K.tavanlar.length; j++){ var x = K.tavanlar[j]; if(!t && ymd >= x.bas && (x.bit === null || ymd <= x.bit)) t = x; }
+        var dogru = k.dogrulama === 'birincil' && !!t && t.dogrulama === 'birincil';
+        var ist = yayimIstisnasi(ymd);
+        return { bas: k.bas, bit: k.bit, formulGoster: dogru, karsilastir: dogru && !ist, istisna: ist ? ist.not : null, dogrulamaTarihi: dogru ? [k.dogrulamaTarihi, t.dogrulamaTarihi].sort()[1] : null,
+          V: k.V, B: k.B, tavanCarpani: k.tavanCarpani, k: k.k, l: k.l, AFL: t ? t.azami : null, asgari: t ? t.asgari : null, tavanBas: t ? t.bas : null, tavanBit: t ? t.bit : null,
+          kaynak: { formul: k.kaynak.formul, katsayi: k.kaynak.katsayi, V: k.kaynak.V, B: k.kaynak.B, tavan: t ? t.kaynak : null } };
+      }
+    }
+    return null;
+  }
+  /* Yayım istisnası: EPİAŞ'ın yayımladığı fiyatların formülden bütünüyle farklı olduğu günler (functions/_lib/dengesizlik.js ile aynı). */
+  function yayimIstisnasi(ymd){
+    var l = K.istisnalar || [];
+    for(var i = 0; i < l.length; i++){ if(ymd >= l[i].bas && ymd <= l[i].bit && K.notlar && typeof K.notlar[l[i].not] === 'string') return { not: l[i].not, metin: K.notlar[l[i].not] }; }
+    return null;
+  }
+  function birimFiyat(ptf, smfN, smfP, yon, kural){
+    if(!kural || !YON_ADI.hasOwnProperty(yon)) return null;
+    if([ptf, smfN, smfP].some(function(x){ return typeof x !== 'number' || !isFinite(x); })) return null;
+    var k = kural.k[yon], l = kural.l[yon], V = kural.V, B = kural.B, AFL = kural.AFL;
+    if(AFL !== null){
+      var alt = typeof kural.asgari === 'number' ? kural.asgari : -Infinity;
+      if([ptf, smfN, smfP].some(function(x){ return x > AFL || x < alt; })) return null;
+    }
+    var negatif, dalNegatif, pozitif, dalPozitif;
+    if(AFL !== null && Math.max(ptf, smfN) === AFL){ negatif = AFL * kural.tavanCarpani * (1 + k); dalNegatif = 'tavan'; }
+    else { negatif = Math.max(V, ptf, smfN) * (1 + k); dalNegatif = 'genel'; }
+    var enDusuk = Math.min(ptf, smfP);
+    if(enDusuk < V){ pozitif = -1 * B * (1 + l); dalPozitif = 'esikAlti'; } /* sınır kesin "<" */
+    else { pozitif = enDusuk * (1 - l); dalPozitif = 'genel'; }
+    return { negatif: temiz(negatif), pozitif: temiz(pozitif), dalNegatif: dalNegatif, dalPozitif: dalPozitif, k: k, l: l, V: V, B: B, AFL: AFL };
+  }
+  /* Yayımlanan dönem formül sonucundan farklı mı? Yalnız saatlik dönemde ve formülün
+     gösterildiği kural diliminde karşılaştırılır (sunucudaki formulFarki ile aynı). */
+  function formulFarki(d, kural){
+    if(!kural || kural.formulGoster !== true || kural.karsilastir === false || d.dk !== 60) return false;
+    if(d.pozitif === null || d.negatif === null || d.ptf === null || d.smf === null || !d.yon) return false;
+    var r = birimFiyat(d.ptf, d.smf, d.smf, d.yon, kural);
+    if(!r) return false;
+    return Math.abs(r.negatif - d.negatif) > 0.01 + 1e-9 || Math.abs(r.pozitif - d.pozitif) > 0.01 + 1e-9;
+  }
+
+  /* ---------- çizim: tablo ---------- */
+  function hucre(n){ return n === null ? '<td class="bos">—</td>' : '<td>' + bicim(n) + '</td>'; }
+  function veriOzn(ad, v){ return v === null ? '' : ' data-' + ad + '="' + v + '"'; }
+  function satirHtml(d, simdiDk, kural){
+    var b = donemDakikasi(d);
+    var simdi = simdiDk !== null && simdiDk >= b && simdiDk < b + d.dk;
+    var fark = false; /* R8: formül farkı hesaplanır ama satırda "†" gösterilmez */
+    return '<tr' + (simdi ? ' class="simdi"' : '') + ' data-bas="' + d.bas + '" data-dk="' + d.dk + '"'
+      + veriOzn('ptf', d.ptf) + veriOzn('smf', d.smf) + veriOzn('yon', d.yon) + veriOzn('poz', d.pozitif) + veriOzn('neg', d.negatif) + '>'
+      + '<th scope="row">' + donemEtiketi(d)
+      + (fark ? '<span class="fark" aria-hidden="true"> †</span><span class="sr-only"> (yayımlanan fiyat formül sonucundan farklı)</span>' : '')
+      + (simdi ? '<span class="sr-only"> (içinde bulunulan dönem)</span>' : '') + '</th>'
+      + hucre(d.ptf) + hucre(d.smf)
+      + (d.yon ? '<td class="yon yon-' + d.yon + '">' + YON_ADI[d.yon] + '</td>' : '<td class="yon bos">—</td>')
+      + hucre(d.pozitif) + hucre(d.negatif) + hucre(d.maliyetPozitif) + hucre(d.maliyetNegatif) + '</tr>';
+  }
+  function simdiDakika(){ return state.tarih === istanbulBugun() ? istanbulDakika() : null; }
+  function tabloYaz(){
+    if(!state.donemler){ elTablo.innerHTML = '<tr><td colspan="8" class="bekle">Veri bekleniyor…</td></tr>'; kapOdak(); return; }
+    var dk = simdiDakika(), kural = kuralBul(state.tarih), h = '';
+    for(var i = 0; i < state.donemler.length; i++) h += satirHtml(state.donemler[i], dk, kural);
+    elTablo.innerHTML = h;
+    mobilSatirlar();
+    kapOdak();
+  }
+  /* R10: telefonda (≤ 640 px) dönem hücresi bir düğmedir; altındaki ayrıntı satırı dört fiyatı gösterir.
+     Masaüstünde ya da JS yokken tablo olduğu gibi kalır (8 sütun). Açık satırlar yeniden çizimde korunur. */
+  var DAR = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
+  var acikSatirlar = {};
+  function darMi(){ return !!(DAR && DAR.matches); }
+  function detayHtml(d){
+    var o = function(ad, v){ return '<div><dt>' + ad + '</dt><dd>' + (v === null ? '—' : bicim(v) + ' TL/MWh') + '</dd></div>'; };
+    return '<dl class="detay-dl">' + o('PTF', d.ptf) + o('SMF', d.smf) + o('Pozitif fiyat', d.pozitif) + o('Negatif fiyat', d.negatif) + '</dl>';
+  }
+  function mobilSatirlar(){
+    Array.prototype.forEach.call(elTablo.querySelectorAll('tr.detay'), function(r){ r.parentNode.removeChild(r); });
+    Array.prototype.forEach.call(elTablo.querySelectorAll('button.satir-ac'), function(b){
+      var th = b.parentNode;
+      Array.prototype.slice.call(b.childNodes).forEach(function(n){ if(!(n.classList && n.classList.contains('satir-ek'))) th.insertBefore(n, b); });
+      th.removeChild(b);
+    });
+    if(!darMi() || !state.donemler) return;
+    var bul = {};
+    state.donemler.forEach(function(d){ bul[d.bas] = d; });
+    Array.prototype.forEach.call(elTablo.querySelectorAll('tr[data-bas]'), function(tr, i){
+      var d = bul[tr.getAttribute('data-bas')], th = tr.querySelector('th');
+      if(!d || !th) return;
+      var id = 'dDetay' + i, acik = !!acikSatirlar[d.bas];
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'satir-ac'; b.setAttribute('aria-expanded', acik ? 'true' : 'false'); b.setAttribute('aria-controls', id);
+      while(th.firstChild) b.appendChild(th.firstChild);
+      var ok = document.createElement('span'); ok.className = 'satir-ok satir-ek'; ok.setAttribute('aria-hidden', 'true'); ok.textContent = '›'; b.appendChild(ok);
+      var sr = document.createElement('span'); sr.className = 'sr-only satir-ek'; sr.textContent = ' · PTF, SMF ve dengesizlik fiyatları'; b.appendChild(sr);
+      th.appendChild(b);
+      var det = document.createElement('tr');
+      det.className = 'detay'; det.id = id; det.hidden = !acik;
+      det.innerHTML = '<td colspan="8">' + detayHtml(d) + '</td>';
+      tr.parentNode.insertBefore(det, tr.nextSibling);
+      b.addEventListener('click', function(){
+        var yeni = b.getAttribute('aria-expanded') !== 'true';
+        b.setAttribute('aria-expanded', yeni ? 'true' : 'false');
+        det.hidden = !yeni;
+        if(yeni) acikSatirlar[d.bas] = true; else delete acikSatirlar[d.bas];
+      });
+    });
+  }
+  if(DAR){ var degis = function(){ mobilSatirlar(); kapOdak(); }; if(DAR.addEventListener) DAR.addEventListener('change', degis); else if(DAR.addListener) DAR.addListener(degis); }
+  function simdiIsaretle(){
+    if(!state.donemler) return;
+    var dk = simdiDakika(), satirlar = elTablo.querySelectorAll('tr[data-bas]');
+    for(var i = 0; i < satirlar.length; i++){
+      var d = state.donemler[i]; if(!d) continue;
+      var b = donemDakikasi(d), simdi = dk !== null && dk >= b && dk < b + d.dk;
+      if(simdi !== satirlar[i].classList.contains('simdi')) { tabloYaz(); return; }
+    }
+  }
+  /* Tablo kabı yalnız gerçekten kaydığı genişliklerde klavye durağıdır. */
+  function kapOdak(){
+    var k = $('dTabloSar');
+    if(k){ if(k.scrollWidth > k.clientWidth + 1) k.setAttribute('tabindex', '0'); else k.removeAttribute('tabindex'); }
+    /* D-A1: küçük tablolar da yalnız taştıklarında klavye durağı + başlığıyla adlandırılmış bölge */
+    Array.prototype.forEach.call(document.querySelectorAll('.kucuk-sar'), function(c){
+      var cap = c.querySelector('caption[id]');
+      if(c.scrollWidth > c.clientWidth + 1){ c.setAttribute('tabindex', '0'); c.setAttribute('role', 'region'); if(cap) c.setAttribute('aria-labelledby', cap.id); }
+      else { c.removeAttribute('tabindex'); c.removeAttribute('role'); c.removeAttribute('aria-labelledby'); }
+    });
+  }
+  window.addEventListener('resize', kapOdak);
+
+  /* ---------- çizim: özet ---------- */
+  function ortalama(dizi){
+    var v = dizi.filter(function(x){ return x !== null; });
+    return v.length ? temiz(v.reduce(function(a, b){ return a + b; }, 0) / v.length) : null;
+  }
+  function ozetHesapla(liste){
+    var y = liste.filter(yayimlandi), yon = { acik: 0, fazla: 0, denge: 0 };
+    y.forEach(function(d){ if(d.yon) yon[d.yon]++; });
+    var al = function(a){ return ortalama(y.map(function(d){ return d[a]; })); };
+    return { toplam: liste.length, yayimlanan: y.length, ptfOrt: al('ptf'), smfOrt: al('smf'), pozitifOrt: al('pozitif'), negatifOrt: al('negatif'), maliyetPozitifOrt: al('maliyetPozitif'), maliyetNegatifOrt: al('maliyetNegatif'), yon: yon, son: y.length ? y[y.length - 1] : null };
+  }
+  /* "2026-11-24T14:30:00+03:00" → "24.11.2026 14:30" */
+  function damgaZamani(iso){ return iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.' + iso.slice(0, 4) + ' ' + iso.slice(11, 16); }
+  function ozetCumlesi(tarih, o, cekildi){
+    if(!o.yayimlanan) return tarihTR(tarih) + ' için EPİAŞ henüz dengesizlik fiyatı yayımlamadı. Tabloda yalnızca yayımlanmış değerler görünür. Veri: EPİAŞ Şeffaflık Platformu.';
+    var kapsam = o.yayimlanan === o.toplam ? o.toplam + ' dönemin tamamı' : o.yayimlanan + '/' + o.toplam + ' dönem';
+    var s = tarihTR(tarih) + ' dengesizlik özeti (' + kapsam + '): ortalama pozitif dengesizlik fiyatı ' + bicim(o.pozitifOrt) + ' TL/MWh; ortalama negatif dengesizlik fiyatı ' + bicim(o.negatifOrt) + ' TL/MWh; '
+      + 'ortalama PTF ' + bicim(o.ptfOrt) + ' TL/MWh; ortalama SMF ' + bicim(o.smfOrt) + ' TL/MWh. '
+      + 'Ortalama pozitif dengesizlik maliyeti (PTF\'ye göre) ' + bicim(o.maliyetPozitifOrt) + ' TL/MWh, ortalama negatif dengesizlik maliyeti (PTF\'ye göre) ' + bicim(o.maliyetNegatifOrt) + ' TL/MWh. '
+      + 'Sistem yönü: ' + o.yon.acik + ' dönem enerji açığı, ' + o.yon.fazla + ' dönem enerji fazlası, ' + o.yon.denge + ' dönem dengede.';
+    if(o.yayimlanan !== o.toplam && o.son){
+      var d = o.son;
+      s += ' Son yayımlanan dönem ' + donemEtiketi(d) + ': pozitif dengesizlik fiyatı ' + bicim(d.pozitif) + ' TL/MWh, negatif dengesizlik fiyatı ' + bicim(d.negatif) + ' TL/MWh, PTF ' + bicim(d.ptf) + ' TL/MWh, SMF ' + bicim(d.smf) + ' TL/MWh'
+        + (d.yon ? ', sistem yönü ' + YON_KUCUK[d.yon] : '') + '.';
+    }
+    return s + ' Veri: EPİAŞ Şeffaflık Platformu' + (cekildi ? ', ' + damgaZamani(cekildi) + ' (Türkiye saati) itibarıyla' : '')
+      + '; ortalamalar Voltage Enerji tarafından bu veriden, yalnızca dengesizlik fiyatı yayımlanan dönemler üzerinden hesaplanmıştır. ' + NOT_ORTALAMA;
+  }
+  function yaz(id, metin){ var el = $(id); if(el && el.textContent !== metin) el.textContent = metin; }
+  function kuralUyarisi(tarih){
+    var kural = kuralBul(tarih);
+    if(!kural) return 'Bu tarih için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; tablo EPİAŞ\'ın yayımladığı değerleri gösterir. 110. maddenin 1 Ocak 2027\'den itibaren uygulanacak metni bu sayfada henüz doğrulanmamıştır.';
+    var ist = yayimIstisnasi(tarih); /* R8: dönem bazında V/AFL notu yok */
+    return ist ? ist.metin : '';
+  }
+  function ozetYaz(){
+    var t = tarihTR(state.tarih);
+    yaz('dGun', t); yaz('dBantGun', t);
+    yaz('dTabloBaslik', t + ' · dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · saatler Türkiye saatiyle (UTC+03:00) · tüm değerler TL/MWh');
+    yaz('dKuralUyari', kuralUyarisi(state.tarih));
+    if(!state.donemler){
+      ['dYayim', 'dPtfOrt', 'dSmfOrt', 'dMalPoz', 'dMalNeg', 'dYonAcik', 'dYonFazla', 'dYonDenge'].forEach(function(id){ yaz(id, '—'); });
+      yaz('dOzet', '');
+      return;
+    }
+    var o = ozetHesapla(state.donemler);
+    yaz('dYayim', o.yayimlanan + ' / ' + o.toplam);
+    yaz('dPtfOrt', bicim(o.ptfOrt)); yaz('dSmfOrt', bicim(o.smfOrt));
+    yaz('dMalPoz', bicim(o.maliyetPozitifOrt)); yaz('dMalNeg', bicim(o.maliyetNegatifOrt));
+    yaz('dYonAcik', o.yayimlanan ? String(o.yon.acik) : '—');
+    yaz('dYonFazla', o.yayimlanan ? String(o.yon.fazla) : '—');
+    yaz('dYonDenge', o.yayimlanan ? String(o.yon.denge) : '—');
+    yaz('dOzet', ozetCumlesi(state.tarih, o, state.cekildi));
+  }
+  function damgaYaz(){
+    var mod = $('dMod'), damga = $('dDamga'), sinif, modMetni, on;
+    if(!state.donemler){ sinif = ' waiting'; modMetni = 'VERİ BEKLENİYOR'; on = null; }
+    else if(state.bayat){ sinif = ' stale'; modMetni = 'SON SENKRON'; on = 'SON SENKRON '; }
+    else { sinif = ''; modMetni = 'EPİAŞ VERİSİ'; on = 'EPİAŞ\'TAN ALINDI '; }
+    if(mod){ yaz('dMod', modMetni); mod.className = 'live-mode' + sinif; }
+    if(damga){
+      /* cekildi biçimi uygula() içinde denetlendi; <time> öğesi güvenle kurulur */
+      var h = on === null ? 'EPİAŞ VERİSİ BEKLENİYOR'
+        : (state.cekildi ? on + '<time datetime="' + state.cekildi + '">' + damgaZamani(state.cekildi) + '</time>' : (state.bayat ? 'SON SENKRON —' : 'EPİAŞ VERİSİ'));
+      if(damga.innerHTML !== h) damga.innerHTML = h;
+      damga.className = 'live-stamp' + sinif;
+    }
+  }
+
+  /* ---------- araç çubuğu ---------- */
+  function baglanti(el, href){
+    if(!el) return;
+    if(href){ el.setAttribute('href', href); el.removeAttribute('aria-disabled'); }
+    else { el.removeAttribute('href'); el.setAttribute('aria-disabled', 'true'); }
+  }
+  function uyariYaz(){
+    if(!tarihGecersiz) return;
+    yaz('dUyari', 'Adresteki tarih geçerli değil ya da seçilebilir aralığın dışında. ' + (state.donemler ? 'Bugünün verisi gösteriliyor. ' : '')
+      + 'Seçilebilir aralık: ' + tarihTR(ILK_GUN) + ' – ' + tarihTR(istanbulBugun()) + '.');
+  }
+  function kontrolYaz(){
+    var t = state.tarih, bg = istanbulBugun();
+    var el = $('dTarih'); if(el){ el.max = bg; if(!el.value || el.getAttribute('data-oto') !== '0') el.value = t; }
+    baglanti($('dOnceki'), t > ILK_GUN ? '/dengesizlik-maliyeti?tarih=' + gunEkle(t, -1) : null);
+    baglanti($('dSonraki'), t < bg ? '/dengesizlik-maliyeti?tarih=' + gunEkle(t, 1) : null);
+    /* İndirme bağlantıları yalnız uç gerçekten veri verebiliyorken açıktır: sunucu render'ından ya da
+       bu oturumdaki başarılı bir uç yanıtından sonra. Veri yalnız tarayıcı önbelleğinden geldiyse
+       (uç başarısız) pasif kalır. Pasif hâlde de klavyeyle odaklanılır ve neden metnine bağlıdır. */
+    var indir = !!state.donemler && state.indirAcik;
+    ['csv', 'xlsx', 'json'].forEach(function(b){
+      var a = $('d' + b.charAt(0).toUpperCase() + b.slice(1));
+      if(!a) return;
+      if(indir){
+        a.setAttribute('href', VERI + '?tarih=' + t + '&bicim=' + b); a.setAttribute('download', '');
+        ['aria-disabled', 'role', 'tabindex', 'aria-describedby'].forEach(function(o){ a.removeAttribute(o); });
+      } else {
+        a.removeAttribute('href'); a.removeAttribute('download');
+        a.setAttribute('role', 'link'); a.setAttribute('tabindex', '0'); a.setAttribute('aria-disabled', 'true'); a.setAttribute('aria-describedby', 'dIndirNot');
+      }
+    });
+    var not = $('dIndirNot'); if(not) not.hidden = indir;
+    var bas = $('dBas'), bit = $('dBit');
+    if(bas && bit){
+      bas.max = bg; bit.max = bg;
+      if(!bit.value) bit.value = t;
+      if(!bas.value){ var b0 = gunEkle(t, -6); bas.value = b0 < ILK_GUN ? ILK_GUN : b0; }
+    }
+    uyariYaz();
+  }
+  var elTarih = $('dTarih');
+  if(elTarih) elTarih.addEventListener('input', function(){ elTarih.setAttribute('data-oto', '0'); });
+
+  /* Tarih aralığı: dosya fetch ile alınır; hata sayfayı terk etmeden satır içinde gösterilir. */
+  var aralikForm = $('dAralikForm');
+  function dosyaKaydet(blob, ad){
+    var u = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = u; a.download = ad; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 2000);
+  }
+  function aralikIndir(bas, bit, bicimAdi){
+    var dugme = aralikForm.querySelector('button[type="submit"]');
+    var GENEL = 'Dosya indirilemedi. Lütfen daha sonra yeniden deneyin.';
+    if(dugme) dugme.disabled = true;
+    return fetch(VERI + '?bas=' + bas + '&bit=' + bit + '&bicim=' + bicimAdi, { headers: { Accept: 'application/json' } })
+      .then(function(r){
+        if(!r.ok) return r.json().then(function(j){ throw new Error(j && j.hata && typeof j.hata.mesaj === 'string' ? j.hata.mesaj : GENEL); }, function(){ throw new Error(GENEL); });
+        var m = /filename="([A-Za-z0-9._-]+)"/.exec(r.headers.get('Content-Disposition') || '');
+        return r.blob().then(function(b){ dosyaKaydet(b, m ? m[1] : 'dengesizlik-maliyeti-' + bas + '_' + bit + '.' + bicimAdi); yaz('dAralikHata', ''); });
+      })
+      .catch(function(e){ yaz('dAralikHata', e && e.message ? e.message : GENEL); })
+      .then(function(){ if(dugme) dugme.disabled = false; });
+  }
+  if(aralikForm){
+    aralikForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var bas = $('dBas').value, bit = $('dBit').value, bg = istanbulBugun(), mesaj = '';
+      if(!ymdGecerli(bas) || !ymdGecerli(bit)) mesaj = 'Başlangıç ve bitiş tarihini seçin.';
+      else if(bas > bit) mesaj = 'Başlangıç tarihi bitiş tarihinden sonra olamaz.';
+      else if(bas < ILK_GUN || bit > bg) mesaj = 'Tarihler ' + tarihTR(ILK_GUN) + ' ile ' + tarihTR(bg) + ' arasında olmalıdır.';
+      else if(gunFarki(bas, bit) + 1 > AZAMI_ARALIK) mesaj = 'Tek dosyada en çok ' + AZAMI_ARALIK + ' gün indirilebilir. Seçilen aralık ' + (gunFarki(bas, bit) + 1) + ' gün.';
+      yaz('dAralikHata', mesaj);
+      if(!mesaj){ var b = $('dBicim').value; aralikIndir(bas, bit, ['csv', 'xlsx', 'json'].indexOf(b) === -1 ? 'csv' : b); }
+    });
+    /* Tarayıcının kendi doğrulaması devreye girince ya da alan değişince eski hata metni kalmasın. */
+    aralikForm.addEventListener('invalid', function(){ yaz('dAralikHata', ''); }, true);
+    aralikForm.addEventListener('input', function(){ yaz('dAralikHata', ''); });
+  }
+
+  /* ---------- hesaplayıcı ---------- */
+  var elSonuc = $('hSonuc'), elDonem = $('hDonem');
+  var NOKTA = {}; /* belirsiz nokta kullanımı işareti */
+  var NOKTA_MESAJI = 'Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125). Nokta yalnızca binlik ayırıcı olarak kabul edilir.';
+  var MIKTAR_NOKTA_MESAJI = 'Bu giriş belirsiz. Ondalık ayırıcı olarak virgül kullanın (örnek: 0,125); binleri noktasız yazın (örnek: 2800).';
+  /* Ondalık ayırıcı YALNIZ virgüldür; nokta yalnız binlik gruptur (ilk grup "0" değil).
+     ALANA GÖRE:
+       fiyat (PTF, SMF; TL/MWh, olağan değerler dört haneli): "2.800" → 2800, "2.800,50" → 2800,5.
+       miktar (MWh): tek gruplu "1.250" belirsizdir (1000 kat hata pahalıdır) → NOKTA; nokta yalnız
+         en az iki grupla ("1.250.000") ya da virgülle birlikte ("1.250,5") kabul edilir.
+     "0.125", "2800.50", "28.00", "1.25" her iki alanda da NOKTA (tahmin yok). Biçim dışı → null. */
+  function sayiOku(v, fiyat){
+    var s = String(v === null || v === undefined ? '' : v).replace(/\s|\u00a0/g, '').replace(/−/g, '-');
+    if(s === '') return null;
+    if(/^-?\d+(,\d+)?$/.test(s)) return Number(s.replace(',', '.'));
+    var binlik = fiyat ? /^-?[1-9]\d{0,2}(\.\d{3})+(,\d+)?$/.test(s)
+      : (/^-?[1-9]\d{0,2}(\.\d{3})+,\d+$/.test(s) || /^-?[1-9]\d{0,2}(\.\d{3}){2,}$/.test(s));
+    if(binlik) return Number(s.replace(/\./g, '').replace(',', '.'));
+    if(/^-?[\d.,]+$/.test(s) && s.indexOf('.') !== -1) return NOKTA;
+    return null;
+  }
+  function alanHata(girdiId, mesaj){
+    var g = $(girdiId), h = $(girdiId + 'Hata');
+    if(g){ if(mesaj) g.setAttribute('aria-invalid', 'true'); else g.removeAttribute('aria-invalid'); }
+    if(h) h.textContent = mesaj || '';
+    return !mesaj;
+  }
+  function miktarOku(girdiId){
+    var n = sayiOku($(girdiId).value, false);
+    if(n === NOKTA) { alanHata(girdiId, MIKTAR_NOKTA_MESAJI); return null; }
+    if(n === null || !isFinite(n)) { alanHata(girdiId, 'Miktarı MWh olarak sayıyla girin. Ondalık için virgül kullanabilirsiniz.'); return null; }
+    if(!(n > 0)) { alanHata(girdiId, 'Miktar sıfırdan büyük olmalıdır.'); return null; }
+    if(n < 0.000001) { alanHata(girdiId, 'Miktar en az 0,000001 MWh olmalıdır.'); return null; }
+    if(n > 1000000) { alanHata(girdiId, 'Miktar en çok 1.000.000 MWh olabilir.'); return null; }
+    alanHata(girdiId, '');
+    return n;
+  }
+  function fiyatOku(girdiId, ad, kural){
+    var n = sayiOku($(girdiId).value, true);
+    if(n === NOKTA) { alanHata(girdiId, NOKTA_MESAJI); return null; }
+    if(n === null || !isFinite(n)) { alanHata(girdiId, ad + ' değerini TL/MWh olarak sayıyla girin.'); return null; }
+    if(n < 0) { alanHata(girdiId, ad + ' sıfırdan küçük olamaz.'); return null; }
+    if(kural && kural.AFL !== null && n > kural.AFL) { alanHata(girdiId, ad + ' azami fiyat limitini (' + sabit(kural.AFL) + ' TL/MWh) aşamaz.'); return null; }
+    alanHata(girdiId, '');
+    return n;
+  }
+  function satir(dt, dd, vurgu, id){
+    var s = vurgu ? ' class="vurgu"' : '';
+    return '<dt' + s + '>' + dt + '</dt><dd' + s + (id ? ' id="' + id + '"' : '') + '>' + dd + '</dd>';
+  }
+  function tl(n){ return bicim(n) + ' TL'; }
+  function tlMwh(n){ return bicim(n) + ' TL/MWh'; }
+  var YUVARLAMA = '<p class="kural-notu" id="hYuvarlama">Tutarlar ayrı ayrı iki ondalığa yuvarlanarak gösterilir; satırlar arasında 0,01 TL fark görülebilir.</p>';
+  /* Bir yön için tutar satırları. fiyat: TL/MWh; q: MWh */
+  function tutarSatirlari(yon, fiyat, ptf, q, on){
+    var tutar = temiz(fiyat * q), ptfDeger = temiz(ptf * q);
+    var fark = yon === 'negatif' ? temiz((fiyat - ptf) * q) : temiz((ptf - fiyat) * q);
+    var birimFark = yon === 'negatif' ? temiz(fiyat - ptf) : temiz(ptf - fiyat);
+    var etiket = yon === 'negatif' ? 'Dengesizlik tutarı (borç)' : (fiyat < 0 ? 'Dengesizlik tutarı (borç)' : 'Dengesizlik tutarı (alacak)');
+    return satir(etiket, tl(yon === 'pozitif' && fiyat < 0 ? Math.abs(tutar) : tutar), false, on + 'Tutar')
+      + satir('Aynı miktarın PTF üzerinden değeri', tl(ptfDeger), false, on + 'PtfDeger')
+      + satir('Dengesizlik maliyeti (PTF\'ye göre)', tl(fark) + ' (' + tlMwh(birimFark) + ')', true, on + 'Fark');
+  }
+  function sonucYaz(html){ if(elSonuc) elSonuc.innerHTML = html; }
+  function donemSecenekleri(){
+    if(!elDonem) return;
+    var onceki = elDonem.value;
+    if(!state.donemler){ elDonem.innerHTML = '<option value="">Veri bekleniyor</option>'; return; }
+    var son = '';
+    state.donemler.forEach(function(d){ if(yayimlandi(d)) son = d.bas; });
+    var hedef = onceki && state.donemler.some(function(d){ return d.bas === onceki; }) ? onceki : (son || state.donemler[0].bas);
+    var h = '';
+    state.donemler.forEach(function(d){
+      h += '<option value="' + d.bas + '"' + (d.bas === hedef ? ' selected' : '') + '>' + donemEtiketi(d) + (yayimlandi(d) ? '' : ' (yayımlanmadı)') + '</option>';
+    });
+    elDonem.innerHTML = h;
+    elDonem.value = hedef;
+  }
+  function gunHesapla(e){
+    e.preventDefault();
+    var q = miktarOku('hMiktar');
+    if(q === null){ sonucYaz(''); $('hMiktar').focus(); return; }
+    if(!state.donemler){ sonucYaz('<div class="sonuc-kutu"><p id="gYok">Seçili gün için EPİAŞ verisi alınamadı. Hesap yapılmadı.</p></div>'); return; }
+    var d = null;
+    state.donemler.forEach(function(x){ if(x.bas === elDonem.value) d = x; });
+    if(!d){ sonucYaz(''); return; }
+    var yon = document.querySelector('input[name="hYon"]:checked').value === 'pozitif' ? 'pozitif' : 'negatif';
+    var baslik = '<h3>' + tarihTR(state.tarih) + ' · ' + donemEtiketi(d) + '</h3>';
+    if(d.dk !== 60){
+      /* 15 dakikalık veride tek dönem üzerinden hesap yapılmaz (saat içi SMF'ler ve miktar için varsayım yok). */
+      sonucYaz('<div class="sonuc-kutu">' + baslik + '<p id="gYok">Bu günün verisi ' + d.dk + ' dakikalık dönemlerle yayımlanmış. Bu hesaplayıcı saatlik dönemler için hazırlanmıştır; ' + d.dk + ' dakikalık veride hesap yapılmaz.</p></div>');
+      return;
+    }
+    var fiyat = yon === 'negatif' ? d.negatif : d.pozitif;
+    if(fiyat === null || d.ptf === null){
+      sonucYaz('<div class="sonuc-kutu">' + baslik + '<p id="gYok">Bu dönemin dengesizlik fiyatı EPİAŞ tarafından henüz yayımlanmadı. Hesap yapılmadı.</p></div>');
+      return;
+    }
+    var h = '<div class="sonuc-kutu">' + baslik + '<dl>'
+      + satir('Dengesizlik miktarı', miktarBicim(q) + ' MWh (' + yon + ')', false, 'gMiktar')
+      + satir('PTF', tlMwh(d.ptf), false, 'gPtf')
+      + satir((yon === 'negatif' ? 'Negatif' : 'Pozitif') + ' dengesizlik fiyatı (EPİAŞ)', tlMwh(fiyat), false, 'gFiyat')
+      + tutarSatirlari(yon, fiyat, d.ptf, q, 'g') + '</dl>'
+      + (yon === 'pozitif' && fiyat < 0 ? '<p>Pozitif dengesizlik fiyatı eksi değerli olduğu için bu dönemde pozitif dengesizlik tutarı borçtur.</p>' : '')
+      + '</div>' + YUVARLAMA;
+    sonucYaz(h);
+  }
+  function dalMetni(yon, r){
+    if(yon === 'negatif'){
+      if(r.dalNegatif === 'tavan') return 'Tavan: max(PTF; SMF) = AFL olduğu için AFL × 1,05 × (1 + k); AFL = ' + sabit(r.AFL) + ', k = ' + katsayiBicim(r.k);
+      return 'Genel: max(V; PTF; SMF) × (1 + k); V = ' + sabit(r.V) + ', k = ' + katsayiBicim(r.k);
+    }
+    if(r.dalPozitif === 'esikAlti') return 'Eşik altı: min(PTF; SMF) < V olduğu için (−1) × B × (1 + l); V = ' + sabit(r.V) + ', B = ' + sabit(r.B) + ', l = ' + katsayiBicim(r.l);
+    return 'Genel: min(PTF; SMF) × (1 − l); V = ' + sabit(r.V) + ', l = ' + katsayiBicim(r.l);
+  }
+  /* "Kendi senaryom" kendi TESLİM GÜNÜNÜN kuralına bağlıdır (seçili tablo gününe değil).
+     O günün kuralı ya da tavanı birincil kaynaklardan doğrulanmamışsa hesap reddedilir.
+     Sunucudaki senaryoNotu() ile AYNI metin. */
+  function kacis(x){ return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function senaryoGunu(){
+    var el = $('sGun'), v = el ? el.value : '';
+    return ymdGecerli(v) && v >= ILK_GUN && v <= istanbulBugun() ? v : null;
+  }
+  var YON_CARPAN_ADI = { acik: 'Sistem enerji açığı', fazla: 'Sistem enerji fazlası', denge: 'Sistem dengede' };
+  function yuzde(x){ return '%' + String(Math.round(x * 1000) / 10).replace('.', ','); }
+  /* Sunucudaki carpanSatiri() ile AYNI */
+  function carpanSatiri(kural, yon){
+    var k = kural.k[yon], l = kural.l[yon], ad = YON_CARPAN_ADI[yon];
+    if(k === l) return ad + ': pozitif ve negatif dengesizlikte ' + yuzde(k) + '.';
+    return l > k ? ad + ': pozitif dengesizlikte ' + yuzde(l) + ', negatifte ' + yuzde(k) + '.' : ad + ': negatif dengesizlikte ' + yuzde(k) + ', pozitifte ' + yuzde(l) + '.';
+  }
+  function senaryoNotu(ymd){
+    if(!ymd) return { acik: false, metin: 'Teslim gününü ' + tarihTR(ILK_GUN) + ' ile ' + tarihTR(istanbulBugun()) + ' arasında seçin.' };
+    var t = tarihTR(ymd), liste = (K.dogrulanmis || []).map(function(a){ return tarihTR(a.bas) + ' – ' + tarihTR(a.bit); }).join(', ');
+    var ek = liste ? ' Doğrulanmış teslim günleri: ' + liste + '.' : '';
+    var kural = kuralBul(ymd);
+    if(!kural) return { acik: false, metin: t + ' teslim günü için bu sayfada doğrulanmış bir dengesizlik fiyatı kuralı yok; bu tarih için hesap yapılmaz.' + ek };
+    if(!kural.formulGoster) return { acik: false, metin: t + ' teslim gününde uygulanan kural ve değerler bu sayfada henüz birincil kaynaklardan doğrulanmadı; bu tarih için hesap yapılmaz.' + ek };
+    /* R8 (sade sayfa): yalnız seçili sistem yönünde kullanılan çarpan */
+    var sy = $('sYon'), yon = sy && YON_ADI.hasOwnProperty(sy.value) ? sy.value : 'acik';
+    return { acik: true, kural: kural, metin: carpanSatiri(kural, yon) };
+  }
+  function senaryoHesapla(e){
+    e.preventDefault();
+    var not = senaryoNotu(senaryoGunu());
+    yaz('hKural', not.metin);
+    if(!not.acik){ sonucYaz('<div class="sonuc-kutu"><p id="sRet">' + kacis(not.metin) + '</p></div>'); var g = $('sGun'); if(g) g.focus(); return; }
+    var kural = not.kural;
+    var ptf = fiyatOku('sPtf', 'PTF', kural), smf = fiyatOku('sSmf', 'SMF', kural), q = miktarOku('sMiktar');
+    if(ptf === null || smf === null || q === null){
+      sonucYaz('');
+      var ilk = ['sPtf', 'sSmf', 'sMiktar'].filter(function(id){ return $(id).getAttribute('aria-invalid') === 'true'; })[0];
+      if(ilk) $(ilk).focus();
+      return;
+    }
+    var yon = $('sYon').value;
+    var r = birimFiyat(ptf, smf, smf, yon, kural);
+    if(!r){ sonucYaz(''); return; }
+    var h = '<div class="sonuc-kutu"><h3 id="sYanki">Senaryo: ' + tarihTR(senaryoGunu()) + ' teslim günü · PTF ' + tlMwh(ptf) + ' · SMF ' + tlMwh(smf) + ' · ' + YON_ADI[yon] + ' · ' + miktarBicim(q) + ' MWh</h3>'
+      + (yon === 'denge' && ptf !== smf ? '<p id="sDengeUyari">Sistem dengedeyken SMF, PTF\'ye eşittir (DUY m.109(1)(c)). Girdiğiniz PTF ve SMF farklı; sonuç yalnızca varsayımsal bir senaryodur.</p>' : '')
+      + '</div>'
+      + '<div class="sonuc-kutu"><h3>Negatif dengesizlik</h3><dl>'
+      + satir('Birim fiyat', tlMwh(r.negatif), false, 'sNegFiyat')
+      + satir('Uygulanan formül', dalMetni('negatif', r), false, 'sNegDal')
+      + tutarSatirlari('negatif', r.negatif, ptf, q, 'sNeg') + '</dl></div>'
+      + '<div class="sonuc-kutu"><h3>Pozitif dengesizlik</h3><dl>'
+      + satir('Birim fiyat', tlMwh(r.pozitif), false, 'sPozFiyat')
+      + satir('Uygulanan formül', dalMetni('pozitif', r), false, 'sPozDal')
+      + tutarSatirlari('pozitif', r.pozitif, ptf, q, 'sPoz') + '</dl>'
+      + (r.pozitif < 0 ? '<p>Pozitif dengesizlik fiyatı eksi değerli olduğu için bu senaryoda pozitif dengesizlik tutarı borçtur.</p>' : '')
+      + '</div>' + YUVARLAMA;
+    sonucYaz(h);
+  }
+  function modYaz(){
+    var gun = $('hModGun'), sen = $('hModSenaryo'), fGun = $('hGun'), fSen = $('hSenaryo'), sg = $('sGun');
+    if(!gun || !sen || !fGun || !fSen) return;
+    if(sg){ var bg = istanbulBugun(); sg.max = bg; if(!sg.value) sg.value = bg; }
+    yaz('hKural', senaryoNotu(senaryoGunu()).metin);
+    fGun.hidden = !gun.checked;
+    fSen.hidden = !sen.checked;
+  }
+  if($('hGun')) $('hGun').addEventListener('submit', gunHesapla);
+  if($('hSenaryo')) $('hSenaryo').addEventListener('submit', senaryoHesapla);
+  ['hModGun', 'hModSenaryo'].forEach(function(id){ var el = $(id); if(el) el.addEventListener('change', function(){ sonucYaz(''); modYaz(); }); });
+  ['sGun', 'sYon'].forEach(function(id){ var el = $(id); if(el) ['input', 'change'].forEach(function(o){ el.addEventListener(o, function(){ sonucYaz(''); yaz('hKural', senaryoNotu(senaryoGunu()).metin); }); }); });
+  /* "Hesapla" düğmeleri JS yokken pasiftir (sayfa boş yere yeniden yüklenmesin); burada açılır. */
+  Array.prototype.forEach.call(document.querySelectorAll('#dHesap button[type="submit"]'), function(b){ b.disabled = false; });
+
+  /* ---------- veri merdiveni ---------- */
+  function ciz(){ tabloYaz(); ozetYaz(); damgaYaz(); kontrolYaz(); donemSecenekleri(); modYaz(); }
+  /* Dış kaynaklı dönem listesi → doğrulanmış liste; tek bir bozuk kayıt varsa tümü reddedilir. */
+  function dogrula(donemler, tarih){
+    if(!Array.isArray(donemler) || !donemler.length || donemler.length > 300) return null;
+    var out = [];
+    for(var i = 0; i < donemler.length; i++){
+      var d = donemKur(donemler[i]);
+      if(!d || d.bas.slice(0, 10) !== tarih) return null;
+      out.push(d);
+    }
+    return out;
+  }
+  function uygula(donemler, cekildi, bayat){
+    var liste = dogrula(donemler, state.tarih);
+    if(!liste) return false;
+    state.donemler = liste;
+    state.cekildi = typeof cekildi === 'string' && CEKILDI_RE.test(cekildi) ? cekildi : null;
+    state.bayat = !!bayat;
+    ciz();
+    return true;
+  }
+  function onbellegeYaz(){
+    try{ localStorage.setItem(ONBELLEK, JSON.stringify({ tarih: state.tarih, cekildi: state.cekildi, donemler: state.donemler })); }catch(e){}
+  }
+  function onbellektenOku(){
+    try{
+      var c = JSON.parse(localStorage.getItem(ONBELLEK) || 'null');
+      if(!c || c.tarih !== state.tarih || typeof c.cekildi !== 'string' || !CEKILDI_RE.test(c.cekildi)) return false;
+      return uygula(c.donemler, c.cekildi, true); /* önceki oturumdan: tazelik iddiası yok */
+    }catch(e){ return false; }
+  }
+  function cek(){
+    if(veriYok) return Promise.resolve(null);
+    return fetch(VERI + '?tarih=' + state.tarih + '&bicim=json', { headers: { Accept: 'application/json' } })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){ return j && j.tarih === state.tarih && Array.isArray(j.donemler) && j.donemler.length ? j : null; })
+      .catch(function(){ return null; }); /* null döner — ASLA uydurma veri */
+  }
+  /* TAZELİK MERDİVENİ (üstteki alttakini yener):
+     1) uçtan şimdi gelen veri  2) sunucunun bu sayfaya bastığı veri
+     3) bu tarayıcıda saklı önceki gerçek veri (SON SENKRON)  4) dürüst bekleme */
+  function senkron(){
+    return cek().then(function(j){
+      if(j){ state.indirAcik = true; if(uygula(j.donemler, j.cekildi, j.bayat)){ onbellegeYaz(); return; } state.indirAcik = false; }
+      if(state.donemler){ if(!state.bayat){ state.bayat = true; damgaYaz(); } return; }
+      if(!veriYok && onbellektenOku()) return;
+      ciz();
+    });
+  }
+
+  if(ssr){
+    /* Sunucunun bastığı satırlar durumun kaynağıdır; tablo yeniden çizilmez. */
+    var ham = [];
+    Array.prototype.forEach.call(elTablo.querySelectorAll('tr[data-bas]'), function(tr){
+      ham.push({ bas: tr.getAttribute('data-bas'), dk: tr.getAttribute('data-dk'), ptf: tr.getAttribute('data-ptf'), smf: tr.getAttribute('data-smf'), yon: tr.getAttribute('data-yon'), pozitif: tr.getAttribute('data-poz'), negatif: tr.getAttribute('data-neg') });
+    });
+    var okunan = dogrula(ham, state.tarih);
+    if(okunan){
+      state.donemler = okunan;
+      state.indirAcik = true;
+      var c0 = govde.getAttribute('data-cekildi');
+      state.cekildi = c0 && CEKILDI_RE.test(c0) ? c0 : null;
+      state.bayat = govde.getAttribute('data-bayat') === '1';
+      kontrolYaz(); donemSecenekleri(); modYaz(); simdiIsaretle(); mobilSatirlar(); kapOdak();
+      if(!state.bayat) onbellegeYaz();
+    } else { ssr = false; }
+  }
+  if(!ssr){ ciz(); senkron(); }
+  if(state.tarih === bugun && !veriYok){
+    setInterval(senkron, YENILEME_MS);
+    setInterval(simdiIsaretle, 60 * 1000);
+  }
+})();
+</script>
+
+<script>
+(function(){
+  var btn = document.getElementById('mobileMenuBtn');
+  var menu = document.getElementById('mobileMenu');
+  if (!btn || !menu) return;
+  function setOpen(open){
+    menu.hidden = !open;
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(){ setOpen(menu.hidden); });
+  menu.addEventListener('click', function(e){ if (e.target.closest('a')) setOpen(false); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !menu.hidden) setOpen(false); });
+})();
+</script>
+</body>
+</html>

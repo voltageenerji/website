@@ -1,0 +1,164 @@
+# Alt sayfa 1. aşama — görsel ve erişilebilirlik denetimi (Chromium 157.0.8103.78, 2026-11-27T09:15Z)
+# Piyasa proxy istekleri kesildi (canlı veri yok). "-test-verisi" görünümlerindeki rakamlar UYDURMA TEST VERİSİDİR.
+
+=== /rehber/tekstil-elektrik
+  bilgi  sayfa boyu (px) 1440: 3692 → 4339 · 390: 5444 → 6132
+  GEÇTİ  320px yatay taşma yok
+  GEÇTİ  320px karşıtlık ≥ 4,5:1 (94 metin, en düşük 7.83)
+  GEÇTİ  320px sayfa/konsol hatası yok
+  GEÇTİ  390px yatay taşma yok
+  GEÇTİ  390px karşıtlık ≥ 4,5:1 (94 metin, en düşük 7.83)
+  GEÇTİ  390px sayfa/konsol hatası yok
+  GEÇTİ  390px odak: 24 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  390px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  390px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/?kaynak=rehber-tekstil-elektrik#leadForm] mobileMenuBtn
+  GEÇTİ  390px mobil menü: açılır (bant ekrana sabit), Esc ile kapanır — {"acik":true,"aria":"true","bant":"fixed","baglanti":6,"gecerli":["/rehber"]}
+  GEÇTİ  768px yatay taşma yok
+  GEÇTİ  768px karşıtlık ≥ 4,5:1 (95 metin, en düşük 7.83)
+  GEÇTİ  768px sayfa/konsol hatası yok
+  GEÇTİ  1440px yatay taşma yok
+  GEÇTİ  1440px karşıtlık ≥ 4,5:1 (101 metin, en düşük 7.83)
+  GEÇTİ  1440px sayfa/konsol hatası yok
+  GEÇTİ  1440px odak: 29 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  1440px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  1440px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/#hakkimizda] A[/#hizmetler]
+  GEÇTİ  JS kapalı 390px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":6603,"menuDugme":"none","alt":10}
+  GEÇTİ  JS kapalı 1440px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":6603,"menuDugme":"none","alt":10}
+  GEÇTİ  hareket azaltma: kaydırma auto, geçiş 0 sn, çalışan animasyon yok — {"kaydirma":"auto","gecis":0,"anim":0}
+  GEÇTİ  normal modda da otomatik animasyon yok — 0
+
+=== /canli-ptf
+  bilgi  sayfa boyu (px) 1440: 4955 → 5606 · 390: 6484 → 7217
+  GEÇTİ  320px yatay taşma yok
+  GEÇTİ  320px karşıtlık ≥ 4,5:1 (138 metin, en düşük 7.05)
+  GEÇTİ  320px sayfa/konsol hatası yok
+  GEÇTİ  390px yatay taşma yok
+  GEÇTİ  390px karşıtlık ≥ 4,5:1 (138 metin, en düşük 7.05)
+  GEÇTİ  390px sayfa/konsol hatası yok
+  GEÇTİ  390px odak: 27 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  390px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  390px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/?kaynak=canli-ptf#leadForm] mobileMenuBtn
+  GEÇTİ  390px mobil menü: açılır (bant ekrana sabit), Esc ile kapanır — {"acik":true,"aria":"true","bant":"fixed","baglanti":6,"gecerli":["/canli-ptf"]}
+  GEÇTİ  768px yatay taşma yok
+  GEÇTİ  768px karşıtlık ≥ 4,5:1 (139 metin, en düşük 7.05)
+  GEÇTİ  768px sayfa/konsol hatası yok
+  GEÇTİ  1440px yatay taşma yok
+  GEÇTİ  1440px karşıtlık ≥ 4,5:1 (145 metin, en düşük 7.05)
+  GEÇTİ  1440px sayfa/konsol hatası yok
+  GEÇTİ  1440px odak: 32 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  1440px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  1440px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/#hakkimizda] A[/#hizmetler]
+  GEÇTİ  JS kapalı 390px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":7183,"menuDugme":"none","alt":10}
+  GEÇTİ  JS kapalı 1440px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":7183,"menuDugme":"none","alt":10}
+  GEÇTİ  hareket azaltma: kaydırma auto, geçiş 0 sn, çalışan animasyon yok — {"kaydirma":"auto","gecis":0,"anim":0}
+  GEÇTİ  normal modda da otomatik animasyon yok — 0
+
+=== /canli-ptf?ornek (test-verisi)
+  bilgi  sayfa boyu (px) 1440: 6036 → 6643 · 390: 7624 → 8358
+  GEÇTİ  320px yatay taşma yok
+  GEÇTİ  320px karşıtlık ≥ 4,5:1 (186 metin, en düşük 7.05)
+  GEÇTİ  320px sayfa/konsol hatası yok
+  GEÇTİ  390px yatay taşma yok
+  GEÇTİ  390px karşıtlık ≥ 4,5:1 (186 metin, en düşük 7.05)
+  GEÇTİ  390px sayfa/konsol hatası yok
+  GEÇTİ  390px odak: 27 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  390px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  390px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/?kaynak=canli-ptf#leadForm] mobileMenuBtn
+  GEÇTİ  390px mobil menü: açılır (bant ekrana sabit), Esc ile kapanır — {"acik":true,"aria":"true","bant":"fixed","baglanti":6,"gecerli":["/canli-ptf"]}
+  GEÇTİ  768px yatay taşma yok
+  GEÇTİ  768px karşıtlık ≥ 4,5:1 (187 metin, en düşük 7.05)
+  GEÇTİ  768px sayfa/konsol hatası yok
+  GEÇTİ  1440px yatay taşma yok
+  GEÇTİ  1440px karşıtlık ≥ 4,5:1 (193 metin, en düşük 7.05)
+  GEÇTİ  1440px sayfa/konsol hatası yok
+  GEÇTİ  1440px odak: 32 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  1440px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  1440px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/#hakkimizda] A[/#hizmetler]
+  GEÇTİ  JS kapalı 390px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":7887,"menuDugme":"none","alt":10}
+  GEÇTİ  JS kapalı 1440px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":7887,"menuDugme":"none","alt":10}
+  GEÇTİ  hareket azaltma: kaydırma auto, geçiş 0 sn, çalışan animasyon yok — {"kaydirma":"auto","gecis":0,"anim":0}
+  GEÇTİ  normal modda da otomatik animasyon yok — 0
+
+=== /kurumsal
+  bilgi  sayfa boyu (px) 1440: 3833 → 4154 · 390: 5540 → 6146
+  GEÇTİ  320px yatay taşma yok
+  GEÇTİ  320px karşıtlık ≥ 4,5:1 (137 metin, en düşük 7.83)
+  GEÇTİ  320px sayfa/konsol hatası yok
+  GEÇTİ  390px yatay taşma yok
+  GEÇTİ  390px karşıtlık ≥ 4,5:1 (137 metin, en düşük 7.83)
+  GEÇTİ  390px sayfa/konsol hatası yok
+  GEÇTİ  390px odak: 24 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  390px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  390px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/?kaynak=kurumsal#leadForm] mobileMenuBtn
+  GEÇTİ  390px mobil menü: açılır (bant ekrana sabit), Esc ile kapanır — {"acik":true,"aria":"true","bant":"fixed","baglanti":6,"gecerli":[]}
+  GEÇTİ  768px yatay taşma yok
+  GEÇTİ  768px karşıtlık ≥ 4,5:1 (138 metin, en düşük 7.83)
+  GEÇTİ  768px sayfa/konsol hatası yok
+  GEÇTİ  1440px yatay taşma yok
+  GEÇTİ  1440px karşıtlık ≥ 4,5:1 (144 metin, en düşük 7.83)
+  GEÇTİ  1440px sayfa/konsol hatası yok
+  GEÇTİ  1440px odak: 29 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  1440px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  1440px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/#hakkimizda] A[/#hizmetler]
+  GEÇTİ  JS kapalı 390px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":5726,"menuDugme":"none","alt":10}
+  GEÇTİ  JS kapalı 1440px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":5706,"menuDugme":"none","alt":10}
+  GEÇTİ  hareket azaltma: kaydırma auto, geçiş 0 sn, çalışan animasyon yok — {"kaydirma":"auto","gecis":0,"anim":0}
+  GEÇTİ  normal modda da otomatik animasyon yok — 0
+
+=== /dengesizlik-maliyeti (test-verisi)
+  bilgi  sayfa boyu (px) 1440: 6216 → 6777 · 390: 8551 → 9304
+  GEÇTİ  320px yatay taşma yok
+  GEÇTİ  320px karşıtlık ≥ 4,5:1 (290 metin, en düşük 5.27)
+  GEÇTİ  320px sayfa/konsol hatası yok
+  GEÇTİ  390px yatay taşma yok
+  GEÇTİ  390px karşıtlık ≥ 4,5:1 (290 metin, en düşük 5.27)
+  GEÇTİ  390px sayfa/konsol hatası yok
+  GEÇTİ  390px odak: 74 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  390px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  390px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] mobileMenuBtn A[/]
+  GEÇTİ  390px mobil menü: açılır (bant ekrana sabit), Esc ile kapanır — {"acik":true,"aria":"true","bant":"fixed","baglanti":6,"gecerli":[]}
+  GEÇTİ  768px yatay taşma yok
+  GEÇTİ  768px karşıtlık ≥ 4,5:1 (364 metin, en düşük 5.27)
+  GEÇTİ  768px sayfa/konsol hatası yok
+  GEÇTİ  1440px yatay taşma yok
+  GEÇTİ  1440px karşıtlık ≥ 4,5:1 (370 metin, en düşük 5.27)
+  GEÇTİ  1440px sayfa/konsol hatası yok
+  GEÇTİ  1440px odak: 55 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  1440px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  1440px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/#hakkimizda] A[/#hizmetler]
+  GEÇTİ  JS kapalı 390px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":10913,"menuDugme":"none","alt":10}
+  GEÇTİ  JS kapalı 1440px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":10913,"menuDugme":"none","alt":10}
+  GEÇTİ  hareket azaltma: kaydırma auto, geçiş 0 sn, çalışan animasyon yok — {"kaydirma":"auto","gecis":0,"anim":0}
+  GEÇTİ  normal modda da otomatik animasyon yok — 0
+
+=== /dengesizlik-maliyeti?veriyok (bekleme)
+  bilgi  sayfa boyu (px) 1440: 5420 → 6083 · 390: 8055 → 8797
+  GEÇTİ  320px yatay taşma yok
+  GEÇTİ  320px karşıtlık ≥ 4,5:1 (170 metin, en düşük 7.05)
+  GEÇTİ  320px sayfa/konsol hatası yok
+  GEÇTİ  390px yatay taşma yok
+  GEÇTİ  390px karşıtlık ≥ 4,5:1 (170 metin, en düşük 7.05)
+  GEÇTİ  390px sayfa/konsol hatası yok
+  GEÇTİ  390px odak: 50 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  390px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  390px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] mobileMenuBtn A[/]
+  GEÇTİ  390px mobil menü: açılır (bant ekrana sabit), Esc ile kapanır — {"acik":true,"aria":"true","bant":"fixed","baglanti":6,"gecerli":[]}
+  GEÇTİ  768px yatay taşma yok
+  GEÇTİ  768px karşıtlık ≥ 4,5:1 (172 metin, en düşük 7.05)
+  GEÇTİ  768px sayfa/konsol hatası yok
+  GEÇTİ  1440px yatay taşma yok
+  GEÇTİ  1440px karşıtlık ≥ 4,5:1 (178 metin, en düşük 7.05)
+  GEÇTİ  1440px sayfa/konsol hatası yok
+  GEÇTİ  1440px odak: 55 durağın hepsinde görünür çerçeve (≥ 2 px) — []
+  GEÇTİ  1440px odak: odaklanan öğe görünüm alanında ve örtülmüyor — []
+  GEÇTİ  1440px odak sırası atlama bağlantısıyla başlar, logo ve menü/teklif ardından gelir — A[#icerik] A[/] A[/#hakkimizda] A[/#hizmetler]
+  GEÇTİ  JS kapalı 390px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":8096,"menuDugme":"none","alt":10}
+  GEÇTİ  JS kapalı 1440px: başlık ve içerik okunur, taşma yok, işlevsiz menü düğmesi gizli, alt bilgi bağlantıları var — {"h1":true,"metin":8096,"menuDugme":"none","alt":10}
+  GEÇTİ  hareket azaltma: kaydırma auto, geçiş 0 sn, çalışan animasyon yok — {"kaydirma":"auto","gecis":0,"anim":0}
+  GEÇTİ  normal modda da otomatik animasyon yok — 0
+
+=== Üst bant: yeni ana sayfa (kaydırılmış) ↔ alt sayfa
+  GEÇTİ  1440px üst bant yüksekliği, zemini, "Teklif Al" rengi, logo hizası ve menü etiketleri aynı — ana {"yukseklik":69,"zemin":"rgb(10, 17, 34)","cta":"rgb(245, 180, 28)","logoSol":100,"menu":"Hakkımızda|Hizmetler|Yaklaşım|Rehber|Canlı PTF|İletişim"} · alt {"yukseklik":69,"zemin":"rgb(10, 17, 34)","cta":"rgb(245, 180, 28)","logoSol":100,"menu":"Hakkımızda|Hizmetler|Yaklaşım|Rehber|Canlı PTF|İletişim"}
+  GEÇTİ  390px üst bant yüksekliği, zemini, "Teklif Al" rengi, logo hizası ve menü etiketleri aynı — ana {"yukseklik":65,"zemin":"rgb(10, 17, 34)","cta":"rgb(245, 180, 28)","logoSol":20,"menu":"Hakkımızda|Hizmetler|Yaklaşım|Rehber|Canlı PTF|İletişim"} · alt {"yukseklik":65,"zemin":"rgb(10, 17, 34)","cta":"rgb(245, 180, 28)","logoSol":20,"menu":"Hakkımızda|Hizmetler|Yaklaşım|Rehber|Canlı PTF|İletişim"}
+
+SONUÇ: hepsi geçti

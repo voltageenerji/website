@@ -1,0 +1,49 @@
+/* /canli-ptf — sayfaya özgü: anlık değer bandının ayrıntıları, gün grafiği, saatlik tablo, PTF oluşum şeması.
+   Seçici ve kimlikler canlıdakiyle aynıdır (functions/canli-ptf.js ve sayfa betiği bunlara yazar). */
+.ch { margin-top: 4px; min-height: 18px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--cta); }
+/* Gün grafiği: ana sayfadaki kart grafiğiyle aynı renkler (yeşil çizgi, hafif yeşil alan, yeşil nokta).
+   SVG'deki renk öznitelikleri canlıdakiyle aynı kalır; stil öznitelikten önce gelir. */
+.live-chart { margin: 18px 0 4px; }
+.live-chart svg { display: block; width: 100%; height: auto; }
+.live-chart svg > g:first-of-type { stroke: rgba(255, 255, 255, 0.14); }
+#pLine { stroke: var(--green-bright); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+#pArea { fill: rgba(91, 196, 137, 0.14); }
+#pDot { fill: var(--green-bright); stroke: #0B1226; stroke-width: 2; }
+.live-chart text { font-family: var(--mono); fill: rgba(255, 255, 255, 0.72); }
+.live-chart text:last-child { text-anchor: end; }
+.sayfa-govde .day-sum { margin: 0 0 26px; }
+.sayfa-govde .day-sum:empty { display: none; }
+
+/* Saatlik tablo: 24 satır, iki sütun; sayılar monospace ve sağa hizalı; içinde bulunulan saat sarı zeminli */
+.ptf-table-wrap { max-width: 560px; margin: 0 0 30px; overflow-x: auto; border: 1px solid var(--line-strong); }
+.ptf-table { width: 100%; font-family: var(--mono); font-size: 14.5px; font-variant-numeric: tabular-nums; }
+.ptf-table th { padding: 11px 16px; text-align: left; font-family: var(--sans); font-size: 12.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); background: var(--paper); border-bottom: 1px solid var(--line-strong); }
+.ptf-table th:last-child { text-align: right; }
+.ptf-table td { padding: 8px 16px; color: var(--ink-soft); border-bottom: 1px solid var(--line); }
+.ptf-table tr:last-child td { border-bottom: 0; }
+.ptf-table td:last-child { text-align: right; }
+.ptf-table tr.now td { font-weight: 600; color: var(--ink); background: #FBEFC9; }
+.ptf-table .ptf-wait, .ptf-table .empty { color: var(--ink-muted); }
+.ptf-table td.ptf-wait { padding-block: 14px; text-align: left; font-family: var(--sans); }
+
+/* PTF oluşum şeması (satır içi SVG): eksen ve eğriler koyu, eşleşme noktası sarı; etiketler düz yazı */
+.vfig { max-width: 560px; margin: 30px 0 34px; }
+.vfig svg { display: block; width: 100%; height: auto; overflow: visible; }
+.vfig-cap { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.6; color: var(--ink-muted); }
+.ptf-fig .ax { fill: none; stroke: var(--ink-muted); stroke-width: 1; }
+.ptf-fig .crv { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: miter; stroke-linecap: butt; }
+.ptf-fig .gd { fill: none; stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 4 3; }
+.ptf-fig .dot { fill: var(--cta); stroke: var(--ink); stroke-width: 1.3; }
+.ptf-fig .rule { fill: none; stroke: var(--line-strong); stroke-width: 1; }
+.ptf-fig text { font-family: var(--sans); letter-spacing: 0.06em; fill: var(--ink-muted); }
+.ptf-fig .lbl { font-size: 10px; }
+.ptf-fig .key { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; fill: var(--ink); }
+.ptf-fig .note { font-size: 9px; letter-spacing: 0.08em; }
+@media print { .vfig { break-inside: avoid; page-break-inside: avoid; } }
+/* Dar ekranda SVG küçüldüğü için etiketler kullanıcı biriminde büyütülür (canlıdaki kuralla aynı ölçek) */
+@media (max-width: 640px) {
+  .ptf-fig .lbl { font-size: 13px; }
+  .ptf-fig .key { font-size: 14px; }
+  .ptf-fig .note { font-size: 12px; letter-spacing: 0.05em; }
+  .live-chart text { font-size: 22px; }
+}

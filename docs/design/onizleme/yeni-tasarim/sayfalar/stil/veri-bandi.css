@@ -1,0 +1,30 @@
+/* Piyasa veri bandı (.live): iki piyasa verisi sayfasının ortak dili. Ana sayfanın kapak PTF kartıyla aynı yüzey
+   (#0B1226, ince açık çizgi, 4 px köşe); ızgara deseni yok. Rakamlar tabular; durum ve damga monospace (piyasa verisi),
+   etiketler düz yazı. Betiğin yazdığı sınıflar (live-mode / live-stamp + stale / waiting) aynen kullanılır. */
+.live { --focus: var(--cta); margin: 32px 0 14px; padding: 22px 26px 16px; color: var(--white); background: #0B1226; border: 1px solid var(--hair-dark); border-radius: 4px; }
+.live-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; padding-bottom: 14px; border-bottom: 1px solid var(--hair-dark); }
+.live-t { font-size: 13px; font-weight: 500; line-height: 1.4; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-dark); }
+.live-mode { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--green-bright); }
+.live-mode.stale { color: var(--cta); }
+.live-mode.waiting { color: var(--on-dark-muted); }
+.live-now { padding: 20px 0 16px; border-bottom: 1px solid var(--hair-dark); }
+.live-now-num { font-size: clamp(38px, 5.4vw, 54px); font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.live-now-num .u { margin-left: 12px; font-size: 15px; font-weight: 400; letter-spacing: 0; color: var(--on-dark-muted); white-space: nowrap; }
+.live-now-k { margin-top: 8px; font-size: 14.5px; line-height: 1.45; color: var(--on-dark-muted); }
+.live-cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--hair-dark); }
+.live-cells .cell { min-width: 0; padding: 16px 16px 14px; border-left: 1px solid var(--hair-dark); }
+.live-cells .cell:first-child { padding-left: 0; border-left: 0; }
+.cv { font-family: var(--mono); font-size: clamp(17px, 1.9vw, 21px); font-weight: 500; line-height: 1.25; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ck { margin-top: 6px; font-size: 13.5px; line-height: 1.4; color: var(--on-dark-muted); }
+.live-foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 16px; padding-top: 12px; font-size: 13px; line-height: 1.45; color: var(--on-dark-muted); }
+.live-stamp { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--green-bright); }
+.live-stamp.stale { color: var(--cta); }
+.live-stamp.waiting { color: var(--on-dark-muted); }
+.sayfa-govde .day-sum { font-size: 15.5px; line-height: 1.65; color: var(--ink-soft); }
+@media (max-width: 640px) {
+  .live { padding: 18px 18px 14px; }
+  .live-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .live-cells .cell { padding-left: 14px; }
+  .live-cells .cell:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .live-cells .cell:nth-child(n+3) { border-top: 1px solid var(--hair-dark); }
+}

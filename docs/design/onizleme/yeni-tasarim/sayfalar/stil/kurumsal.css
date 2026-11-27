@@ -1,0 +1,23 @@
+/* /kurumsal — sayfaya özgü: tescil işareti, logo künyesi, kimlik tablosu, "ne yapıyoruz / ne yapmıyoruz" sütunları.
+   Ana sayfanın künye dili: kalın üst çizgi, satır çizgileri, küçük büyük harf etiketler; kutu, gölge, krem kart yok. */
+.reg { margin-left: 0.12em; font-size: 0.55em; font-weight: 400; vertical-align: super; opacity: 0.75; }
+.marka-gorsel { display: flex; align-items: center; gap: 22px; margin: 28px 0 10px; }
+.marka-gorsel img { flex: none; width: 112px; height: 112px; border: 1px solid var(--line); border-radius: 4px; }
+.marka-gorsel figcaption { max-width: 40em; font-size: 15px; line-height: 1.6; color: var(--ink-soft); }
+
+.id-card { margin: 22px 0 18px; border-top: 2px solid var(--ink); }
+.id-card table { width: 100%; }
+.id-card th { width: 32%; padding: 12px 20px 12px 0; text-align: left; vertical-align: top; font-size: 12.5px; font-weight: 600; line-height: 1.5; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); border-bottom: 1px solid var(--line-strong); }
+.id-card td { padding: 10px 0; font-size: 16.5px; line-height: 1.5; color: var(--ink); border-bottom: 1px solid var(--line-strong); overflow-wrap: anywhere; }
+.id-card td .mono { font-size: 15.5px; }
+@media (max-width: 560px) {
+  .id-card th, .id-card td { display: block; width: 100%; }
+  .id-card th { padding: 12px 0 2px; border-bottom: 0; }
+  .id-card td { padding-top: 0; }
+}
+
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px var(--g); margin: 24px 0 18px; }
+.col { padding-top: 16px; border-top: 1px solid var(--line-strong); }
+.sayfa-govde .col h3 { margin-top: 0; }
+.col ul { margin-bottom: 0; font-size: 16px; }
+@media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
