@@ -1,5 +1,19 @@
 # CHANGELOG — voltage.com.tr Revizyonu (Aşama A–E, Temmuz 2026)
 
+## 27.11.2026 — Yeni tasarım: ana sayfa + 25 alt sayfa (yayın adayı `claude/yayin-yeni-tasarim`)
+
+Sahip kararı (27.11, yazılı): yeni tasarım bütün sitede, kabul ölçütlerinin hepsi geçerse yayımlanır. Yayın QA kararı ve sahibin önizleme onayıyla `main`'e gider.
+
+- **Kaynak:** tasarım hazırlığı 9cba3af (üretici a021f28), main 50649ca.
+- **index.html** — yeni ana sayfa (`docs/design/onizleme/yeni-tasarim/yapi/kur.py`, main'in `index.html`'inden): baş bölümü (title, description, canonical, robots, OG, JSON-LD), teklif formu ve canlı veri betikleri canlıdan aynen; yeni kapak, H1 ve bölümler, saatlik PTF şeridi, yerelleştirilmiş dosya seçici. Proxy adresi gerçek uç (`epias-proxy…workers.dev`).
+- **img/** — 26 WebP (5 kapak + 21 sektör). Sektör görselleri Kling ile üretildi; ticari kullanım hakkı sahip tarafından teyit edildi (27.11).
+- **25 alt sayfa** — 16 rehber, `rehber`, `canli-ptf`, `kurumsal`, `sanayi-elektrik-tedariki`, `elektrik-faturasi-hesaplama`, `kvkk`, `cerez-politikasi`, `kullanim-kosullari`, `404` (`sayfalar/kur-sayfalar.py`, main'deki dosyalardan). `<head>` (stil hariç), içerik ve sayfa betikleri bayt bayt aynı; yalnız kabuk (üst bant, mobil menü, sayfa başı, alt bilgi) ve stil değişti.
+- **Değişmeyenler:** dondurulmuş üç rehber (`rehber/ptf-nedir`, `rehber/serbest-tuketici`, `rehber/tedarikci-degistirme`; 10 Aralık SEO ölçümüne kadar eski tasarımda), `panel.html`, `_redirects`, `robots.txt`, `llms.txt`.
+- **Kabuk (Hukuk 27.11):** alt bilgide "Kuruluş 2011 · EPİAŞ Piyasa Katılımcısı"; alt sayfalarda menü düğmesi ve alt bilgi gezinmesinin erişilebilir adı Türkçe ("Menü", "Alt bilgi").
+- **_headers** — `/img/*` için `public, max-age=86400, must-revalidate` (dosya adları hash'siz; `immutable` güvenli değil). `https://:project.pages.dev/*` ve `https://:version.:project.pages.dev/*` için `X-Robots-Tag: noindex` (yalnız pages.dev önizleme hostları; voltage.com.tr eşleşmez). CSP değişmedi (`img-src 'self'` yeterli).
+- **sitemap.xml** — yalnız ana sayfa `<lastmod>` 2026-11-27 (kapak ve H1 metni değişti). Alt sayfalarda içerik değişmediği için tarih aynı.
+- **functions/canli-ptf.js + functions/_lib/onizleme.js** — önizleme hostlarında (`*.pages.dev`, yerel) `/canli-ptf` SSR yanıtı `X-Robots-Tag: noindex, nofollow` ve robots meta `noindex, nofollow` alır; üretim hostunda yanıt aynen döner (`_headers` Function yanıtlarına uygulanmaz). Test: `docs/qa/test-ssr-ptf.mjs` (+3).
+
 Kanonik kaynak: Voltage_Template.pdf. İlke: revizyon, yeniden yazım değil — mimari, içerik ve teknik altyapı korunur; değişen şey karakterdir ("yaşayan memorandum").
 
 ## Dosyalar

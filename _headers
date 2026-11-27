@@ -8,6 +8,18 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://epias-proxy.emirhantan-ku.workers.dev https://static.cloudflareinsights.com https://cloudflareinsights.com; frame-ancestors 'self';
 
+# Önizleme adresleri arama dizinine girmesin (Cloudflare Pages belgesindeki kalıp:
+# https://developers.cloudflare.com/pages/configuration/headers/).
+# YALNIZ *.pages.dev adresleri (projenin pages.dev adresi, dal ve sürüm önizlemeleri) bu
+# kurallarla eşleşir; üretim alan adı voltage.com.tr ETKİLENMEZ.
+# _headers Pages Function yanıtlarına UYGULANMAZ: Function'lı /canli-ptf aynı başlığı
+# kendisi ekler (functions/_lib/onizleme.js).
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex
+
 # HTML — kısa cache, revalidate
 /*.html
   Cache-Control: public, max-age=300, must-revalidate
@@ -54,6 +66,12 @@
 # 1 gün + revalidate: kartlar sayfa tarafından yüklenmez, yalnız paylaşım robotları
 # çeker; performans etkisi yoktur, tazelik kazanılır.
 /og/*
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# Ana sayfa görselleri (kapak ve sektör fotoğrafları, WebP). Sayfa yükler (masaüstünde kapak LCP öğesidir).
+# Dosya adları içerik hash'i TAŞIMAZ ve görseller aynı adla değiştirilebilir: "immutable"
+# GÜVENLİ DEĞİLDİR. 1 gün + revalidate: tekrar ziyarette istek 304 ile döner.
+/img/*
   Cache-Control: public, max-age=86400, must-revalidate
 
 # Feed (Pages Functions) — köprüler (Zapier/Buffer) okur; kısa cache.
