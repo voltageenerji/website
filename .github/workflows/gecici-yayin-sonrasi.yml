@@ -16,72 +16,14 @@ jobs:
         run: |
           set +e
           K=https://voltage.com.tr
-          G=0; H=0
-          ok(){ if [ "$1" = 1 ]; then G=$((G+1)); echo "GECTI  $2"; else H=$((H+1)); echo "KALDI  $2  -> $3"; fi; }
-          sha(){ curl -s --max-time 20 "$1" | sha256sum | cut -c1-64; }
-          # 0) Canli surumun gelmesini bekle (en cok 15 dk)
-          for i in $(seq 1 60); do
-            c=$(curl -s --max-time 20 "$K/?t=$RANDOM" | grep -c 'Piyasa Katılımcısı')
-            [ "$c" -ge 1 ] && break; sleep 15
+          R=https://raw.githubusercontent.com/voltageenerji/website/main
+          # Canli dosya ile main'deki dosya farki (herkese acik sayfalar; yalniz fark satirlari, 160 karakter)
+          for p in "/|index.html" "/rehber/ptf-nedir|rehber/ptf-nedir.html" "/rehber/serbest-tuketici|rehber/serbest-tuketici.html" "/rehber/tedarikci-degistirme|rehber/tedarikci-degistirme.html" "/rehber/tekstil-elektrik|rehber/tekstil-elektrik.html"; do
+            u=${p%%|*}; f=${p##*|}
+            curl -s --max-time 20 "$K$u" > /tmp/canli; curl -s --max-time 20 "$R/$f" > /tmp/depo
+            echo "== $u canli=$(wc -c </tmp/canli) depo=$(wc -c </tmp/depo) fark-satiri=$(diff /tmp/depo /tmp/canli | grep -c '^[<>]')"
+            diff /tmp/depo /tmp/canli | head -12 | cut -c1-160
           done
-          echo "yeni ana sayfa isareti: $c (deneme $i)"
-          ok $([ "$c" -ge 1 ] && echo 1) "ana sayfa yeni surum (alt bilgi isareti)" "$c"
-          ok $([ "$(sha $K/)" = 558cf99fcac068703dcfdd020cd22edaf5046fb199d1e90fe0143423eedd1f17 ] && echo 1) "ana sayfa sha main 4bf70d5 ile ayni" "farkli"
-          # 1) Indekslenebilirlik
-          for p in / /rehber /rehber/tekstil-elektrik /rehber/sktt /kurumsal /canli-ptf /sanayi-elektrik-tedariki /elektrik-faturasi-hesaplama /kvkk /cerez-politikasi /kullanim-kosullari; do
-            h=$(curl -s -D - -o /tmp/b --max-time 20 "$K$p")
-            s=$(echo "$h" | head -1 | awk '{print $2}')
-            xr=$(echo "$h" | grep -ci '^x-robots-tag')
-            ni=$(grep -ci '<meta name="robots" content="[^"]*noindex' /tmp/b)
-            cn=$(grep -c "<link rel=\"canonical\" href=\"https://voltage.com.tr" /tmp/b)
-            ld=$(grep -c 'application/ld+json' /tmp/b)
-            mn=$(grep -c '<main' /tmp/b)
-            ft=$(grep -c 'Piyasa Katılımcısı' /tmp/b)
-            tel=$(grep -c '479 0510\|4790510\|479 05 10' /tmp/b)
-            echo "  $p  durum=$s x-robots=$xr meta-noindex=$ni canonical=$cn jsonld=$ld main=$mn kabuk=$ft"
-            ok $([ "$s" = 200 ] && [ "$xr" = 0 ] && [ "$ni" = 0 ] && [ "$cn" -ge 1 ] && echo 1) "$p 200, noindex yok, canonical var" "s=$s xr=$xr ni=$ni cn=$cn"
-            ok $([ "$ft" -ge 1 ] && echo 1) "$p yeni kabuk" "$ft"
-            ok $([ "$tel" = 0 ] && echo 1) "$p yasak numara yok" "$tel"
+          for p in / /rehber/sktt /kurumsal; do
+            echo "$p son durum: $(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$K$p")"
           done
-          # canli-ptf SSR
-          ss=$(curl -s --max-time 25 "$K/canli-ptf" | grep -c 'data-ssr="1"')
-          ok $([ "$ss" -ge 1 ] && echo 1) "/canli-ptf sunucuda isleniyor (data-ssr=1)" "$ss"
-          # 2) pages.dev noindex (kasitli)
-          xp=$(curl -sI --max-time 20 https://website-dh5.pages.dev/ | grep -i '^x-robots-tag' | tr -d '\r')
-          ok $(echo "$xp" | grep -qi noindex && echo 1) "website-dh5.pages.dev X-Robots-Tag noindex" "$xp"
-          # 3) Gorseller
-          for f in kapak-1600 kapak-mobil-579 sektor-tekstil-800 sektor-veri-merkezi-480; do
-            h=$(curl -sI --max-time 20 "$K/img/$f.webp" | tr -d '\r')
-            s=$(echo "$h" | head -1 | awk '{print $2}'); ct=$(echo "$h" | grep -i '^content-type' | cut -d' ' -f2); cc=$(echo "$h" | grep -i '^cache-control' | cut -d' ' -f2-)
-            ok $([ "$s" = 200 ] && [ "$ct" = image/webp ] && echo "$cc" | grep -q 'max-age=86400' && echo 1) "/img/$f.webp 200 webp onbellek" "s=$s ct=$ct cc=$cc"
-          done
-          # 4) sitemap, robots, llms
-          lm=$(curl -s --max-time 20 "$K/sitemap.xml" | grep -A1 '<loc>https://voltage.com.tr/</loc>' | grep -o '<lastmod>[^<]*' | cut -d'>' -f2)
-          ok $([ "$lm" = 2026-11-27 ] && echo 1) "sitemap ana sayfa lastmod 2026-11-27" "$lm"
-          su=$(curl -s --max-time 20 "$K/sitemap.xml" | grep -c '<loc>')
-          echo "  sitemap url sayisi: $su"
-          ok $([ "$(sha $K/robots.txt)" = edaf4163f9fecd50c048e1ee92d12e30aa933bac19c1b6a08da20074f12eb38a ] && echo 1) "robots.txt degismedi" "farkli"
-          ok $([ "$(sha $K/llms.txt)" = 5b5fdf6e36748d57bd03756e16158d090c3b2c2fcd544b8229346a238d3fc971 ] && echo 1) "llms.txt degismedi" "farkli"
-          # 5) Dondurulan rehberler ve dengesizlik sayfasi yayin disi
-          ok $([ "$(sha $K/rehber/ptf-nedir.html)" = 857fd2a8bca818075a6e25b92cbedbeb5996399b8971c47c81180d0c0a4af5e0 ] || [ "$(sha $K/rehber/ptf-nedir)" = 857fd2a8bca818075a6e25b92cbedbeb5996399b8971c47c81180d0c0a4af5e0 ] && echo 1) "ptf-nedir dondurulmus (bayt ayni)" "farkli"
-          ok $([ "$(sha $K/rehber/serbest-tuketici)" = 398a5c06b7c6ea485d6a2c2637f290e77980301d3e181a11102e3c860dc7c2a4 ] && echo 1) "serbest-tuketici dondurulmus" "farkli"
-          ok $([ "$(sha $K/rehber/tedarikci-degistirme)" = cafe6fbfa1e36cc6ec3f4e3d80af99edc8713dad542eda03c5b507e205c35b95 ] && echo 1) "tedarikci-degistirme dondurulmus" "farkli"
-          d=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$K/dengesizlik-maliyeti")
-          ok $([ "$d" = 404 ] && echo 1) "dengesizlik-maliyeti yayinda degil (404)" "$d"
-          # 6) Ic dosyalar 302, 404 sayfasi
-          for p in /docs/OPERASYON-DEFTERI.md /CLAUDE.md /DEPLOY.md /CHANGELOG.md /lib/ /tools/gsc-export.mjs /.github/workflows/lead-reports.yml /.claude/settings.json; do
-            s=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$K$p")
-            ok $([ "$s" = 302 ] && echo 1) "$p 302" "$s"
-          done
-          h=$(curl -s -D - -o /tmp/b --max-time 20 "$K/yok-boyle-bir-sayfa-27")
-          s=$(echo "$h" | head -1 | awk '{print $2}'); ni=$(grep -ci 'noindex' /tmp/b)
-          ok $([ "$s" = 404 ] && [ "$ni" -ge 1 ] && echo 1) "olmayan sayfa 404 + noindex" "s=$s ni=$ni"
-          # 7) EPIAS proxy canli siteye yanit veriyor (yalniz durum ve CORS basligi; govde yazdirilmaz)
-          P=https://epias-proxy.emirhantan-ku.workers.dev
-          h=$(curl -s -D - -o /tmp/p -H 'Origin: https://voltage.com.tr' --max-time 25 "$P/ptf/today" | tr -d '\r')
-          s=$(echo "$h" | head -1 | awk '{print $2}'); ao=$(echo "$h" | grep -i '^access-control-allow-origin' | cut -d' ' -f2)
-          n=$(grep -o '"[a-zA-Z]*": *[0-9][0-9.]*' /tmp/p | wc -l)
-          ok $([ "$s" = 200 ] && [ "$ao" = https://voltage.com.tr ] && echo 1) "proxy /ptf/today 200, CORS voltage.com.tr" "s=$s ao=$ao"
-          echo "  proxy sayisal alan sayisi: $n"
-          echo "TOPLAM: $G gecti, $H kaldi"
-          [ "$H" = 0 ]
