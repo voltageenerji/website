@@ -14,7 +14,7 @@ jobs:
       - name: Playwright kur
         shell: bash {0}
         run: |
-          mkdir o && cd o && npm init -y >/dev/null; npm i playwright@1.49.1 2>&1 | tail -3; npx playwright install --with-deps chromium webkit firefox 2>&1 | tail -5; echo "kurulum=$?"
+          mkdir o && cd o && npm init -y >/dev/null; npm i playwright@latest 2>&1 | tail -3; npx playwright install --with-deps chromium webkit firefox 2>&1 | tail -5; echo "kurulum=$?"
       - name: Şerit hareketi (yalnız sayılar)
         shell: bash {0}
         working-directory: o
@@ -23,7 +23,7 @@ jobs:
           import pw from 'playwright';
           const hedefler = [['onizleme', 'https://6da52819.website-dh5.pages.dev/'], ['canli', 'https://voltage.com.tr/']];
           for (const tarayici of ['chromium', 'webkit', 'firefox']) {
-            let b; try { b = await pw[tarayici].launch(); } catch (e) { console.log(tarayici, 'baslatilamadi'); continue; }
+            let b; try { b = await pw[tarayici].launch(); } catch (e) { console.log(tarayici, 'baslatilamadi', String(e.message).split('\n')[0].slice(0, 100)); continue; }
             for (const [ad, url] of hedefler) for (const [w, h] of [[1440, 900], [390, 844]]) for (const rm of ['no-preference', 'reduce']) {
               const c = await b.newContext({ viewport: { width: w, height: h }, reducedMotion: rm });
               const p = await c.newPage(); let hata = 0; p.on('pageerror', () => hata++);
