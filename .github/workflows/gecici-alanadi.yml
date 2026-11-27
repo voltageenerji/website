@@ -1,0 +1,16 @@
+name: gecici-alanadi
+on:
+  push:
+    branches: [claude/voltan-orchestrator-agent-a30dgt]
+    paths: [.github/workflows/gecici-alanadi.yml]
+permissions: {}
+jobs:
+  kontrol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Yonlendirme
+        run: |
+          for u in https://www.voltage.com.tr/ "https://www.voltage.com.tr/rehber/ptf-nedir?x=1" http://www.voltage.com.tr/ https://voltage.com.tr/ https://voltage.com.tr/rehber/ptf-nedir https://voltan.com.tr/rehber/ptf-nedir https://www.voltage.com.tr/robots.txt https://www.voltage.com.tr/sitemap.xml; do
+            echo "KONTROL $u -> $(curl -sS -o /dev/null -m 15 -w '%{http_code} %{redirect_url}' "$u" | tail -1) | son: $(curl -sS -L -o /dev/null -m 20 -w '%{http_code} %{url_effective} adim=%{num_redirects}' "$u" | tail -1)"
+          done
