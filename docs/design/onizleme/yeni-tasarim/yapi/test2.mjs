@@ -572,6 +572,9 @@ for (const [w, h] of [[1440, 900], [390, 844], [320, 568]]) {
   ok(`F8 ${w}px bahar anı açılışta yok (betik yalnız kutucuk işaretlenince ekler)`, (await bahar(p)).n === 0);
   await p.locator('#lead-yesil').scrollIntoViewIfNeeded(); await p.evaluate(() => window.scrollBy(0, 120));
   await p.check('#lead-yesil');
+  /* QA-YT-2: süs dokunuşun karesi çizildikten sonra kurulur (rAF + setTimeout 0); en geç 500 ms içinde gelmeli */
+  const kurulum = await p.waitForFunction(() => document.querySelector('.bh-kat'), null, { timeout: 500 }).then(() => true, () => false);
+  ok(`F8 ${w}px bahar anı dokunuştan sonraki karede (≤ 500 ms) kurulur`, kurulum);
   const ilk = await bahar(p);
   const kayit = await kaydet(p, 5000);
   const [nc, nk, ny] = BEKLENEN[w];
