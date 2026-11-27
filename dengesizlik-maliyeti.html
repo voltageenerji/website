@@ -193,9 +193,33 @@ h2#tablo { margin: 18px 0 10px; font-size: clamp(20px, 2.4vw, 24px); }
 .about { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-muted); }
 .about p { color: var(--ink-muted); margin-bottom: 8px; max-width: none; }
 footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-muted); }
+/* R10: telefonda (≤ 640 px) tablo dört sütun — Dönem, Sistem yönü, iki maliyet; dört fiyat sütunu satıra
+   dokununca açılan ayrıntıda. YALNIZ JS çalışınca (html.dm-js): JS yokken tüm sütunlar kayan kapta görünür.
+   Sunucu HTML'i her zaman 8 sütunun tamamını taşır (SEO / tarayıcısız okuyucu). */
+.dm-tablo .kisa, .mobil-lejant, .dm-tablo .satir-ok { display: none; }
+.dm-tablo tr.detay td { text-align: left; white-space: normal; background: var(--paper-warm); padding: 8px 10px 10px; }
+.detay-dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; margin: 0; }
+.detay-dl div { display: flex; flex-direction: column; }
+.detay-dl dt { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+.detay-dl dd { margin: 0; color: var(--ink); }
+.satir-ac { font: inherit; color: inherit; background: none; border: 0; padding: 0 2px; margin: 0; min-height: 44px; width: 100%; display: inline-flex; align-items: center; gap: 4px; text-align: left; cursor: pointer; }
+.satir-ac:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+@media (max-width: 640px) {
+  .dm-js .mobil-lejant { display: block; font-family: var(--mono); font-size: 11px; color: var(--ink-muted); margin: 0 0 6px; }
+  .dm-js .dm-tablo { min-width: 0; font-size: 12px; }
+  .dm-js .dm-tablo tr > :nth-child(2), .dm-js .dm-tablo tr > :nth-child(3), .dm-js .dm-tablo tr > :nth-child(5), .dm-js .dm-tablo tr > :nth-child(6) { display: none; }
+  .dm-js .dm-tablo th, .dm-js .dm-tablo td { padding-left: 6px; padding-right: 6px; }
+  .dm-js .dm-tablo tbody th { padding-top: 0; padding-bottom: 0; }
+  .dm-js .dm-tablo td.yon { white-space: normal; }
+  .dm-js .dm-tablo .uzun { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  .dm-js .dm-tablo .kisa { display: inline; }
+  .dm-js .dm-tablo .satir-ok { display: inline; color: var(--ink-muted); }
+  .dm-js .satir-ac[aria-expanded="true"] .satir-ok { transform: rotate(90deg); }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 @media print { .arac, .hesap { display: none; } .tablo-sar { overflow: visible; max-height: none; margin: 0 0 14px; } .dm-tablo thead th, .dm-tablo tbody th { position: static; } }
 </style>
+<script>document.documentElement.classList.add('dm-js');</script>
 </head>
 <body>
 <div class="page">
@@ -223,6 +247,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
 
   <h2 id="tablo">Dönem bazında PTF, SMF, pozitif ve negatif dengesizlik fiyatı</h2>
   <p class="uyari" id="dKuralUyari" role="status"></p>
+  <p class="mobil-lejant" id="dLejant">Maliyetler TL/MWh, PTF'ye göre</p>
   <div class="tablo-sar" id="dTabloSar" role="region" aria-labelledby="dTabloBaslik" tabindex="0">
     <table class="dm-tablo">
       <caption id="dTabloBaslik">Dönem bazında PTF, SMF, sistem yönü ve dengesizlik fiyatları · saatler Türkiye saatiyle (UTC+03:00) · tüm değerler TL/MWh</caption>
@@ -234,8 +259,8 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
           <th scope="col" class="sol">Sistem yönü</th>
           <th scope="col">Pozitif dengesizlik fiyatı<span class="sr-only"> (TL/MWh)</span></th>
           <th scope="col">Negatif dengesizlik fiyatı<span class="sr-only"> (TL/MWh)</span></th>
-          <th scope="col">Pozitif dengesizlik maliyeti (PTF'ye göre)<span class="sr-only"> (TL/MWh)</span></th>
-          <th scope="col">Negatif dengesizlik maliyeti (PTF'ye göre)<span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col" title="Pozitif dengesizlik maliyeti (PTF'ye göre), TL/MWh"><span class="uzun">Pozitif dengesizlik maliyeti (PTF'ye göre)</span><span class="kisa" aria-hidden="true">Pozitif maliyet</span><span class="sr-only"> (TL/MWh)</span></th>
+          <th scope="col" title="Negatif dengesizlik maliyeti (PTF'ye göre), TL/MWh"><span class="uzun">Negatif dengesizlik maliyeti (PTF'ye göre)</span><span class="kisa" aria-hidden="true">Negatif maliyet</span><span class="sr-only"> (TL/MWh)</span></th>
         </tr>
       </thead>
       <tbody id="dTablo">
@@ -629,8 +654,51 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
     var dk = simdiDakika(), kural = kuralBul(state.tarih), h = '';
     for(var i = 0; i < state.donemler.length; i++) h += satirHtml(state.donemler[i], dk, kural);
     elTablo.innerHTML = h;
+    mobilSatirlar();
     kapOdak();
   }
+  /* R10: telefonda (≤ 640 px) dönem hücresi bir düğmedir; altındaki ayrıntı satırı dört fiyatı gösterir.
+     Masaüstünde ya da JS yokken tablo olduğu gibi kalır (8 sütun). Açık satırlar yeniden çizimde korunur. */
+  var DAR = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
+  var acikSatirlar = {};
+  function darMi(){ return !!(DAR && DAR.matches); }
+  function detayHtml(d){
+    var o = function(ad, v){ return '<div><dt>' + ad + '</dt><dd>' + (v === null ? '—' : bicim(v) + ' TL/MWh') + '</dd></div>'; };
+    return '<dl class="detay-dl">' + o('PTF', d.ptf) + o('SMF', d.smf) + o('Pozitif fiyat', d.pozitif) + o('Negatif fiyat', d.negatif) + '</dl>';
+  }
+  function mobilSatirlar(){
+    Array.prototype.forEach.call(elTablo.querySelectorAll('tr.detay'), function(r){ r.parentNode.removeChild(r); });
+    Array.prototype.forEach.call(elTablo.querySelectorAll('button.satir-ac'), function(b){
+      var th = b.parentNode;
+      Array.prototype.slice.call(b.childNodes).forEach(function(n){ if(!(n.classList && n.classList.contains('satir-ek'))) th.insertBefore(n, b); });
+      th.removeChild(b);
+    });
+    if(!darMi() || !state.donemler) return;
+    var bul = {};
+    state.donemler.forEach(function(d){ bul[d.bas] = d; });
+    Array.prototype.forEach.call(elTablo.querySelectorAll('tr[data-bas]'), function(tr, i){
+      var d = bul[tr.getAttribute('data-bas')], th = tr.querySelector('th');
+      if(!d || !th) return;
+      var id = 'dDetay' + i, acik = !!acikSatirlar[d.bas];
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'satir-ac'; b.setAttribute('aria-expanded', acik ? 'true' : 'false'); b.setAttribute('aria-controls', id);
+      while(th.firstChild) b.appendChild(th.firstChild);
+      var ok = document.createElement('span'); ok.className = 'satir-ok satir-ek'; ok.setAttribute('aria-hidden', 'true'); ok.textContent = '›'; b.appendChild(ok);
+      var sr = document.createElement('span'); sr.className = 'sr-only satir-ek'; sr.textContent = ' · PTF, SMF ve dengesizlik fiyatları'; b.appendChild(sr);
+      th.appendChild(b);
+      var det = document.createElement('tr');
+      det.className = 'detay'; det.id = id; det.hidden = !acik;
+      det.innerHTML = '<td colspan="8">' + detayHtml(d) + '</td>';
+      tr.parentNode.insertBefore(det, tr.nextSibling);
+      b.addEventListener('click', function(){
+        var yeni = b.getAttribute('aria-expanded') !== 'true';
+        b.setAttribute('aria-expanded', yeni ? 'true' : 'false');
+        det.hidden = !yeni;
+        if(yeni) acikSatirlar[d.bas] = true; else delete acikSatirlar[d.bas];
+      });
+    });
+  }
+  if(DAR){ var degis = function(){ mobilSatirlar(); kapOdak(); }; if(DAR.addEventListener) DAR.addEventListener('change', degis); else if(DAR.addListener) DAR.addListener(degis); }
   function simdiIsaretle(){
     if(!state.donemler) return;
     var dk = simdiDakika(), satirlar = elTablo.querySelectorAll('tr[data-bas]');
@@ -1054,7 +1122,7 @@ footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
       var c0 = govde.getAttribute('data-cekildi');
       state.cekildi = c0 && CEKILDI_RE.test(c0) ? c0 : null;
       state.bayat = govde.getAttribute('data-bayat') === '1';
-      kontrolYaz(); donemSecenekleri(); modYaz(); simdiIsaretle(); kapOdak();
+      kontrolYaz(); donemSecenekleri(); modYaz(); simdiIsaretle(); mobilSatirlar(); kapOdak();
       if(!state.bayat) onbellegeYaz();
     } else { ssr = false; }
   }

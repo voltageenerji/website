@@ -946,7 +946,7 @@ const ornekOf = (h) => { const m = /<div class="ornek" id="dOrnek">([\s\S]*?)<\/
   // Tablo anlamı
   ok('kabuk tablo: caption + scope=col x8', /<caption id="dTabloBaslik">/.test(KABUK) && (/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1].match(/<th scope="col"/g) || []).length === 8);
   ok('kabuk tablo kapsayicisi: region + tabindex + etiket', /<div class="tablo-sar" id="dTabloSar" role="region" aria-labelledby="dTabloBaslik" tabindex="0">/.test(KABUK));
-  ok('kabuk sutun basliklari (yeni adlar + sr-only birim)', coz(/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1]) === "Dönem PTF (TL/MWh) SMF (TL/MWh) Sistem yönü Pozitif dengesizlik fiyatı (TL/MWh) Negatif dengesizlik fiyatı (TL/MWh) Pozitif dengesizlik maliyeti (PTF'ye göre) (TL/MWh) Negatif dengesizlik maliyeti (PTF'ye göre) (TL/MWh)" && (/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1].match(/<span class="sr-only"> \(TL\/MWh\)<\/span>/g) || []).length === 6, `-> ${coz(/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1])}`);
+  ok('kabuk sutun basliklari (yeni adlar + sr-only birim; R10 kisa telefon etiketi aria-hidden haric)', coz(/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1].replace(/<span class="kisa" aria-hidden="true">[^<]*<\/span>/g, '')) === "Dönem PTF (TL/MWh) SMF (TL/MWh) Sistem yönü Pozitif dengesizlik fiyatı (TL/MWh) Negatif dengesizlik fiyatı (TL/MWh) Pozitif dengesizlik maliyeti (PTF'ye göre) (TL/MWh) Negatif dengesizlik maliyeti (PTF'ye göre) (TL/MWh)" && (/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1].match(/<span class="sr-only"> \(TL\/MWh\)<\/span>/g) || []).length === 6, `-> ${coz(/<thead>([\s\S]*?)<\/thead>/.exec(KABUK)[1])}`);
   // Formlar JS'siz çalışır
   ok('kabuk tarih formu duz GET', /<form method="get" action="\/dengesizlik-maliyeti" id="dTarihForm">/.test(KABUK) && /<input type="date" id="dTarih" name="tarih" min="2026-01-01" required>/.test(KABUK));
   ok('kabuk aralik formu duz GET', /<form method="get" action="\/dengesizlik-maliyeti\/veri" id="dAralikForm">/.test(KABUK) && /name="bas"/.test(KABUK) && /name="bit"/.test(KABUK) && /<select id="dBicim" name="bicim">/.test(KABUK));
@@ -1360,7 +1360,7 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
   const sayfadaBulunan = YASAK.filter((r) => r.test(atifsiz)).map(String);
   ok('EPİAŞ kimlik yolu yok: dengesizlik-maliyeti.html (atif baglantilari haric)', sayfadaBulunan.length === 0, `-> ${sayfadaBulunan}`);
   // Tarayıcı betiği proxy'ye ya da EPİAŞ'a doğrudan gitmez (yalnız aynı kökenli /veri ucu)
-  const betik = KABUK.slice(KABUK.indexOf('<script>'), KABUK.lastIndexOf('</script>'));
+  const betik = KABUK.slice(KABUK.indexOf('<script>\n/* Dengesizlik Maliyeti'), KABUK.lastIndexOf('</script>'));
   ok('istemci betigi yalniz /dengesizlik-maliyeti/veri ucunu cagirir', !/epias|piyasa\/v1|workers\.dev/i.test(betik) && /var VERI = '\/dengesizlik-maliyeti\/veri';/.test(betik));
   // Taramanın kendisi çalışıyor mu: yasak dizgiler yakalanır
   ok('tarama yasak dizgileri yakalar', ['https://giris.epias.com.tr/cas/v1/tickets', 'env.EPIAS_PASSWORD', "headers: { TGT: t }", '/reporting-service/v1/'].every((x) => YASAK.some((r) => r.test(x))) && !YASAK.some((r) => r.test('PIYASA_VERI_ANAHTAR tgtx')));
@@ -1652,6 +1652,21 @@ ok('M3 loglarinda sir yok', !loglar.some((l) => l.includes(SAHTE_ENV.PIYASA_VERI
   const kontrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
   ok('R9 maliyet sutunu kontrasti: metin, "—" ve baslik >= 4,5:1', kontrast('#0A0E1A', '#F3EBD3') >= 4.5 && kontrast('#4A5264', '#F3EBD3') >= 4.5 && kontrast('#0A0E1A', '#E9DEBF') >= 4.5, `-> ${kontrast('#4A5264', '#F3EBD3').toFixed(2)}`);
   ok('R9 tablo semantigi degismedi: 8 sutun basligi scope=col, satir basligi th scope=row', (/<thead>[\s\S]*?<\/thead>/.exec(KABUK)[0].match(/<th scope="col"/g) || []).length === 8 && /<th scope="row">00:00–01:00/.test(h));
+}
+
+
+// ============================================================================
+// REVİZYON 10 — telefonda dört sütun + satır ayrıntısı; sunucu HTML'i 8 sütunun tamamını taşır
+// ============================================================================
+{
+  const { h } = await al('?tarih=2026-11-23');
+  const s = satirlar(h);
+  ok('R10 sunucu HTML: tek <table>, 8 sutun basligi, her satirda 8 hucre (tum fiyat degerleri)', (h.match(/<table class="dm-tablo">/g) || []).length === 1 && s.length === 24 && s.every((x) => x.length === 8) && s[0].join('|') === '00:00–01:00|2.000,00|2.300,00|Enerji açığı|1.940,00|2.438,00|60,00|438,00');
+  ok('R10 sunucu HTML: ayrinti satiri ve dugme YOK (yalniz istemci, yalniz dar ekranda)', !/class="detay"|satir-ac/.test(govdeOf(h)));
+  ok('R10 dar ekran gizlemesi yalniz html.dm-js ile (JS yokken tum sutunlar)', KABUK.includes("<script>document.documentElement.classList.add('dm-js');</script>\n</head>") && KABUK.includes('.dm-js .dm-tablo tr > :nth-child(2), .dm-js .dm-tablo tr > :nth-child(3), .dm-js .dm-tablo tr > :nth-child(5), .dm-js .dm-tablo tr > :nth-child(6) { display: none; }') && /@media \(max-width: 640px\) \{\n  \.dm-js \.mobil-lejant/.test(KABUK));
+  ok('R10 maliyet basliklari: tam ad (ekran okuyucu + title) ve kisa telefon etiketi', KABUK.includes(`<th scope="col" title="Pozitif dengesizlik maliyeti (PTF'ye göre), TL/MWh"><span class="uzun">Pozitif dengesizlik maliyeti (PTF'ye göre)</span><span class="kisa" aria-hidden="true">Pozitif maliyet</span>`) && KABUK.includes(`<span class="kisa" aria-hidden="true">Negatif maliyet</span>`));
+  ok('R10 tek satir lejant tablonun ustunde', KABUK.includes(`<p class="mobil-lejant" id="dLejant">Maliyetler TL/MWh, PTF'ye göre</p>`) && KABUK.indexOf('id="dLejant"') < KABUK.indexOf('id="dTabloSar"') && KABUK.indexOf('id="dLejant"') > KABUK.indexOf('<h2 id="tablo">'));
+  ok('R10 dokunma hedefi >= 44 px (satir dugmesi)', /\.satir-ac \{[^}]*min-height: 44px/.test(KABUK));
 }
 
 // ============================================================================

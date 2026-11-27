@@ -129,6 +129,8 @@ if (!CIHAZ) {
     ['senaryo sonucu', '/dengesizlik-maliyeti', async (p) => { await p.check('#hModSenaryo'); await p.fill('#sPtf', '2800'); await p.fill('#sSmf', '3400'); await p.fill('#sMiktar', '10'); await p.click('#hSenaryo button[type="submit"]'); }],
     ['senaryo ret (boş teslim günü)', '/dengesizlik-maliyeti', async (p) => { await p.check('#hModSenaryo'); await p.fill('#sGun', ''); await p.fill('#sPtf', '2800'); await p.fill('#sSmf', '3400'); await p.fill('#sMiktar', '10'); await p.click('#hSenaryo button[type="submit"]'); }],
     ['aralık hatası', '/dengesizlik-maliyeti', async (p) => { await p.fill('#dBas', '2026-10-01'); await p.fill('#dBit', '2026-11-10'); await p.click('#dAralikForm button[type="submit"]'); }],
+    // R10: telefonda satır ayrıntısı açık (1280 px'te düğme yok; eylem kendini atlar)
+    ['satır ayrıntısı açık', '/dengesizlik-maliyeti', async (p) => { const b = p.locator('#dTablo button.satir-ac').nth(4); if (await b.count()) await b.click(); }],
   ];
   for (const w of [1280, 390]) {
     for (const [ad, yol, eylem] of durumlar) {

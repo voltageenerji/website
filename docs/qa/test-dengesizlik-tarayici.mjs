@@ -146,7 +146,8 @@ for (const [w, h] of [[320, 640], [390, 844], [768, 1024], [1440, 900]]) {
     if (!yol.includes('veriyok')) {
       const kap = await page.evaluate(() => { const e = document.getElementById('dTabloSar'); const r = e.getBoundingClientRect(); return { sw: e.scrollWidth, cw: e.clientWidth, sol: r.left, sag: r.right, vw: document.documentElement.clientWidth, of: getComputedStyle(e).overflowX }; });
       if (w < 1000) {
-        ok(`S2 ${w}px tablo kendi kabinda yatay kayar`, kap.sw > kap.cw === (w < 840) && kap.of === 'auto' && kap.sag <= kap.vw + 0.5, `-> ${JSON.stringify(kap)}`);
+        // R10: ≤ 640 px (JS) dört sütun — 390 px'te kap kaymaz, 320 px'te kendi kabında kayar; 768 px'te sekiz sütun kayar
+        ok(`S2 ${w}px tablo kabi ${w === 390 ? 'kaymaz (dort sutun sigar)' : 'kendi kabinda yatay kayar'}`, kap.sw > kap.cw === (w === 390 ? false : w < 840) && kap.of === 'auto' && kap.sag <= kap.vw + 0.5, `-> ${JSON.stringify(kap)}`);
         ok(`S2 ${w}px tablo kabi yalniz kayiyorsa klavye duragi`, (await page.getAttribute('#dTabloSar', 'tabindex')) === (kap.sw > kap.cw ? '0' : null));
         if (kap.sw > kap.cw) {
           const once = await page.evaluate(() => document.getElementById('dTabloSar').scrollLeft);
@@ -160,8 +161,8 @@ for (const [w, h] of [[320, 640], [390, 844], [768, 1024], [1440, 900]]) {
           await page.waitForTimeout(100);
           const sabit = await page.evaluate(() => {
             const kab = document.getElementById('dTabloSar').getBoundingClientRect();
-            const bas = document.querySelector('.dm-tablo thead th:nth-child(2)').getBoundingClientRect();
-            const ilk = document.querySelector('.dm-tablo tbody tr:nth-child(12) th').getBoundingClientRect();
+            const bas = document.querySelector('.dm-tablo thead th:nth-child(4)').getBoundingClientRect();
+            const ilk = document.querySelectorAll('#dTablo tr[data-bas]')[11].querySelector('th').getBoundingClientRect();
             return { basUstte: Math.abs(bas.top - kab.top) < 3, ilkSolda: Math.abs(ilk.left - kab.left) < 3 };
           });
           ok(`S2 ${w}px baslik satiri ve donem sutunu sabit`, sabit.basUstte && sabit.ilkSolda, `-> ${JSON.stringify(sabit)}`);
@@ -671,6 +672,58 @@ bolum('S7 istemci çizimi = sunucu çizimi; tazelik merdiveni');
     }
     await kapat();
   }
+}
+
+{ // R10: telefonda dört sütun; satıra dokununca / klavyeyle dört fiyat açılır; JS yokken 8 sütun
+  const gorunurBaslik = (page) => page.evaluate(() => [...document.querySelectorAll('.dm-tablo thead th')].filter((t) => getComputedStyle(t).display !== 'none').length);
+  const kapDurum = (page) => page.evaluate(() => { const k = document.getElementById('dTabloSar'); return { kayar: k.scrollWidth > k.clientWidth + 1, sayfa: document.documentElement.scrollWidth > window.innerWidth }; });
+  for (const w of [390, 320]) {
+    const { page, kayit, kapat } = await ac('/dengesizlik-maliyeti', { w, h: 844 });
+    const k = await kapDurum(page);
+    ok(`R10 ${w}px: yalniz 4 sutun gorunur, sayfa yatay kaymaz${w === 390 ? ', tablo kabi da kaymaz' : ''}`, (await gorunurBaslik(page)) === 4 && !k.sayfa && (w === 390 ? !k.kayar : true), `-> ${JSON.stringify(k)}`);
+    ok(`R10 ${w}px: lejant gorunur, her veri satirinda 44 px dugme`, (await page.isVisible('#dLejant')) && (await page.locator('#dTablo tr[data-bas] th button.satir-ac').count()) === 24 && (await page.evaluate(() => Math.min(...[...document.querySelectorAll('button.satir-ac')].map((b) => b.getBoundingClientRect().height)))) >= 44);
+    if (w === 390) {
+      // Dokunma: 04:00–05:00 (eşik altı, eksi pozitif fiyat) — değerler veriden
+      const b = page.locator('#dTablo tr[data-bas="2026-11-24T04:00:00+03:00"] button.satir-ac');
+      const det = await b.getAttribute('aria-controls');
+      ok('R10 dugme kapali baslar; ayrinti satiri gizli; aria-controls gecerli', (await b.getAttribute('aria-expanded')) === 'false' && (await page.locator(`#${det}`).isHidden()));
+      await b.click();
+      const ayr = (await page.locator(`#${det}`).innerText()).replace(/\s+/g, ' ').trim();
+      ok('R10 dokununca acilir: PTF, SMF, pozitif ve negatif fiyat etiketli, TL/MWh, veriden', (await b.getAttribute('aria-expanded')) === 'true' && ayr === `PTF ${bicim(450)} TL/MWh SMF ${bicim(60)} TL/MWh POZİTİF FİYAT ${bicim(-106)} TL/MWh NEGATİF FİYAT ${bicim(463.5)} TL/MWh`, `-> ${ayr}`);
+      ok('R10 ayrinti satiri ilgili satirin hemen altinda', await page.evaluate((id) => document.getElementById(id).previousElementSibling.getAttribute('data-bas') === '2026-11-24T04:00:00+03:00', det));
+      await b.click();
+      ok('R10 ikinci dokunus kapatir', (await b.getAttribute('aria-expanded')) === 'false' && (await page.locator(`#${det}`).isHidden()));
+      // Klavye: odak + Enter / Space
+      const b2 = page.locator('#dTablo tr[data-bas="2026-11-24T10:00:00+03:00"] button.satir-ac');
+      await b2.focus(); await page.keyboard.press('Enter');
+      const det2 = await b2.getAttribute('aria-controls');
+      const ayr2 = (await page.locator(`#${det2}`).innerText()).replace(/\s+/g, ' ');
+      ok('R10 klavye (Enter) acar; degerler veriden (10:00)', (await b2.getAttribute('aria-expanded')) === 'true' && /PTF 2\.100,00 TL\/MWh/.test(ayr2), `-> ${ayr2}`);
+      await page.keyboard.press('Space');
+      ok('R10 klavye (Space) kapatir', (await b2.getAttribute('aria-expanded')) === 'false');
+      const b3 = page.locator('#dTablo tr[data-bas="2026-11-24T20:00:00+03:00"] button.satir-ac');
+      await b3.click();
+      const ayr3 = (await page.locator(`#${await b3.getAttribute('aria-controls')}`).innerText()).replace(/\s+/g, ' ').trim();
+      ok('R10 yayimlanmamis donemde fiyatlar "—" (0 degil), PTF yayimlanmis', ayr3 === `PTF ${bicim(2200)} TL/MWh SMF — POZİTİF FİYAT — NEGATİF FİYAT —`, `-> ${ayr3}`);
+      ok('R10 dugmenin erisilebilir adi donemi ve icerigi soyler', /^20:00–21:00.*PTF, SMF ve dengesizlik fiyatları/.test((await b3.evaluate((x) => x.textContent)).replace(/\s+/g, ' ')));
+      // Masaüstüne geçince ayrıntılar kalkar, 8 sütun döner
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.waitForTimeout(100);
+      ok('R10 genislik 640 ustune cikinca dugme/ayrinti kalkar, 8 sutun', (await page.locator('button.satir-ac').count()) === 0 && (await page.locator('tr.detay').count()) === 0 && (await gorunurBaslik(page)) === 8 && (await page.locator('#dTablo tr[data-bas] th').first().innerText()).startsWith('00:00–01:00'));
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.waitForTimeout(100);
+      ok('R10 tekrar daralinca dugmeler geri gelir, acik satir korunur (20:00)', (await page.locator('button.satir-ac').count()) === 24 && (await page.locator('#dTablo tr[data-bas="2026-11-24T20:00:00+03:00"] button.satir-ac').getAttribute('aria-expanded')) === 'true');
+      const kontrast = await kontrastSorunlari(page);
+      ok('R10 390px kontrast >= 4.5:1 (ayrinti acikken)', kontrast.length === 0, `-> ${kontrast.slice(0, 4).join(' ; ')}`);
+    }
+    ok(`R10 ${w}px: hata yok`, kayit.hata.length === 0 && kayit.konsol.length === 0, `-> ${JSON.stringify(kayit)}`);
+    await kapat();
+  }
+  // JS kapalı telefonda: tüm sütunlar kayan kapta (bugünkü gibi), düğme yok
+  const nj = await ac('/dengesizlik-maliyeti', { w: 390, h: 844, js: false });
+  const k = await kapDurum(nj.page);
+  ok('R10 JS kapali 390px: 8 sutun, tablo kendi kabinda kayar, sayfa kaymaz, dugme/lejant yok', (await gorunurBaslik(nj.page)) === 8 && k.kayar && !k.sayfa && (await nj.page.locator('button.satir-ac').count()) === 0 && (await nj.page.isHidden('#dLejant')));
+  await nj.kapat();
 }
 
 // ============================================================================
