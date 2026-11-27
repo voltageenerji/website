@@ -319,8 +319,12 @@ js += """
     });
     b.zaman.push(setTimeout(function(){ sondur(false); }, 4950));
   }
+  /* Süs, dokunuşun karesi çizildikten sonra kurulur: ölçüm ve öğe üretimi etkileşim gecikmesine (INP) eklenmez (QA-YT-2) */
+  var bekleyen = 0;
   kutu.addEventListener('change', function(){
-    if(kutu.checked){ if(!g) basla(); } else sondur(true);
+    if(kutu.checked){
+      if(!g && !bekleyen) bekleyen = requestAnimationFrame(function(){ setTimeout(function(){ bekleyen = 0; if(kutu.checked && !g) basla(); }, 0); });
+    } else { if(bekleyen){ cancelAnimationFrame(bekleyen); bekleyen = 0; } sondur(true); }
   });
   form.addEventListener('submit', function(){ sondur(true); });
 })();

@@ -113,7 +113,11 @@ body.menu-open{overflow:hidden}
 /* ===== 2) Alt sayfa kabuğu ve ortak içerik dizgisi (sayfalar/kabuk.css) ===== */
 /* Yedek yazı tipi ölçüleri Archivo'ya eşitlenir: web yazı tipi geç gelince metin yeniden dizilmez (masaüstü CLS,
    SEO regresyon denetimi N1, 27.11). Değerler Archivo font ölçülerinden hesaplandı. */
-@font-face{font-family:'Archivo Fallback';src:local('Arial'),local('Liberation Sans'),local('Helvetica');size-adjust:99.7%;ascent-override:88.1%;descent-override:21.1%;line-gap-override:0%}
+/* Başlık (Newsreader) ve kalın metin (Archivo 600) için ayrı yedekler: QA-YT-1, 27.11; size-adjust tarayıcıda ölçülen
+   genişlik oranlarından */
+@font-face{font-family:'Newsreader Fallback';src:local('Times New Roman'),local('Liberation Serif'),local('Tinos');size-adjust:108.7%;ascent-override:85%;descent-override:22%;line-gap-override:0%}
+@font-face{font-family:'Archivo Fallback';font-weight:100 549;src:local('Arial'),local('ArialMT'),local('Liberation Sans'),local('Helvetica');size-adjust:98.3%;ascent-override:89.4%;descent-override:21.4%;line-gap-override:0%}
+@font-face{font-family:'Archivo Fallback';font-weight:550 900;src:local('Arial Bold'),local('Arial-BoldMT'),local('Liberation Sans Bold'),local('Helvetica Bold');size-adjust:95.3%;ascent-override:92.2%;descent-override:22.1%;line-gap-override:0%}
 /* Alt sayfa kabuğu: üst bant ana sayfanın kaydırılmış hâliyle aynıdır (koyu zemin, 68 px; 1039 px ve altında 64 px;
    sarı "Teklif Al"). Alt sayfada kapak fotoğrafı olmadığı için bant baştan koyudur ve sayfa akışındadır (yapışkan
    değildir): uzun okuma ve veri sayfalarında dikey alan içeriğe kalır, tablo başlığı sayfa kayarken ekranın en üstünde
@@ -196,7 +200,7 @@ p.note{margin:0 0 28px;padding-left:14px;border-left:2px solid var(--line-strong
 @media print{.site-header,.mobile-menu,.skip{display:none}
 .sayfa-bas{background:none;color:#000}
 .sayfa-bas .crumbs,.sayfa-bas .crumbs a,.sayfa-bas .updated,.sayfa-bas .lede{color:#000}}
-:root{--sans:'Archivo','Archivo Fallback',-apple-system,'Segoe UI',sans-serif}
+:root{--sans:'Archivo','Archivo Fallback',-apple-system,'Segoe UI',sans-serif;--serif:'Newsreader','Newsreader Fallback',Georgia,serif}
 </style>
 </head>
 <body>
