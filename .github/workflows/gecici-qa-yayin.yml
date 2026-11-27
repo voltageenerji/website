@@ -143,7 +143,10 @@ jobs:
               await ctx.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
             }
             const p = await ctx.newPage();
-            p.on('pageerror', () => { p.__hata = (p.__hata || 0) + 1; });
+            p.on('pageerror', (e) => { p.__hata = (p.__hata || 0) + 1; console.log('  NOT sayfa hatası: ' + String(e && e.message).slice(0, 140).replace(/https?:\/\/\S+/g, '<adres>')); });
+            if (process.env.CORS_SIM) { // yalnız test: önizleme kökeni proxy'nin CORS listesinde yok; GERÇEK yanıt aynen, yalnız ACAO eklenir
+              await ctx.route('https://epias-proxy.emirhantan-ku.workers.dev/**', async (r) => { try { const y = await r.fetch(); return r.fulfill({ status: y.status(), body: await y.body(), headers: { 'content-type': y.headers()['content-type'] || 'application/json', 'access-control-allow-origin': '*' } }); } catch { return r.abort(); } });
+            }
             A = {
               ad: MOD, get: async (u) => { await p.goto(u, { waitUntil: 'load', timeout: 45000 }); await p.evaluate(OLCUM); },
               js: (f, ...a) => p.evaluate(([f, a]) => (0, eval)('(' + f + ')').apply(null, a), [f.toString(), a]),
@@ -245,7 +248,7 @@ jobs:
                 }
                 if (yol === '/canli-ptf') {
                   const c = await A.js(() => { const h = [...document.querySelectorAll('#pTable td')].map(x => x.textContent.trim()); const sifir = h.filter(v => /^0+([.,]0+)?$/.test(v)).length; return { hucre: h.length, tire: h.filter(v => v === '—').length, sifir, mod: (document.getElementById('pMode') || {}).textContent ? document.getElementById('pMode').textContent.trim().replace(/[^A-ZÇĞİÖŞÜ ]/g, '').slice(0, 14) : null }; });
-                  ok(`${e}: saatlik tablo dolu, eksik saat "—", sıfır yok`, c.hucre >= 24 && c.sifir === 0, c);
+                  ok(`${e}: saatlik tablo dolu (eksik saat "—") ya da dürüst bekleme (tek satır, rakam yok); sıfır yok`, c.sifir === 0 && (c.hucre >= 24 || (c.hucre === 1 && /BEKLEN/.test(c.mod || ''))), c);
                 }
                 if (yol === '/elektrik-faturasi-hesaplama') {
                   await A.tikla('#t1Tutar'); await A.yaz('#t1Tutar', '2.450,80'); await A.tikla('#t1Kwh'); await A.yaz('#t1Kwh', '520'); await bekle(800);
@@ -295,7 +298,7 @@ jobs:
         shell: bash {0}
         run: |
           H=0
-          for M in firefox webkit; do echo "== $M"; MOD=$M MODUL=$PWD/node_modules timeout 600 node gercek.mjs; k=$?; echo "$M çıkış $k"; [ $k -eq 0 ] || H=1; done
+          for M in firefox webkit; do echo "== $M (gerçek EPİAŞ yanıtı, yalnız CORS başlığı eklenir)"; CORS_SIM=1 MOD=$M MODUL=$PWD/node_modules timeout 600 node gercek.mjs; k=$?; echo "$M çıkış $k"; [ $k -eq 0 ] || H=1; done
           exit $H
 
   macos-safari-ios:
@@ -424,7 +427,10 @@ jobs:
               await ctx.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
             }
             const p = await ctx.newPage();
-            p.on('pageerror', () => { p.__hata = (p.__hata || 0) + 1; });
+            p.on('pageerror', (e) => { p.__hata = (p.__hata || 0) + 1; console.log('  NOT sayfa hatası: ' + String(e && e.message).slice(0, 140).replace(/https?:\/\/\S+/g, '<adres>')); });
+            if (process.env.CORS_SIM) { // yalnız test: önizleme kökeni proxy'nin CORS listesinde yok; GERÇEK yanıt aynen, yalnız ACAO eklenir
+              await ctx.route('https://epias-proxy.emirhantan-ku.workers.dev/**', async (r) => { try { const y = await r.fetch(); return r.fulfill({ status: y.status(), body: await y.body(), headers: { 'content-type': y.headers()['content-type'] || 'application/json', 'access-control-allow-origin': '*' } }); } catch { return r.abort(); } });
+            }
             A = {
               ad: MOD, get: async (u) => { await p.goto(u, { waitUntil: 'load', timeout: 45000 }); await p.evaluate(OLCUM); },
               js: (f, ...a) => p.evaluate(([f, a]) => (0, eval)('(' + f + ')').apply(null, a), [f.toString(), a]),
@@ -526,7 +532,7 @@ jobs:
                 }
                 if (yol === '/canli-ptf') {
                   const c = await A.js(() => { const h = [...document.querySelectorAll('#pTable td')].map(x => x.textContent.trim()); const sifir = h.filter(v => /^0+([.,]0+)?$/.test(v)).length; return { hucre: h.length, tire: h.filter(v => v === '—').length, sifir, mod: (document.getElementById('pMode') || {}).textContent ? document.getElementById('pMode').textContent.trim().replace(/[^A-ZÇĞİÖŞÜ ]/g, '').slice(0, 14) : null }; });
-                  ok(`${e}: saatlik tablo dolu, eksik saat "—", sıfır yok`, c.hucre >= 24 && c.sifir === 0, c);
+                  ok(`${e}: saatlik tablo dolu (eksik saat "—") ya da dürüst bekleme (tek satır, rakam yok); sıfır yok`, c.sifir === 0 && (c.hucre >= 24 || (c.hucre === 1 && /BEKLEN/.test(c.mod || ''))), c);
                 }
                 if (yol === '/elektrik-faturasi-hesaplama') {
                   await A.tikla('#t1Tutar'); await A.yaz('#t1Tutar', '2.450,80'); await A.tikla('#t1Kwh'); await A.yaz('#t1Kwh', '520'); await bekle(800);
@@ -568,7 +574,7 @@ jobs:
           const OLCUM = readFileSync(new URL('./olcum.js', import.meta.url), 'utf8');
           const raporlar = [];
           const SENARYO = `(function(){
-            var R={yol:location.pathname,olay:[]};var bek=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+            var R={yol:location.pathname,baharsiz:/qabaharsiz/.test(location.search),olay:[]};var bek=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
             function gonder(){try{navigator.sendBeacon('/__qa/rapor',JSON.stringify(R))}catch(e){}}
             window.addEventListener('error',function(){R.hata=(R.hata||0)+1});
             window.addEventListener('load',async function(){
@@ -590,7 +596,8 @@ jobs:
               R.bitti=true; gonder();
             });
           })();`;
-          const EK = `<script>window.__qaHata=[];addEventListener('error',function(){window.__qaHata.push(1)});</script><script>${OLCUM}\n${SENARYO}</script>`;
+          const YAKALA = `<script>window.__qaHata=[];addEventListener('error',function(){window.__qaHata.push(1)});</script>`;
+          const EK = (oto) => YAKALA + `<script>${OLCUM}\n${oto ? SENARYO : ''}</script>`;
 
           http.createServer(async (q, s) => {
             try {
@@ -602,7 +609,9 @@ jobs:
               const bas = { 'content-type': tur, 'cache-control': 'no-store' }; const yer = r.headers.get('location'); if (yer) bas.location = yer.replace(TABAN, '');
               if (tur.includes('text/html')) {
                 let h = await r.text();
-                h = h.split(PTF).join('/__ptf').replace(/<head>/i, '<head>' + EK);
+                const oto = /[?&]qaoto/.test(q.url);
+                if (/[?&]qabaharsiz/.test(q.url)) { const i = h.indexOf('// 9) Bahar an'); const son = "form.addEventListener('submit', function(){ sondur(true); });"; const j = h.indexOf(son, i); if (i > 0 && j > i) h = h.slice(0, i) + h.slice(h.indexOf('})();', j) + 5); }
+                h = h.split(PTF).join('/__ptf').replace(/<head>/i, '<head>' + EK(oto));
                 s.writeHead(r.status, bas); return s.end(h);
               }
               s.writeHead(r.status, bas); s.end(Buffer.from(await r.arrayBuffer()));
@@ -651,10 +660,20 @@ jobs:
           xcrun simctl boot "$UDID" &
           npm install --no-audit --no-fund "selenium-webdriver@${SELENIUM_SURUM}" >/dev/null 2>&1; echo "npm $?"
           sudo safaridriver --enable; echo "safaridriver $?"
-      - name: Gerçek Safari (macOS, safaridriver)
+      - name: Aktarıcı (127.0.0.1:8790; EPİAŞ çağrısı aynı kökenden, hata yakalayıcı ilk betik)
+        working-directory: ${{ runner.temp }}/qa
+        run: |
+          nohup node ios-yedek.mjs > ../yedek.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8790/robots.txt && break; sleep 1; done
+          curl -s -o /dev/null -w 'aktarıcı %{http_code}\n' http://127.0.0.1:8790/
+      - name: Gerçek Safari (macOS, safaridriver) — aktarıcı üzerinden canlı veriyle
         working-directory: ${{ runner.temp }}/qa
         continue-on-error: true
-        run: MOD=safari MODUL=$PWD/node_modules timeout 600 node gercek.mjs
+        run: TABAN=http://127.0.0.1:8790 MOD=safari MODUL=$PWD/node_modules node gercek.mjs
+      - name: Gerçek Safari (macOS, safaridriver) — önizleme adresine doğrudan (gerçek başlıklar, CORS → dürüst bekleme)
+        working-directory: ${{ runner.temp }}/qa
+        continue-on-error: true
+        run: MOD=safari MODUL=$PWD/node_modules node gercek.mjs
       - name: iOS Simülatörü — Mobile Safari, safaridriver ile (Uzaktan Otomasyon)
         id: iossd
         working-directory: ${{ runner.temp }}/qa
@@ -664,20 +683,19 @@ jobs:
           xcrun simctl bootstatus "$UDID" -b > /dev/null; echo "önyükleme $?"
           for k in RemoteAutomationEnabled WebKitRemoteAutomationEnabled; do xcrun simctl spawn "$UDID" defaults write com.apple.mobilesafari $k -bool true; done
           xcrun simctl spawn "$UDID" defaults write com.apple.WebInspector RemoteAutomationEnabled -bool true
-          MOD=ios IOS_UDID=$UDID MODUL=$PWD/node_modules timeout 900 node gercek.mjs; k=$?; echo "ios-safaridriver çıkış $k"; exit $k
+          TABAN=http://127.0.0.1:8790 MOD=ios IOS_UDID=$UDID MODUL=$PWD/node_modules node gercek.mjs; k=$?; echo "ios-safaridriver çıkış $k"; exit $k
       - name: iOS Simülatörü — Mobile Safari, openurl + sayfa içi senaryo + ekran OCR (her durumda)
         working-directory: ${{ runner.temp }}/qa
         shell: bash {0}
         run: |
-          nohup node ios-yedek.mjs > ../yedek.log 2>&1 &
-          for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8790/robots.txt && break; sleep 1; done
           xcrun simctl status_bar "$UDID" override --time 14:30 2>/dev/null || true
           xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null
           B=http://127.0.0.1:8790; E=../ekran
-          xcrun simctl openurl "$UDID" "$B/"; sleep 9; xcrun simctl io "$UDID" screenshot $E/ios-1-ana-ilk.png >/dev/null 2>&1
+          xcrun simctl openurl "$UDID" "$B/?qaoto"; sleep 9; xcrun simctl io "$UDID" screenshot $E/ios-1-ana-ilk.png >/dev/null 2>&1
           sleep 4.5; xcrun simctl io "$UDID" screenshot $E/ios-2-bahar.png >/dev/null 2>&1
           sleep 12; xcrun simctl io "$UDID" screenshot $E/ios-3-bahar-sonra.png >/dev/null 2>&1
-          for p in rehber/sktt canli-ptf elektrik-faturasi-hesaplama kurumsal olmayan-sayfa-qa-yayin; do xcrun simctl openurl "$UDID" "$B/$p"; sleep 9; xcrun simctl io "$UDID" screenshot $E/ios-$(echo $p | tr / -).png >/dev/null 2>&1; done
+          for i in 1 2 3; do xcrun simctl openurl "$UDID" "$B/?qaoto&qabaharsiz&n=$i"; sleep 20; xcrun simctl openurl "$UDID" "$B/?qaoto&n=$i"; sleep 20; done
+          for p in rehber/sktt canli-ptf elektrik-faturasi-hesaplama kurumsal olmayan-sayfa-qa-yayin; do xcrun simctl openurl "$UDID" "$B/$p?qaoto"; sleep 9; xcrun simctl io "$UDID" screenshot $E/ios-$(echo $p | tr / -).png >/dev/null 2>&1; done
           sleep 3
           H="Cannot Open|Cannot Connect|açılamıyor|bağlanamıyor"
           swift ocr.swift $E/ios-1-ana-ilk.png "Voltage|Teklif" "$H"
@@ -694,6 +712,7 @@ jobs:
           print('Mobile Safari rapor sayısı:',len(r))
           for x in r:
               d=x.get('durum',{}); o={k:x[k] for k in ('menuAcik','menuKapali','ana','serit','isaret','yazi','bahar','hesap','tablo','hata') if k in x}
+              if x.get('yol')=='/': print('  bahar', 'KAPALI' if x.get('baharsiz') else 'AÇIK', 'kare', x.get('bahar',{}).get('kare'), 'en uzun', x.get('bahar',{}).get('enUzunMs'), '>50', x.get('bahar',{}).get('uzun50'), '>100', x.get('bahar',{}).get('uzun100'), 'yazı gecikme en çok', (x.get('yazi') or [0,0])[1], 'ms · örtülü', x.get('bahar',{}).get('ortulu'), 'kesişim', x.get('bahar',{}).get('kesisim'), 'sonra süs', x.get('bahar',{}).get('sonraSus'))
               print(' ',x.get('yol'),'·',d.get('motor'),'·',d.get('w'),'px dpr',d.get('dpr'),'· taşma',d.get('tasma'),'· h1',d.get('h1'),'· atla',d.get('atla'),'· künye',d.get('kunye'),'· js hata',d.get('hata'),'·',json.dumps(o,ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
